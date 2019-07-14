@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-     <Protobuf Include="../Service.proto" OutputDir="%(RelativePath)" CompileOutputs="false" GrpcServices="client" Access="internal" />
+     <Protobuf Include="../proto/users.proto" OutputDir="%(RelativePath)" CompileOutputs="false" GrpcServices="client" Access="internal" />
   </ItemGroup>
 
   <ItemGroup>
