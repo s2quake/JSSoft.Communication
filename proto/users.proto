@@ -23,9 +23,13 @@ message PollRequest {
     int32 id = 1;
 }
 
-message PollReply {
+message PollReplyItem {
     int32 id = 1;
     string name = 2;
     repeated string type = 3;
     repeated string data = 4;
+}
+
+message PollReply {
+    repeated PollReplyItem items = 1;
 }

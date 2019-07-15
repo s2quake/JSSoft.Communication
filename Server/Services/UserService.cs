@@ -10,8 +10,9 @@ namespace Ntreev.Crema.Services.Users
     class UserService : IUserContextService.IUserContextServiceBase, IUserServiceCallback
     {
         private readonly Dispatcher dispatcher;
-        private List<PollReply> callbackList = new List<PollReply>();
+        private List<PollReplyItem> callbackList = new List<PollReplyItem>();
         private int id;
+        private readonly PollReplyItem nullReply = new PollReplyItem() { Id = -1 };
 
         public UserService()
         {
@@ -26,7 +27,7 @@ namespace Ntreev.Crema.Services.Users
         {
             this.dispatcher.InvokeAsync(() =>
             {
-                var reply = new PollReply()
+                var reply = new PollReplyItem()
                 {
                     Id = id++,
                 };
@@ -43,19 +44,17 @@ namespace Ntreev.Crema.Services.Users
             {
                 var request = requestStream.Current;
                 var id = request.Id;
-                var replies = await this.dispatcher.InvokeAsync(() =>
+                var reply = new PollReply();
+                await this.dispatcher.InvokeAsync(() =>
                 {
-                    var items = new PollReply[this.callbackList.Count - id];
+                    var items = new PollReplyItem[this.callbackList.Count - id];
                     for (var i = id; i < this.callbackList.Count; i++)
                     {
-                        items[i - id] = this.callbackList[i];
+                        reply.Items.Add(this.callbackList[i]);
                     }
                     return items;
                 });
-                foreach (var item in replies)
-                {
-                    await responseStream.WriteAsync(item);
-                }
+                await responseStream.WriteAsync(reply);
             }
         }
 

@@ -8,22 +8,20 @@
             "name": ".NET Core Launch (client)",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
             "program": "${workspaceFolder}/Client/bin/Debug/netcoreapp2.2/Client.dll",
             "args": [],
             "cwd": "${workspaceFolder}/Client",
             "stopAtEntry": false,
-            "console": "integratedTerminal"
+            "console": "externalTerminal"
         },
         {
             "name": ".NET Core Launch (server)",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
             "program": "${workspaceFolder}/Server/bin/Debug/netcoreapp2.2/Server.dll",
             "args": [],
             "cwd": "${workspaceFolder}/Server",
-            "console": "integratedTerminal",
+            "console": "externalTerminal",
             "stopAtEntry": false
         },
         {

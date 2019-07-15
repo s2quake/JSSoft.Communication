@@ -28,20 +28,23 @@ namespace Ntreev.Crema.Services.Users {
             "b29nbGUvcHJvdG9idWYvYW55LnByb3RvIjkKDUludm9rZVJlcXVlc3QSDAoE",
             "bmFtZRgBIAEoCRIMCgR0eXBlGAIgASgJEgwKBGRhdGEYAyABKAkiKQoLSW52",
             "b2tlUmVwbHkSDAoEdHlwZRgBIAEoCRIMCgRkYXRhGAIgASgJIhkKC1BvbGxS",
-            "ZXF1ZXN0EgoKAmlkGAEgASgFIkEKCVBvbGxSZXBseRIKCgJpZBgBIAEoBRIM",
-            "CgRuYW1lGAIgASgJEgwKBHR5cGUYAyADKAkSDAoEZGF0YRgEIAMoCTLXAQoT",
-            "SVVzZXJDb250ZXh0U2VydmljZRJgCgZJbnZva2USKi5udHJlZXYuY3JlbWEu",
-            "c2VydmljZXMudXNlcnMuSW52b2tlUmVxdWVzdBooLm50cmVldi5jcmVtYS5z",
-            "ZXJ2aWNlcy51c2Vycy5JbnZva2VSZXBseSIAEl4KBFBvbGwSKC5udHJlZXYu",
-            "Y3JlbWEuc2VydmljZXMudXNlcnMuUG9sbFJlcXVlc3QaJi5udHJlZXYuY3Jl",
-            "bWEuc2VydmljZXMudXNlcnMuUG9sbFJlcGx5IgAoATABYgZwcm90bzM="));
+            "ZXF1ZXN0EgoKAmlkGAEgASgFIkUKDVBvbGxSZXBseUl0ZW0SCgoCaWQYASAB",
+            "KAUSDAoEbmFtZRgCIAEoCRIMCgR0eXBlGAMgAygJEgwKBGRhdGEYBCADKAki",
+            "RgoJUG9sbFJlcGx5EjkKBWl0ZW1zGAEgAygLMioubnRyZWV2LmNyZW1hLnNl",
+            "cnZpY2VzLnVzZXJzLlBvbGxSZXBseUl0ZW0y1wEKE0lVc2VyQ29udGV4dFNl",
+            "cnZpY2USYAoGSW52b2tlEioubnRyZWV2LmNyZW1hLnNlcnZpY2VzLnVzZXJz",
+            "Lkludm9rZVJlcXVlc3QaKC5udHJlZXYuY3JlbWEuc2VydmljZXMudXNlcnMu",
+            "SW52b2tlUmVwbHkiABJeCgRQb2xsEigubnRyZWV2LmNyZW1hLnNlcnZpY2Vz",
+            "LnVzZXJzLlBvbGxSZXF1ZXN0GiYubnRyZWV2LmNyZW1hLnNlcnZpY2VzLnVz",
+            "ZXJzLlBvbGxSZXBseSIAKAEwAWIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Google.Protobuf.WellKnownTypes.AnyReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Services.Users.InvokeRequest), global::Ntreev.Crema.Services.Users.InvokeRequest.Parser, new[]{ "Name", "Type", "Data" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Services.Users.InvokeReply), global::Ntreev.Crema.Services.Users.InvokeReply.Parser, new[]{ "Type", "Data" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Services.Users.PollRequest), global::Ntreev.Crema.Services.Users.PollRequest.Parser, new[]{ "Id" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Services.Users.PollReply), global::Ntreev.Crema.Services.Users.PollReply.Parser, new[]{ "Id", "Name", "Type", "Data" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Services.Users.PollReplyItem), global::Ntreev.Crema.Services.Users.PollReplyItem.Parser, new[]{ "Id", "Name", "Type", "Data" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Services.Users.PollReply), global::Ntreev.Crema.Services.Users.PollReply.Parser, new[]{ "Items" }, null, null, null)
           }));
     }
     #endregion
@@ -519,11 +522,11 @@ namespace Ntreev.Crema.Services.Users {
 
   }
 
-  internal sealed partial class PollReply : pb::IMessage<PollReply> {
-    private static readonly pb::MessageParser<PollReply> _parser = new pb::MessageParser<PollReply>(() => new PollReply());
+  internal sealed partial class PollReplyItem : pb::IMessage<PollReplyItem> {
+    private static readonly pb::MessageParser<PollReplyItem> _parser = new pb::MessageParser<PollReplyItem>(() => new PollReplyItem());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pb::MessageParser<PollReply> Parser { get { return _parser; } }
+    public static pb::MessageParser<PollReplyItem> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
@@ -536,14 +539,14 @@ namespace Ntreev.Crema.Services.Users {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public PollReply() {
+    public PollReplyItem() {
       OnConstruction();
     }
 
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public PollReply(PollReply other) : this() {
+    public PollReplyItem(PollReplyItem other) : this() {
       id_ = other.id_;
       name_ = other.name_;
       type_ = other.type_.Clone();
@@ -552,8 +555,8 @@ namespace Ntreev.Crema.Services.Users {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public PollReply Clone() {
-      return new PollReply(this);
+    public PollReplyItem Clone() {
+      return new PollReplyItem(this);
     }
 
     /// <summary>Field number for the "id" field.</summary>
@@ -600,11 +603,11 @@ namespace Ntreev.Crema.Services.Users {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
-      return Equals(other as PollReply);
+      return Equals(other as PollReplyItem);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public bool Equals(PollReply other) {
+    public bool Equals(PollReplyItem other) {
       if (ReferenceEquals(other, null)) {
         return false;
       }
@@ -671,7 +674,7 @@ namespace Ntreev.Crema.Services.Users {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(PollReply other) {
+    public void MergeFrom(PollReplyItem other) {
       if (other == null) {
         return;
       }
@@ -708,6 +711,127 @@ namespace Ntreev.Crema.Services.Users {
           }
           case 34: {
             data_.AddEntriesFrom(input, _repeated_data_codec);
+            break;
+          }
+        }
+      }
+    }
+
+  }
+
+  internal sealed partial class PollReply : pb::IMessage<PollReply> {
+    private static readonly pb::MessageParser<PollReply> _parser = new pb::MessageParser<PollReply>(() => new PollReply());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<PollReply> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Ntreev.Crema.Services.Users.UsersReflection.Descriptor.MessageTypes[4]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public PollReply() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public PollReply(PollReply other) : this() {
+      items_ = other.items_.Clone();
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public PollReply Clone() {
+      return new PollReply(this);
+    }
+
+    /// <summary>Field number for the "items" field.</summary>
+    public const int ItemsFieldNumber = 1;
+    private static readonly pb::FieldCodec<global::Ntreev.Crema.Services.Users.PollReplyItem> _repeated_items_codec
+        = pb::FieldCodec.ForMessage(10, global::Ntreev.Crema.Services.Users.PollReplyItem.Parser);
+    private readonly pbc::RepeatedField<global::Ntreev.Crema.Services.Users.PollReplyItem> items_ = new pbc::RepeatedField<global::Ntreev.Crema.Services.Users.PollReplyItem>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public pbc::RepeatedField<global::Ntreev.Crema.Services.Users.PollReplyItem> Items {
+      get { return items_; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as PollReply);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(PollReply other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if(!items_.Equals(other.items_)) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      hash ^= items_.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+      items_.WriteTo(output, _repeated_items_codec);
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      size += items_.CalculateSize(_repeated_items_codec);
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(PollReply other) {
+      if (other == null) {
+        return;
+      }
+      items_.Add(other.items_);
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            items_.AddEntriesFrom(input, _repeated_items_codec);
             break;
           }
         }
