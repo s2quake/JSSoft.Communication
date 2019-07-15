@@ -1,8 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-     <Protobuf Include="../proto/users.proto" OutputDir="%(RelativePath)Services" CompileOutputs="false" GrpcServices="client" Access="internal" />
-     <Compile Include="..\Server\Services\IUserServiceCallback.cs" Link="Services\IUserServiceCallback.cs" />
+    <Protobuf Include="../proto/common.proto" OutputDir="%(RelativePath)Services" CompileOutputs="false" GrpcServices="none" Access="internal" />
+    <Protobuf Include="../proto/users.proto" OutputDir="%(RelativePath)Services" CompileOutputs="false" GrpcServices="client" Access="internal" />
+    <Compile Include="..\Server\Services\IUserServiceCallback.cs" Link="Services\IUserServiceCallback.cs" />
   </ItemGroup>
 
   <ItemGroup>

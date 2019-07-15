@@ -1,35 +1,10 @@
 syntax = "proto3";
 import "google/protobuf/any.proto";
+import "common.proto";
 
 package ntreev.crema.services.users;
 
 service IUserContextService {
-    rpc Invoke (InvokeRequest) returns (InvokeReply) {}
-    rpc Poll(stream PollRequest) returns (stream PollReply) {}
-}
-
-message InvokeRequest {
-    string name = 1;
-    string type = 2;
-    string data = 3;
-}
-
-message InvokeReply {
-    string type = 1;
-    string data = 2;
-}
-
-message PollRequest {
-    int32 id = 1;
-}
-
-message PollReplyItem {
-    int32 id = 1;
-    string name = 2;
-    repeated string type = 3;
-    repeated string data = 4;
-}
-
-message PollReply {
-    repeated PollReplyItem items = 1;
+    rpc Invoke (ntreev.crema.services.InvokeRequest) returns (ntreev.crema.services.InvokeReply) {}
+    rpc Poll(stream ntreev.crema.services.PollRequest) returns (stream ntreev.crema.services.PollReply) {}
 }

@@ -1,0 +1,28 @@
+syntax = "proto3";
+package ntreev.crema.services;
+
+message InvokeRequest {
+    string name = 1;
+    string type = 2;
+    string data = 3;
+}
+
+message InvokeReply {
+    string type = 1;
+    string data = 2;
+}
+
+message PollRequest {
+    int32 id = 1;
+}
+
+message PollReplyItem {
+    int32 id = 1;
+    string name = 2;
+    repeated string type = 3;
+    repeated string data = 4;
+}
+
+message PollReply {
+    repeated PollReplyItem items = 1;
+}
