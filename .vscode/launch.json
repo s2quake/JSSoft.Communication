@@ -5,7 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": ".NET Core Launch (console)",
+            "name": ".NET Core Launch (client)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/Client/bin/Debug/netcoreapp2.2/Client.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/Client",
+            "stopAtEntry": false,
+            "console": "integratedTerminal"
+        },
+        {
+            "name": ".NET Core Launch (server)",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",

@@ -12,29 +12,20 @@ namespace Ntreev.Crema.Services.Users {
   {
     static readonly string __ServiceName = "ntreev.crema.services.users.IUserContextService";
 
-    static readonly grpc::Marshaller<global::Ntreev.Crema.Services.Users.SubscribeRequest> __Marshaller_ntreev_crema_services_users_SubscribeRequest = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Ntreev.Crema.Services.Users.SubscribeRequest.Parser.ParseFrom);
-    static readonly grpc::Marshaller<global::Ntreev.Crema.Services.Users.SubscribeReply> __Marshaller_ntreev_crema_services_users_SubscribeReply = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Ntreev.Crema.Services.Users.SubscribeReply.Parser.ParseFrom);
-    static readonly grpc::Marshaller<global::Ntreev.Crema.Services.Users.EmptyRequest> __Marshaller_ntreev_crema_services_users_EmptyRequest = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Ntreev.Crema.Services.Users.EmptyRequest.Parser.ParseFrom);
-    static readonly grpc::Marshaller<global::Ntreev.Crema.Services.Users.EmptyReply> __Marshaller_ntreev_crema_services_users_EmptyReply = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Ntreev.Crema.Services.Users.EmptyReply.Parser.ParseFrom);
+    static readonly grpc::Marshaller<global::Ntreev.Crema.Services.Users.InvokeRequest> __Marshaller_ntreev_crema_services_users_InvokeRequest = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Ntreev.Crema.Services.Users.InvokeRequest.Parser.ParseFrom);
+    static readonly grpc::Marshaller<global::Ntreev.Crema.Services.Users.InvokeReply> __Marshaller_ntreev_crema_services_users_InvokeReply = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Ntreev.Crema.Services.Users.InvokeReply.Parser.ParseFrom);
     static readonly grpc::Marshaller<global::Ntreev.Crema.Services.Users.PollRequest> __Marshaller_ntreev_crema_services_users_PollRequest = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Ntreev.Crema.Services.Users.PollRequest.Parser.ParseFrom);
     static readonly grpc::Marshaller<global::Ntreev.Crema.Services.Users.PollReply> __Marshaller_ntreev_crema_services_users_PollReply = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Ntreev.Crema.Services.Users.PollReply.Parser.ParseFrom);
 
-    static readonly grpc::Method<global::Ntreev.Crema.Services.Users.SubscribeRequest, global::Ntreev.Crema.Services.Users.SubscribeReply> __Method_Subscribe = new grpc::Method<global::Ntreev.Crema.Services.Users.SubscribeRequest, global::Ntreev.Crema.Services.Users.SubscribeReply>(
+    static readonly grpc::Method<global::Ntreev.Crema.Services.Users.InvokeRequest, global::Ntreev.Crema.Services.Users.InvokeReply> __Method_Invoke = new grpc::Method<global::Ntreev.Crema.Services.Users.InvokeRequest, global::Ntreev.Crema.Services.Users.InvokeReply>(
         grpc::MethodType.Unary,
         __ServiceName,
-        "Subscribe",
-        __Marshaller_ntreev_crema_services_users_SubscribeRequest,
-        __Marshaller_ntreev_crema_services_users_SubscribeReply);
-
-    static readonly grpc::Method<global::Ntreev.Crema.Services.Users.EmptyRequest, global::Ntreev.Crema.Services.Users.EmptyReply> __Method_Unsubscribe = new grpc::Method<global::Ntreev.Crema.Services.Users.EmptyRequest, global::Ntreev.Crema.Services.Users.EmptyReply>(
-        grpc::MethodType.Unary,
-        __ServiceName,
-        "Unsubscribe",
-        __Marshaller_ntreev_crema_services_users_EmptyRequest,
-        __Marshaller_ntreev_crema_services_users_EmptyReply);
+        "Invoke",
+        __Marshaller_ntreev_crema_services_users_InvokeRequest,
+        __Marshaller_ntreev_crema_services_users_InvokeReply);
 
     static readonly grpc::Method<global::Ntreev.Crema.Services.Users.PollRequest, global::Ntreev.Crema.Services.Users.PollReply> __Method_Poll = new grpc::Method<global::Ntreev.Crema.Services.Users.PollRequest, global::Ntreev.Crema.Services.Users.PollReply>(
-        grpc::MethodType.Unary,
+        grpc::MethodType.DuplexStreaming,
         __ServiceName,
         "Poll",
         __Marshaller_ntreev_crema_services_users_PollRequest,
@@ -50,17 +41,12 @@ namespace Ntreev.Crema.Services.Users {
     [grpc::BindServiceMethod(typeof(IUserContextService), "BindService")]
     public abstract partial class IUserContextServiceBase
     {
-      public virtual global::System.Threading.Tasks.Task<global::Ntreev.Crema.Services.Users.SubscribeReply> Subscribe(global::Ntreev.Crema.Services.Users.SubscribeRequest request, grpc::ServerCallContext context)
+      public virtual global::System.Threading.Tasks.Task<global::Ntreev.Crema.Services.Users.InvokeReply> Invoke(global::Ntreev.Crema.Services.Users.InvokeRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
 
-      public virtual global::System.Threading.Tasks.Task<global::Ntreev.Crema.Services.Users.EmptyReply> Unsubscribe(global::Ntreev.Crema.Services.Users.EmptyRequest request, grpc::ServerCallContext context)
-      {
-        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
-      }
-
-      public virtual global::System.Threading.Tasks.Task<global::Ntreev.Crema.Services.Users.PollReply> Poll(global::Ntreev.Crema.Services.Users.PollRequest request, grpc::ServerCallContext context)
+      public virtual global::System.Threading.Tasks.Task Poll(grpc::IAsyncStreamReader<global::Ntreev.Crema.Services.Users.PollRequest> requestStream, grpc::IServerStreamWriter<global::Ntreev.Crema.Services.Users.PollReply> responseStream, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -72,8 +58,7 @@ namespace Ntreev.Crema.Services.Users {
     public static grpc::ServerServiceDefinition BindService(IUserContextServiceBase serviceImpl)
     {
       return grpc::ServerServiceDefinition.CreateBuilder()
-          .AddMethod(__Method_Subscribe, serviceImpl.Subscribe)
-          .AddMethod(__Method_Unsubscribe, serviceImpl.Unsubscribe)
+          .AddMethod(__Method_Invoke, serviceImpl.Invoke)
           .AddMethod(__Method_Poll, serviceImpl.Poll).Build();
     }
 
@@ -83,9 +68,8 @@ namespace Ntreev.Crema.Services.Users {
     /// <param name="serviceImpl">An object implementing the server-side handling logic.</param>
     public static void BindService(grpc::ServiceBinderBase serviceBinder, IUserContextServiceBase serviceImpl)
     {
-      serviceBinder.AddMethod(__Method_Subscribe, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Ntreev.Crema.Services.Users.SubscribeRequest, global::Ntreev.Crema.Services.Users.SubscribeReply>(serviceImpl.Subscribe));
-      serviceBinder.AddMethod(__Method_Unsubscribe, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Ntreev.Crema.Services.Users.EmptyRequest, global::Ntreev.Crema.Services.Users.EmptyReply>(serviceImpl.Unsubscribe));
-      serviceBinder.AddMethod(__Method_Poll, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Ntreev.Crema.Services.Users.PollRequest, global::Ntreev.Crema.Services.Users.PollReply>(serviceImpl.Poll));
+      serviceBinder.AddMethod(__Method_Invoke, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Ntreev.Crema.Services.Users.InvokeRequest, global::Ntreev.Crema.Services.Users.InvokeReply>(serviceImpl.Invoke));
+      serviceBinder.AddMethod(__Method_Poll, serviceImpl == null ? null : new grpc::DuplexStreamingServerMethod<global::Ntreev.Crema.Services.Users.PollRequest, global::Ntreev.Crema.Services.Users.PollReply>(serviceImpl.Poll));
     }
 
   }

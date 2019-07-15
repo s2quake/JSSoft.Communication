@@ -25,40 +25,34 @@ namespace Ntreev.Crema.Services.Users {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "Cgt1c2Vycy5wcm90bxIbbnRyZWV2LmNyZW1hLnNlcnZpY2VzLnVzZXJzGhln",
-            "b29nbGUvcHJvdG9idWYvYW55LnByb3RvGgxjb21tb24ucHJvdG8iDgoMRW1w",
-            "dHlSZXF1ZXN0Ij8KCkVtcHR5UmVwbHkSMQoGcmVzdWx0GAEgASgLMiEubnRy",
-            "ZWV2LmNyZW1hLnNlcnZpY2VzLlJlc3VsdEJhc2UiLwoQU3Vic2NyaWJlUmVx",
-            "dWVzdBIbChNhdXRoZW50aWNhdGlvblRva2VuGAEgASgJIkMKDlN1YnNjcmli",
-            "ZVJlcGx5EjEKBnJlc3VsdBgBIAEoCzIhLm50cmVldi5jcmVtYS5zZXJ2aWNl",
-            "cy5SZXN1bHRCYXNlIhkKC1BvbGxSZXF1ZXN0EgoKAmlkGAEgASgJIhcKCVBv",
-            "bGxSZXBseRIKCgJpZBgBIAEoCTLBAgoTSVVzZXJDb250ZXh0U2VydmljZRJp",
-            "CglTdWJzY3JpYmUSLS5udHJlZXYuY3JlbWEuc2VydmljZXMudXNlcnMuU3Vi",
-            "c2NyaWJlUmVxdWVzdBorLm50cmVldi5jcmVtYS5zZXJ2aWNlcy51c2Vycy5T",
-            "dWJzY3JpYmVSZXBseSIAEmMKC1Vuc3Vic2NyaWJlEikubnRyZWV2LmNyZW1h",
-            "LnNlcnZpY2VzLnVzZXJzLkVtcHR5UmVxdWVzdBonLm50cmVldi5jcmVtYS5z",
-            "ZXJ2aWNlcy51c2Vycy5FbXB0eVJlcGx5IgASWgoEUG9sbBIoLm50cmVldi5j",
-            "cmVtYS5zZXJ2aWNlcy51c2Vycy5Qb2xsUmVxdWVzdBomLm50cmVldi5jcmVt",
-            "YS5zZXJ2aWNlcy51c2Vycy5Qb2xsUmVwbHkiAGIGcHJvdG8z"));
+            "b29nbGUvcHJvdG9idWYvYW55LnByb3RvIjkKDUludm9rZVJlcXVlc3QSDAoE",
+            "bmFtZRgBIAEoCRIMCgR0eXBlGAIgASgJEgwKBGRhdGEYAyABKAkiKQoLSW52",
+            "b2tlUmVwbHkSDAoEdHlwZRgBIAEoCRIMCgRkYXRhGAIgASgJIhkKC1BvbGxS",
+            "ZXF1ZXN0EgoKAmlkGAEgASgFIkEKCVBvbGxSZXBseRIKCgJpZBgBIAEoBRIM",
+            "CgRuYW1lGAIgASgJEgwKBHR5cGUYAyADKAkSDAoEZGF0YRgEIAMoCTLXAQoT",
+            "SVVzZXJDb250ZXh0U2VydmljZRJgCgZJbnZva2USKi5udHJlZXYuY3JlbWEu",
+            "c2VydmljZXMudXNlcnMuSW52b2tlUmVxdWVzdBooLm50cmVldi5jcmVtYS5z",
+            "ZXJ2aWNlcy51c2Vycy5JbnZva2VSZXBseSIAEl4KBFBvbGwSKC5udHJlZXYu",
+            "Y3JlbWEuc2VydmljZXMudXNlcnMuUG9sbFJlcXVlc3QaJi5udHJlZXYuY3Jl",
+            "bWEuc2VydmljZXMudXNlcnMuUG9sbFJlcGx5IgAoATABYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Google.Protobuf.WellKnownTypes.AnyReflection.Descriptor, global::Ntreev.Crema.Services.CommonReflection.Descriptor, },
+          new pbr::FileDescriptor[] { global::Google.Protobuf.WellKnownTypes.AnyReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Services.Users.EmptyRequest), global::Ntreev.Crema.Services.Users.EmptyRequest.Parser, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Services.Users.EmptyReply), global::Ntreev.Crema.Services.Users.EmptyReply.Parser, new[]{ "Result" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Services.Users.SubscribeRequest), global::Ntreev.Crema.Services.Users.SubscribeRequest.Parser, new[]{ "AuthenticationToken" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Services.Users.SubscribeReply), global::Ntreev.Crema.Services.Users.SubscribeReply.Parser, new[]{ "Result" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Services.Users.InvokeRequest), global::Ntreev.Crema.Services.Users.InvokeRequest.Parser, new[]{ "Name", "Type", "Data" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Services.Users.InvokeReply), global::Ntreev.Crema.Services.Users.InvokeReply.Parser, new[]{ "Type", "Data" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Services.Users.PollRequest), global::Ntreev.Crema.Services.Users.PollRequest.Parser, new[]{ "Id" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Services.Users.PollReply), global::Ntreev.Crema.Services.Users.PollReply.Parser, new[]{ "Id" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Services.Users.PollReply), global::Ntreev.Crema.Services.Users.PollReply.Parser, new[]{ "Id", "Name", "Type", "Data" }, null, null, null)
           }));
     }
     #endregion
 
   }
   #region Messages
-  internal sealed partial class EmptyRequest : pb::IMessage<EmptyRequest> {
-    private static readonly pb::MessageParser<EmptyRequest> _parser = new pb::MessageParser<EmptyRequest>(() => new EmptyRequest());
+  internal sealed partial class InvokeRequest : pb::IMessage<InvokeRequest> {
+    private static readonly pb::MessageParser<InvokeRequest> _parser = new pb::MessageParser<InvokeRequest>(() => new InvokeRequest());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pb::MessageParser<EmptyRequest> Parser { get { return _parser; } }
+    public static pb::MessageParser<InvokeRequest> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
@@ -71,41 +65,83 @@ namespace Ntreev.Crema.Services.Users {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public EmptyRequest() {
+    public InvokeRequest() {
       OnConstruction();
     }
 
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public EmptyRequest(EmptyRequest other) : this() {
+    public InvokeRequest(InvokeRequest other) : this() {
+      name_ = other.name_;
+      type_ = other.type_;
+      data_ = other.data_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public EmptyRequest Clone() {
-      return new EmptyRequest(this);
+    public InvokeRequest Clone() {
+      return new InvokeRequest(this);
+    }
+
+    /// <summary>Field number for the "name" field.</summary>
+    public const int NameFieldNumber = 1;
+    private string name_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public string Name {
+      get { return name_; }
+      set {
+        name_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "type" field.</summary>
+    public const int TypeFieldNumber = 2;
+    private string type_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public string Type {
+      get { return type_; }
+      set {
+        type_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "data" field.</summary>
+    public const int DataFieldNumber = 3;
+    private string data_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public string Data {
+      get { return data_; }
+      set {
+        data_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
-      return Equals(other as EmptyRequest);
+      return Equals(other as InvokeRequest);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public bool Equals(EmptyRequest other) {
+    public bool Equals(InvokeRequest other) {
       if (ReferenceEquals(other, null)) {
         return false;
       }
       if (ReferenceEquals(other, this)) {
         return true;
       }
+      if (Name != other.Name) return false;
+      if (Type != other.Type) return false;
+      if (Data != other.Data) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override int GetHashCode() {
       int hash = 1;
+      if (Name.Length != 0) hash ^= Name.GetHashCode();
+      if (Type.Length != 0) hash ^= Type.GetHashCode();
+      if (Data.Length != 0) hash ^= Data.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -119,6 +155,18 @@ namespace Ntreev.Crema.Services.Users {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
+      if (Name.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Name);
+      }
+      if (Type.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Type);
+      }
+      if (Data.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(Data);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -127,6 +175,15 @@ namespace Ntreev.Crema.Services.Users {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
       int size = 0;
+      if (Name.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Name);
+      }
+      if (Type.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Type);
+      }
+      if (Data.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Data);
+      }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -134,9 +191,18 @@ namespace Ntreev.Crema.Services.Users {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(EmptyRequest other) {
+    public void MergeFrom(InvokeRequest other) {
       if (other == null) {
         return;
+      }
+      if (other.Name.Length != 0) {
+        Name = other.Name;
+      }
+      if (other.Type.Length != 0) {
+        Type = other.Type;
+      }
+      if (other.Data.Length != 0) {
+        Data = other.Data;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -149,17 +215,29 @@ namespace Ntreev.Crema.Services.Users {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
+          case 10: {
+            Name = input.ReadString();
+            break;
+          }
+          case 18: {
+            Type = input.ReadString();
+            break;
+          }
+          case 26: {
+            Data = input.ReadString();
+            break;
+          }
         }
       }
     }
 
   }
 
-  internal sealed partial class EmptyReply : pb::IMessage<EmptyReply> {
-    private static readonly pb::MessageParser<EmptyReply> _parser = new pb::MessageParser<EmptyReply>(() => new EmptyReply());
+  internal sealed partial class InvokeReply : pb::IMessage<InvokeReply> {
+    private static readonly pb::MessageParser<InvokeReply> _parser = new pb::MessageParser<InvokeReply>(() => new InvokeReply());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pb::MessageParser<EmptyReply> Parser { get { return _parser; } }
+    public static pb::MessageParser<InvokeReply> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
@@ -172,55 +250,69 @@ namespace Ntreev.Crema.Services.Users {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public EmptyReply() {
+    public InvokeReply() {
       OnConstruction();
     }
 
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public EmptyReply(EmptyReply other) : this() {
-      result_ = other.result_ != null ? other.result_.Clone() : null;
+    public InvokeReply(InvokeReply other) : this() {
+      type_ = other.type_;
+      data_ = other.data_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public EmptyReply Clone() {
-      return new EmptyReply(this);
+    public InvokeReply Clone() {
+      return new InvokeReply(this);
     }
 
-    /// <summary>Field number for the "result" field.</summary>
-    public const int ResultFieldNumber = 1;
-    private global::Ntreev.Crema.Services.ResultBase result_;
+    /// <summary>Field number for the "type" field.</summary>
+    public const int TypeFieldNumber = 1;
+    private string type_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::Ntreev.Crema.Services.ResultBase Result {
-      get { return result_; }
+    public string Type {
+      get { return type_; }
       set {
-        result_ = value;
+        type_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "data" field.</summary>
+    public const int DataFieldNumber = 2;
+    private string data_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public string Data {
+      get { return data_; }
+      set {
+        data_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
       }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
-      return Equals(other as EmptyReply);
+      return Equals(other as InvokeReply);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public bool Equals(EmptyReply other) {
+    public bool Equals(InvokeReply other) {
       if (ReferenceEquals(other, null)) {
         return false;
       }
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (!object.Equals(Result, other.Result)) return false;
+      if (Type != other.Type) return false;
+      if (Data != other.Data) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override int GetHashCode() {
       int hash = 1;
-      if (result_ != null) hash ^= Result.GetHashCode();
+      if (Type.Length != 0) hash ^= Type.GetHashCode();
+      if (Data.Length != 0) hash ^= Data.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -234,9 +326,13 @@ namespace Ntreev.Crema.Services.Users {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
-      if (result_ != null) {
+      if (Type.Length != 0) {
         output.WriteRawTag(10);
-        output.WriteMessage(Result);
+        output.WriteString(Type);
+      }
+      if (Data.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Data);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -246,8 +342,11 @@ namespace Ntreev.Crema.Services.Users {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
       int size = 0;
-      if (result_ != null) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Result);
+      if (Type.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Type);
+      }
+      if (Data.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Data);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -256,15 +355,15 @@ namespace Ntreev.Crema.Services.Users {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(EmptyReply other) {
+    public void MergeFrom(InvokeReply other) {
       if (other == null) {
         return;
       }
-      if (other.result_ != null) {
-        if (result_ == null) {
-          Result = new global::Ntreev.Crema.Services.ResultBase();
-        }
-        Result.MergeFrom(other.Result);
+      if (other.Type.Length != 0) {
+        Type = other.Type;
+      }
+      if (other.Data.Length != 0) {
+        Data = other.Data;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -278,274 +377,11 @@ namespace Ntreev.Crema.Services.Users {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
-            if (result_ == null) {
-              Result = new global::Ntreev.Crema.Services.ResultBase();
-            }
-            input.ReadMessage(Result);
+            Type = input.ReadString();
             break;
           }
-        }
-      }
-    }
-
-  }
-
-  internal sealed partial class SubscribeRequest : pb::IMessage<SubscribeRequest> {
-    private static readonly pb::MessageParser<SubscribeRequest> _parser = new pb::MessageParser<SubscribeRequest>(() => new SubscribeRequest());
-    private pb::UnknownFieldSet _unknownFields;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pb::MessageParser<SubscribeRequest> Parser { get { return _parser; } }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ntreev.Crema.Services.Users.UsersReflection.Descriptor.MessageTypes[2]; }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    pbr::MessageDescriptor pb::IMessage.Descriptor {
-      get { return Descriptor; }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public SubscribeRequest() {
-      OnConstruction();
-    }
-
-    partial void OnConstruction();
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public SubscribeRequest(SubscribeRequest other) : this() {
-      authenticationToken_ = other.authenticationToken_;
-      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public SubscribeRequest Clone() {
-      return new SubscribeRequest(this);
-    }
-
-    /// <summary>Field number for the "authenticationToken" field.</summary>
-    public const int AuthenticationTokenFieldNumber = 1;
-    private string authenticationToken_ = "";
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public string AuthenticationToken {
-      get { return authenticationToken_; }
-      set {
-        authenticationToken_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
-      }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public override bool Equals(object other) {
-      return Equals(other as SubscribeRequest);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public bool Equals(SubscribeRequest other) {
-      if (ReferenceEquals(other, null)) {
-        return false;
-      }
-      if (ReferenceEquals(other, this)) {
-        return true;
-      }
-      if (AuthenticationToken != other.AuthenticationToken) return false;
-      return Equals(_unknownFields, other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public override int GetHashCode() {
-      int hash = 1;
-      if (AuthenticationToken.Length != 0) hash ^= AuthenticationToken.GetHashCode();
-      if (_unknownFields != null) {
-        hash ^= _unknownFields.GetHashCode();
-      }
-      return hash;
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public override string ToString() {
-      return pb::JsonFormatter.ToDiagnosticString(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void WriteTo(pb::CodedOutputStream output) {
-      if (AuthenticationToken.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(AuthenticationToken);
-      }
-      if (_unknownFields != null) {
-        _unknownFields.WriteTo(output);
-      }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public int CalculateSize() {
-      int size = 0;
-      if (AuthenticationToken.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(AuthenticationToken);
-      }
-      if (_unknownFields != null) {
-        size += _unknownFields.CalculateSize();
-      }
-      return size;
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(SubscribeRequest other) {
-      if (other == null) {
-        return;
-      }
-      if (other.AuthenticationToken.Length != 0) {
-        AuthenticationToken = other.AuthenticationToken;
-      }
-      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(pb::CodedInputStream input) {
-      uint tag;
-      while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
-          default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
-            break;
-          case 10: {
-            AuthenticationToken = input.ReadString();
-            break;
-          }
-        }
-      }
-    }
-
-  }
-
-  internal sealed partial class SubscribeReply : pb::IMessage<SubscribeReply> {
-    private static readonly pb::MessageParser<SubscribeReply> _parser = new pb::MessageParser<SubscribeReply>(() => new SubscribeReply());
-    private pb::UnknownFieldSet _unknownFields;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pb::MessageParser<SubscribeReply> Parser { get { return _parser; } }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ntreev.Crema.Services.Users.UsersReflection.Descriptor.MessageTypes[3]; }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    pbr::MessageDescriptor pb::IMessage.Descriptor {
-      get { return Descriptor; }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public SubscribeReply() {
-      OnConstruction();
-    }
-
-    partial void OnConstruction();
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public SubscribeReply(SubscribeReply other) : this() {
-      result_ = other.result_ != null ? other.result_.Clone() : null;
-      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public SubscribeReply Clone() {
-      return new SubscribeReply(this);
-    }
-
-    /// <summary>Field number for the "result" field.</summary>
-    public const int ResultFieldNumber = 1;
-    private global::Ntreev.Crema.Services.ResultBase result_;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::Ntreev.Crema.Services.ResultBase Result {
-      get { return result_; }
-      set {
-        result_ = value;
-      }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public override bool Equals(object other) {
-      return Equals(other as SubscribeReply);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public bool Equals(SubscribeReply other) {
-      if (ReferenceEquals(other, null)) {
-        return false;
-      }
-      if (ReferenceEquals(other, this)) {
-        return true;
-      }
-      if (!object.Equals(Result, other.Result)) return false;
-      return Equals(_unknownFields, other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public override int GetHashCode() {
-      int hash = 1;
-      if (result_ != null) hash ^= Result.GetHashCode();
-      if (_unknownFields != null) {
-        hash ^= _unknownFields.GetHashCode();
-      }
-      return hash;
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public override string ToString() {
-      return pb::JsonFormatter.ToDiagnosticString(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void WriteTo(pb::CodedOutputStream output) {
-      if (result_ != null) {
-        output.WriteRawTag(10);
-        output.WriteMessage(Result);
-      }
-      if (_unknownFields != null) {
-        _unknownFields.WriteTo(output);
-      }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public int CalculateSize() {
-      int size = 0;
-      if (result_ != null) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Result);
-      }
-      if (_unknownFields != null) {
-        size += _unknownFields.CalculateSize();
-      }
-      return size;
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(SubscribeReply other) {
-      if (other == null) {
-        return;
-      }
-      if (other.result_ != null) {
-        if (result_ == null) {
-          Result = new global::Ntreev.Crema.Services.ResultBase();
-        }
-        Result.MergeFrom(other.Result);
-      }
-      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(pb::CodedInputStream input) {
-      uint tag;
-      while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
-          default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
-            break;
-          case 10: {
-            if (result_ == null) {
-              Result = new global::Ntreev.Crema.Services.ResultBase();
-            }
-            input.ReadMessage(Result);
+          case 18: {
+            Data = input.ReadString();
             break;
           }
         }
@@ -562,7 +398,7 @@ namespace Ntreev.Crema.Services.Users {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ntreev.Crema.Services.Users.UsersReflection.Descriptor.MessageTypes[4]; }
+      get { return global::Ntreev.Crema.Services.Users.UsersReflection.Descriptor.MessageTypes[2]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -590,12 +426,12 @@ namespace Ntreev.Crema.Services.Users {
 
     /// <summary>Field number for the "id" field.</summary>
     public const int IdFieldNumber = 1;
-    private string id_ = "";
+    private int id_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public string Id {
+    public int Id {
       get { return id_; }
       set {
-        id_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+        id_ = value;
       }
     }
 
@@ -619,7 +455,7 @@ namespace Ntreev.Crema.Services.Users {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override int GetHashCode() {
       int hash = 1;
-      if (Id.Length != 0) hash ^= Id.GetHashCode();
+      if (Id != 0) hash ^= Id.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -633,9 +469,9 @@ namespace Ntreev.Crema.Services.Users {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
-      if (Id.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(Id);
+      if (Id != 0) {
+        output.WriteRawTag(8);
+        output.WriteInt32(Id);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -645,8 +481,8 @@ namespace Ntreev.Crema.Services.Users {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
       int size = 0;
-      if (Id.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Id);
+      if (Id != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Id);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -659,7 +495,7 @@ namespace Ntreev.Crema.Services.Users {
       if (other == null) {
         return;
       }
-      if (other.Id.Length != 0) {
+      if (other.Id != 0) {
         Id = other.Id;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
@@ -673,8 +509,8 @@ namespace Ntreev.Crema.Services.Users {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
-          case 10: {
-            Id = input.ReadString();
+          case 8: {
+            Id = input.ReadInt32();
             break;
           }
         }
@@ -691,7 +527,7 @@ namespace Ntreev.Crema.Services.Users {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ntreev.Crema.Services.Users.UsersReflection.Descriptor.MessageTypes[5]; }
+      get { return global::Ntreev.Crema.Services.Users.UsersReflection.Descriptor.MessageTypes[3]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -709,6 +545,9 @@ namespace Ntreev.Crema.Services.Users {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public PollReply(PollReply other) : this() {
       id_ = other.id_;
+      name_ = other.name_;
+      type_ = other.type_.Clone();
+      data_ = other.data_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -719,13 +558,44 @@ namespace Ntreev.Crema.Services.Users {
 
     /// <summary>Field number for the "id" field.</summary>
     public const int IdFieldNumber = 1;
-    private string id_ = "";
+    private int id_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public string Id {
+    public int Id {
       get { return id_; }
       set {
-        id_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+        id_ = value;
       }
+    }
+
+    /// <summary>Field number for the "name" field.</summary>
+    public const int NameFieldNumber = 2;
+    private string name_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public string Name {
+      get { return name_; }
+      set {
+        name_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "type" field.</summary>
+    public const int TypeFieldNumber = 3;
+    private static readonly pb::FieldCodec<string> _repeated_type_codec
+        = pb::FieldCodec.ForString(26);
+    private readonly pbc::RepeatedField<string> type_ = new pbc::RepeatedField<string>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public pbc::RepeatedField<string> Type {
+      get { return type_; }
+    }
+
+    /// <summary>Field number for the "data" field.</summary>
+    public const int DataFieldNumber = 4;
+    private static readonly pb::FieldCodec<string> _repeated_data_codec
+        = pb::FieldCodec.ForString(34);
+    private readonly pbc::RepeatedField<string> data_ = new pbc::RepeatedField<string>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public pbc::RepeatedField<string> Data {
+      get { return data_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -742,13 +612,19 @@ namespace Ntreev.Crema.Services.Users {
         return true;
       }
       if (Id != other.Id) return false;
+      if (Name != other.Name) return false;
+      if(!type_.Equals(other.type_)) return false;
+      if(!data_.Equals(other.data_)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override int GetHashCode() {
       int hash = 1;
-      if (Id.Length != 0) hash ^= Id.GetHashCode();
+      if (Id != 0) hash ^= Id.GetHashCode();
+      if (Name.Length != 0) hash ^= Name.GetHashCode();
+      hash ^= type_.GetHashCode();
+      hash ^= data_.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -762,10 +638,16 @@ namespace Ntreev.Crema.Services.Users {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
-      if (Id.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(Id);
+      if (Id != 0) {
+        output.WriteRawTag(8);
+        output.WriteInt32(Id);
       }
+      if (Name.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Name);
+      }
+      type_.WriteTo(output, _repeated_type_codec);
+      data_.WriteTo(output, _repeated_data_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -774,9 +656,14 @@ namespace Ntreev.Crema.Services.Users {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
       int size = 0;
-      if (Id.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Id);
+      if (Id != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Id);
       }
+      if (Name.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Name);
+      }
+      size += type_.CalculateSize(_repeated_type_codec);
+      size += data_.CalculateSize(_repeated_data_codec);
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -788,9 +675,14 @@ namespace Ntreev.Crema.Services.Users {
       if (other == null) {
         return;
       }
-      if (other.Id.Length != 0) {
+      if (other.Id != 0) {
         Id = other.Id;
       }
+      if (other.Name.Length != 0) {
+        Name = other.Name;
+      }
+      type_.Add(other.type_);
+      data_.Add(other.data_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -802,8 +694,20 @@ namespace Ntreev.Crema.Services.Users {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
-          case 10: {
-            Id = input.ReadString();
+          case 8: {
+            Id = input.ReadInt32();
+            break;
+          }
+          case 18: {
+            Name = input.ReadString();
+            break;
+          }
+          case 26: {
+            type_.AddEntriesFrom(input, _repeated_type_codec);
+            break;
+          }
+          case 34: {
+            data_.AddEntriesFrom(input, _repeated_data_codec);
             break;
           }
         }

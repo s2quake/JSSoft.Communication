@@ -1,0 +1,3 @@
+[submodule "sub-modules/Ntreev.Library"]
+	path = sub-modules/Ntreev.Library
+	url = https://github.com/s2quake/Ntreev.Library.git

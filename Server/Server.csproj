@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <Protobuf Include="../proto/common.proto" OutputDir="%(RelativePath)Services" CompileOutputs="false" GrpcServices="none" Access="internal" />
     <Protobuf Include="../proto/users.proto" OutputDir="%(RelativePath)Services" CompileOutputs="false" GrpcServices="server" Access="internal" />
   </ItemGroup>
 
@@ -12,6 +11,12 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\sub-modules\Ntreev.Library\Ntreev.Library\Ntreev.Library.csproj" />
+    <ProjectReference Include="..\sub-modules\Ntreev.Library\Ntreev.Library.Random\Ntreev.Library.Random.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
