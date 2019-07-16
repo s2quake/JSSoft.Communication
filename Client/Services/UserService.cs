@@ -9,7 +9,7 @@ using Ntreev.Library.Threading;
 
 namespace Ntreev.Crema.Services.Users
 {
-    class UserService : ServiceBase<IUserContextService.IUserContextServiceClient, IUserServiceCallback>, IUserServiceCallback
+    class UserService : ServiceBase<Adaptor.AdaptorClient, IUserServiceCallback>, IUserServiceCallback
     {
         private AsyncDuplexStreamingCall<PollRequest, PollReply> call;
 
@@ -25,9 +25,9 @@ namespace Ntreev.Crema.Services.Users
             return this.call.ResponseStream.Current;
         }
 
-        protected override IUserContextService.IUserContextServiceClient CreateClient(Channel channel)
+        protected override Adaptor.AdaptorClient CreateClient(Channel channel)
         {
-            return new IUserContextService.IUserContextServiceClient(channel);
+            return new Adaptor.AdaptorClient(channel);
         }
 
         protected override void OnPollBegun()

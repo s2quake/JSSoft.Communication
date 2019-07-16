@@ -30,7 +30,11 @@ namespace Ntreev.Crema.Services {
             "IAEoCSIZCgtQb2xsUmVxdWVzdBIKCgJpZBgBIAEoBSJFCg1Qb2xsUmVwbHlJ",
             "dGVtEgoKAmlkGAEgASgFEgwKBG5hbWUYAiABKAkSDAoEdHlwZRgDIAMoCRIM",
             "CgRkYXRhGAQgAygJIkAKCVBvbGxSZXBseRIzCgVpdGVtcxgBIAMoCzIkLm50",
-            "cmVldi5jcmVtYS5zZXJ2aWNlcy5Qb2xsUmVwbHlJdGVtYgZwcm90bzM="));
+            "cmVldi5jcmVtYS5zZXJ2aWNlcy5Qb2xsUmVwbHlJdGVtMrMBCgdBZGFwdG9y",
+            "ElQKBkludm9rZRIkLm50cmVldi5jcmVtYS5zZXJ2aWNlcy5JbnZva2VSZXF1",
+            "ZXN0GiIubnRyZWV2LmNyZW1hLnNlcnZpY2VzLkludm9rZVJlcGx5IgASUgoE",
+            "UG9sbBIiLm50cmVldi5jcmVtYS5zZXJ2aWNlcy5Qb2xsUmVxdWVzdBogLm50",
+            "cmVldi5jcmVtYS5zZXJ2aWNlcy5Qb2xsUmVwbHkiACgBMAFiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {

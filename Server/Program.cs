@@ -14,7 +14,7 @@ namespace Server
             var userService = new Ntreev.Crema.Services.Users.UserService();
             var server = new Grpc.Core.Server()
             {
-                Services = { Ntreev.Crema.Services.Users.IUserContextService.BindService(userService) },
+                Services = { Ntreev.Crema.Services.Adaptor.BindService(userService) },
                 Ports = { new Grpc.Core.ServerPort("localhost", 4004, Grpc.Core.ServerCredentials.Insecure) }
             };
 

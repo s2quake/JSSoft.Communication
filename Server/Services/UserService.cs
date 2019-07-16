@@ -7,8 +7,9 @@ using Ntreev.Library.Threading;
 
 namespace Ntreev.Crema.Services.Users
 {
-    class UserService : IUserContextService.IUserContextServiceBase, IUserServiceCallback
+    class UserService : Adaptor.AdaptorBase, IUserServiceCallback
     {
+        private JsonSerializerSettings settings = new JsonSerializerSettings();
         private readonly Dispatcher dispatcher;
         private List<PollReplyItem> callbackList = new List<PollReplyItem>();
         private int id;
@@ -25,17 +26,7 @@ namespace Ntreev.Crema.Services.Users
 
         public void OnLoggedIn(string userID)
         {
-            this.dispatcher.InvokeAsync(() =>
-            {
-                var reply = new PollReplyItem()
-                {
-                    Id = id++,
-                };
-                reply.Name = nameof(OnLoggedIn);
-                reply.Type.Add(userID.GetType().AssemblyQualifiedName);
-                reply.Data.Add(JsonConvert.SerializeObject(userID));
-                this.callbackList.Add(reply);
-            });
+            this.AddCallback(nameof(OnLoggedIn), userID);
         }
 
         public override async Task Poll(IAsyncStreamReader<PollRequest> requestStream, IServerStreamWriter<PollReply> responseStream, ServerCallContext context)
@@ -61,6 +52,32 @@ namespace Ntreev.Crema.Services.Users
         public void Dispose()
         {
             this.dispatcher.Dispose();
+        }
+
+        private void AddCallback<T>(string name, T arg)
+        {
+            this.dispatcher.InvokeAsync(() =>
+            {
+                var reply = new PollReplyItem() { Id = id++ };
+                reply.Name = name;
+                reply.Type.Add(typeof(T).AssemblyQualifiedName);
+                reply.Data.Add(JsonConvert.SerializeObject(arg, typeof(T), this.settings));
+                this.callbackList.Add(reply);
+            });
+        }
+
+        private void AddCallback<T1, T2>(string name, T1 arg1, T2 arg2)
+        {
+            this.dispatcher.InvokeAsync(() =>
+            {
+                var reply = new PollReplyItem() { Id = id++ };
+                reply.Name = name;
+                reply.Type.Add(typeof(T1).AssemblyQualifiedName);
+                reply.Data.Add(JsonConvert.SerializeObject(arg1, typeof(T1), this.settings));
+                reply.Type.Add(typeof(T2).AssemblyQualifiedName);
+                reply.Data.Add(JsonConvert.SerializeObject(arg2, typeof(T2), this.settings));
+                this.callbackList.Add(reply);
+            });
         }
     }
 }

@@ -1,6 +1,11 @@
 syntax = "proto3";
 package ntreev.crema.services;
 
+service Adaptor {
+    rpc Invoke (ntreev.crema.services.InvokeRequest) returns (ntreev.crema.services.InvokeReply) {}
+    rpc Poll(stream ntreev.crema.services.PollRequest) returns (stream ntreev.crema.services.PollReply) {}
+}
+
 message InvokeRequest {
     string name = 1;
     string type = 2;
