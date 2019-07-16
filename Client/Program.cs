@@ -10,15 +10,20 @@ namespace Client
     {
         static void Main(string[] args)
         {
-            var channel = new Grpc.Core.Channel("localhost:4004", Grpc.Core.ChannelCredentials.Insecure);
-            var client = new IUserContextService.IUserContextServiceClient(channel);
-            var userService = new Ntreev.Crema.Services.Users.UserService(client);
+            var serviceHost = new ServiceHost();
+            serviceHost.Address = "localhost:4004";
+            serviceHost.Services.Add(new UserService());
+            serviceHost.Open();
+            // var channel = new Grpc.Core.Channel("localhost:4004", Grpc.Core.ChannelCredentials.Insecure);
+            // var client = new IUserContextService.IUserContextServiceClient(channel);
+            // var userService = new Ntreev.Crema.Services.Users.UserService(client);
 
             //var methods = userService.GetType().GetInterfaceMap(typeof(IUserServiceCallback)).TargetMethods;
 
             Console.ReadKey();
-            userService.Dispose();
-            channel.ShutdownAsync().Wait();
+            serviceHost.Close();
+            //userService.Dispose();
+            //channel.ShutdownAsync().Wait();
         }
     }
 }

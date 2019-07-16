@@ -9,30 +9,45 @@ using Ntreev.Library.Threading;
 
 namespace Ntreev.Crema.Services.Users
 {
-    class UserService : ServiceBase<IUserServiceCallback>, IDisposable
+    class UserService : ServiceBase<IUserContextService.IUserContextServiceClient, IUserServiceCallback>, IUserServiceCallback
     {
-        private readonly IUserContextService.IUserContextServiceClient client;
         private AsyncDuplexStreamingCall<PollRequest, PollReply> call;
-        public UserService(IUserContextService.IUserContextServiceClient client)
-            : this(client, null)
-        {
-        }
 
-        public UserService(IUserContextService.IUserContextServiceClient client, object instanceContext)
-            : base(instanceContext)
+        public UserService()
+            : base()
         {
-            this.client = client;
         }
 
         protected async override Task<PollReply> RequestAsync(PollRequest request, CancellationToken cancellation)
         {
-            if (this.call == null)
-            {
-                this.call = this.client.Poll();
-            }
             await this.call.RequestStream.WriteAsync(request);
             await this.call.ResponseStream.MoveNext(cancellation);
             return this.call.ResponseStream.Current;
         }
+
+        protected override IUserContextService.IUserContextServiceClient CreateClient(Channel channel)
+        {
+            return new IUserContextService.IUserContextServiceClient(channel);
+        }
+
+        protected override void OnPollBegun()
+        {
+            this.call = this.Client.Poll();
+        }
+
+        protected override void OnPollEnded()
+        {
+            this.call.Dispose();
+            this.call = null;
+        }
+
+        #region IUserServiceCallback
+
+        void IUserServiceCallback.OnLoggedIn(string userID)
+        {
+            Console.WriteLine(userID);
+        }
+
+        #endregion
     }
 }
