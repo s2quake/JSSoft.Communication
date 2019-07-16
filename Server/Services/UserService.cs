@@ -31,8 +31,8 @@ namespace Ntreev.Crema.Services.Users
                 {
                     Id = id++,
                 };
-                reply.Type.Add(userID.GetType().AssemblyQualifiedName);
                 reply.Name = nameof(OnLoggedIn);
+                reply.Type.Add(userID.GetType().AssemblyQualifiedName);
                 reply.Data.Add(JsonConvert.SerializeObject(userID));
                 this.callbackList.Add(reply);
             });
