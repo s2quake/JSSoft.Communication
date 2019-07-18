@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <Protobuf Include="../proto/common.proto" OutputDir="%(RelativePath)Services" CompileOutputs="false" GrpcServices="server" Access="internal" />
+    <Protobuf Include="../proto/adaptor.proto" OutputDir="%(RelativePath)Services" CompileOutputs="false" GrpcServices="server" Access="internal" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,5 +24,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.2</TargetFramework>
   </PropertyGroup>
+
+  <Import Project="..\Common\Common.projitems" Label="Shared" />
 
 </Project>
