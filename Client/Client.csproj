@@ -1,9 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <Protobuf Include="../proto/adaptor.proto" OutputDir="%(RelativePath)Services" CompileOutputs="false" GrpcServices="client" Access="internal" />
-    <Compile Include="..\Server\Services\IUserServiceCallback.cs" Link="Services\IUserServiceCallback.cs" />
-    <Compile Include="..\Server\Services\IUserService.cs" Link="Services\IUserService.cs" />
+    <Protobuf Include="../Common/adaptor.proto" OutputDir="%(RelativePath)Services" CompileOutputs="false" GrpcServices="client" Access="internal" />
+    <Compile Include="..\Common\IUserServiceCallback.cs" Link="Services\IUserServiceCallback.cs" />
+    <Compile Include="..\Common\IUserService.cs" Link="Services\IUserService.cs" />
+    <Compile Include="..\Common\ServiceContractAttribute.cs" Link="Services\ServiceContractAttribute.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,6 +23,5 @@
     <TargetFramework>netcoreapp2.2</TargetFramework>
   </PropertyGroup>
 
-  <Import Project="..\Common\Common.projitems" Label="Shared" />
 
 </Project>
