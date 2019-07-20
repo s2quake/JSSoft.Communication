@@ -29,6 +29,11 @@ namespace Ntreev.Crema.Services.Users
             this.AddCallback(nameof(OnLoggedIn), userID);
         }
 
+        public void OnAdd(string userID, int test)
+        {
+            
+        }
+
         public override async Task Poll(IAsyncStreamReader<PollRequest> requestStream, IServerStreamWriter<PollReply> responseStream, ServerCallContext context)
         {
             while (await requestStream.MoveNext())

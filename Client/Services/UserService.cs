@@ -48,6 +48,11 @@ namespace Ntreev.Crema.Services.Users
             Console.WriteLine(userID);
         }
 
+        void IUserServiceCallback.OnAdd(string userID, int test)
+        {
+            
+        }
+
         #endregion
     }
 }
