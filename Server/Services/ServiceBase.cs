@@ -11,7 +11,7 @@ using Ntreev.Library.Threading;
 
 namespace Ntreev.Crema.Services
 {
-    abstract class ServiceBase : Adaptor.AdaptorBase
+    abstract class ServiceBase : Adaptor.AdaptorBase, IService
     {
         private readonly Type serviceType;
         private readonly Type callbackType;
@@ -35,7 +35,7 @@ namespace Ntreev.Crema.Services
         }
 
         public object Callback => this.callback;
-        internal void Open(ServiceInstanceBuilder instanceBuilder)
+        internal ServerServiceDefinition Open(ServiceInstanceBuilder instanceBuilder)
         {
             var typeName = $"{this.callbackType.Name}Impl";
             var typeNamespace = this.callbackType.Namespace;

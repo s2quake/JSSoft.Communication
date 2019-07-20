@@ -15,9 +15,9 @@ namespace Ntreev.Crema.Services
         private AssemblyBuilder assemblyBuilder;
         private ModuleBuilder moduleBuilder;
 
-        public ServiceInstanceBuilder(string assemblyName)
+        public ServiceInstanceBuilder()
         {
-            this.AssemblyName = new AssemblyName(assemblyName);
+            this.AssemblyName = new AssemblyName("Ntreev.Crema.Services.Runtime");
         }
 
         public Type CreateType(string name, string typeNamespace, Type interfaceType)
