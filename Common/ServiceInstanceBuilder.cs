@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 
-//[assembly: InternalsVisibleTo("Ntreev.Crema.Services.Runtime")]
+[assembly: InternalsVisibleTo("Ntreev.Crema.Services.Runtime")]
 
 namespace Ntreev.Crema.Services
 {
@@ -25,7 +25,7 @@ namespace Ntreev.Crema.Services
             var fullname = $"{typeNamespace}.{name}";
             if (this.typeByName.ContainsKey(fullname) == false)
             {
-                var type = CreateType(name, typeNamespace, interfaceType);
+                var type = CreateType(this.ModuleBuilder, name, typeNamespace, interfaceType);
                 this.typeByName.Add(fullname, type);
             }
             return this.typeByName[fullname];
@@ -75,7 +75,7 @@ namespace Ntreev.Crema.Services
             var parameterInfos = methodInfo.GetParameters();
             var parameterTypes = parameterInfos.Select(i => i.ParameterType).ToArray();
             var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, MethodAttributes.Public | MethodAttributes.Virtual, CallingConventions.Standard, typeof(void), parameterTypes);
-            var invokeMethod = typeBuilder.BaseType.GetMethod(nameof(CallbackBase.InvokeDelegate), BindingFlags.NonPublic | BindingFlags.Instance);
+            var invokeMethod = typeBuilder.BaseType.GetMethod(nameof(CallbackBase.InvokeDelegate));
             var arrayCount = parameterInfos.Length * 2;
             var typeofMethod = typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle));
 

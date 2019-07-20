@@ -4,38 +4,53 @@ using Grpc.Core;
 
 namespace Ntreev.Crema.Services
 {
-    abstract class ServiceHostBase : IServiecHost
+    abstract class ServiceHostBase : IServiceHost
     {
         private Grpc.Core.Server server;
         private ServiceInstanceBuilder instanceBuilder;
-        protected ServiceHostBase()
+
+        protected ServiceHostBase(IEnumerable<IService> services)
         {
-            this.Services = new ServiceCollection<ServiceBase>(this);
+            this.Services = new ServiceCollection(this);
             this.Port = 4004;
+            this.instanceBuilder = new ServiceInstanceBuilder();
         }
 
         public void Open()
         {
-            this.server = new Grpc.Core.Server();
-            this.instanceBuilder = new ServiceInstanceBuilder();
-            // var channel = new Channel(this.Address, Grpc.Core.ChannelCredentials.Insecure);
+            this.server = new Grpc.Core.Server()
+            {
+                Ports = { new Grpc.Core.ServerPort("localhost", 4004, Grpc.Core.ServerCredentials.Insecure) }
+            };
             foreach (var item in this.Services)
             {
-                item.Open(this.instanceBuilder);
+                var service = item.Open(this.instanceBuilder);
             }
+            this.server.Start();
             this.OnOpened(EventArgs.Empty);
         }
 
         public void Close()
         {
+            foreach (var item in this.Services)
+            {
+                item.Close();
+            }
+            this.server.ShutdownAsync().Wait();
             this.OnClosed(EventArgs.Empty);
         }
 
-        public ServiceCollection<ServiceBase> Services { get; }
+        public void Dispose()
+        {
+            foreach (var item in this.Services)
+            {
+                item.Dispose();
+            }
+        }
+
+        public ServiceCollection Services { get; }
 
         public int Port { get; set; }
-
-
 
         public event EventHandler Opened;
 
@@ -53,7 +68,7 @@ namespace Ntreev.Crema.Services
 
         #region IServiecHost
 
-        IEnumerable<IService> IServiecHost.Services => this.Services;
+        IEnumerable<IService> IServiceHost.Services => this.Services;
 
         #endregion
     }

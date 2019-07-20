@@ -1,47 +1,56 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Ntreev.Crema.Services
 {
-    class ServiceCollection<T> : IEnumerable<T> where T : IService
+    class ServiceCollection : IEnumerable<IService>
     {
-        private readonly List<T> itemList = new List<T>();
+        private readonly List<IService> itemList;
         private readonly IServiceHost serviceHost;
 
         internal ServiceCollection(IServiceHost serviceHost)
+            : this(serviceHost, Enumerable.Empty<IService>())
         {
             this.serviceHost = serviceHost;
         }
 
-        public void Add(T item)
+        internal ServiceCollection(IServiceHost serviceHost, IEnumerable<IService> services)
+        {
+            this.serviceHost = serviceHost;
+            this.itemList = new List<IService>(services); 
+
+        }
+
+        public void Add(IService item)
         {
             this.itemList.Add(item);
         }
 
-        public void Remove(T item)
+        public void Remove(IService item)
         {
             this.itemList.Remove(item);
         }
 
-        public int IndexOf(T item)
+        public int IndexOf(IService item)
         {
             return this.itemList.IndexOf(item);
         }
 
-        public T this[int index]
+        public IService this[int index]
         {
             get => this.itemList[index];
         }
 
-        public bool Contains(T item)
+        public bool Contains(IService item)
         {
             return this.itemList.Contains(item);
         }
 
         #region IEnumerable
 
-        IEnumerator<T> IEnumerable<T>.GetEnumerator()
+        IEnumerator<IService> IEnumerable<IService>.GetEnumerator()
         {
             foreach (var item in this.itemList)
             {

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Newtonsoft.Json;
@@ -7,6 +8,7 @@ using Ntreev.Library.Threading;
 
 namespace Ntreev.Crema.Services.Users
 {
+    [Export(typeof(IService))]
     class UserService : ServiceBase<IUserService, IUserServiceCallback>, IUserService
     {
         public void Login(string user)
