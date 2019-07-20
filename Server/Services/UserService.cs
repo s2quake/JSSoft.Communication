@@ -7,7 +7,20 @@ using Ntreev.Library.Threading;
 
 namespace Ntreev.Crema.Services.Users
 {
-    class UserService : Adaptor.AdaptorBase, IUserServiceCallback
+    class UserService : ServiceBase<IUserService, IUserServiceCallback>, IUserService
+    {
+        public void Login(string user)
+        {
+
+        }
+
+        public void Logout()
+        {
+
+        }
+    }
+
+    class UserServiceOld : Adaptor.AdaptorBase, IUserServiceCallback
     {
         private JsonSerializerSettings settings = new JsonSerializerSettings();
         private readonly Dispatcher dispatcher;
@@ -31,7 +44,7 @@ namespace Ntreev.Crema.Services.Users
 
         public void OnAdd(string userID, int test)
         {
-            
+
         }
 
         public override async Task Poll(IAsyncStreamReader<PollRequest> requestStream, IServerStreamWriter<PollReply> responseStream, ServerCallContext context)
