@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <Protobuf Include="../Common/adaptor.proto" OutputDir="%(RelativePath)Services" CompileOutputs="false" GrpcServices="client" Access="internal" />
-    <Compile Include="..\Common\IUserServiceCallback.cs" Link="Services\IUserServiceCallback.cs" />
-    <Compile Include="..\Common\IUserService.cs" Link="Services\IUserService.cs" />
-    <Compile Include="..\Common\ServiceContractAttribute.cs" Link="Services\ServiceContractAttribute.cs" />
+    <Protobuf Include="..\Common\adaptor.proto" OutputDir="%(RelativePath)Services" CompileOutputs="false" GrpcServices="client" Access="internal" />
+    <Compile Include="..\Common\IUserServiceCallback.cs" Link=".\Services\IUserServiceCallback.cs" />
+    <Compile Include="..\Common\IUserService.cs" Link=".\Services\IUserService.cs" />
+    <Compile Include="..\Common\ServiceContractAttribute.cs" Link=".\Services\ServiceContractAttribute.cs" />
   </ItemGroup>
 
   <ItemGroup>
