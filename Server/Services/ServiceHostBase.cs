@@ -8,36 +8,37 @@ namespace Ntreev.Crema.Services
 {
     abstract class ServiceHostBase : IServiceHost
     {
-        private IAdaptorHost adaptorHost;
-        private ServiceInstanceBuilder instanceBuilder;
+        private readonly IAdaptorHost adaptorHost;
+        private readonly ServiceInstanceBuilder instanceBuilder;
+        private Dictionary<IService, ServiceToken> tokenByService;
 
         protected ServiceHostBase(IAdaptorHost adaptorHost, IEnumerable<IService> services)
         {
             this.adaptorHost = adaptorHost;
-            this.Services = new ServiceCollection(this);
+            this.Services = new ServiceCollection(this, services);
             this.Port = 4004;
             this.instanceBuilder = new ServiceInstanceBuilder();
         }
 
         public void Open()
         {
-            var tokenByService = new Dictionary<IService, ServiceToken>(this.Services.Count);
+            this.tokenByService = new Dictionary<IService, ServiceToken>(this.Services.Count);
             foreach (var item in this.Services)
             {
                 var callbackType = item.CallbackType;
                 var typeName = $"{callbackType.Name}Impl";
                 var typeNamespace = callbackType.Namespace;
                 var implType = instanceBuilder.CreateType(typeName, typeNamespace, callbackType);
-                var callback = TypeDescriptor.CreateInstance(null, implType, null, null) as CallbackBase;
-                var adaptor = this.adaptorHost.Create(item, callback);
+                var callback = TypeDescriptor.CreateInstance(null, implType, null, null);
+                var adaptor = this.adaptorHost.Create(item);
                 var token = new ServiceToken(adaptor, callback);
-                tokenByService.Add(item, token);
+                this.tokenByService.Add(item, token);
             }
-            var adaptors = tokenByService.Values.Select(item => item.Adaptor);
+            var adaptors = this.tokenByService.Values.Select(item => item.Adaptor);
             this.adaptorHost.Open("localhost", 4004, adaptors);
             foreach (var item in this.Services)
             {
-                var token = tokenByService[item];
+                var token = this.tokenByService[item];
                 item.Open(token);
             }
             this.OnOpened(EventArgs.Empty);
@@ -47,9 +48,16 @@ namespace Ntreev.Crema.Services
         {
             foreach (var item in this.Services)
             {
-                item.Close();
+                item.Close(ServiceToken.Empty);
             }
-            this.server.ShutdownAsync().Wait();
+            foreach (var item in this.tokenByService.Values)
+            {
+                if (item.Callback is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                }
+            }
+            this.adaptorHost.Close();
             this.OnClosed(EventArgs.Empty);
         }
 
@@ -81,7 +89,7 @@ namespace Ntreev.Crema.Services
 
         #region IServiecHost
 
-        IEnumerable<IService> IServiceHost.Services => this.Services;
+        IReadOnlyList<IService> IServiceHost.Services => this.Services;
 
         #endregion
     }

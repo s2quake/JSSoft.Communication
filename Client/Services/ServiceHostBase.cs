@@ -1,23 +1,27 @@
 using System;
+using System.Collections.Generic;
 using Grpc.Core;
 
 namespace Ntreev.Crema.Services
 {
-    abstract class ServiceHostBase
+    abstract class ServiceHostBase : IServiceHost
     {
-        private Channel channel;
-        protected ServiceHostBase()
+        private readonly IAdaptorHost adaptorHost;
+        protected ServiceHostBase(IAdaptorHost adaptorHost, IEnumerable<IService> services)
         {
-            this.Services = new ServiceCollection(this);
-            this.Address = "localhost:4004";
+            this.adaptorHost = adaptorHost;
+            this.Services = new ServiceCollection(this, services);
+            this.Host = "localhost";
+            this.Port = 4004;
         }
 
         public void Open()
         {
-            var channel = new Channel(this.Address, Grpc.Core.ChannelCredentials.Insecure);
+            //var channel = new Channel(this.Address, Grpc.Core.ChannelCredentials.Insecure);
             foreach (var item in this.Services)
             {
-                item.Open(channel);
+                
+                //item.Open(channel);
             }
             this.OnOpened(EventArgs.Empty);
         }
@@ -29,7 +33,9 @@ namespace Ntreev.Crema.Services
 
         public ServiceCollection Services { get; }
 
-        public string Address { get; set; }
+        public string Host { get; set; }
+
+        public int Port { get; set; }
 
         public event EventHandler Opened;
 
@@ -44,5 +50,11 @@ namespace Ntreev.Crema.Services
         {
             this.Closed?.Invoke(this, e);
         }
+        
+#region IServiceHost
+
+        IReadOnlyList<IService> IServiceHost.Services => this.Services;
+
+        #endregion
     }
 }

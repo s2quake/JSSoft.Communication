@@ -6,6 +6,6 @@ namespace Ntreev.Crema.Services
 {
     public interface IServiceInvoker
     {
-        Task<InvokeResult> Invoke(InvokeInfo info);
+        Task<InvokeResult> InvokeAsync(InvokeInfo info);
     }
 }

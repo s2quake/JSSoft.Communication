@@ -2,23 +2,26 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Grpc.Core;
+using Newtonsoft.Json;
 
 namespace Ntreev.Crema.Services
 {
     class AdaptorImpl : Adaptor.AdaptorBase, IAdaptor
     {
-        private readonly IServiceInvoker serviceInvoker;
-        private readonly CallbackBase callback;
+        private static readonly JsonSerializerSettings settings = new JsonSerializerSettings();
+        private readonly AdaptorHost adaptorHost;
+        private IService service;
 
-        public AdaptorImpl(IServiceInvoker serviceInvoker, CallbackBase callback)
+        public AdaptorImpl(AdaptorHost adaptorHost, IService service)
         {
-            this.serviceInvoker = serviceInvoker;
-            this.callback = callback;
+            this.adaptorHost = adaptorHost;
+            this.service = service;
         }
+
         public override async Task<InvokeReply> Invoke(InvokeRequest request, ServerCallContext context)
         {
             var info = ToInvokeInfo(request);
-            var result = await this.serviceInvoker.Invoke(info);
+            var result = await this.service.InvokeAsync(context, info);
             return ToInvokeReply(result);
         }
 
@@ -29,26 +32,26 @@ namespace Ntreev.Crema.Services
                 var request = requestStream.Current;
                 var id = request.Id;
                 var reply = new PollReply();
-                await this.callback.PollAsync(reply, id);
+                var results = await this.service.PollAsync(context, id);
                 await responseStream.WriteAsync(reply);
             }
         }
 
         private static InvokeInfo ToInvokeInfo(InvokeRequest request)
         {
+            // pollItem.Types[i] = type.AssemblyQualifiedName;
+            //         pollItem.Datas[i] = JsonConvert.SerializeObject(value, type, this.settings);
+
             var info = new InvokeInfo()
             {
                 Name = request.Name,
-                Types = new string[request.Types_.Count],
-                Datas = new string[request.Datas.Count]
+                Types = new Type[request.Types_.Count],
+                Datas = new object[request.Datas.Count]
             };
             for (var i = 0; i < request.Types_.Count; i++)
             {
-                info.Types[i] = request.Types_[i];
-            }
-            for (var i = 0; i < request.Datas.Count; i++)
-            {
-                info.Types[i] = request.Datas[i];
+                info.Types[i] = Type.GetType(request.Types_[i]);
+                info.Datas[i] = JsonConvert.DeserializeObject(request.Datas[i], info.Types[i], settings);
             }
             return info;
         }
@@ -56,9 +59,42 @@ namespace Ntreev.Crema.Services
         private static InvokeReply ToInvokeReply(InvokeResult result)
         {
             var reply = new InvokeReply();
-            reply.Types_.AddRange(result.Types);
-            reply.Datas.AddRange(result.Datas);
+            var types = new string[result.Types.Length];
+            var datas = new string[result.Datas.Length];
+            for (var i = 0; i < types.Length; i++)
+            {
+                types[i] = result.Types[i].AssemblyQualifiedName;
+                datas[i] = JsonConvert.SerializeObject(result.Datas[i], result.Types[i], settings);
+            }
+            reply.Types_.AddRange(types);
+            reply.Datas.AddRange(datas);
             return reply;
+        }
+
+        private static PollReply ToPollReply(PollItem[] results)
+        {
+            var replyItemList = new List<PollReplyItem>(results.Length);
+            var reply = new PollReply();
+            for (var i = 0; i < results.Length; i++)
+            {
+                var item = results[i];
+                replyItemList.Add(ToPollReplyItem(item));
+            }
+            reply.Items.AddRange(replyItemList);
+            return reply;
+        }
+
+
+        private static PollReplyItem ToPollReplyItem(PollItem pollItem)
+        {
+            var replyItem = new PollReplyItem()
+            {
+                Id = pollItem.ID,
+                Name = pollItem.Name,
+            };
+            replyItem.Types_.AddRange(pollItem.Types);
+            replyItem.Datas.AddRange(pollItem.Datas);
+            return replyItem;
         }
     }
 }

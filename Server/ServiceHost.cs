@@ -9,8 +9,8 @@ namespace Ntreev.Crema.Services
     class ServiceHost : ServiceHostBase
     {
         [ImportingConstructor]
-        public ServiceHost([ImportMany]IEnumerable<IService> services)
-            : base(services)
+        public ServiceHost(IAdaptorHost adaptorHost, [ImportMany]IEnumerable<IService> services)
+            : base(adaptorHost, services)
         {
      
         }

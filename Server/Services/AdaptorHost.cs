@@ -5,14 +5,14 @@ using System.ComponentModel.Composition;
 
 namespace Ntreev.Crema.Services
 {
-    [Export(typeof(IAdaptor))]
+    [Export(typeof(IAdaptorHost))]
     class AdaptorHost : Grpc.Core.Server, IAdaptorHost
     {
         #region IAdaptorHost
 
-        IAdaptor IAdaptorHost.Create(CallbackBase callback)
+        IAdaptor IAdaptorHost.Create(IService service)
         {
-            return new AdaptorImpl(callback);
+            return new AdaptorImpl(this, service);
         }
 
         void IAdaptorHost.Open(string host, int port, IEnumerable<IAdaptor> adaptors)

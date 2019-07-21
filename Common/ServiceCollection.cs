@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Ntreev.Crema.Services
 {
-    class ServiceCollection : IEnumerable<IService>
+    class ServiceCollection : IEnumerable<IService>, IReadOnlyList<IService>
     {
         private readonly List<IService> itemList;
         private readonly IServiceHost serviceHost;
@@ -20,7 +20,6 @@ namespace Ntreev.Crema.Services
         {
             this.serviceHost = serviceHost;
             this.itemList = new List<IService>(services); 
-
         }
 
         public void Add(IService item)

@@ -2,13 +2,17 @@
 
   <ItemGroup>
     <Protobuf Include="..\Common\adaptor.proto" OutputDir="%(RelativePath)Services" CompileOutputs="false" GrpcServices="client" Access="internal" />
-    <Compile Include="..\Common\IAdaptorHost.cs" Link="Services\IAdaptorHost.cs" />
-    <Compile Include="..\Common\IAdaptor.cs" Link="Services\IAdaptor.cs" />
+    <Compile Include="..\Common\InvokeInfo.cs" Link="Services\InvokeInfo.cs" />
+    <Compile Include="..\Common\IServiceInvoker.cs" Link="Services\IServiceInvoker.cs" />
+    <Compile Include="..\Common\IServicePoller.cs" Link="Services\IServicePoller.cs" />
+    <!-- <Compile Include="..\Common\IAdaptorHost.cs" Link="Services\IAdaptorHost.cs" />
+    <Compile Include="..\Common\IAdaptor.cs" Link="Services\IAdaptor.cs" /> -->
     <Compile Include="..\Common\IServiceHost.cs" Link=".\Services\IServiceHost.cs" />
     <Compile Include="..\Common\IService.cs" Link=".\Services\IService.cs" />
     <Compile Include="..\Common\IUserServiceCallback.cs" Link=".\Services\IUserServiceCallback.cs" />
     <Compile Include="..\Common\IUserService.cs" Link=".\Services\IUserService.cs" />
     <Compile Include="..\Common\ServiceContractAttribute.cs" Link=".\Services\ServiceContractAttribute.cs" />
+    <Compile Include="..\Common\ServiceCollection.cs" Link=".\Services\ServiceCollection.cs" />
     <Compile Include="..\Common\ServiceToken.cs" Link="Services\ServiceToken.cs" />
   </ItemGroup>
 
@@ -20,12 +24,14 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="System.ComponentModel.Composition" Version="4.5.0" />
     <ProjectReference Include="..\sub-modules\Ntreev.Library\Ntreev.Library\Ntreev.Library.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.2</TargetFramework>
+    <DefineConstants>Client</DefineConstants>
   </PropertyGroup>
 
 

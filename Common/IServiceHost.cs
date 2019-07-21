@@ -9,7 +9,7 @@ namespace Ntreev.Crema.Services
 
         void Close();
 
-        IEnumerable<IService> Services { get; }
+        IReadOnlyList<IService> Services { get; }
 
         int Port { get; set; }
 

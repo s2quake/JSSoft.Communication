@@ -48,6 +48,9 @@ namespace Server
             return container.GetExportedValue<T>();
         }
 
-
+        public static void Release()
+        {
+            container.Dispose();
+        }
     }
 }

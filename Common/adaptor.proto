@@ -24,8 +24,8 @@ message PollRequest {
 message PollReplyItem {
     int32 id = 1;
     string name = 2;
-    repeated string type = 3;
-    repeated string data = 4;
+    repeated string types = 3;
+    repeated string datas = 4;
 }
 
 message PollReply {
