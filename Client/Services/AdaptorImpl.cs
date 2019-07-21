@@ -14,6 +14,7 @@ namespace Ntreev.Crema.Services
         private AsyncDuplexStreamingCall<PollRequest, PollReply> call;
 
         public AdaptorImpl(Grpc.Core.Channel channel, IService service)
+            : base(channel)
         {
             this.channel = channel;
             this.service = service;
@@ -21,7 +22,10 @@ namespace Ntreev.Crema.Services
 
         public async Task<InvokeResult> InvokeAsync(InvokeInfo info)
         {
-            throw new NotImplementedException();
+            var request = ToInvokeReqeust(info);
+            var reply = await Task.Run(() => this.Invoke(request));
+            return ToInvokeResult(reply);            
+
         }
 
         public int ID { get; set; }
@@ -65,6 +69,32 @@ namespace Ntreev.Crema.Services
                 pollItem.Datas[i] = JsonConvert.DeserializeObject(replyItem.Datas[i], pollItem.Types[i], settings);
             }
             return pollItem;
+        }
+
+        private static InvokeRequest ToInvokeReqeust(InvokeInfo info)
+        {
+            var types = new string[info.Types.Length];
+            var datas = new string[info.Datas.Length];
+            var request = new InvokeRequest()
+            {
+                Name = info.Name,
+            };
+            for(var i=0;i<info.Types.Length ; i++)
+            {
+                types[i] = info.Types[i].AssemblyQualifiedName;
+                datas[i] = JsonConvert.SerializeObject(info.Datas[i], info.Types[i], settings);
+            }
+            request.Types_.AddRange(types);
+            request.Datas.AddRange(datas);
+            return request;
+        }
+
+        private static InvokeResult ToInvokeResult(InvokeReply reply)
+        {
+            var result = new InvokeResult();
+            result.Type = Type.GetType(reply.Type);
+            result.Data = JsonConvert.DeserializeObject(reply.Data, result.Type, settings);
+            return result;
         }
 
         // protected async override Task<PollReply> RequestAsync(PollRequest request, CancellationToken cancellation)

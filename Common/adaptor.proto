@@ -13,8 +13,8 @@ message InvokeRequest {
 }
 
 message InvokeReply {
-    repeated string types = 1;
-    repeated string datas = 2;
+    string type = 1;
+    string data = 2;
 }
 
 message PollRequest {

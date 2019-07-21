@@ -13,9 +13,9 @@ namespace Ntreev.Crema.Services
 
     public struct InvokeResult
     {
-        public Type[] Types { get; set; }
+        public Type Type { get; set; }
 
-        public object[] Datas { get; set; }
+        public object Data { get; set; }
     }
 
     public struct PollItem

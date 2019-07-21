@@ -11,6 +11,7 @@ namespace Ntreev.Crema.Services.Users
     [Export(typeof(IService))]
     class UserService : ServiceBase<IUserService, IUserServiceCallback>, IUserService
     {
+        [ServiceContract]
         public async Task<int> LoginAsync(string user)
         {
             await Task.Delay(100);
@@ -19,6 +20,7 @@ namespace Ntreev.Crema.Services.Users
             //Task.Run(()=> this.Callback.OnAdd("WER", 0));
         }
 
+        [ServiceContract]
         public async Task<(int, string)> LogoutAsync(string user, int count)
         {
             await Task.Delay(100);

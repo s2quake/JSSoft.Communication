@@ -58,16 +58,11 @@ namespace Ntreev.Crema.Services
 
         private static InvokeReply ToInvokeReply(InvokeResult result)
         {
-            var reply = new InvokeReply();
-            var types = new string[result.Types.Length];
-            var datas = new string[result.Datas.Length];
-            for (var i = 0; i < types.Length; i++)
+            var reply = new InvokeReply()
             {
-                types[i] = result.Types[i].AssemblyQualifiedName;
-                datas[i] = JsonConvert.SerializeObject(result.Datas[i], result.Types[i], settings);
-            }
-            reply.Types_.AddRange(types);
-            reply.Datas.AddRange(datas);
+                Type = result.Type.AssemblyQualifiedName,
+                Data = JsonConvert.SerializeObject(result.Data, result.Type, settings)
+            };
             return reply;
         }
 

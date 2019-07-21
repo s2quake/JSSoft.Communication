@@ -209,12 +209,13 @@ namespace Ntreev.Crema.Services
                 il.Emit(OpCodes.Stelem_Ref);
             }
 
-var sss = invokeMethod.MakeGenericMethod(methodInfo.ReturnType.GetGenericArguments());
-            il.Emit(OpCodes.Call, sss);
-            il.Emit(OpCodes.Stloc_0);
-            il.Emit(OpCodes.Br_S, label);
-            il.MarkLabel(label);
-            il.Emit(OpCodes.Ldloc_0);
+            var genericMethod = invokeMethod.MakeGenericMethod(methodInfo.ReturnType.GetGenericArguments());
+            il.Emit(OpCodes.Call, genericMethod);
+            // il.Emit(OpCodes.Stloc_0);
+            // il.Emit(OpCodes.Br_S, label);
+            // il.MarkLabel(label);
+            // il.Emit(OpCodes.Ldloc_0);
+            il.Emit(OpCodes.Nop);
             il.Emit(OpCodes.Ret);
         }
     }

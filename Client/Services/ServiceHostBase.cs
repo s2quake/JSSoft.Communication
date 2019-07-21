@@ -23,24 +23,25 @@ namespace Ntreev.Crema.Services
         public void Open()
         {
             this.tokenByService = new Dictionary<IService, ServiceToken>(this.Services.Count);
+            this.adaptorHost.Open("localhost", 4004);
             foreach (var item in this.Services)
             {
                 var serviceType = item.ServiceType;
                 var typeName = $"{serviceType.Name}Impl";
                 var typeNamespace = serviceType.Namespace;
                 var implType = instanceBuilder.CreateType(typeName, typeNamespace, typeof(ContextBase), serviceType);
-                var serviceInstance = TypeDescriptor.CreateInstance(null, implType, null, null);
+                var serviceInstance = TypeDescriptor.CreateInstance(null, implType, null, null) as ContextBase;
                 var adaptor = this.adaptorHost.Create(item);
-                
+                serviceInstance.Adaptor = adaptor;
                 (serviceInstance as Users.IUserService).LoginAsync("wer");
             }
             var adaptors = this.tokenByService.Values.Select(item => item.Adaptor);
-            this.adaptorHost.Open("localhost", 4004, adaptors);
-            foreach (var item in this.Services)
-            {
-                var token = this.tokenByService[item];
-                item.Open(token);
-            }
+            
+            // foreach (var item in this.Services)
+            // {
+            //     var token = this.tokenByService[item];
+            //     item.Open(token);
+            // }
             this.OnOpened(EventArgs.Empty);
         }
 

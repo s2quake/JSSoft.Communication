@@ -12,13 +12,15 @@ namespace Ntreev.Crema.Services
     {
         private JsonSerializerSettings settings = new JsonSerializerSettings();
         private List<PollItem> callbackList = new List<PollItem>();
-        private IAdaptor adaptor;
+        //private IAdaptor adaptor;
 
         public ContextBase()
         {
             //this.adaptor = adaptor;
             this.Dispatcher = new Dispatcher(this);
         }
+
+        public IAdaptor Adaptor{get;set;}
 
         public void Dispose()
         {
@@ -44,8 +46,8 @@ namespace Ntreev.Crema.Services
                 invokeInfo.Types[i] = type;
                 invokeInfo.Datas[i] = value;
             }
-            var result = await this.adaptor.InvokeAsync(invokeInfo);
-            throw new NotImplementedException();
+            var result = await this.Adaptor.InvokeAsync(invokeInfo);
+            return (T)result.Data;
         }
 
         

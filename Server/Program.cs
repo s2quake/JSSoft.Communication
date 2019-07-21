@@ -23,11 +23,11 @@ namespace Server
             var cancellation = new CancellationTokenSource();
             var serviceHost = Container.GetService<IServiceHost>();
             serviceHost.Open();
-            var task = InvokeTest(serviceHost, cancellation.Token);
+            //var task = InvokeTest(serviceHost, cancellation.Token);
             Console.WriteLine("press any key to exit.");
             Console.ReadKey();
             cancellation.Cancel();
-            task.Wait();
+            //task.Wait();
             serviceHost.Close();
             Container.Release();
         }
