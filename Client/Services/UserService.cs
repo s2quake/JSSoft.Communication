@@ -1,45 +1,47 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Newtonsoft.Json;
-using Ntreev.Library.Threading;
 
 namespace Ntreev.Crema.Services.Users
 {
-    class UserService : ServiceBase<Adaptor.AdaptorClient, IUserServiceCallback>, IUserServiceCallback
+    [Export(typeof(IService))]
+    class UserService : ServiceBase<IUserService, IUserServiceCallback>, IUserServiceCallback
     {
         private AsyncDuplexStreamingCall<PollRequest, PollReply> call;
 
         public UserService()
             : base()
         {
+            
         }
 
-        protected async override Task<PollReply> RequestAsync(PollRequest request, CancellationToken cancellation)
-        {
-            await this.call.RequestStream.WriteAsync(request);
-            await this.call.ResponseStream.MoveNext(cancellation);
-            return this.call.ResponseStream.Current;
-        }
+        // protected async override Task<PollReply> RequestAsync(PollRequest request, CancellationToken cancellation)
+        // {
+        //     await this.call.RequestStream.WriteAsync(request);
+        //     await this.call.ResponseStream.MoveNext(cancellation);
+        //     return this.call.ResponseStream.Current;
+        // }
 
-        protected override Adaptor.AdaptorClient CreateClient(Channel channel)
-        {
-            return new Adaptor.AdaptorClient(channel);
-        }
+        // protected override Adaptor.AdaptorClient CreateClient(Channel channel)
+        // {
+        //     return new Adaptor.AdaptorClient(channel);
+        // }
 
-        protected override void OnPollBegun()
-        {
-            this.call = this.Client.Poll();
-        }
+        // protected override void OnPollBegun()
+        // {
+        //     this.call = this.Client.Poll();
+        // }
 
-        protected override void OnPollEnded()
-        {
-            this.call.Dispose();
-            this.call = null;
-        }
+        // protected override void OnPollEnded()
+        // {
+        //     this.call.Dispose();
+        //     this.call = null;
+        // }
 
         #region IUserServiceCallback
 

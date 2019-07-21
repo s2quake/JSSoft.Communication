@@ -1,52 +1,77 @@
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Ntreev.Library.Threading;
 
 namespace Ntreev.Crema.Services
 {
-    internal class CallbackBase
+    class CallbackBase : IServiceInstance, IDisposable
     {
-        public Action<string, object[]> ActionDelegate { get; set; }
+        private List<PollItem> callbackList = new List<PollItem>();
 
-        public void Invoke<T>(string name, T arg)
+        public CallbackBase()
         {
-            this.InvokeDelegate(name, typeof(T), arg);
+            this.Dispatcher = new Dispatcher(this);
         }
 
-        public void Invoke<T1, T2>(string name, T1 arg1, T2 arg2)
+        public void Dispose()
         {
-            this.InvokeDelegate(name, typeof(T1), arg1, typeof(T2), arg2);
+            if (this.Dispatcher == null)
+                throw new InvalidOperationException();
+            this.Dispatcher.Dispose();
+            this.Dispatcher = null;
         }
 
-        public void Invoke<T1, T2, T3>(string name, T1 arg1, T2 arg2, T3 arg3)
+        public void Invoke(string name, params object[] args)
         {
-            this.InvokeDelegate(name, typeof(T1), arg1, typeof(T2), arg2, typeof(T3), arg3);
+            this.Dispatcher.InvokeAsync(() =>
+            {
+                var length = args.Length / 2;
+                var pollItem = new PollItem()
+                {
+                    ID = this.ID++,
+                    Name = name,
+                    Types = new Type[length],
+                    Datas = new string[length],
+                };
+                for (var i = 0; i < length; i++)
+                {
+                    var type = (Type)args[i * 2 + 0];
+                    var value = args[i * 2 + 1];
+                    pollItem.Types[i] = type;
+                    pollItem.Datas[i] = value;
+                }
+                this.callbackList.Add(pollItem);
+            });
         }
 
-        public void Invoke<T1, T2, T3, T4>(string name, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+        public Task InvokeAsync(string name, params object[] args)
         {
-            this.InvokeDelegate(name, typeof(T1), arg1, typeof(T2), arg2, typeof(T3), arg3, typeof(T4), arg4);
+throw new NotImplementedException();
+        }
+        
+
+        public Task<T> InvokeAsyncWithResult<T>(string name, params object[] args)
+        {
+throw new NotImplementedException();
         }
 
-        public void Invoke<T1, T2, T3, T4, T5>(string name, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
+        public Task<PollItem[]> PollAsync(int id)
         {
-            this.InvokeDelegate(name, typeof(T1), arg1, typeof(T2), arg2, typeof(T3), arg3, typeof(T4), arg4, typeof(T5), arg5);
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                var items = new PollItem[this.callbackList.Count - id];
+                for (var i = id; i < this.callbackList.Count; i++)
+                {
+                    items[id - i] = this.callbackList[i];
+                }
+                return items;
+            });
         }
 
-        private void InvokeDelegate(string name, params object[] args)
-        {
-            this.ActionDelegate(name, args);
-        }
+        public Dispatcher Dispatcher { get; private set; }
+
+        public int ID { get; private set; }
     }
-
-    // class IUserServiceCallbackImpl : CallbackBase, Users.IUserServiceCallback
-    // {
-    //     public void OnLoggedIn(string userID)
-    //     {
-    //         Invoke("OnLoggedIn", userID);
-    //     }
-
-    //     public void OnAdd(string userID, int test)
-    //     {
-    //         Invoke("OnAdd", userID, test);
-    //     }
-    // }
 }

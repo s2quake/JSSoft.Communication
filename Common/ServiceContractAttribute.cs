@@ -3,8 +3,11 @@ using System;
 namespace Ntreev.Crema.Services
 {
     [AttributeUsage(AttributeTargets.Method)]
-    class ServiceContractAttribute : Attribute
+    public class ServiceContractAttribute : Attribute
     {
+        public ServiceContractAttribute()
+        {
 
+        }
     }
 }

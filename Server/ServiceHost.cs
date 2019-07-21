@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using Ntreev.Crema.Services;
+using System.Linq;
 
-namespace Client
+namespace Ntreev.Crema.Services
 {
     [Export(typeof(IServiceHost))]
     class ServiceHost : ServiceHostBase

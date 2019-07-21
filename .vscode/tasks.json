@@ -4,7 +4,35 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build",
+            "label": "build client",
+            "command": "dotnet",
+            "type": "shell",
+            "group": "build",
+            "args": [
+                "build", 
+                "Client"
+            ],
+            "presentation": {
+                "reveal": "always"
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "build server",
+            "command": "dotnet",
+            "type": "shell",
+            "group": "build",
+            "args": [
+                "build", 
+                "Server"
+            ],
+            "presentation": {
+                "reveal": "always"
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "build all",
             "command": "dotnet build",
             "type": "shell",
             "group": "build",
