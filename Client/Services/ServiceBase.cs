@@ -10,7 +10,7 @@ using Ntreev.Library.Threading;
 
 namespace Ntreev.Crema.Services
 {
-    abstract class ServiceBase : IService, IServiceInvoker
+    abstract class ServiceBase : IService
     {
         private readonly Type serviceType;
         private readonly Type callbackType;
@@ -111,18 +111,16 @@ namespace Ntreev.Crema.Services
 
         private void InvokeMethod(PollItem pollItem)
         {
-            var argList = new List<object>(pollItem.Datas.Length);
+            var dataList = new List<object>(pollItem.Datas.Length);
             var typeList = new List<Type>(pollItem.Datas.Length);
             for (var i = 0; i < pollItem.Datas.Length; i++)
             {
-                var typeName = pollItem.Types[i];
+                var type = pollItem.Types[i];
                 var data = pollItem.Datas[i];
-                var type = Type.GetType(typeName);
-                var obj = JsonConvert.DeserializeObject(data, type);
                 typeList.Add(type);
-                argList.Add(obj);
+                dataList.Add(data);
             }
-            this.InvokeMethod(pollItem.Name, typeList.ToArray(), argList.ToArray());
+            this.InvokeMethod(pollItem.Name, typeList.ToArray(), dataList.ToArray());
         }
 
         private void InvokeMethod(string name, Type[] types, object[] args)
@@ -175,6 +173,11 @@ namespace Ntreev.Crema.Services
 
         public void Close(ServiceToken token)
         {
+            this.cancellation.Cancel();
+            this.task.Wait();
+            this.task = null;
+            this.dispatcher.Dispose();
+            this.dispatcher = null;
             this.adaptor = null;
             this.service = null;
             this.OnClosed(EventArgs.Empty);

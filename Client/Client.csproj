@@ -7,12 +7,14 @@
     <Compile Include="..\Common\IServicePoller.cs" Link="Services\IServicePoller.cs" />
     <!-- <Compile Include="..\Common\IAdaptorHost.cs" Link="Services\IAdaptorHost.cs" />
     <Compile Include="..\Common\IAdaptor.cs" Link="Services\IAdaptor.cs" /> -->
+    <Compile Include="..\Common\IServiceInstance.cs" Link="Services\IServiceInstance.cs" />
     <Compile Include="..\Common\IServiceHost.cs" Link=".\Services\IServiceHost.cs" />
     <Compile Include="..\Common\IService.cs" Link=".\Services\IService.cs" />
     <Compile Include="..\Common\IUserServiceCallback.cs" Link=".\Services\IUserServiceCallback.cs" />
     <Compile Include="..\Common\IUserService.cs" Link=".\Services\IUserService.cs" />
     <Compile Include="..\Common\ServiceContractAttribute.cs" Link=".\Services\ServiceContractAttribute.cs" />
     <Compile Include="..\Common\ServiceCollection.cs" Link=".\Services\ServiceCollection.cs" />
+    <Compile Include="..\Common\ServiceInstanceBuilder.cs" Link="Services\ServiceInstanceBuilder.cs" />
     <Compile Include="..\Common\ServiceToken.cs" Link="Services\ServiceToken.cs" />
   </ItemGroup>
 

@@ -6,7 +6,7 @@ using Ntreev.Library.Threading;
 
 namespace Ntreev.Crema.Services
 {
-    class CallbackBase : IDisposable
+    class CallbackBase : IServiceInstance, IDisposable
     {
         private List<PollItem> callbackList = new List<PollItem>();
 
@@ -23,7 +23,7 @@ namespace Ntreev.Crema.Services
             this.Dispatcher = null;
         }
 
-        public void InvokeDelegate(string name, params object[] args)
+        public void Invoke(string name, params object[] args)
         {
             this.Dispatcher.InvokeAsync(() =>
             {
@@ -44,6 +44,17 @@ namespace Ntreev.Crema.Services
                 }
                 this.callbackList.Add(pollItem);
             });
+        }
+
+        public Task InvokeAsync(string name, params object[] args)
+        {
+throw new NotImplementedException();
+        }
+        
+
+        public Task<T> InvokeAsyncWithResult<T>(string name, params object[] args)
+        {
+throw new NotImplementedException();
         }
 
         public Task<PollItem[]> PollAsync(int id)

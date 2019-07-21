@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using Grpc.Core;
 
 namespace Ntreev.Crema.Services
 {
+    [Export(typeof(IAdaptorHost))]
     class AdaptorHost : IAdaptorHost
     {
         private Channel channel;

@@ -15,9 +15,9 @@ namespace Ntreev.Crema.Services
         protected ServiceHostBase(IAdaptorHost adaptorHost, IEnumerable<IService> services)
         {
             this.adaptorHost = adaptorHost;
+            this.instanceBuilder = new ServiceInstanceBuilder();
             this.Services = new ServiceCollection(this, services);
             this.Port = 4004;
-            this.instanceBuilder = new ServiceInstanceBuilder();
         }
 
         public void Open()
@@ -28,7 +28,7 @@ namespace Ntreev.Crema.Services
                 var callbackType = item.CallbackType;
                 var typeName = $"{callbackType.Name}Impl";
                 var typeNamespace = callbackType.Namespace;
-                var implType = instanceBuilder.CreateType(typeName, typeNamespace, callbackType);
+                var implType = instanceBuilder.CreateType(typeName, typeNamespace, typeof(CallbackBase), callbackType);
                 var callback = TypeDescriptor.CreateInstance(null, implType, null, null);
                 var adaptor = this.adaptorHost.Create(item);
                 var token = new ServiceToken(adaptor, callback);

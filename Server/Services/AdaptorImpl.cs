@@ -87,13 +87,20 @@ namespace Ntreev.Crema.Services
 
         private static PollReplyItem ToPollReplyItem(PollItem pollItem)
         {
+            var types = new string[pollItem.Types.Length];
+            var datas = new string[pollItem.Datas.Length];
             var replyItem = new PollReplyItem()
             {
                 Id = pollItem.ID,
                 Name = pollItem.Name,
             };
-            replyItem.Types_.AddRange(pollItem.Types);
-            replyItem.Datas.AddRange(pollItem.Datas);
+            for (var i = 0; i < types.Length; i++)
+            {
+                types[i] = pollItem.Types[i].AssemblyQualifiedName;
+                datas[i] = JsonConvert.SerializeObject(pollItem.Datas[i], pollItem.Types[i], settings);
+            }
+            replyItem.Types_.AddRange(types);
+            replyItem.Datas.AddRange(datas);
             return replyItem;
         }
     }

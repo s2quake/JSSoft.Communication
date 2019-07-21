@@ -6,6 +6,7 @@
     <Compile Include="..\Common\IUserService.cs" Link="Services\IUserService.cs" />
     <Compile Include="..\Common\ServiceContractAttribute.cs" Link="Services\ServiceContractAttribute.cs" />
     <!-- <Compile Include="..\Common\CallbackBase.cs" Link="Services\CallbackBase.cs" /> -->
+    <Compile Include="..\Common\IServiceInstance.cs" Link="Services\IServiceInstance.cs" />
     <Compile Include="..\Common\ServiceInstanceBuilder.cs" Link="Services\ServiceInstanceBuilder.cs" />
     <Compile Include="..\Common\InvokeInfo.cs" Link="Services\InvokeInfo.cs" />
     <!-- <Compile Include="..\Common\IAdaptorHost.cs" Link="Services\IAdaptorHost.cs" />

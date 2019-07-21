@@ -5,9 +5,9 @@ namespace Ntreev.Crema.Services.Users
 {
     interface IUserService
     {
-        Task LoginAsync(string user);
+        Task<int> LoginAsync(string user);
 
-        Task LogoutAsync();
+        Task<(int, string)> LogoutAsync(string user, int count);
     }
 
 }

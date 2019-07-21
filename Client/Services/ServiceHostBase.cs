@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 using Grpc.Core;
 
 namespace Ntreev.Crema.Services
@@ -7,9 +9,12 @@ namespace Ntreev.Crema.Services
     abstract class ServiceHostBase : IServiceHost
     {
         private readonly IAdaptorHost adaptorHost;
+        private readonly ServiceInstanceBuilder instanceBuilder;
+        private Dictionary<IService, ServiceToken> tokenByService;
         protected ServiceHostBase(IAdaptorHost adaptorHost, IEnumerable<IService> services)
         {
             this.adaptorHost = adaptorHost;
+            this.instanceBuilder = new ServiceInstanceBuilder();
             this.Services = new ServiceCollection(this, services);
             this.Host = "localhost";
             this.Port = 4004;
@@ -17,11 +22,24 @@ namespace Ntreev.Crema.Services
 
         public void Open()
         {
-            //var channel = new Channel(this.Address, Grpc.Core.ChannelCredentials.Insecure);
+            this.tokenByService = new Dictionary<IService, ServiceToken>(this.Services.Count);
             foreach (var item in this.Services)
             {
+                var serviceType = item.ServiceType;
+                var typeName = $"{serviceType.Name}Impl";
+                var typeNamespace = serviceType.Namespace;
+                var implType = instanceBuilder.CreateType(typeName, typeNamespace, typeof(ContextBase), serviceType);
+                var serviceInstance = TypeDescriptor.CreateInstance(null, implType, null, null);
+                var adaptor = this.adaptorHost.Create(item);
                 
-                //item.Open(channel);
+                (serviceInstance as Users.IUserService).LoginAsync("wer");
+            }
+            var adaptors = this.tokenByService.Values.Select(item => item.Adaptor);
+            this.adaptorHost.Open("localhost", 4004, adaptors);
+            foreach (var item in this.Services)
+            {
+                var token = this.tokenByService[item];
+                item.Open(token);
             }
             this.OnOpened(EventArgs.Empty);
         }

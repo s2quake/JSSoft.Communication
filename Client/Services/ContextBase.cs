@@ -2,18 +2,21 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Ntreev.Crema.Services.Users;
 using Ntreev.Library.Threading;
 
+// https://sharplab.io/#v2:C4LglgNgNAJiDUAfAAgJgIwFgBQyAMABMugKwDcOyAzEagQMIEDeOBbRNyAbAQJIB2ANwD2AawCmAQQDOAT34BjABTFC/AIYBbcVAIAHdQCct0gsIBGAK3ELgAbQC6BIwHNpASlbtvLbN+/AABaGwgDuBPzi4QBywsC8mnoQ4tr8wOIwAKIAHgriesBgwvxK7hR+7AC+Xmw1HERcADwAKgB8fEJiUnKKLa0q6GpaOvpGJmZWNvZOrh51PvPsQSHhkTFxCUkp4mkZOXkFRSVlddUVtee0BACq0uKGAMr3gmB5mxAEIAx1vv7s1A1GmA0u0ADLCFzAmTyZSqAgAVzuhk8lwWqL+RAA7AQgmBpAA6AQiCTQ3rA4D9DTaYQAMyU4Mh/FJCncumAsj04lpAzwrIRSJO6LYZwxBEWbAB3EaSnJulU7jBEOE8OAzJ5/PuunJBAUyrSKNFv1F/2xuIJRK6zOlsqIgwVSipXLpDKhPRZbI5Tp5fMRmpxnu55L5uvh+vKopFVRwlSAA===
 namespace Ntreev.Crema.Services
 {
-    class ContextBase : IServiceInvoker, IDisposable
+    class ContextBase : IDisposable
     {
         private JsonSerializerSettings settings = new JsonSerializerSettings();
         private List<PollItem> callbackList = new List<PollItem>();
-        private Adaptor.AdaptorClient client;
+        private IAdaptor adaptor;
 
         public ContextBase()
         {
+            //this.adaptor = adaptor;
             this.Dispatcher = new Dispatcher(this);
         }
 
@@ -25,35 +28,44 @@ namespace Ntreev.Crema.Services
             this.Dispatcher = null;
         }
 
-        public void InvokeDelegate(string name, params object[] args)
+        public async Task<T> InvokeAsyncWithResult<T>(string name, params object[] args)
         {
-            this.Dispatcher.InvokeAsync(() =>
+            var length = args.Length / 2;
+            var invokeInfo = new InvokeInfo()
             {
-                var length = args.Length / 2;
-                var pollItem = new PollItem()
-                {
-                    ID = this.ID++,
-                    Name = name,
-                    Types = new string[length],
-                    Datas = new string[length],
-                };
-                for (var i = 0; i < length; i++)
-                {
-                    var type = (Type)args[i * 2 + 0];
-                    var value = args[i * 2 + 1];
-                    pollItem.Types[i] = type.AssemblyQualifiedName;
-                    pollItem.Datas[i] = JsonConvert.SerializeObject(value, type, this.settings);
-                }
-                //this.client.InvokeAsync()
-            });
+                Name = name,
+                Types = new Type[length],
+                Datas = new object[length],
+            };
+            for (var i = 0; i < length; i++)
+            {
+                var type = (Type)args[i * 2 + 0];
+                var value = args[i * 2 + 1];
+                invokeInfo.Types[i] = type;
+                invokeInfo.Datas[i] = value;
+            }
+            var result = await this.adaptor.InvokeAsync(invokeInfo);
+            throw new NotImplementedException();
         }
 
-        public Task<InvokeResult> InvokeAsync(InvokeInfo info)
+        
+        public void Invoke(string name, params object[] args)
         {
-            throw new NotImplementedException();
-            //Adaptor.AdaptorClient d;
-            //d.in
+throw new NotImplementedException();
         }
+        
+
+        public Task InvokeAsync(string name, params object[] args)
+        {
+throw new NotImplementedException();
+        }
+
+        // public Task<InvokeResult> InvokeAsync(InvokeInfo info)
+        // {
+        //     throw new NotImplementedException();
+        //     //Adaptor.AdaptorClient d;
+        //     //d.in
+        // }
 
         // public Task<PollItem[]> PollAsync(int id)
         // {
@@ -70,6 +82,23 @@ namespace Ntreev.Crema.Services
 
         public Dispatcher Dispatcher { get; private set; }
 
-        public int ID { get; private set; }
+        //public int ID { get; private set; }
+    }
+
+    class UserServiceImpl : ContextBase, IUserService
+    {
+        public UserServiceImpl()
+        {
+            
+        }
+        public Task<int> LoginAsync(string user)
+        {
+            return this.InvokeAsyncWithResult<int>(nameof(LoginAsync), typeof(string), user);
+        }
+
+        public Task<(int, string)> LogoutAsync(string user, int count)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
