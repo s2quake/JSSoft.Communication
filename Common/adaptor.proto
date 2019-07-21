@@ -8,13 +8,13 @@ service Adaptor {
 
 message InvokeRequest {
     string name = 1;
-    string type = 2;
-    string data = 3;
+    repeated string types = 2;
+    repeated string datas = 3;
 }
 
 message InvokeReply {
-    string type = 1;
-    string data = 2;
+    repeated string types = 1;
+    repeated string datas = 2;
 }
 
 message PollRequest {

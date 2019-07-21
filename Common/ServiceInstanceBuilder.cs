@@ -9,13 +9,13 @@ using System.Runtime.CompilerServices;
 
 namespace Ntreev.Crema.Services
 {
-    class ServiceInstanceBuilder
+    sealed class ServiceInstanceBuilder
     {
         private readonly Dictionary<string, Type> typeByName = new Dictionary<string, Type>();
         private AssemblyBuilder assemblyBuilder;
         private ModuleBuilder moduleBuilder;
 
-        public ServiceInstanceBuilder()
+        internal ServiceInstanceBuilder()
         {
             this.AssemblyName = new AssemblyName("Ntreev.Crema.Services.Runtime");
         }

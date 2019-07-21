@@ -4,9 +4,9 @@ namespace Ntreev.Crema.Services
 {
     public interface IService
     {
-        void Open();
+        void Open(ServiceToken token);
 
-        void Close();
+        void Close(ServiceToken token);
 
         Type ServiceType { get; }
         Type CallbackType { get; }

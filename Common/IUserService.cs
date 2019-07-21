@@ -1,12 +1,13 @@
 using System;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Users
 {
     interface IUserService
     {
-        void Login(string user);
+        Task LoginAsync(string user);
 
-        void Logout();
+        Task LogoutAsync();
     }
 
 }

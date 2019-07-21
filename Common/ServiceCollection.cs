@@ -48,6 +48,8 @@ namespace Ntreev.Crema.Services
             return this.itemList.Contains(item);
         }
 
+        public int Count => this.itemList.Count;
+
         #region IEnumerable
 
         IEnumerator<IService> IEnumerable<IService>.GetEnumerator()

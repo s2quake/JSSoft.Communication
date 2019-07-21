@@ -11,13 +11,15 @@ using Ntreev.Library.Threading;
 
 namespace Ntreev.Crema.Services
 {
-    abstract class ServiceBase : Adaptor.AdaptorBase, IService
+    abstract class ServiceBase : IService, IServiceInvoker
     {
         private readonly Type serviceType;
         private readonly Type callbackType;
         private CallbackBase callback;
         private Dispatcher dispatcher;
         private readonly PollReplyItem nullReply = new PollReplyItem() { Id = -1 };
+
+        private IAdaptor adaptor;
 
         public ServiceBase(Type serviceType, Type callbackType)
         {
@@ -28,21 +30,26 @@ namespace Ntreev.Crema.Services
             this.dispatcher = new Dispatcher(this);
         }
 
-        public override Task<InvokeReply> Invoke(InvokeRequest request, ServerCallContext context)
-        {
-            throw new NotImplementedException();
-        }
+        // public override Task<InvokeReply> Invoke(InvokeRequest request, ServerCallContext context)
+        // {
+        //     throw new NotImplementedException();
+        // }
 
-        public override async Task Poll(IAsyncStreamReader<PollRequest> requestStream, IServerStreamWriter<PollReply> responseStream, ServerCallContext context)
+        // public override async Task Poll(IAsyncStreamReader<PollRequest> requestStream, IServerStreamWriter<PollReply> responseStream, ServerCallContext context)
+        // {
+        //     while (await requestStream.MoveNext())
+        //     {
+        //         var request = requestStream.Current;
+        //         var id = request.Id;
+        //         var reply = new PollReply();
+        //         await this.callback.PollAsync(reply, id);
+        //         await responseStream.WriteAsync(reply);
+        //     }
+        // }
+
+        public Task<InvokeResult> Invoke(InvokeInfo info)
         {
-            while (await requestStream.MoveNext())
-            {
-                var request = requestStream.Current;
-                var id = request.Id;
-                var reply = new PollReply();
-                await this.callback.PollAsync(reply, id);
-                await responseStream.WriteAsync(reply);
-            }
+            
         }
 
         public void Dispose()
@@ -56,19 +63,31 @@ namespace Ntreev.Crema.Services
 
         public Type CallbackType => this.callbackType;
 
-        internal ServerServiceDefinition Open(ServiceInstanceBuilder instanceBuilder)
+        public void Open(ServiceToken token)
         {
-            var typeName = $"{this.callbackType.Name}Impl";
-            var typeNamespace = this.callbackType.Namespace;
-            var implType = instanceBuilder.CreateType(typeName, typeNamespace, this.callbackType);
-            this.callback = TypeDescriptor.CreateInstance(null, implType, null, null) as CallbackBase;
-            return Adaptor.BindService(this);
+            this.adaptor = token.Adaptor;
+            this.callback = token.Callback;
+            this.OnOpened(EventArgs.Empty);
         }
 
-        internal void Close()
+        public void Close(ServiceToken token)
         {
-            this.callback.Dispose();
+            this.adaptor = null;
             this.callback = null;
+        }
+
+        public event EventHandler Opened;
+
+        public event EventHandler Closed;
+
+        protected virtual void OnOpened(EventArgs e)
+        {
+            this.OnOpened(EventArgs.Empty);
+        }
+
+        protected virtual void OnClosed(EventArgs e)
+        {
+            this.OnClosed(EventArgs.Empty);
         }
     }
     abstract class ServiceBase<T, U> : ServiceBase where T : class where U : class

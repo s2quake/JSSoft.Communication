@@ -24,22 +24,23 @@ namespace Ntreev.Crema.Services {
     static AdaptorReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "Cg1hZGFwdG9yLnByb3RvEhVudHJlZXYuY3JlbWEuc2VydmljZXMiOQoNSW52",
-            "b2tlUmVxdWVzdBIMCgRuYW1lGAEgASgJEgwKBHR5cGUYAiABKAkSDAoEZGF0",
-            "YRgDIAEoCSIpCgtJbnZva2VSZXBseRIMCgR0eXBlGAEgASgJEgwKBGRhdGEY",
-            "AiABKAkiGQoLUG9sbFJlcXVlc3QSCgoCaWQYASABKAUiRQoNUG9sbFJlcGx5",
-            "SXRlbRIKCgJpZBgBIAEoBRIMCgRuYW1lGAIgASgJEgwKBHR5cGUYAyADKAkS",
-            "DAoEZGF0YRgEIAMoCSJACglQb2xsUmVwbHkSMwoFaXRlbXMYASADKAsyJC5u",
-            "dHJlZXYuY3JlbWEuc2VydmljZXMuUG9sbFJlcGx5SXRlbTKzAQoHQWRhcHRv",
-            "chJUCgZJbnZva2USJC5udHJlZXYuY3JlbWEuc2VydmljZXMuSW52b2tlUmVx",
-            "dWVzdBoiLm50cmVldi5jcmVtYS5zZXJ2aWNlcy5JbnZva2VSZXBseSIAElIK",
-            "BFBvbGwSIi5udHJlZXYuY3JlbWEuc2VydmljZXMuUG9sbFJlcXVlc3QaIC5u",
-            "dHJlZXYuY3JlbWEuc2VydmljZXMuUG9sbFJlcGx5IgAoATABYgZwcm90bzM="));
+            "Cg1hZGFwdG9yLnByb3RvEhVudHJlZXYuY3JlbWEuc2VydmljZXMiOwoNSW52",
+            "b2tlUmVxdWVzdBIMCgRuYW1lGAEgASgJEg0KBXR5cGVzGAIgAygJEg0KBWRh",
+            "dGFzGAMgAygJIisKC0ludm9rZVJlcGx5Eg0KBXR5cGVzGAEgAygJEg0KBWRh",
+            "dGFzGAIgAygJIhkKC1BvbGxSZXF1ZXN0EgoKAmlkGAEgASgFIkUKDVBvbGxS",
+            "ZXBseUl0ZW0SCgoCaWQYASABKAUSDAoEbmFtZRgCIAEoCRIMCgR0eXBlGAMg",
+            "AygJEgwKBGRhdGEYBCADKAkiQAoJUG9sbFJlcGx5EjMKBWl0ZW1zGAEgAygL",
+            "MiQubnRyZWV2LmNyZW1hLnNlcnZpY2VzLlBvbGxSZXBseUl0ZW0yswEKB0Fk",
+            "YXB0b3ISVAoGSW52b2tlEiQubnRyZWV2LmNyZW1hLnNlcnZpY2VzLkludm9r",
+            "ZVJlcXVlc3QaIi5udHJlZXYuY3JlbWEuc2VydmljZXMuSW52b2tlUmVwbHki",
+            "ABJSCgRQb2xsEiIubnRyZWV2LmNyZW1hLnNlcnZpY2VzLlBvbGxSZXF1ZXN0",
+            "GiAubnRyZWV2LmNyZW1hLnNlcnZpY2VzLlBvbGxSZXBseSIAKAEwAWIGcHJv",
+            "dG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Services.InvokeRequest), global::Ntreev.Crema.Services.InvokeRequest.Parser, new[]{ "Name", "Type", "Data" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Services.InvokeReply), global::Ntreev.Crema.Services.InvokeReply.Parser, new[]{ "Type", "Data" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Services.InvokeRequest), global::Ntreev.Crema.Services.InvokeRequest.Parser, new[]{ "Name", "Types_", "Datas" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Services.InvokeReply), global::Ntreev.Crema.Services.InvokeReply.Parser, new[]{ "Types_", "Datas" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Services.PollRequest), global::Ntreev.Crema.Services.PollRequest.Parser, new[]{ "Id" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Services.PollReplyItem), global::Ntreev.Crema.Services.PollReplyItem.Parser, new[]{ "Id", "Name", "Type", "Data" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Services.PollReply), global::Ntreev.Crema.Services.PollReply.Parser, new[]{ "Items" }, null, null, null)
@@ -75,8 +76,8 @@ namespace Ntreev.Crema.Services {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public InvokeRequest(InvokeRequest other) : this() {
       name_ = other.name_;
-      type_ = other.type_;
-      data_ = other.data_;
+      types_ = other.types_.Clone();
+      datas_ = other.datas_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -96,26 +97,24 @@ namespace Ntreev.Crema.Services {
       }
     }
 
-    /// <summary>Field number for the "type" field.</summary>
-    public const int TypeFieldNumber = 2;
-    private string type_ = "";
+    /// <summary>Field number for the "types" field.</summary>
+    public const int Types_FieldNumber = 2;
+    private static readonly pb::FieldCodec<string> _repeated_types_codec
+        = pb::FieldCodec.ForString(18);
+    private readonly pbc::RepeatedField<string> types_ = new pbc::RepeatedField<string>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public string Type {
-      get { return type_; }
-      set {
-        type_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
-      }
+    public pbc::RepeatedField<string> Types_ {
+      get { return types_; }
     }
 
-    /// <summary>Field number for the "data" field.</summary>
-    public const int DataFieldNumber = 3;
-    private string data_ = "";
+    /// <summary>Field number for the "datas" field.</summary>
+    public const int DatasFieldNumber = 3;
+    private static readonly pb::FieldCodec<string> _repeated_datas_codec
+        = pb::FieldCodec.ForString(26);
+    private readonly pbc::RepeatedField<string> datas_ = new pbc::RepeatedField<string>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public string Data {
-      get { return data_; }
-      set {
-        data_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
-      }
+    public pbc::RepeatedField<string> Datas {
+      get { return datas_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -132,8 +131,8 @@ namespace Ntreev.Crema.Services {
         return true;
       }
       if (Name != other.Name) return false;
-      if (Type != other.Type) return false;
-      if (Data != other.Data) return false;
+      if(!types_.Equals(other.types_)) return false;
+      if(!datas_.Equals(other.datas_)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -141,8 +140,8 @@ namespace Ntreev.Crema.Services {
     public override int GetHashCode() {
       int hash = 1;
       if (Name.Length != 0) hash ^= Name.GetHashCode();
-      if (Type.Length != 0) hash ^= Type.GetHashCode();
-      if (Data.Length != 0) hash ^= Data.GetHashCode();
+      hash ^= types_.GetHashCode();
+      hash ^= datas_.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -160,14 +159,8 @@ namespace Ntreev.Crema.Services {
         output.WriteRawTag(10);
         output.WriteString(Name);
       }
-      if (Type.Length != 0) {
-        output.WriteRawTag(18);
-        output.WriteString(Type);
-      }
-      if (Data.Length != 0) {
-        output.WriteRawTag(26);
-        output.WriteString(Data);
-      }
+      types_.WriteTo(output, _repeated_types_codec);
+      datas_.WriteTo(output, _repeated_datas_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -179,12 +172,8 @@ namespace Ntreev.Crema.Services {
       if (Name.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Name);
       }
-      if (Type.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Type);
-      }
-      if (Data.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Data);
-      }
+      size += types_.CalculateSize(_repeated_types_codec);
+      size += datas_.CalculateSize(_repeated_datas_codec);
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -199,12 +188,8 @@ namespace Ntreev.Crema.Services {
       if (other.Name.Length != 0) {
         Name = other.Name;
       }
-      if (other.Type.Length != 0) {
-        Type = other.Type;
-      }
-      if (other.Data.Length != 0) {
-        Data = other.Data;
-      }
+      types_.Add(other.types_);
+      datas_.Add(other.datas_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -221,11 +206,11 @@ namespace Ntreev.Crema.Services {
             break;
           }
           case 18: {
-            Type = input.ReadString();
+            types_.AddEntriesFrom(input, _repeated_types_codec);
             break;
           }
           case 26: {
-            Data = input.ReadString();
+            datas_.AddEntriesFrom(input, _repeated_datas_codec);
             break;
           }
         }
@@ -259,8 +244,8 @@ namespace Ntreev.Crema.Services {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public InvokeReply(InvokeReply other) : this() {
-      type_ = other.type_;
-      data_ = other.data_;
+      types_ = other.types_.Clone();
+      datas_ = other.datas_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -269,26 +254,24 @@ namespace Ntreev.Crema.Services {
       return new InvokeReply(this);
     }
 
-    /// <summary>Field number for the "type" field.</summary>
-    public const int TypeFieldNumber = 1;
-    private string type_ = "";
+    /// <summary>Field number for the "types" field.</summary>
+    public const int Types_FieldNumber = 1;
+    private static readonly pb::FieldCodec<string> _repeated_types_codec
+        = pb::FieldCodec.ForString(10);
+    private readonly pbc::RepeatedField<string> types_ = new pbc::RepeatedField<string>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public string Type {
-      get { return type_; }
-      set {
-        type_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
-      }
+    public pbc::RepeatedField<string> Types_ {
+      get { return types_; }
     }
 
-    /// <summary>Field number for the "data" field.</summary>
-    public const int DataFieldNumber = 2;
-    private string data_ = "";
+    /// <summary>Field number for the "datas" field.</summary>
+    public const int DatasFieldNumber = 2;
+    private static readonly pb::FieldCodec<string> _repeated_datas_codec
+        = pb::FieldCodec.ForString(18);
+    private readonly pbc::RepeatedField<string> datas_ = new pbc::RepeatedField<string>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public string Data {
-      get { return data_; }
-      set {
-        data_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
-      }
+    public pbc::RepeatedField<string> Datas {
+      get { return datas_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -304,16 +287,16 @@ namespace Ntreev.Crema.Services {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (Type != other.Type) return false;
-      if (Data != other.Data) return false;
+      if(!types_.Equals(other.types_)) return false;
+      if(!datas_.Equals(other.datas_)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override int GetHashCode() {
       int hash = 1;
-      if (Type.Length != 0) hash ^= Type.GetHashCode();
-      if (Data.Length != 0) hash ^= Data.GetHashCode();
+      hash ^= types_.GetHashCode();
+      hash ^= datas_.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -327,14 +310,8 @@ namespace Ntreev.Crema.Services {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
-      if (Type.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(Type);
-      }
-      if (Data.Length != 0) {
-        output.WriteRawTag(18);
-        output.WriteString(Data);
-      }
+      types_.WriteTo(output, _repeated_types_codec);
+      datas_.WriteTo(output, _repeated_datas_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -343,12 +320,8 @@ namespace Ntreev.Crema.Services {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
       int size = 0;
-      if (Type.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Type);
-      }
-      if (Data.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Data);
-      }
+      size += types_.CalculateSize(_repeated_types_codec);
+      size += datas_.CalculateSize(_repeated_datas_codec);
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -360,12 +333,8 @@ namespace Ntreev.Crema.Services {
       if (other == null) {
         return;
       }
-      if (other.Type.Length != 0) {
-        Type = other.Type;
-      }
-      if (other.Data.Length != 0) {
-        Data = other.Data;
-      }
+      types_.Add(other.types_);
+      datas_.Add(other.datas_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -378,11 +347,11 @@ namespace Ntreev.Crema.Services {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
-            Type = input.ReadString();
+            types_.AddEntriesFrom(input, _repeated_types_codec);
             break;
           }
           case 18: {
-            Data = input.ReadString();
+            datas_.AddEntriesFrom(input, _repeated_datas_codec);
             break;
           }
         }

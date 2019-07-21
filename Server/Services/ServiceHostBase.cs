@@ -1,16 +1,19 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 using Grpc.Core;
 
 namespace Ntreev.Crema.Services
 {
     abstract class ServiceHostBase : IServiceHost
     {
-        private Grpc.Core.Server server;
+        private IAdaptorHost adaptorHost;
         private ServiceInstanceBuilder instanceBuilder;
 
-        protected ServiceHostBase(IEnumerable<IService> services)
+        protected ServiceHostBase(IAdaptorHost adaptorHost, IEnumerable<IService> services)
         {
+            this.adaptorHost = adaptorHost;
             this.Services = new ServiceCollection(this);
             this.Port = 4004;
             this.instanceBuilder = new ServiceInstanceBuilder();
@@ -18,15 +21,25 @@ namespace Ntreev.Crema.Services
 
         public void Open()
         {
-            this.server = new Grpc.Core.Server()
-            {
-                Ports = { new Grpc.Core.ServerPort("localhost", 4004, Grpc.Core.ServerCredentials.Insecure) }
-            };
+            var tokenByService = new Dictionary<IService, ServiceToken>(this.Services.Count);
             foreach (var item in this.Services)
             {
-                var service = item.Open(this.instanceBuilder);
+                var callbackType = item.CallbackType;
+                var typeName = $"{callbackType.Name}Impl";
+                var typeNamespace = callbackType.Namespace;
+                var implType = instanceBuilder.CreateType(typeName, typeNamespace, callbackType);
+                var callback = TypeDescriptor.CreateInstance(null, implType, null, null) as CallbackBase;
+                var adaptor = this.adaptorHost.Create(item, callback);
+                var token = new ServiceToken(adaptor, callback);
+                tokenByService.Add(item, token);
             }
-            this.server.Start();
+            var adaptors = tokenByService.Values.Select(item => item.Adaptor);
+            this.adaptorHost.Open("localhost", 4004, adaptors);
+            foreach (var item in this.Services)
+            {
+                var token = tokenByService[item];
+                item.Open(token);
+            }
             this.OnOpened(EventArgs.Empty);
         }
 

@@ -6,7 +6,7 @@ using Ntreev.Library.Threading;
 
 namespace Ntreev.Crema.Services
 {
-    class CallbackBase
+    public class CallbackBase
     {
         private JsonSerializerSettings settings = new JsonSerializerSettings();
         private List<PollReplyItem> callbackList = new List<PollReplyItem>();

@@ -11,14 +11,15 @@ namespace Ntreev.Crema.Services.Users
     [Export(typeof(IService))]
     class UserService : ServiceBase<IUserService, IUserServiceCallback>, IUserService
     {
-        public void Login(string user)
+        public Task LoginAsync(string user)
         {
-
+            return Task.Delay(100);
+            //Task.Run(()=> this.Callback.OnAdd("WER", 0));
         }
 
-        public void Logout()
+        public Task LogoutAsync()
         {
-
+            return Task.Delay(100);
         }
     }
 
