@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
@@ -6,18 +8,18 @@ using Newtonsoft.Json;
 
 namespace Ntreev.Crema.Services
 {
-    class AdaptorImpl : Adaptor.AdaptorClient, IAdaptor
+    class AdaptorImpl : Adaptor.AdaptorClient
     {
         private static readonly JsonSerializerSettings settings = new JsonSerializerSettings();
         private readonly Grpc.Core.Channel channel;
-        private readonly IService service;
+        private readonly IService[] services;
         private AsyncDuplexStreamingCall<PollRequest, PollReply> call;
 
-        public AdaptorImpl(Grpc.Core.Channel channel, IService service)
+        public AdaptorImpl(Grpc.Core.Channel channel, IEnumerable<IService> services)
             : base(channel)
         {
             this.channel = channel;
-            this.service = service;
+            this.services = services.ToArray();
         }
 
         public async Task<InvokeResult> InvokeAsync(InvokeInfo info)
@@ -96,28 +98,5 @@ namespace Ntreev.Crema.Services
             result.Data = JsonConvert.DeserializeObject(reply.Data, result.Type, settings);
             return result;
         }
-
-        // protected async override Task<PollReply> RequestAsync(PollRequest request, CancellationToken cancellation)
-        // {
-        //     await this.call.RequestStream.WriteAsync(request);
-        //     await this.call.ResponseStream.MoveNext(cancellation);
-        //     return this.call.ResponseStream.Current;
-        // }
-
-        // protected override Adaptor.AdaptorClient CreateClient(Channel channel)
-        // {
-        //     return new Adaptor.AdaptorClient(channel);
-        // }
-
-        // protected override void OnPollBegun()
-        // {
-        //     this.call = this.Client.Poll();
-        // }
-
-        // protected override void OnPollEnded()
-        // {
-        //     this.call.Dispose();
-        //     this.call = null;
-        // }
     }
 }

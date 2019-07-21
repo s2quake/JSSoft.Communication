@@ -5,21 +5,21 @@ namespace Ntreev.Crema.Services
     public sealed class ServiceToken
     {
 #if Server
-        internal ServiceToken(IAdaptor adaptor, object callback)
+        internal ServiceToken(IAdaptorHost adaptorHost, object callback)
         {
-            this.Adaptor = adaptor;
+            this.AdaptorHost = adaptorHost;
             this.Callback = callback;
         }
 #endif
 #if Client
-        internal ServiceToken(IAdaptor adaptor, object client)
+        internal ServiceToken(IAdaptorHost adaptorHost, object client)
         {
-            this.Adaptor = adaptor;
+            this.AdaptorHost = adaptorHost;
             this.Client = client;
         }
 #endif
 
-        public IAdaptor Adaptor { get; }
+        public IAdaptorHost AdaptorHost { get; }
 
 #if Server
         public object Callback { get; }

@@ -12,7 +12,7 @@ namespace Ntreev.Crema.Services.Users
     [Export(typeof(IService))]
     class UserService : ServiceBase<IUserService, IUserServiceCallback>, IUserServiceCallback
     {
-        private AsyncDuplexStreamingCall<PollRequest, PollReply> call;
+        //private AsyncDuplexStreamingCall<PollRequest, PollReply> call;
 
         public UserService()
             : base()

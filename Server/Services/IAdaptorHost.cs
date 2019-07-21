@@ -5,10 +5,8 @@ namespace Ntreev.Crema.Services
 {
     public interface IAdaptorHost
     {
-        void Open(string host, int port, IEnumerable<IAdaptor> adaptors);
+        void Open(string host, int port);
 
         void Close();
-
-        IAdaptor Create(IService service);
     }
 }

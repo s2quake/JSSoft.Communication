@@ -1,27 +1,31 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Newtonsoft.Json;
 
 namespace Ntreev.Crema.Services
 {
-    class AdaptorImpl : Adaptor.AdaptorBase, IAdaptor
+    class AdaptorImpl : Adaptor.AdaptorBase
     {
         private static readonly JsonSerializerSettings settings = new JsonSerializerSettings();
-        private readonly AdaptorHost adaptorHost;
-        private IService service;
+        private readonly Dictionary<string, IService> serviceByName = new Dictionary<string, IService>();
+        //private readonly AdaptorHost adaptorHost;
+        //private IService service;
 
-        public AdaptorImpl(AdaptorHost adaptorHost, IService service)
+        public AdaptorImpl(IEnumerable<IService> services)
         {
-            this.adaptorHost = adaptorHost;
-            this.service = service;
+            this.serviceByName = services.ToDictionary(item => item.Name);
+            //this.adaptorHost = adaptorHost;
+            //this.service = service;
         }
 
         public override async Task<InvokeReply> Invoke(InvokeRequest request, ServerCallContext context)
         {
             var info = ToInvokeInfo(request);
-            var result = await this.service.InvokeAsync(context, info);
+            var service = this.serviceByName[info.ServiceName];
+            var result = await service.InvokeAsync(context, info);
             return ToInvokeReply(result);
         }
 
@@ -31,8 +35,9 @@ namespace Ntreev.Crema.Services
             {
                 var request = requestStream.Current;
                 var id = request.Id;
-                var reply = new PollReply();
-                var results = await this.service.PollAsync(context, id);
+                var reply = new PollReply() { ServiceName = request.ServiceName };
+                var service = this.serviceByName[reply.ServiceName];
+                var results = await service.PollAsync(context, id);
                 await responseStream.WriteAsync(reply);
             }
         }

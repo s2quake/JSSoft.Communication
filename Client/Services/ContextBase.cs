@@ -20,7 +20,9 @@ namespace Ntreev.Crema.Services
             this.Dispatcher = new Dispatcher(this);
         }
 
-        public IAdaptor Adaptor{get;set;}
+        public IAdaptorHost AdaptorHost{get;set;}
+
+        public string ServiceName{get;set;}
 
         public void Dispose()
         {
@@ -35,6 +37,7 @@ namespace Ntreev.Crema.Services
             var length = args.Length / 2;
             var invokeInfo = new InvokeInfo()
             {
+                ServiceName = this.ServiceName,
                 Name = name,
                 Types = new Type[length],
                 Datas = new object[length],
@@ -46,7 +49,7 @@ namespace Ntreev.Crema.Services
                 invokeInfo.Types[i] = type;
                 invokeInfo.Datas[i] = value;
             }
-            var result = await this.Adaptor.InvokeAsync(invokeInfo);
+            var result = await this.AdaptorHost.InvokeAsync(invokeInfo);
             return (T)result.Data;
         }
 

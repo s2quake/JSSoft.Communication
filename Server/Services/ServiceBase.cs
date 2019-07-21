@@ -18,12 +18,13 @@ namespace Ntreev.Crema.Services
         private CallbackBase callback;
         private Dispatcher dispatcher;
         //private readonly PollReplyItem nullReply = new PollReplyItem() { Id = -1 };
-        private IAdaptor adaptor;
+        private IAdaptorHost adaptorHost;
 
         public ServiceBase(Type serviceType, Type callbackType)
         {
             if (serviceType.IsAssignableFrom(this.GetType()) == false)
                 throw new ArgumentException("invalid type", nameof(serviceType));
+            this.Name = serviceType.Name;
             this.serviceType = serviceType;
             this.callbackType = callbackType;
             this.dispatcher = new Dispatcher(this);
@@ -53,17 +54,19 @@ namespace Ntreev.Crema.Services
 
         public void Open(ServiceToken token)
         {
-            this.adaptor = token.Adaptor;
+            this.adaptorHost = token.AdaptorHost;
             this.callback = token.Callback as CallbackBase;
             this.OnOpened(EventArgs.Empty);
         }
 
         public void Close(ServiceToken token)
         {
-            this.adaptor = null;
+            this.adaptorHost = null;
             this.callback = null;
             this.OnClosed(EventArgs.Empty);
         }
+
+        public string Name {get;}
 
         public event EventHandler Opened;
 

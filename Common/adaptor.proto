@@ -7,18 +7,21 @@ service Adaptor {
 }
 
 message InvokeRequest {
-    string name = 1;
-    repeated string types = 2;
-    repeated string datas = 3;
+    string serviceName = 1;
+    string name = 2;
+    repeated string types = 3;
+    repeated string datas = 4;
 }
 
 message InvokeReply {
-    string type = 1;
-    string data = 2;
+    string serviceName = 1;
+    string type = 2;
+    string data = 3;
 }
 
 message PollRequest {
-    int32 id = 1;
+    string serviceName = 1;
+    int32 id = 2;
 }
 
 message PollReplyItem {
@@ -29,5 +32,6 @@ message PollReplyItem {
 }
 
 message PollReply {
-    repeated PollReplyItem items = 1;
+    string serviceName = 1;
+    repeated PollReplyItem items = 2;
 }

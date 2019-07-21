@@ -30,12 +30,10 @@ namespace Ntreev.Crema.Services
                 var typeNamespace = callbackType.Namespace;
                 var implType = instanceBuilder.CreateType(typeName, typeNamespace, typeof(CallbackBase), callbackType);
                 var callback = TypeDescriptor.CreateInstance(null, implType, null, null);
-                var adaptor = this.adaptorHost.Create(item);
-                var token = new ServiceToken(adaptor, callback);
+                var token = new ServiceToken(this.adaptorHost, callback);
                 this.tokenByService.Add(item, token);
             }
-            var adaptors = this.tokenByService.Values.Select(item => item.Adaptor);
-            this.adaptorHost.Open("localhost", 4004, adaptors);
+            this.adaptorHost.Open("localhost", 4004);
             foreach (var item in this.Services)
             {
                 var token = this.tokenByService[item];

@@ -17,6 +17,8 @@ namespace Ntreev.Crema.Services
 
         Type CallbackType { get; }
 
+        string Name { get; }
+
         event EventHandler Opened;
 
         event EventHandler Closed;

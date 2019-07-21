@@ -26,6 +26,7 @@ namespace Ntreev.Crema.Services
         {
             if (callbackType.IsAssignableFrom(this.GetType()) == false)
                 throw new ArgumentException("invalid type", nameof(serviceType));
+                this.Name = serviceType.Name;
             this.serviceType = serviceType;
             this.callbackType = callbackType;
             this.dispatcher = new Dispatcher(this);
@@ -88,6 +89,8 @@ namespace Ntreev.Crema.Services
         public Type ServiceType => this.serviceType;
 
         public Type CallbackType => this.callbackType;
+
+        public string Name {get;}
 
         // private async Task PollAsync()
         // {

@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services
 {
@@ -9,6 +11,8 @@ namespace Ntreev.Crema.Services
 
         void Close();
 
-        IAdaptor Create(IService service);
+        Task<InvokeResult> InvokeAsync(InvokeInfo info);
+
+        Task PollAsync(Action<PollItem> callback, CancellationToken cancellation);
     }
 }

@@ -6,13 +6,13 @@ using Grpc.Core;
 using Newtonsoft.Json;
 using Ntreev.Library.Threading;
 
-namespace Ntreev.Crema.Services.Users
+namespace Ntreev.Crema.Services.Data
 {
     [Export(typeof(IService))]
-    class UserService : ServiceBase<IUserService, IUserServiceCallback>, IUserService
+    class DataService : ServiceBase<IDataService, IDataServiceCallback>, IDataService
     {
         [ServiceContract]
-        public async Task<int> LoginAsync(string user)
+        public async Task<int> LoginAsync(string Data)
         {
             await Task.Delay(100);
             Console.WriteLine("LoginAsync");
@@ -21,7 +21,7 @@ namespace Ntreev.Crema.Services.Users
         }
 
         [ServiceContract]
-        public async Task<(int, string)> LogoutAsync(string user, int count)
+        public async Task<(int, string)> LogoutAsync(string Data, int count)
         {
             await Task.Delay(100);
             return (1, "ser");
