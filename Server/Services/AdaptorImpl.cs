@@ -11,14 +11,10 @@ namespace Ntreev.Crema.Services
     {
         private static readonly JsonSerializerSettings settings = new JsonSerializerSettings();
         private readonly Dictionary<string, IService> serviceByName = new Dictionary<string, IService>();
-        //private readonly AdaptorHost adaptorHost;
-        //private IService service;
 
         public AdaptorImpl(IEnumerable<IService> services)
         {
             this.serviceByName = services.ToDictionary(item => item.Name);
-            //this.adaptorHost = adaptorHost;
-            //this.service = service;
         }
 
         public override async Task<InvokeReply> Invoke(InvokeRequest request, ServerCallContext context)
@@ -44,9 +40,6 @@ namespace Ntreev.Crema.Services
 
         private static InvokeInfo ToInvokeInfo(InvokeRequest request)
         {
-            // pollItem.Types[i] = type.AssemblyQualifiedName;
-            //         pollItem.Datas[i] = JsonConvert.SerializeObject(value, type, this.settings);
-
             var info = new InvokeInfo()
             {
                 Name = request.Name,
@@ -83,7 +76,6 @@ namespace Ntreev.Crema.Services
             reply.Items.AddRange(replyItemList);
             return reply;
         }
-
 
         private static PollReplyItem ToPollReplyItem(PollItem pollItem)
         {

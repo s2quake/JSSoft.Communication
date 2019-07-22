@@ -11,8 +11,8 @@ namespace Ntreev.Crema.Services
 
         void Close();
 
-        Task<InvokeResult> InvokeAsync(InvokeInfo info);
+        // Task<InvokeResult> InvokeAsync(InvokeInfo info);
 
-        Task PollAsync(Action<PollItem> callback, CancellationToken cancellation);
+        // Task PollAsync(Action<PollItem> callback, CancellationToken cancellation);
     }
 }

@@ -14,25 +14,35 @@ namespace Ntreev.Crema.Services
         private readonly Grpc.Core.Channel channel;
         private readonly IService[] services;
         private AsyncDuplexStreamingCall<PollRequest, PollReply> call;
+        private CancellationTokenSource cancellation;
+        private Task task;
 
         public AdaptorImpl(Grpc.Core.Channel channel, IEnumerable<IService> services)
             : base(channel)
         {
             this.channel = channel;
             this.services = services.ToArray();
+            this.cancellation = new CancellationTokenSource();
+
+            this.task = this.PollAsync(this.cancellation.Token);
         }
 
         public async Task<InvokeResult> InvokeAsync(InvokeInfo info)
         {
             var request = ToInvokeReqeust(info);
             var reply = await Task.Run(() => this.Invoke(request));
-            return ToInvokeResult(reply);            
+            return ToInvokeResult(reply);
 
         }
 
         public int ID { get; set; }
 
-        public async Task PollAsync(Action<PollItem> callback, CancellationToken cancellation)
+        private void OnPoll(PollItem pollItem)
+        {
+
+        }
+
+        public async Task PollAsync(CancellationToken cancellation)
         {
             this.call = this.Poll();
             while (!cancellation.IsCancellationRequested)
@@ -47,7 +57,7 @@ namespace Ntreev.Crema.Services
                     if (item.Id >= 0)
                     {
                         var pollItem = ToPollItem(item);
-                        callback(pollItem);
+                        this.OnPoll(pollItem);
                         this.ID = item.Id + 1;
                     }
                 }
@@ -81,7 +91,7 @@ namespace Ntreev.Crema.Services
             {
                 Name = info.Name,
             };
-            for(var i=0;i<info.Types.Length ; i++)
+            for (var i = 0; i < info.Types.Length; i++)
             {
                 types[i] = info.Types[i].AssemblyQualifiedName;
                 datas[i] = JsonConvert.SerializeObject(info.Datas[i], info.Types[i], settings);

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using Ntreev.Library.Threading;
 
 namespace Ntreev.Crema.Services
@@ -48,13 +47,12 @@ namespace Ntreev.Crema.Services
 
         public Task InvokeAsync(string name, params object[] args)
         {
-throw new NotImplementedException();
+            throw new NotImplementedException();
         }
-        
 
         public Task<T> InvokeAsyncWithResult<T>(string name, params object[] args)
         {
-throw new NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public Task<PollItem[]> PollAsync(int id)

@@ -20,7 +20,7 @@ namespace Ntreev.Crema.Services
         private Task task;
         private Dispatcher dispatcher;
 
-        private IAdaptor adaptor;
+        private IAdaptorHost adaptorHost;
 
         public ServiceBase(Type serviceType, Type callbackType)
         {
@@ -168,20 +168,20 @@ namespace Ntreev.Crema.Services
         {
             this.cancellation = new CancellationTokenSource();
             this.dispatcher = new Dispatcher(this);
-            this.adaptor = token.Adaptor;
+            this.adaptorHost = token.AdaptorHost;
             this.service = token.Client;
-            this.task = this.adaptor.PollAsync(this.InvokeMethod, this.cancellation.Token);
+            //this.task = this.adaptorHost.PollAsync(this.InvokeMethod, this.cancellation.Token);
             this.OnOpened(EventArgs.Empty);
         }
 
         public void Close(ServiceToken token)
         {
-            this.cancellation.Cancel();
-            this.task.Wait();
-            this.task = null;
+            //this.cancellation.Cancel();
+            //this.task.Wait();
+            //this.task = null;
             this.dispatcher.Dispose();
             this.dispatcher = null;
-            this.adaptor = null;
+            this.adaptorHost = null;
             this.service = null;
             this.OnClosed(EventArgs.Empty);
         }

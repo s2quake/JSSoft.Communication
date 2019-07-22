@@ -20,31 +20,18 @@ namespace Server
     {
         static void Main(string[] args)
         {
-            var cancellation = new CancellationTokenSource();
-            var serviceHost = Container.GetService<IServiceHost>();
-            serviceHost.Open();
-            //var task = InvokeTest(serviceHost, cancellation.Token);
-            Console.WriteLine("press any key to exit.");
-            Console.ReadKey();
-            cancellation.Cancel();
-            //task.Wait();
-            serviceHost.Close();
-            Container.Release();
-        }
-
-        static Task InvokeTest(IServiceHost serviceHost, CancellationToken cancellation)
-        {
-            return Task.Run(() =>
+            try
             {
-                while (!cancellation.IsCancellationRequested)
+                using (var shell = Shell.Create())
                 {
-                    if (serviceHost.Services[0] is IUserService userService)
-                    {
-                        userService.LoginAsync("wer");
-                    }
-                    Thread.Sleep(1000);
+                    shell.Start();
                 }
-            });
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine(e);
+                Environment.Exit(1);
+            }
         }
     }
 }

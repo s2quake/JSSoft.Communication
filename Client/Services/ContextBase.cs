@@ -20,9 +20,11 @@ namespace Ntreev.Crema.Services
             this.Dispatcher = new Dispatcher(this);
         }
 
-        public IAdaptorHost AdaptorHost{get;set;}
+        public IAdaptorHost AdaptorHost { get; set; }
 
-        public string ServiceName{get;set;}
+        public Func<InvokeInfo, Task<InvokeResult>> InvokeDelegate { get; set; }
+
+        public string ServiceName { get; set; }
 
         public void Dispose()
         {
@@ -49,20 +51,20 @@ namespace Ntreev.Crema.Services
                 invokeInfo.Types[i] = type;
                 invokeInfo.Datas[i] = value;
             }
-            var result = await this.AdaptorHost.InvokeAsync(invokeInfo);
+            var result = await this.InvokeDelegate(invokeInfo);
             return (T)result.Data;
         }
 
-        
+
         public void Invoke(string name, params object[] args)
         {
-throw new NotImplementedException();
+            throw new NotImplementedException();
         }
-        
+
 
         public Task InvokeAsync(string name, params object[] args)
         {
-throw new NotImplementedException();
+            throw new NotImplementedException();
         }
 
         // public Task<InvokeResult> InvokeAsync(InvokeInfo info)
@@ -94,7 +96,7 @@ throw new NotImplementedException();
     {
         public UserServiceImpl()
         {
-            
+
         }
         public Task<int> LoginAsync(string user)
         {

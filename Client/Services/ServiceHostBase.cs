@@ -31,17 +31,16 @@ namespace Ntreev.Crema.Services
                 var typeNamespace = serviceType.Namespace;
                 var implType = instanceBuilder.CreateType(typeName, typeNamespace, typeof(ContextBase), serviceType);
                 var serviceInstance = TypeDescriptor.CreateInstance(null, implType, null, null) as ContextBase;
-                var adaptor = this.adaptorHost.Create(item);
-                serviceInstance.Adaptor = adaptor;
-                (serviceInstance as Users.IUserService).LoginAsync("wer");
+                //serviceInstance.InvokeDelegate = 
+                //(serviceInstance as Users.IUserService).LoginAsync("wer");
             }
-            var adaptors = this.tokenByService.Values.Select(item => item.Adaptor);
-            
-            // foreach (var item in this.Services)
-            // {
-            //     var token = this.tokenByService[item];
-            //     item.Open(token);
-            // }
+            //var adaptors = this.tokenByService.Values.Select(item => item.Adaptor);
+
+            foreach (var item in this.Services)
+            {
+                var token = this.tokenByService[item];
+                item.Open(token);
+            }
             this.OnOpened(EventArgs.Empty);
         }
 
@@ -69,8 +68,8 @@ namespace Ntreev.Crema.Services
         {
             this.Closed?.Invoke(this, e);
         }
-        
-#region IServiceHost
+
+        #region IServiceHost
 
         IReadOnlyList<IService> IServiceHost.Services => this.Services;
 

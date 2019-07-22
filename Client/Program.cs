@@ -11,15 +11,18 @@ namespace Client
     {
         static void Main(string[] args)
         {
-            var cancellation = new CancellationTokenSource();
-            var serviceHost = Container.GetService<IServiceHost>();
-            serviceHost.Open();
-            Console.WriteLine("press any key to exit.");
-            Console.ReadKey();
-            cancellation.Cancel();
-            //task.Wait();
-            serviceHost.Close();
-            Container.Release();
+            try
+            {
+                using (var shell = Shell.Create())
+                {
+                    shell.Start();
+                }
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine(e);
+                Environment.Exit(1);
+            }
         }
     }
 }

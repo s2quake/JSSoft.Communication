@@ -21,24 +21,8 @@ namespace Ntreev.Crema.Services
             this.services = services.ToArray();
         }
 
-        public  Task<InvokeResult> InvokeAsync(InvokeInfo info)
-        {
-            return this.apdatorImpl.InvokeAsync(info);
-
-        }
-        
-        public Task PollAsync(Action<PollItem> callback, CancellationToken cancellation)
-        {
-            return this.apdatorImpl.PollAsync(callback, cancellation);
-        }
-
         #region IAdaptorHost
         
-        // IAdaptor IAdaptorHost.Create(IService service)
-        // {
-        //     return new AdaptorImpl(this.channel, service);
-        // }
-
         void IAdaptorHost.Open(string host, int port)
         {
             this.channel = new Channel($"{host}:{port}", Grpc.Core.ChannelCredentials.Insecure);

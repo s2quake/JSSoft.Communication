@@ -17,7 +17,6 @@ namespace Ntreev.Crema.Services
         private readonly Type callbackType;
         private CallbackBase callback;
         private Dispatcher dispatcher;
-        //private readonly PollReplyItem nullReply = new PollReplyItem() { Id = -1 };
         private IAdaptorHost adaptorHost;
 
         public ServiceBase(Type serviceType, Type callbackType)
