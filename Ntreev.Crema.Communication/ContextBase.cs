@@ -2,11 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Ntreev.Crema.Services.Users;
 using Ntreev.Library.Threading;
 
 // https://sharplab.io/#v2:C4LglgNgNAJiDUAfAAgJgIwFgBQyAMABMugKwDcOyAzEagQMIEDeOBbRNyAbAQJIB2ANwD2AawCmAQQDOAT34BjABTFC/AIYBbcVAIAHdQCct0gsIBGAK3ELgAbQC6BIwHNpASlbtvLbN+/AABaGwgDuBPzi4QBywsC8mnoQ4tr8wOIwAKIAHgriesBgwvxK7hR+7AC+Xmw1HERcADwAKgB8fEJiUnKKLa0q6GpaOvpGJmZWNvZOrh51PvPsQSHhkTFxCUkp4mkZOXkFRSVlddUVtee0BACq0uKGAMr3gmB5mxAEIAx1vv7s1A1GmA0u0ADLCFzAmTyZSqAgAVzuhk8lwWqL+RAA7AQgmBpAA6AQiCTQ3rA4D9DTaYQAMyU4Mh/FJCncumAsj04lpAzwrIRSJO6LYZwxBEWbAB3EaSnJulU7jBEOE8OAzJ5/PuunJBAUyrSKNFv1F/2xuIJRK6zOlsqIgwVSipXLpDKhPRZbI5Tp5fMRmpxnu55L5uvh+vKopFVRwlSAA===
-namespace Ntreev.Crema.Services
+namespace Ntreev.Crema.Communication
 {
     class ContextBase : IDisposable
     {
@@ -90,22 +89,5 @@ namespace Ntreev.Crema.Services
         public Dispatcher Dispatcher { get; private set; }
 
         //public int ID { get; private set; }
-    }
-
-    class UserServiceImpl : ContextBase, IUserService
-    {
-        public UserServiceImpl()
-        {
-
-        }
-        public Task<int> LoginAsync(string user)
-        {
-            return this.InvokeAsyncWithResult<int>(nameof(LoginAsync), typeof(string), user);
-        }
-
-        public Task<(int, string)> LogoutAsync(string user, int count)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

@@ -6,11 +6,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Newtonsoft.Json;
+using Ntreev.Crema.Communication;
 
 namespace Ntreev.Crema.Services.Users
 {
     [Export(typeof(IService))]
-    class UserService : ServiceBase<IUserService, IUserServiceCallback>, IUserServiceCallback
+    class UserService : ClientServiceBase<IUserService, IUserServiceCallback>, IUserServiceCallback
     {
         //private AsyncDuplexStreamingCall<PollRequest, PollReply> call;
 

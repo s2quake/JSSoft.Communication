@@ -1,32 +1,31 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
 
-namespace Ntreev.Crema.Services
+namespace Ntreev.Crema.Communication
 {
-    [Export(typeof(IAdaptorHost))]
-    class AdaptorHost : IAdaptorHost
+    class AdaptorClientHost : IAdaptorHost
     {
         private IService[] services;
         private Channel channel;
-        private AdaptorImpl apdatorImpl;
+        private AdaptorClientImpl apdatorImpl;
+        private ServiceInstanceBuilder instanceBuilder = new ServiceInstanceBuilder();
 
         [ImportingConstructor]
-        public AdaptorHost([ImportMany]IEnumerable<IService> services)
+        public AdaptorClientHost([ImportMany]IEnumerable<IService> services)
         {
             this.services = services.ToArray();
         }
 
-        #region IAdaptorHost
-        
-        void IAdaptorHost.Open(string host, int port)
+        public void Open(string host, int port)
         {
             this.channel = new Channel($"{host}:{port}", Grpc.Core.ChannelCredentials.Insecure);
-            this.apdatorImpl = new AdaptorImpl(this.channel, this.services);
+            this.apdatorImpl = new AdaptorClientImpl(this.channel, this.services);
             //this.Ports.Add(new Grpc.Core.ServerPort(host, port, Grpc.Core.ServerCredentials.Insecure));
             // foreach (var item in adaptors)
             // {
@@ -42,12 +41,20 @@ namespace Ntreev.Crema.Services
             //this.channel.s
         }
 
-        void IAdaptorHost.Close()
+        public void Close()
         {
             this.channel.ShutdownAsync().Wait();
             this.channel = null;
         }
 
-        #endregion
+        public object CreateInstance(IService service)
+        {
+            var instanceType = service.ServiceType;
+            var typeName = $"{instanceType.Name}Impl";
+            var typeNamespace = instanceType.Namespace;
+            var implType = instanceBuilder.CreateType(typeName, typeNamespace, typeof(ContextBase), instanceType);
+            var instance = TypeDescriptor.CreateInstance(null, implType, null, null);
+            return instance;
+        }
     }
 }

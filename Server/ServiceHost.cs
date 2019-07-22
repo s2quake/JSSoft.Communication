@@ -7,11 +7,11 @@ using Ntreev.Crema.Communication;
 namespace Server
 {
     [Export(typeof(IServiceHost))]
-    class ServiceHost : ServiceHostBase
+    class ServiceHost : ServerHostBase
     {
         [ImportingConstructor]
-        public ServiceHost(IAdaptorHost adaptorHost, [ImportMany]IEnumerable<IService> services)
-            : base(adaptorHost, services)
+        public ServiceHost([ImportMany]IEnumerable<IService> services)
+            : base(services)
         {
      
         }

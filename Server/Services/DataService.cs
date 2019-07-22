@@ -10,7 +10,7 @@ using Ntreev.Library.Threading;
 namespace Ntreev.Crema.Services.Data
 {
     [Export(typeof(IService))]
-    class DataService : ServiceBase<IDataService, IDataServiceCallback>, IDataService
+    class DataService : ServerServiceBase<IDataService, IDataServiceCallback>, IDataService
     {
         [ServiceContract]
         public async Task<int> LoginAsync(string Data)

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using Grpc.Core;
 using Newtonsoft.Json;
 
-namespace Ntreev.Crema.Services
+namespace Ntreev.Crema.Communication
 {
-    class AdaptorImpl : Adaptor.AdaptorClient
+    class AdaptorClientImpl : Adaptor.AdaptorClient
     {
         private static readonly JsonSerializerSettings settings = new JsonSerializerSettings();
         private readonly Grpc.Core.Channel channel;
@@ -17,7 +17,7 @@ namespace Ntreev.Crema.Services
         private CancellationTokenSource cancellation;
         private Task task;
 
-        public AdaptorImpl(Grpc.Core.Channel channel, IEnumerable<IService> services)
+        public AdaptorClientImpl(Grpc.Core.Channel channel, IEnumerable<IService> services)
             : base(channel)
         {
             this.channel = channel;
@@ -32,7 +32,6 @@ namespace Ntreev.Crema.Services
             var request = ToInvokeReqeust(info);
             var reply = await Task.Run(() => this.Invoke(request));
             return ToInvokeResult(reply);
-
         }
 
         public int ID { get; set; }

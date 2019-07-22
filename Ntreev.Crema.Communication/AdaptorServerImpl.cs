@@ -7,12 +7,12 @@ using Newtonsoft.Json;
 
 namespace Ntreev.Crema.Communication
 {
-    class AdaptorImpl : Adaptor.AdaptorBase
+    class AdaptorServerImpl : Adaptor.AdaptorBase
     {
         private static readonly JsonSerializerSettings settings = new JsonSerializerSettings();
         private readonly Dictionary<string, IService> serviceByName = new Dictionary<string, IService>();
 
-        public AdaptorImpl(IEnumerable<IService> services)
+        public AdaptorServerImpl(IEnumerable<IService> services)
         {
             this.serviceByName = services.ToDictionary(item => item.Name);
         }

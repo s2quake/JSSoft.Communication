@@ -5,9 +5,9 @@ namespace Ntreev.Crema.Communication
 {
     public interface IService : IDisposable
     {
-        Task<InvokeResult> InvokeAsync(object context, InvokeInfo info);
+        // Task<InvokeResult> InvokeAsync(object context, InvokeInfo info);
 
-        Task<PollItem[]> PollAsync(object context, int id);
+        // Task<PollItem[]> PollAsync(object context, int id);
 
         void Open(ServiceToken token);
 

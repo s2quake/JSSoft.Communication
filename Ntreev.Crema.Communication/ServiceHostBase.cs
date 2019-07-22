@@ -12,7 +12,7 @@ namespace Ntreev.Crema.Communication
         private readonly ServiceInstanceBuilder instanceBuilder;
         private Dictionary<IService, ServiceToken> tokenByService;
 
-        protected ServiceHostBase(IAdaptorHost adaptorHost, IEnumerable<IService> services)
+        internal ServiceHostBase(IAdaptorHost adaptorHost, IEnumerable<IService> services)
         {
             this.adaptorHost = adaptorHost;
             this.instanceBuilder = new ServiceInstanceBuilder();
@@ -23,21 +23,19 @@ namespace Ntreev.Crema.Communication
         public void Open()
         {
             this.tokenByService = new Dictionary<IService, ServiceToken>(this.Services.Count);
-            foreach (var item in this.Services)
-            {
-                var callbackType = item.CallbackType;
-                var typeName = $"{callbackType.Name}Impl";
-                var typeNamespace = callbackType.Namespace;
-                var implType = instanceBuilder.CreateType(typeName, typeNamespace, typeof(CallbackBase), callbackType);
-                var callback = TypeDescriptor.CreateInstance(null, implType, null, null);
-                var token = new ServiceToken(this.adaptorHost, callback);
-                this.tokenByService.Add(item, token);
-            }
             this.adaptorHost.Open("localhost", 4004);
             foreach (var item in this.Services)
             {
-                var token = this.tokenByService[item];
+                var instance = this.adaptorHost.CreateInstance(item);
+                var token = new ServiceToken(this.adaptorHost, instance);
+                this.tokenByService.Add(item, token);
                 item.Open(token);
+            }
+            
+            foreach (var item in this.Services)
+            {
+                var token = this.tokenByService[item];
+                
             }
             this.OnOpened(EventArgs.Empty);
         }
@@ -50,7 +48,7 @@ namespace Ntreev.Crema.Communication
             }
             foreach (var item in this.tokenByService.Values)
             {
-                if (item.Callback is IDisposable disposable)
+                if (item.Instance is IDisposable disposable)
                 {
                     disposable.Dispose();
                 }

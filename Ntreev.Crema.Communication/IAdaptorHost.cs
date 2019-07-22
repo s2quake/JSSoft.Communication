@@ -8,5 +8,7 @@ namespace Ntreev.Crema.Communication
         void Open(string host, int port);
 
         void Close();
+
+        object CreateInstance(IService service);
     }
 }

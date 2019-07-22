@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.Composition;
+using Ntreev.Crema.Communication;
 using Ntreev.Crema.Services;
 using Ntreev.Library.Commands;
 

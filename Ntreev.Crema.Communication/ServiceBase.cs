@@ -10,9 +10,9 @@ namespace Ntreev.Crema.Communication
         private readonly Type callbackType;
         private CallbackBase callback;
         private Dispatcher dispatcher;
-        private IAdaptorHost adaptorHost;
+        //private IAdaptorHost adaptorHost;
 
-        public ServiceBase(Type serviceType, Type callbackType)
+        internal ServiceBase(Type serviceType, Type callbackType)
         {
             if (serviceType.IsAssignableFrom(this.GetType()) == false)
                 throw new ArgumentException("invalid type", nameof(serviceType));
@@ -22,15 +22,15 @@ namespace Ntreev.Crema.Communication
             this.dispatcher = new Dispatcher(this);
         }
 
-        Task<InvokeResult> IService.InvokeAsync(object context, InvokeInfo info)
-        {
-            throw new NotImplementedException();
-        }
+        // Task<InvokeResult> IService.InvokeAsync(object context, InvokeInfo info)
+        // {
+        //     throw new NotImplementedException();
+        // }
 
-        Task<PollItem[]> IService.PollAsync(object context, int id)
-        {
-            return this.callback.PollAsync(id);
-        }
+        // Task<PollItem[]> IService.PollAsync(object context, int id)
+        // {
+        //     return this.callback.PollAsync(id);
+        // }
 
         public void Dispose()
         {
@@ -46,14 +46,14 @@ namespace Ntreev.Crema.Communication
 
         public void Open(ServiceToken token)
         {
-            this.adaptorHost = token.AdaptorHost;
-            this.callback = token.Callback as CallbackBase;
+            //this.adaptorHost = token.AdaptorHost;
+            this.callback = token.Instance as CallbackBase;
             this.OnOpened(EventArgs.Empty);
         }
 
         public void Close(ServiceToken token)
         {
-            this.adaptorHost = null;
+            //this.adaptorHost = null;
             this.callback = null;
             this.OnClosed(EventArgs.Empty);
         }
@@ -73,16 +73,5 @@ namespace Ntreev.Crema.Communication
         {
             this.Closed?.Invoke(this, e);
         }
-    }
-
-    public abstract class ServiceBase<T, U> : ServiceBase where T : class where U : class
-    {
-        protected ServiceBase()
-            : base(typeof(T), typeof(U))
-        {
-
-        }
-
-        protected new U Callback => (U)base.Callback;
     }
 }

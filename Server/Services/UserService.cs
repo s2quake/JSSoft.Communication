@@ -10,7 +10,7 @@ using Ntreev.Library.Threading;
 namespace Ntreev.Crema.Services.Users
 {
     [Export(typeof(IService))]
-    class UserService : ServiceBase<IUserService, IUserServiceCallback>, IUserService
+    class UserService : ServerServiceBase<IUserService, IUserServiceCallback>, IUserService
     {
         [ServiceContract]
         public async Task<int> LoginAsync(string user)

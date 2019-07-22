@@ -70,6 +70,8 @@ namespace Ntreev.Crema.Communication
 
         public Dispatcher Dispatcher { get; private set; }
 
+        public IService Service { get; set; }
+
         public int ID { get; private set; }
     }
 }
