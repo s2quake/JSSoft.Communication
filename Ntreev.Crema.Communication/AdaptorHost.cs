@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 
-namespace Ntreev.Crema.Services
+namespace Ntreev.Crema.Communication
 {
     [Export(typeof(IAdaptorHost))]
     class AdaptorHost : IAdaptorHost

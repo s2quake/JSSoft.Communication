@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Protobuf Include="adaptor.proto" OutputDir="%(RelativePath)" CompileOutputs="false" GrpcServices="both" Access="internal" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="google.protobuf" Version="3.9.0" />
+    <PackageReference Include="grpc" Version="1.22.0" />
+    <PackageReference Include="grpc.tools" Version="1.22.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="System.ComponentModel.Composition" Version="4.5.0" />
+    <ProjectReference Include="..\sub-modules\Ntreev.Library\Ntreev.Library\Ntreev.Library.csproj" />
+  </ItemGroup>
+
+</Project>

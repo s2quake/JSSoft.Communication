@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <ItemGroup>
+  <!-- <ItemGroup>
     <Protobuf Include="..\Common\adaptor.proto" OutputDir="%(RelativePath)Services" CompileOutputs="false" GrpcServices="server" Access="internal" />
     <Compile Include="..\Common\IUserServiceCallback.cs" Link="Services\IUserServiceCallback.cs" />
     <Compile Include="..\Common\IUserService.cs" Link="Services\IUserService.cs" />
@@ -16,7 +16,7 @@
     <Compile Include="..\Common\IServiceHost.cs" Link="Services\IServiceHost.cs" />
     <Compile Include="..\Common\ServiceCollection.cs" Link="Services\ServiceCollection.cs" />
     <Compile Include="..\Common\ServiceToken.cs" Link="Services\ServiceToken.cs" />
-  </ItemGroup>
+  </ItemGroup> -->
 
   <ItemGroup>
     <PackageReference Include="google.protobuf" Version="3.9.0" />
@@ -30,6 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Ntreev.Crema.Communication\Ntreev.Crema.Communication.csproj" />
     <ProjectReference Include="..\sub-modules\Ntreev.Library\Ntreev.Library\Ntreev.Library.csproj" />
     <ProjectReference Include="..\sub-modules\Ntreev.Library\Ntreev.Library.Random\Ntreev.Library.Random.csproj" />
     <ProjectReference Include="..\sub-modules\Ntreev.Library.Commands\Ntreev.Library.Commands\Ntreev.Library.Commands.csproj" />

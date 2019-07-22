@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
-using Ntreev.Crema.Services;
+using Ntreev.Crema.Communication;
 
 namespace Server
 {

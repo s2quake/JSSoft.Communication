@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Newtonsoft.Json;
+using Ntreev.Crema.Communication;
 using Ntreev.Library.Threading;
 
 namespace Ntreev.Crema.Services.Users

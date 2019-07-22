@@ -9,7 +9,7 @@ using pb = global::Google.Protobuf;
 using pbc = global::Google.Protobuf.Collections;
 using pbr = global::Google.Protobuf.Reflection;
 using scg = global::System.Collections.Generic;
-namespace Ntreev.Crema.Services {
+namespace Ntreev.Crema.Communication {
 
   /// <summary>Holder for reflection information generated from adaptor.proto</summary>
   internal static partial class AdaptorReflection {
@@ -24,27 +24,28 @@ namespace Ntreev.Crema.Services {
     static AdaptorReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "Cg1hZGFwdG9yLnByb3RvEhVudHJlZXYuY3JlbWEuc2VydmljZXMiUAoNSW52",
-            "b2tlUmVxdWVzdBITCgtzZXJ2aWNlTmFtZRgBIAEoCRIMCgRuYW1lGAIgASgJ",
-            "Eg0KBXR5cGVzGAMgAygJEg0KBWRhdGFzGAQgAygJIj4KC0ludm9rZVJlcGx5",
-            "EhMKC3NlcnZpY2VOYW1lGAEgASgJEgwKBHR5cGUYAiABKAkSDAoEZGF0YRgD",
-            "IAEoCSIuCgtQb2xsUmVxdWVzdBITCgtzZXJ2aWNlTmFtZRgBIAEoCRIKCgJp",
-            "ZBgCIAEoBSJHCg1Qb2xsUmVwbHlJdGVtEgoKAmlkGAEgASgFEgwKBG5hbWUY",
-            "AiABKAkSDQoFdHlwZXMYAyADKAkSDQoFZGF0YXMYBCADKAkiVQoJUG9sbFJl",
-            "cGx5EhMKC3NlcnZpY2VOYW1lGAEgASgJEjMKBWl0ZW1zGAIgAygLMiQubnRy",
-            "ZWV2LmNyZW1hLnNlcnZpY2VzLlBvbGxSZXBseUl0ZW0yswEKB0FkYXB0b3IS",
-            "VAoGSW52b2tlEiQubnRyZWV2LmNyZW1hLnNlcnZpY2VzLkludm9rZVJlcXVl",
-            "c3QaIi5udHJlZXYuY3JlbWEuc2VydmljZXMuSW52b2tlUmVwbHkiABJSCgRQ",
-            "b2xsEiIubnRyZWV2LmNyZW1hLnNlcnZpY2VzLlBvbGxSZXF1ZXN0GiAubnRy",
-            "ZWV2LmNyZW1hLnNlcnZpY2VzLlBvbGxSZXBseSIAKAEwAWIGcHJvdG8z"));
+            "Cg1hZGFwdG9yLnByb3RvEhpudHJlZXYuY3JlbWEuY29tbXVuaWNhdGlvbiJQ",
+            "Cg1JbnZva2VSZXF1ZXN0EhMKC3NlcnZpY2VOYW1lGAEgASgJEgwKBG5hbWUY",
+            "AiABKAkSDQoFdHlwZXMYAyADKAkSDQoFZGF0YXMYBCADKAkiPgoLSW52b2tl",
+            "UmVwbHkSEwoLc2VydmljZU5hbWUYASABKAkSDAoEdHlwZRgCIAEoCRIMCgRk",
+            "YXRhGAMgASgJIi4KC1BvbGxSZXF1ZXN0EhMKC3NlcnZpY2VOYW1lGAEgASgJ",
+            "EgoKAmlkGAIgASgFIkcKDVBvbGxSZXBseUl0ZW0SCgoCaWQYASABKAUSDAoE",
+            "bmFtZRgCIAEoCRINCgV0eXBlcxgDIAMoCRINCgVkYXRhcxgEIAMoCSJaCglQ",
+            "b2xsUmVwbHkSEwoLc2VydmljZU5hbWUYASABKAkSOAoFaXRlbXMYAiADKAsy",
+            "KS5udHJlZXYuY3JlbWEuY29tbXVuaWNhdGlvbi5Qb2xsUmVwbHlJdGVtMscB",
+            "CgdBZGFwdG9yEl4KBkludm9rZRIpLm50cmVldi5jcmVtYS5jb21tdW5pY2F0",
+            "aW9uLkludm9rZVJlcXVlc3QaJy5udHJlZXYuY3JlbWEuY29tbXVuaWNhdGlv",
+            "bi5JbnZva2VSZXBseSIAElwKBFBvbGwSJy5udHJlZXYuY3JlbWEuY29tbXVu",
+            "aWNhdGlvbi5Qb2xsUmVxdWVzdBolLm50cmVldi5jcmVtYS5jb21tdW5pY2F0",
+            "aW9uLlBvbGxSZXBseSIAKAEwAWIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Services.InvokeRequest), global::Ntreev.Crema.Services.InvokeRequest.Parser, new[]{ "ServiceName", "Name", "Types_", "Datas" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Services.InvokeReply), global::Ntreev.Crema.Services.InvokeReply.Parser, new[]{ "ServiceName", "Type", "Data" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Services.PollRequest), global::Ntreev.Crema.Services.PollRequest.Parser, new[]{ "ServiceName", "Id" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Services.PollReplyItem), global::Ntreev.Crema.Services.PollReplyItem.Parser, new[]{ "Id", "Name", "Types_", "Datas" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Services.PollReply), global::Ntreev.Crema.Services.PollReply.Parser, new[]{ "ServiceName", "Items" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.InvokeRequest), global::Ntreev.Crema.Communication.InvokeRequest.Parser, new[]{ "ServiceName", "Name", "Types_", "Datas" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.InvokeReply), global::Ntreev.Crema.Communication.InvokeReply.Parser, new[]{ "ServiceName", "Type", "Data" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.PollRequest), global::Ntreev.Crema.Communication.PollRequest.Parser, new[]{ "ServiceName", "Id" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.PollReplyItem), global::Ntreev.Crema.Communication.PollReplyItem.Parser, new[]{ "Id", "Name", "Types_", "Datas" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.PollReply), global::Ntreev.Crema.Communication.PollReply.Parser, new[]{ "ServiceName", "Items" }, null, null, null)
           }));
     }
     #endregion
@@ -59,7 +60,7 @@ namespace Ntreev.Crema.Services {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ntreev.Crema.Services.AdaptorReflection.Descriptor.MessageTypes[0]; }
+      get { return global::Ntreev.Crema.Communication.AdaptorReflection.Descriptor.MessageTypes[0]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -256,7 +257,7 @@ namespace Ntreev.Crema.Services {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ntreev.Crema.Services.AdaptorReflection.Descriptor.MessageTypes[1]; }
+      get { return global::Ntreev.Crema.Communication.AdaptorReflection.Descriptor.MessageTypes[1]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -441,7 +442,7 @@ namespace Ntreev.Crema.Services {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ntreev.Crema.Services.AdaptorReflection.Descriptor.MessageTypes[2]; }
+      get { return global::Ntreev.Crema.Communication.AdaptorReflection.Descriptor.MessageTypes[2]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -598,7 +599,7 @@ namespace Ntreev.Crema.Services {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ntreev.Crema.Services.AdaptorReflection.Descriptor.MessageTypes[3]; }
+      get { return global::Ntreev.Crema.Communication.AdaptorReflection.Descriptor.MessageTypes[3]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -795,7 +796,7 @@ namespace Ntreev.Crema.Services {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ntreev.Crema.Services.AdaptorReflection.Descriptor.MessageTypes[4]; }
+      get { return global::Ntreev.Crema.Communication.AdaptorReflection.Descriptor.MessageTypes[4]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -835,11 +836,11 @@ namespace Ntreev.Crema.Services {
 
     /// <summary>Field number for the "items" field.</summary>
     public const int ItemsFieldNumber = 2;
-    private static readonly pb::FieldCodec<global::Ntreev.Crema.Services.PollReplyItem> _repeated_items_codec
-        = pb::FieldCodec.ForMessage(18, global::Ntreev.Crema.Services.PollReplyItem.Parser);
-    private readonly pbc::RepeatedField<global::Ntreev.Crema.Services.PollReplyItem> items_ = new pbc::RepeatedField<global::Ntreev.Crema.Services.PollReplyItem>();
+    private static readonly pb::FieldCodec<global::Ntreev.Crema.Communication.PollReplyItem> _repeated_items_codec
+        = pb::FieldCodec.ForMessage(18, global::Ntreev.Crema.Communication.PollReplyItem.Parser);
+    private readonly pbc::RepeatedField<global::Ntreev.Crema.Communication.PollReplyItem> items_ = new pbc::RepeatedField<global::Ntreev.Crema.Communication.PollReplyItem>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public pbc::RepeatedField<global::Ntreev.Crema.Services.PollReplyItem> Items {
+    public pbc::RepeatedField<global::Ntreev.Crema.Communication.PollReplyItem> Items {
       get { return items_; }
     }
 

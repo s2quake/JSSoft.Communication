@@ -1,0 +1,37 @@
+syntax = "proto3";
+package ntreev.crema.communication;
+
+service Adaptor {
+    rpc Invoke (InvokeRequest) returns (InvokeReply) {}
+    rpc Poll(stream PollRequest) returns (stream PollReply) {}
+}
+
+message InvokeRequest {
+    string serviceName = 1;
+    string name = 2;
+    repeated string types = 3;
+    repeated string datas = 4;
+}
+
+message InvokeReply {
+    string serviceName = 1;
+    string type = 2;
+    string data = 3;
+}
+
+message PollRequest {
+    string serviceName = 1;
+    int32 id = 2;
+}
+
+message PollReplyItem {
+    int32 id = 1;
+    string name = 2;
+    repeated string types = 3;
+    repeated string datas = 4;
+}
+
+message PollReply {
+    string serviceName = 1;
+    repeated PollReplyItem items = 2;
+}

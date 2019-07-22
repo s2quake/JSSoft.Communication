@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ntreev.Library.Threading;
 
-namespace Ntreev.Crema.Services
+namespace Ntreev.Crema.Communication
 {
     class CallbackBase : IServiceInstance, IDisposable
     {

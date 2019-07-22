@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Ntreev.Crema.Services
+namespace Ntreev.Crema.Communication
 {
     public interface IAdaptorHost
     {

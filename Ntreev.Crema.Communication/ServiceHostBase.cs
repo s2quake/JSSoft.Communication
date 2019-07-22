@@ -4,9 +4,9 @@ using System.ComponentModel;
 using System.Linq;
 using Grpc.Core;
 
-namespace Ntreev.Crema.Services
+namespace Ntreev.Crema.Communication
 {
-    abstract class ServiceHostBase : IServiceHost
+    public abstract class ServiceHostBase : IServiceHost
     {
         private readonly IAdaptorHost adaptorHost;
         private readonly ServiceInstanceBuilder instanceBuilder;

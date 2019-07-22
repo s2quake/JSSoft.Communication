@@ -1,15 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
-using Grpc.Core;
-using Newtonsoft.Json;
-using Ntreev.Crema.Services.Users;
 using Ntreev.Library.Threading;
 
-namespace Ntreev.Crema.Services
+namespace Ntreev.Crema.Communication
 {
     public abstract class ServiceBase : IService
     {

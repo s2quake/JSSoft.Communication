@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Grpc.Core;
 using Newtonsoft.Json;
 
-namespace Ntreev.Crema.Services
+namespace Ntreev.Crema.Communication
 {
     class AdaptorImpl : Adaptor.AdaptorBase
     {
