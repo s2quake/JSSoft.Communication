@@ -66,7 +66,6 @@ namespace Ntreev.Crema.Communication.Grpc
 
         private int InvokeCallback(IService service, int id, IEnumerable<PollReplyItem> pollItems)
         {
-
             foreach (var item in pollItems)
             {
                 if (item.Id >= 0)

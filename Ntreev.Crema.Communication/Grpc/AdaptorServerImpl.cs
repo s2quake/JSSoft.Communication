@@ -91,9 +91,35 @@ namespace Ntreev.Crema.Communication.Grpc
                 var items = new PollReplyItem[callbacks.Count - id];
                 for (var i = id; i < callbacks.Count; i++)
                 {
-                    items[id - i] = callbacks[i];
+                    items[i - id] = callbacks[i];
                 }
                 return items;
+            });
+        }
+
+        public void InvokeDelegate(string serviceName, string name, object[] args)
+        {
+            this.dispatcher.InvokeAsync(() =>
+            {
+                var length = args.Length / 2;
+                var callbacks = this.callbacksByName[serviceName];
+                var types = new string[length];
+                var datas = new string[length];
+                var pollItem = new PollReplyItem()
+                {
+                    Id = callbacks.Count,
+                    Name = name,
+                };
+                for (var i = 0; i < length; i++)
+                {
+                    var type = (Type)args[i * 2 + 0];
+                    var value = args[i * 2 + 1];
+                    types[i] = type.AssemblyQualifiedName;
+                    datas[i] = JsonConvert.SerializeObject(value, type, settings);
+                }
+                pollItem.Types_.AddRange(types);
+                pollItem.Datas.AddRange(datas);
+                callbacks.Add(pollItem);
             });
         }
 

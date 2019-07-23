@@ -26,6 +26,12 @@ namespace Ntreev.Crema.Services.Commands
             return this.UserService.LoginAsync(userID);
         }
 
+        [CommandMethod]
+        public async Task LoginOutAsync(string userID)
+        {
+            var value = await this.UserService.LogoutAsync(userID, 0);
+        }
+
         private IUserService UserService => this.userService.Value;
     }
 }

@@ -45,7 +45,8 @@ namespace Ntreev.Crema.Communication
             var typeNamespace = instanceType.Namespace;
             var implType = instanceBuilder.CreateType(typeName, typeNamespace, typeof(CallbackBase), instanceType);
             var instance = TypeDescriptor.CreateInstance(null, implType, null, null) as CallbackBase;
-            instance.Service = service;
+            instance.ServiceName = service.Name;
+            instance.InvokeDelegate = this.adaptor.InvokeDelegate;
             return instance;
         }
     }
