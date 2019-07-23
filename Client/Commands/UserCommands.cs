@@ -20,6 +20,7 @@ namespace Ntreev.Crema.Services.Commands
             
         }
 
+        [CommandMethod]
         public Task LoginAsync(string userID)
         {
             return this.UserService.LoginAsync(userID);

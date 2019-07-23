@@ -20,7 +20,7 @@ message InvokeReply {
 }
 
 message PollRequest {
-    repeated string serviceNames = 1;
+    string serviceName = 1;
     int32 id = 2;
 }
 

@@ -1,21 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Dynamic;
-using System.Linq;
-using System.Reflection;
-using System.Reflection.Emit;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
-using Grpc.Core;
-using Ntreev.Crema.Services;
-using Ntreev.Crema.Services.Users;
 
 
 
 namespace Server
 {
+    class Test
+    {
+        public void Invoke()
+        {
+
+        }
+    }
     class Program
     {
         static void Main(string[] args)

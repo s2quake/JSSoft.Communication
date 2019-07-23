@@ -16,12 +16,14 @@ namespace Ntreev.Crema.Communication.Grpc
         private AsyncDuplexStreamingCall<PollRequest, PollReply> call;
         private CancellationTokenSource cancellation;
         private Task task;
+        private Dictionary<IService, int> idByService = new Dictionary<IService, int>();
 
         public AdaptorClientImpl(Channel channel, IEnumerable<IService> services)
             : base(channel)
         {
             this.channel = channel;
             this.services = services.ToArray();
+            this.idByService = services.ToDictionary(item => item, item => 0);
             this.cancellation = new CancellationTokenSource();
 
             this.task = this.PollAsync(this.cancellation.Token);
@@ -43,26 +45,38 @@ namespace Ntreev.Crema.Communication.Grpc
 
         public async Task PollAsync(CancellationToken cancellation)
         {
+            var count = this.idByService.Count;
             this.call = this.Poll();
             while (!cancellation.IsCancellationRequested)
             {
-                var request = new PollRequest() { Id = this.ID, };
-                //var replies = await this.RequestAsync(request, this.cancellation.Token);
-                await this.call.RequestStream.WriteAsync(request);
-                await this.call.ResponseStream.MoveNext(cancellation);
-                var replies = this.call.ResponseStream.Current;
-                foreach (var item in replies.Items)
+                foreach (var item in this.services)
                 {
-                    if (item.Id >= 0)
-                    {
-                        var pollItem = ToPollItem(item);
-                        this.OnPoll(pollItem);
-                        this.ID = item.Id + 1;
-                    }
+                    var id = this.idByService[item];
+                    var request = new PollRequest() { Id = id, ServiceName = item.Name };
+                    await this.call.RequestStream.WriteAsync(request);
+                    await this.call.ResponseStream.MoveNext(cancellation);
+                    var reply = this.call.ResponseStream.Current;
+                    this.idByService[item] = this.InvokeCallback(item, id, reply.Items);
+                    await Task.Delay(1);
                 }
             }
             this.call.Dispose();
             this.call = null;
+        }
+
+        private int InvokeCallback(IService service, int id, IEnumerable<PollReplyItem> pollItems)
+        {
+
+            foreach (var item in pollItems)
+            {
+                if (item.Id >= 0)
+                {
+                    var pollItem = ToPollItem(item);
+                    this.OnPoll(pollItem);
+                    id = item.Id + 1;
+                }
+            }
+            return id;
         }
 
         private static PollItem ToPollItem(PollReplyItem replyItem)
@@ -88,6 +102,7 @@ namespace Ntreev.Crema.Communication.Grpc
             var datas = new string[info.Datas.Length];
             var request = new InvokeRequest()
             {
+                ServiceName = info.ServiceName,
                 Name = info.Name,
             };
             for (var i = 0; i < info.Types.Length; i++)

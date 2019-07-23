@@ -54,7 +54,9 @@ namespace Ntreev.Crema.Communication
             var typeName = $"{instanceType.Name}Impl";
             var typeNamespace = instanceType.Namespace;
             var implType = instanceBuilder.CreateType(typeName, typeNamespace, typeof(ContextBase), instanceType);
-            var instance = TypeDescriptor.CreateInstance(null, implType, null, null);
+            var instance = TypeDescriptor.CreateInstance(null, implType, null, null) as ContextBase;
+            instance.InvokeDelegate = this.apdatorImpl.InvokeAsync;
+            instance.ServiceName = service.Name;
             return instance;
         }
     }

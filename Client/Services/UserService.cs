@@ -12,38 +12,27 @@ namespace Ntreev.Crema.Services.Users
 {
     [Export(typeof(IService))]
     [Export(typeof(IUserService))]
-    class UserService : ClientServiceBase<IUserService, IUserServiceCallback>, IUserServiceCallback
+    class UserService : ClientServiceBase<IUserService, IUserServiceCallback>, IUserService, IUserServiceCallback
     {
-        //private AsyncDuplexStreamingCall<PollRequest, PollReply> call;
-
         public UserService()
             : base()
         {
-            
+
         }
 
-        // protected async override Task<PollReply> RequestAsync(PollRequest request, CancellationToken cancellation)
-        // {
-        //     await this.call.RequestStream.WriteAsync(request);
-        //     await this.call.ResponseStream.MoveNext(cancellation);
-        //     return this.call.ResponseStream.Current;
-        // }
+        #region IUserServiceCallback
 
-        // protected override Adaptor.AdaptorClient CreateClient(Channel channel)
-        // {
-        //     return new Adaptor.AdaptorClient(channel);
-        // }
+        public Task<int> LoginAsync(string user)
+        {
+            return this.Service.LoginAsync(user);
+        }
 
-        // protected override void OnPollBegun()
-        // {
-        //     this.call = this.Client.Poll();
-        // }
+        public Task<(int, string)> LogoutAsync(string user, int count)
+        {
+            return this.Service.LogoutAsync(user, count);
+        }
 
-        // protected override void OnPollEnded()
-        // {
-        //     this.call.Dispose();
-        //     this.call = null;
-        // }
+        #endregion
 
         #region IUserServiceCallback
 
@@ -54,7 +43,7 @@ namespace Ntreev.Crema.Services.Users
 
         void IUserServiceCallback.OnAdd(string userID, int test)
         {
-            
+
         }
 
         #endregion

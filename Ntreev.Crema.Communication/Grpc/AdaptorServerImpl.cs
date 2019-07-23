@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Newtonsoft.Json;
+using Ntreev.Library.Threading;
 
 namespace Ntreev.Crema.Communication.Grpc
 {
@@ -13,12 +14,14 @@ namespace Ntreev.Crema.Communication.Grpc
         private static readonly JsonSerializerSettings settings = new JsonSerializerSettings();
         private readonly Dictionary<string, IService> serviceByName = new Dictionary<string, IService>();
         private readonly Dictionary<string, MethodInfo> methodByName = new Dictionary<string, MethodInfo>();
-        private readonly Dictionary<string, CallbackCollection> callbacksByName = new Dictionary<string,CallbackCollection>();
+        private readonly Dictionary<string, CallbackCollection> callbacksByName = new Dictionary<string, CallbackCollection>();
+        private readonly Dispatcher dispatcher;
 
         public AdaptorServerImpl(IEnumerable<IService> services)
         {
             this.serviceByName = services.ToDictionary(item => item.Name);
-            this.callbacksByName = services.ToDictionary(item => item.Name, item =>new CallbackCollection(item));
+            this.callbacksByName = services.ToDictionary(item => item.Name, item => new CallbackCollection(item));
+            this.dispatcher = new Dispatcher(this);
             foreach (var item in services)
             {
                 RegisterMethod(this.methodByName, item);
@@ -30,15 +33,40 @@ namespace Ntreev.Crema.Communication.Grpc
             var info = ToInvokeInfo(request);
             if (this.serviceByName.ContainsKey(info.ServiceName) == false)
                 throw new InvalidOperationException();
-                var service = this.serviceByName[info.ServiceName];
+            var service = this.serviceByName[info.ServiceName];
             var methodName = $"{info.ServiceName}.{info.Name}";
             if (this.methodByName.ContainsKey(methodName) == false)
                 throw new InvalidOperationException();
             var method = methodByName[methodName];
             var value = await Task.Run(() => method.Invoke(service, info.Datas));
-            throw new NotImplementedException();
-            // var result = await service.InvokeAsync(context, info);
-            // return ToInvokeReply(result);
+            var valueType = method.ReturnType;
+            if (value is Task task)
+            {
+                await task;
+                var taskType = task.GetType();
+                if (taskType.GetGenericArguments().Any() == true)
+                {
+                    var propertyInfo = taskType.GetProperty("Result");
+                    value = propertyInfo.GetValue(task);
+                    valueType = propertyInfo.PropertyType;
+                }
+                else
+                {
+                    value = null;
+                    valueType = typeof(void);
+                }
+            }
+            var reply = new InvokeReply()
+            {
+                ServiceName = info.ServiceName,
+                Type = valueType.AssemblyQualifiedName,
+            };
+            if (valueType != typeof(void))
+            {
+                reply.Data = JsonConvert.SerializeObject(value, valueType, settings);
+            }
+
+            return reply;
         }
 
         public override async Task Poll(IAsyncStreamReader<PollRequest> requestStream, IServerStreamWriter<PollReply> responseStream, ServerCallContext context)
@@ -47,12 +75,26 @@ namespace Ntreev.Crema.Communication.Grpc
             {
                 var request = requestStream.Current;
                 var id = request.Id;
-                //var reply = new PollReply() { ServiceName = request.ServiceName };
-                // var service = this.serviceByName[reply.ServiceName];
-                // var results = await service.PollAsync(context, id);
-                // await responseStream.WriteAsync(reply);
-                throw new NotImplementedException();
+                var service = this.serviceByName[request.ServiceName];
+                var items = await this.PollAsync(service, id);
+                var reply = new PollReply() { ServiceName = request.ServiceName };
+                reply.Items.AddRange(items);
+                await responseStream.WriteAsync(reply);
             }
+        }
+
+        public Task<PollReplyItem[]> PollAsync(IService service, int id)
+        {
+            return this.dispatcher.InvokeAsync(() =>
+            {
+                var callbacks = this.callbacksByName[service.Name];
+                var items = new PollReplyItem[callbacks.Count - id];
+                for (var i = id; i < callbacks.Count; i++)
+                {
+                    items[id - i] = callbacks[i];
+                }
+                return items;
+            });
         }
 
         private static void RegisterMethod(Dictionary<string, MethodInfo> methodByName, IService service)
@@ -75,6 +117,7 @@ namespace Ntreev.Crema.Communication.Grpc
         {
             var info = new InvokeInfo()
             {
+                ServiceName = request.ServiceName,
                 Name = request.Name,
                 Types = new Type[request.Types_.Count],
                 Datas = new object[request.Datas.Count]

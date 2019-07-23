@@ -8,7 +8,7 @@ namespace Ntreev.Crema.Communication
     {
         private readonly Type serviceType;
         private readonly Type callbackType;
-        private CallbackBase callback;
+        private object instance;
         private Dispatcher dispatcher;
 
         internal ServiceBase(Type serviceType, Type callbackType, Type validationType)
@@ -27,7 +27,7 @@ namespace Ntreev.Crema.Communication
             this.dispatcher = null;
         }
 
-        protected object Callback => this.callback;
+        protected object Instance => this.instance;
 
         public Type ServiceType => this.serviceType;
 
@@ -36,14 +36,14 @@ namespace Ntreev.Crema.Communication
         public void Open(ServiceToken token)
         {
             //this.adaptorHost = token.AdaptorHost;
-            this.callback = token.Instance as CallbackBase;
+            this.instance = token.Instance;
             this.OnOpened(EventArgs.Empty);
         }
 
         public void Close(ServiceToken token)
         {
             //this.adaptorHost = null;
-            this.callback = null;
+            this.instance = null;
             this.OnClosed(EventArgs.Empty);
         }
 
