@@ -1,28 +1,44 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Newtonsoft.Json;
 
-namespace Ntreev.Crema.Communication
+namespace Ntreev.Crema.Communication.Grpc
 {
     class AdaptorServerImpl : Adaptor.AdaptorBase
     {
         private static readonly JsonSerializerSettings settings = new JsonSerializerSettings();
         private readonly Dictionary<string, IService> serviceByName = new Dictionary<string, IService>();
+        private readonly Dictionary<string, MethodInfo> methodByName = new Dictionary<string, MethodInfo>();
+        private readonly Dictionary<string, CallbackCollection> callbacksByName = new Dictionary<string,CallbackCollection>();
 
         public AdaptorServerImpl(IEnumerable<IService> services)
         {
             this.serviceByName = services.ToDictionary(item => item.Name);
+            this.callbacksByName = services.ToDictionary(item => item.Name, item =>new CallbackCollection(item));
+            foreach (var item in services)
+            {
+                RegisterMethod(this.methodByName, item);
+            }
         }
 
         public override async Task<InvokeReply> Invoke(InvokeRequest request, ServerCallContext context)
         {
             var info = ToInvokeInfo(request);
-            var service = this.serviceByName[info.ServiceName];
-            var result = await service.InvokeAsync(context, info);
-            return ToInvokeReply(result);
+            if (this.serviceByName.ContainsKey(info.ServiceName) == false)
+                throw new InvalidOperationException();
+                var service = this.serviceByName[info.ServiceName];
+            var methodName = $"{info.ServiceName}.{info.Name}";
+            if (this.methodByName.ContainsKey(methodName) == false)
+                throw new InvalidOperationException();
+            var method = methodByName[methodName];
+            var value = await Task.Run(() => method.Invoke(service, info.Datas));
+            throw new NotImplementedException();
+            // var result = await service.InvokeAsync(context, info);
+            // return ToInvokeReply(result);
         }
 
         public override async Task Poll(IAsyncStreamReader<PollRequest> requestStream, IServerStreamWriter<PollReply> responseStream, ServerCallContext context)
@@ -31,10 +47,27 @@ namespace Ntreev.Crema.Communication
             {
                 var request = requestStream.Current;
                 var id = request.Id;
-                var reply = new PollReply() { ServiceName = request.ServiceName };
-                var service = this.serviceByName[reply.ServiceName];
-                var results = await service.PollAsync(context, id);
-                await responseStream.WriteAsync(reply);
+                //var reply = new PollReply() { ServiceName = request.ServiceName };
+                // var service = this.serviceByName[reply.ServiceName];
+                // var results = await service.PollAsync(context, id);
+                // await responseStream.WriteAsync(reply);
+                throw new NotImplementedException();
+            }
+        }
+
+        private static void RegisterMethod(Dictionary<string, MethodInfo> methodByName, IService service)
+        {
+            var query = from baseMethod in service.ServiceType.GetMethods()
+                        join implMethod in service.GetType().GetMethods()
+                        on baseMethod.ToString() equals implMethod.ToString()
+                        select implMethod;
+            foreach (var item in query.ToArray())
+            {
+                if (item.GetCustomAttribute(typeof(ServiceContractAttribute)) is ServiceContractAttribute attr)
+                {
+                    var methodName = attr.Name ?? item.Name;
+                    methodByName.Add($"{service.Name}.{methodName}", item);
+                }
             }
         }
 

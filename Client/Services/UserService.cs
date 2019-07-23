@@ -11,6 +11,7 @@ using Ntreev.Crema.Communication;
 namespace Ntreev.Crema.Services.Users
 {
     [Export(typeof(IService))]
+    [Export(typeof(IUserService))]
     class UserService : ClientServiceBase<IUserService, IUserServiceCallback>, IUserServiceCallback
     {
         //private AsyncDuplexStreamingCall<PollRequest, PollReply> call;

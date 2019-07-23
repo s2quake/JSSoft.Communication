@@ -6,18 +6,18 @@ using System.Threading.Tasks;
 using Grpc.Core;
 using Newtonsoft.Json;
 
-namespace Ntreev.Crema.Communication
+namespace Ntreev.Crema.Communication.Grpc
 {
     class AdaptorClientImpl : Adaptor.AdaptorClient
     {
         private static readonly JsonSerializerSettings settings = new JsonSerializerSettings();
-        private readonly Grpc.Core.Channel channel;
+        private readonly Channel channel;
         private readonly IService[] services;
         private AsyncDuplexStreamingCall<PollRequest, PollReply> call;
         private CancellationTokenSource cancellation;
         private Task task;
 
-        public AdaptorClientImpl(Grpc.Core.Channel channel, IEnumerable<IService> services)
+        public AdaptorClientImpl(Channel channel, IEnumerable<IService> services)
             : base(channel)
         {
             this.channel = channel;

@@ -10,27 +10,16 @@ namespace Ntreev.Crema.Communication
         private readonly Type callbackType;
         private CallbackBase callback;
         private Dispatcher dispatcher;
-        //private IAdaptorHost adaptorHost;
 
-        internal ServiceBase(Type serviceType, Type callbackType)
+        internal ServiceBase(Type serviceType, Type callbackType, Type validationType)
         {
-            if (serviceType.IsAssignableFrom(this.GetType()) == false)
-                throw new ArgumentException("invalid type", nameof(serviceType));
+            if (validationType.IsAssignableFrom(this.GetType()) == false)
+                throw new ArgumentException("invalid type", nameof(validationType));
             this.Name = serviceType.Name;
             this.serviceType = serviceType;
             this.callbackType = callbackType;
             this.dispatcher = new Dispatcher(this);
         }
-
-        // Task<InvokeResult> IService.InvokeAsync(object context, InvokeInfo info)
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-        // Task<PollItem[]> IService.PollAsync(object context, int id)
-        // {
-        //     return this.callback.PollAsync(id);
-        // }
 
         public void Dispose()
         {

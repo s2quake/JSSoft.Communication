@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Protobuf Include="adaptor.proto" OutputDir="%(RelativePath)" CompileOutputs="false" GrpcServices="both" Access="internal" />
+    <Protobuf Include="Grpc\adaptor.proto" OutputDir="%(RelativePath)Grpc" CompileOutputs="false" GrpcServices="both" Access="internal" />
   </ItemGroup>
   
   <ItemGroup>

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
+using Ntreev.Crema.Communication.Grpc;
 
 namespace Ntreev.Crema.Communication
 {
@@ -24,7 +25,7 @@ namespace Ntreev.Crema.Communication
 
         public void Open(string host, int port)
         {
-            this.channel = new Channel($"{host}:{port}", Grpc.Core.ChannelCredentials.Insecure);
+            this.channel = new Channel($"{host}:{port}", ChannelCredentials.Insecure);
             this.apdatorImpl = new AdaptorClientImpl(this.channel, this.services);
             //this.Ports.Add(new Grpc.Core.ServerPort(host, port, Grpc.Core.ServerCredentials.Insecure));
             // foreach (var item in adaptors)

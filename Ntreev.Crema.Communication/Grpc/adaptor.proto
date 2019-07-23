@@ -1,5 +1,5 @@
 syntax = "proto3";
-package ntreev.crema.communication;
+package ntreev.crema.communication.grpc;
 
 service Adaptor {
     rpc Invoke (InvokeRequest) returns (InvokeReply) {}

@@ -4,13 +4,15 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
+using Grpc.Core;
+using Ntreev.Crema.Communication.Grpc;
 
 namespace Ntreev.Crema.Communication
 {
     class AdaptorServerHost : IAdaptorHost
     {
         private IService[] services;
-        private Grpc.Core.Server server;
+        private Server server;
         private AdaptorServerImpl adaptor;
         private ServiceInstanceBuilder instanceBuilder = new ServiceInstanceBuilder();
 
@@ -22,10 +24,10 @@ namespace Ntreev.Crema.Communication
         public void Open(string host, int port)
         {
             this.adaptor = new AdaptorServerImpl(this.services);
-            this.server = new Grpc.Core.Server()
+            this.server = new Server()
             {
                 Services = { Adaptor.BindService(this.adaptor) },
-                Ports = { new Grpc.Core.ServerPort(host, port, Grpc.Core.ServerCredentials.Insecure) },
+                Ports = { new ServerPort(host, port, ServerCredentials.Insecure) },
             };
             this.server.Start();
         }
