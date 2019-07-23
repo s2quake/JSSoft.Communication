@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
@@ -11,6 +12,8 @@ namespace Ntreev.Crema.Communication.Grpc
     class AdaptorClientImpl : Adaptor.AdaptorClient
     {
         private static readonly JsonSerializerSettings settings = new JsonSerializerSettings();
+        private readonly Dictionary<string, IService> serviceByName = new Dictionary<string, IService>();
+        private readonly Dictionary<string, MethodInfo> methodByName = new Dictionary<string, MethodInfo>();
         private readonly Channel channel;
         private readonly IService[] services;
         private AsyncDuplexStreamingCall<PollRequest, PollReply> call;
@@ -18,14 +21,19 @@ namespace Ntreev.Crema.Communication.Grpc
         private Task task;
         private Dictionary<IService, int> idByService = new Dictionary<IService, int>();
 
+
         public AdaptorClientImpl(Channel channel, IEnumerable<IService> services)
             : base(channel)
         {
             this.channel = channel;
+            this.serviceByName = services.ToDictionary(item => item.Name);
             this.services = services.ToArray();
             this.idByService = services.ToDictionary(item => item, item => 0);
             this.cancellation = new CancellationTokenSource();
-
+            foreach (var item in services)
+            {
+                RegisterMethod(this.methodByName, item);
+            }
             this.task = this.PollAsync(this.cancellation.Token);
         }
 
@@ -40,7 +48,28 @@ namespace Ntreev.Crema.Communication.Grpc
 
         private void OnPoll(PollItem pollItem)
         {
+            var methodName = $"{pollItem.ServiceName}.{pollItem.Name}";
+            var service = this.serviceByName[pollItem.ServiceName];
+            if(this.methodByName.ContainsKey(methodName) == false)
+                throw new InvalidOperationException();
+            var methodInfo = this.methodByName[methodName];
+            methodInfo.Invoke(service, pollItem.Datas);
+        }
 
+        private static void RegisterMethod(Dictionary<string, MethodInfo> methodByName, IService service)
+        {
+            var query = from callMethod in service.CallbackType.GetMethods()
+                        join implMethod in service.GetType().GetMethods()
+                        on callMethod.ToString() equals implMethod.ToString()
+                        select implMethod;
+            foreach (var item in query.ToArray())
+            {
+                if (item.GetCustomAttribute(typeof(ServiceContractAttribute)) is ServiceContractAttribute attr)
+                {
+                    var methodName = attr.Name ?? item.Name;
+                    methodByName.Add($"{service.Name}.{methodName}", item);
+                }
+            }
         }
 
         public async Task PollAsync(CancellationToken cancellation)
