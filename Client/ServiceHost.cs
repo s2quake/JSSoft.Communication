@@ -9,8 +9,8 @@ namespace Client
     class ServiceHost : ClientHostBase
     {
         [ImportingConstructor]
-        public ServiceHost([ImportMany]IEnumerable<IService> services)
-            : base(services)
+        public ServiceHost(IAdaptorHostProvider adaptorHostProvider, [ImportMany]IEnumerable<IService> services)
+            : base(adaptorHostProvider, services)
         {
      
         }

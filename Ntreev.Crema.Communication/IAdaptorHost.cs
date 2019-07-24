@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 namespace Ntreev.Crema.Communication
 {
-    interface IAdaptorHost
+    public interface IAdaptorHost : IDisposable
     {
         void Open(string host, int port);
 
         void Close();
 
-        object CreateInstance(IService service);
+        object Create(IService service);
     }
 }

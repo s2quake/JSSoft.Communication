@@ -8,13 +8,15 @@ namespace Ntreev.Crema.Communication
 {
     public abstract class ServiceHostBase : IServiceHost
     {
-        private readonly IAdaptorHost adaptorHost;
+        private readonly IAdaptorHostProvider adpatorHostProvider;
+        
         private readonly ServiceInstanceBuilder instanceBuilder;
-        private Dictionary<IService, ServiceToken> tokenByService;
+        private Dictionary<IService, object> instanceByService;
+        private IAdaptorHost adaptorHost;
 
-        internal ServiceHostBase(IAdaptorHost adaptorHost, IEnumerable<IService> services)
+        internal ServiceHostBase(IAdaptorHostProvider adpatorHostProvider, IEnumerable<IService> services)
         {
-            this.adaptorHost = adaptorHost;
+            this.adpatorHostProvider = adpatorHostProvider;
             this.instanceBuilder = new ServiceInstanceBuilder();
             this.Services = new ServiceCollection(this, services);
             this.Port = 4004;
@@ -22,19 +24,19 @@ namespace Ntreev.Crema.Communication
 
         public void Open()
         {
-            this.tokenByService = new Dictionary<IService, ServiceToken>(this.Services.Count);
+            this.adaptorHost = this.adpatorHostProvider.Create(this, ServiceToken.Empty);
+            this.instanceByService = new Dictionary<IService, object>(this.Services.Count);
             this.adaptorHost.Open("localhost", 4004);
             foreach (var item in this.Services)
             {
-                var instance = this.adaptorHost.CreateInstance(item);
-                var token = new ServiceToken(this.adaptorHost, instance);
-                this.tokenByService.Add(item, token);
-                item.Open(token);
+                var instance = this.adaptorHost.Create(item);
+                this.instanceByService.Add(item, instance);
+                item.Open(ServiceToken.Empty, instance);
             }
             
             foreach (var item in this.Services)
             {
-                var token = this.tokenByService[item];
+                var token = this.instanceByService[item];
                 
             }
             this.OnOpened(EventArgs.Empty);
@@ -44,11 +46,9 @@ namespace Ntreev.Crema.Communication
         {
             foreach (var item in this.Services)
             {
+                var instance = this.instanceByService[item];
                 item.Close(ServiceToken.Empty);
-            }
-            foreach (var item in this.tokenByService.Values)
-            {
-                if (item.Instance is IDisposable disposable)
+                if (instance is IDisposable disposable)
                 {
                     disposable.Dispose();
                 }

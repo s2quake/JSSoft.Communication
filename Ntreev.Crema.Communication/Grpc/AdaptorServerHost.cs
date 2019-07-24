@@ -7,7 +7,7 @@ using System.Linq;
 using Grpc.Core;
 using Ntreev.Crema.Communication.Grpc;
 
-namespace Ntreev.Crema.Communication
+namespace Ntreev.Crema.Communication.Grpc
 {
     class AdaptorServerHost : IAdaptorHost
     {
@@ -16,7 +16,7 @@ namespace Ntreev.Crema.Communication
         private AdaptorServerImpl adaptor;
         private ServiceInstanceBuilder instanceBuilder = new ServiceInstanceBuilder();
 
-        public AdaptorServerHost([ImportMany]IEnumerable<IService> services)
+        public AdaptorServerHost(IEnumerable<IService> services)
         {
             this.services = services.ToArray();
         }
@@ -38,7 +38,7 @@ namespace Ntreev.Crema.Communication
             this.server = null;
         }
 
-        public object CreateInstance(IService service)
+        public object Create(IService service)
         {
             var instanceType = service.CallbackType;
             var typeName = $"{instanceType.Name}Impl";
@@ -48,6 +48,11 @@ namespace Ntreev.Crema.Communication
             instance.ServiceName = service.Name;
             instance.InvokeDelegate = this.adaptor.InvokeDelegate;
             return instance;
+        }
+
+        public void Dispose()
+        {
+            
         }
     }
 }

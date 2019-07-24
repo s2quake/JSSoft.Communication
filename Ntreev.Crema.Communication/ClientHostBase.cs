@@ -5,8 +5,8 @@ namespace Ntreev.Crema.Communication
 {
     public abstract class ClientHostBase : ServiceHostBase
     {
-        protected ClientHostBase(IEnumerable<IService> services)
-            : base(new AdaptorClientHost(services), services)
+        protected ClientHostBase(IAdaptorHostProvider adpatorHostProvider, IEnumerable<IService> services)
+            : base(adpatorHostProvider, services)
         {
 
         }

@@ -9,63 +9,60 @@ namespace Ntreev.Crema.Communication
 {
     class ContextBase : IDisposable
     {
-        //private JsonSerializerSettings settings = new JsonSerializerSettings();
-        //private List<PollItem> callbackList = new List<PollItem>();
-        //private IAdaptor adaptor;
-
         public ContextBase()
         {
-            //this.adaptor = adaptor;
-            this.Dispatcher = new Dispatcher(this);
+
         }
 
         public IAdaptorClientHost AdaptorHost { get; set; }
-
-        public Func<InvokeInfo, Task<InvokeResult>> InvokeDelegate { get; set; }
 
         public string ServiceName { get; set; }
 
         public void Dispose()
         {
-            if (this.Dispatcher == null)
-                throw new InvalidOperationException();
-            this.Dispatcher.Dispose();
-            this.Dispatcher = null;
+
         }
 
         public async Task<T> InvokeAsyncWithResult<T>(string name, params object[] args)
         {
-            var length = args.Length / 2;
-            var invokeInfo = new InvokeInfo()
-            {
-                ServiceName = this.ServiceName,
-                Name = name,
-                Types = new Type[length],
-                Datas = new object[length],
-            };
-            for (var i = 0; i < length; i++)
-            {
-                var type = (Type)args[i * 2 + 0];
-                var value = args[i * 2 + 1];
-                invokeInfo.Types[i] = type;
-                invokeInfo.Datas[i] = value;
-            }
-            var result = await this.InvokeDelegate(invokeInfo);
-            return (T)result.Data;
-        }
-
-
-        public void Invoke(string name, params object[] args)
-        {
             throw new NotImplementedException();
+            // var length = args.Length / 2;
+            // var invokeInfo = new InvokeInfo()
+            // {
+            //     ServiceName = this.ServiceName,
+            //     Name = name,
+            //     Types = new Type[length],
+            //     Datas = new object[length],
+            // };
+            // for (var i = 0; i < length; i++)
+            // {
+            //     var type = (Type)args[i * 2 + 0];
+            //     var value = args[i * 2 + 1];
+            //     invokeInfo.Types[i] = type;
+            //     invokeInfo.Datas[i] = value;
+            // }
+            // var result = await this.InvokeDelegate(invokeInfo);
+            // return (T)result.Data;
         }
 
-
-        public Task InvokeAsync(string name, params object[] args)
+        protected void Invoke(string name, params object[] args)
         {
-            throw new NotImplementedException();
+            this.AdaptorHost.Invoke(this.ServiceName, name, args);
         }
 
-        public Dispatcher Dispatcher { get; private set; }
+        protected T Invoke<T>(string name, params object[] args)
+        {
+            return this.AdaptorHost.Invoke<T>(this.ServiceName, name, args);
+        }
+
+        protected Task InvokeAsync(string name, params object[] args)
+        {
+            return this.AdaptorHost.InvokeAsync(this.ServiceName, name, args);
+        }
+
+        protected Task<T> InvokeAsync<T>(string name, params object[] args)
+        {
+            return this.AdaptorHost.InvokeAsync<T>(this.ServiceName, name, args);
+        }
     }
 }

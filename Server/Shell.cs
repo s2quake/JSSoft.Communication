@@ -7,7 +7,8 @@ using Ntreev.Library.Commands;
 namespace Server
 {
     [Export(typeof(IShell))]
-    class Shell : CommandContextTerminal, IShell
+    [Export(typeof(IServiceProvider))]
+    class Shell : CommandContextTerminal, IShell, IServiceProvider
     {
         private readonly IServiceHost serviceHost;
         private bool isDisposed;
@@ -34,6 +35,18 @@ namespace Server
                 this.isDisposed = true;
             }
         }
+
+        #region IServiceProvider
+
+        object IServiceProvider.GetService(Type serviceType)
+        {
+            if (serviceType == typeof(IServiceProvider))
+                return this;
+
+            return Container.GetService(serviceType);
+        }
+
+        #endregion
 
         #region IShell
 

@@ -33,10 +33,9 @@ namespace Ntreev.Crema.Communication
 
         public Type CallbackType => this.callbackType;
 
-        public void Open(ServiceToken token)
+        public void Open(ServiceToken token, object instance)
         {
-            //this.adaptorHost = token.AdaptorHost;
-            this.instance = token.Instance;
+            this.instance = instance;
             this.OnOpened(EventArgs.Empty);
         }
 

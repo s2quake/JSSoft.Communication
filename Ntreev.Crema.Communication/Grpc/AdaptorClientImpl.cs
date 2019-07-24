@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 
 namespace Ntreev.Crema.Communication.Grpc
 {
-    class AdaptorClientImpl : Adaptor.AdaptorClient
+    class AdaptorClientImpl : Adaptor.AdaptorClient, IAdaptorClientHost
     {
         private static readonly JsonSerializerSettings settings = new JsonSerializerSettings();
         private readonly Dictionary<string, IService> serviceByName = new Dictionary<string, IService>();
@@ -143,6 +143,26 @@ namespace Ntreev.Crema.Communication.Grpc
             result.Type = Type.GetType(reply.Type);
             result.Data = JsonConvert.DeserializeObject(reply.Data, result.Type, settings);
             return result;
+        }
+
+        void IAdaptorClientHost.Invoke(string serviceName, string name, object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        T IAdaptorClientHost.Invoke<T>(string serviceName, string name, object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task IAdaptorClientHost.InvokeAsync(string serviceName, string name, object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<T> IAdaptorClientHost.InvokeAsync<T>(string serviceName, string name, object[] args)
+        {
+            throw new NotImplementedException();
         }
     }
 }

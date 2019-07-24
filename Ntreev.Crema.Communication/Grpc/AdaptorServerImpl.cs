@@ -9,7 +9,7 @@ using Ntreev.Library.Threading;
 
 namespace Ntreev.Crema.Communication.Grpc
 {
-    class AdaptorServerImpl : Adaptor.AdaptorBase
+    class AdaptorServerImpl : Adaptor.AdaptorBase, IAdaptorServerHost
     {
         private static readonly JsonSerializerSettings settings = new JsonSerializerSettings();
         private readonly Dictionary<string, IService> serviceByName = new Dictionary<string, IService>();

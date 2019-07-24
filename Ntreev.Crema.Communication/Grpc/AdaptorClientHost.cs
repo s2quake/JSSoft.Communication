@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Grpc.Core;
 using Ntreev.Crema.Communication.Grpc;
 
-namespace Ntreev.Crema.Communication
+namespace Ntreev.Crema.Communication.Grpc
 {
     class AdaptorClientHost : IAdaptorHost
     {
@@ -34,16 +34,21 @@ namespace Ntreev.Crema.Communication
             this.channel = null;
         }
 
-        public object CreateInstance(IService service)
+        public object Create(IService service)
         {
             var instanceType = service.ServiceType;
             var typeName = $"{instanceType.Name}Impl";
             var typeNamespace = instanceType.Namespace;
             var implType = instanceBuilder.CreateType(typeName, typeNamespace, typeof(ContextBase), instanceType);
             var instance = TypeDescriptor.CreateInstance(null, implType, null, null) as ContextBase;
-            instance.InvokeDelegate = this.apdatorImpl.InvokeAsync;
+            instance.AdaptorHost = this.apdatorImpl;
             instance.ServiceName = service.Name;
             return instance;
+        }
+
+        public void Dispose()
+        {
+
         }
     }
 }

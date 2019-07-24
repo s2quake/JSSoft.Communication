@@ -10,8 +10,8 @@ namespace Server
     class ServiceHost : ServerHostBase
     {
         [ImportingConstructor]
-        public ServiceHost([ImportMany]IEnumerable<IService> services)
-            : base(services)
+        public ServiceHost(IAdaptorHostProvider adaptorHostProvider, [ImportMany]IEnumerable<IService> services)
+            : base(adaptorHostProvider, services)
         {
      
         }
