@@ -4,7 +4,7 @@ namespace Client
 {
     public interface IShell : IDisposable
     {
-        void Cancel();
+        void Stop();
 
         void Start();
     }

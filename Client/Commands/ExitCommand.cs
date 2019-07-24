@@ -27,7 +27,7 @@ namespace Ntreev.Crema.Services.Commands
 
         protected override void OnExecute()
         {
-            this.shell.Value.Cancel();
+            this.shell.Value.Stop();
         }
     }
 }

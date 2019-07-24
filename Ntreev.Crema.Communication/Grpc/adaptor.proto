@@ -2,8 +2,17 @@ syntax = "proto3";
 package ntreev.crema.communication.grpc;
 
 service Adaptor {
-    rpc Invoke (InvokeRequest) returns (InvokeReply) {}
-    rpc Poll(stream PollRequest) returns (stream PollReply) {}
+    rpc Ping (PingRequest) returns (PingReply);
+    rpc Invoke (InvokeRequest) returns (InvokeReply);
+    rpc Poll (stream PollRequest) returns (stream PollReply);
+}
+
+message PingRequest {
+    int64 time = 1;
+}
+
+message PingReply {
+    int64 time = 1;
 }
 
 message InvokeRequest {

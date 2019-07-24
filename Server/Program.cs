@@ -1,16 +1,7 @@
 ﻿using System;
 
-
-
 namespace Server
 {
-    class Test
-    {
-        public void Invoke()
-        {
-
-        }
-    }
     class Program
     {
         static void Main(string[] args)

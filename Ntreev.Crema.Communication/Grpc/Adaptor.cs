@@ -25,23 +25,28 @@ namespace Ntreev.Crema.Communication.Grpc {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "ChJHcnBjL2FkYXB0b3IucHJvdG8SH250cmVldi5jcmVtYS5jb21tdW5pY2F0",
-            "aW9uLmdycGMiUAoNSW52b2tlUmVxdWVzdBITCgtzZXJ2aWNlTmFtZRgBIAEo",
-            "CRIMCgRuYW1lGAIgASgJEg0KBXR5cGVzGAMgAygJEg0KBWRhdGFzGAQgAygJ",
-            "Ij4KC0ludm9rZVJlcGx5EhMKC3NlcnZpY2VOYW1lGAEgASgJEgwKBHR5cGUY",
-            "AiABKAkSDAoEZGF0YRgDIAEoCSIuCgtQb2xsUmVxdWVzdBITCgtzZXJ2aWNl",
-            "TmFtZRgBIAEoCRIKCgJpZBgCIAEoBSJHCg1Qb2xsUmVwbHlJdGVtEgoKAmlk",
-            "GAEgASgFEgwKBG5hbWUYAiABKAkSDQoFdHlwZXMYAyADKAkSDQoFZGF0YXMY",
-            "BCADKAkiXwoJUG9sbFJlcGx5EhMKC3NlcnZpY2VOYW1lGAEgASgJEj0KBWl0",
-            "ZW1zGAIgAygLMi4ubnRyZWV2LmNyZW1hLmNvbW11bmljYXRpb24uZ3JwYy5Q",
-            "b2xsUmVwbHlJdGVtMtsBCgdBZGFwdG9yEmgKBkludm9rZRIuLm50cmVldi5j",
-            "cmVtYS5jb21tdW5pY2F0aW9uLmdycGMuSW52b2tlUmVxdWVzdBosLm50cmVl",
-            "di5jcmVtYS5jb21tdW5pY2F0aW9uLmdycGMuSW52b2tlUmVwbHkiABJmCgRQ",
-            "b2xsEiwubnRyZWV2LmNyZW1hLmNvbW11bmljYXRpb24uZ3JwYy5Qb2xsUmVx",
-            "dWVzdBoqLm50cmVldi5jcmVtYS5jb21tdW5pY2F0aW9uLmdycGMuUG9sbFJl",
-            "cGx5IgAoATABYgZwcm90bzM="));
+            "aW9uLmdycGMiGwoLUGluZ1JlcXVlc3QSDAoEdGltZRgBIAEoAyIZCglQaW5n",
+            "UmVwbHkSDAoEdGltZRgBIAEoAyJQCg1JbnZva2VSZXF1ZXN0EhMKC3NlcnZp",
+            "Y2VOYW1lGAEgASgJEgwKBG5hbWUYAiABKAkSDQoFdHlwZXMYAyADKAkSDQoF",
+            "ZGF0YXMYBCADKAkiPgoLSW52b2tlUmVwbHkSEwoLc2VydmljZU5hbWUYASAB",
+            "KAkSDAoEdHlwZRgCIAEoCRIMCgRkYXRhGAMgASgJIi4KC1BvbGxSZXF1ZXN0",
+            "EhMKC3NlcnZpY2VOYW1lGAEgASgJEgoKAmlkGAIgASgFIkcKDVBvbGxSZXBs",
+            "eUl0ZW0SCgoCaWQYASABKAUSDAoEbmFtZRgCIAEoCRINCgV0eXBlcxgDIAMo",
+            "CRINCgVkYXRhcxgEIAMoCSJfCglQb2xsUmVwbHkSEwoLc2VydmljZU5hbWUY",
+            "ASABKAkSPQoFaXRlbXMYAiADKAsyLi5udHJlZXYuY3JlbWEuY29tbXVuaWNh",
+            "dGlvbi5ncnBjLlBvbGxSZXBseUl0ZW0yuQIKB0FkYXB0b3ISYAoEUGluZxIs",
+            "Lm50cmVldi5jcmVtYS5jb21tdW5pY2F0aW9uLmdycGMuUGluZ1JlcXVlc3Qa",
+            "Ki5udHJlZXYuY3JlbWEuY29tbXVuaWNhdGlvbi5ncnBjLlBpbmdSZXBseRJm",
+            "CgZJbnZva2USLi5udHJlZXYuY3JlbWEuY29tbXVuaWNhdGlvbi5ncnBjLklu",
+            "dm9rZVJlcXVlc3QaLC5udHJlZXYuY3JlbWEuY29tbXVuaWNhdGlvbi5ncnBj",
+            "Lkludm9rZVJlcGx5EmQKBFBvbGwSLC5udHJlZXYuY3JlbWEuY29tbXVuaWNh",
+            "dGlvbi5ncnBjLlBvbGxSZXF1ZXN0GioubnRyZWV2LmNyZW1hLmNvbW11bmlj",
+            "YXRpb24uZ3JwYy5Qb2xsUmVwbHkoATABYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
+            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.PingRequest), global::Ntreev.Crema.Communication.Grpc.PingRequest.Parser, new[]{ "Time" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.PingReply), global::Ntreev.Crema.Communication.Grpc.PingReply.Parser, new[]{ "Time" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.InvokeRequest), global::Ntreev.Crema.Communication.Grpc.InvokeRequest.Parser, new[]{ "ServiceName", "Name", "Types_", "Datas" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.InvokeReply), global::Ntreev.Crema.Communication.Grpc.InvokeReply.Parser, new[]{ "ServiceName", "Type", "Data" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.PollRequest), global::Ntreev.Crema.Communication.Grpc.PollRequest.Parser, new[]{ "ServiceName", "Id" }, null, null, null),
@@ -53,6 +58,264 @@ namespace Ntreev.Crema.Communication.Grpc {
 
   }
   #region Messages
+  internal sealed partial class PingRequest : pb::IMessage<PingRequest> {
+    private static readonly pb::MessageParser<PingRequest> _parser = new pb::MessageParser<PingRequest>(() => new PingRequest());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<PingRequest> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Ntreev.Crema.Communication.Grpc.AdaptorReflection.Descriptor.MessageTypes[0]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public PingRequest() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public PingRequest(PingRequest other) : this() {
+      time_ = other.time_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public PingRequest Clone() {
+      return new PingRequest(this);
+    }
+
+    /// <summary>Field number for the "time" field.</summary>
+    public const int TimeFieldNumber = 1;
+    private long time_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public long Time {
+      get { return time_; }
+      set {
+        time_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as PingRequest);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(PingRequest other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Time != other.Time) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Time != 0L) hash ^= Time.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+      if (Time != 0L) {
+        output.WriteRawTag(8);
+        output.WriteInt64(Time);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      if (Time != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(Time);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(PingRequest other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Time != 0L) {
+        Time = other.Time;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            Time = input.ReadInt64();
+            break;
+          }
+        }
+      }
+    }
+
+  }
+
+  internal sealed partial class PingReply : pb::IMessage<PingReply> {
+    private static readonly pb::MessageParser<PingReply> _parser = new pb::MessageParser<PingReply>(() => new PingReply());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<PingReply> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Ntreev.Crema.Communication.Grpc.AdaptorReflection.Descriptor.MessageTypes[1]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public PingReply() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public PingReply(PingReply other) : this() {
+      time_ = other.time_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public PingReply Clone() {
+      return new PingReply(this);
+    }
+
+    /// <summary>Field number for the "time" field.</summary>
+    public const int TimeFieldNumber = 1;
+    private long time_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public long Time {
+      get { return time_; }
+      set {
+        time_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as PingReply);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(PingReply other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Time != other.Time) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Time != 0L) hash ^= Time.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+      if (Time != 0L) {
+        output.WriteRawTag(8);
+        output.WriteInt64(Time);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      if (Time != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(Time);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(PingReply other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Time != 0L) {
+        Time = other.Time;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            Time = input.ReadInt64();
+            break;
+          }
+        }
+      }
+    }
+
+  }
+
   internal sealed partial class InvokeRequest : pb::IMessage<InvokeRequest> {
     private static readonly pb::MessageParser<InvokeRequest> _parser = new pb::MessageParser<InvokeRequest>(() => new InvokeRequest());
     private pb::UnknownFieldSet _unknownFields;
@@ -61,7 +324,7 @@ namespace Ntreev.Crema.Communication.Grpc {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ntreev.Crema.Communication.Grpc.AdaptorReflection.Descriptor.MessageTypes[0]; }
+      get { return global::Ntreev.Crema.Communication.Grpc.AdaptorReflection.Descriptor.MessageTypes[2]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -258,7 +521,7 @@ namespace Ntreev.Crema.Communication.Grpc {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ntreev.Crema.Communication.Grpc.AdaptorReflection.Descriptor.MessageTypes[1]; }
+      get { return global::Ntreev.Crema.Communication.Grpc.AdaptorReflection.Descriptor.MessageTypes[3]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -443,7 +706,7 @@ namespace Ntreev.Crema.Communication.Grpc {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ntreev.Crema.Communication.Grpc.AdaptorReflection.Descriptor.MessageTypes[2]; }
+      get { return global::Ntreev.Crema.Communication.Grpc.AdaptorReflection.Descriptor.MessageTypes[4]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -600,7 +863,7 @@ namespace Ntreev.Crema.Communication.Grpc {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ntreev.Crema.Communication.Grpc.AdaptorReflection.Descriptor.MessageTypes[3]; }
+      get { return global::Ntreev.Crema.Communication.Grpc.AdaptorReflection.Descriptor.MessageTypes[5]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -797,7 +1060,7 @@ namespace Ntreev.Crema.Communication.Grpc {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ntreev.Crema.Communication.Grpc.AdaptorReflection.Descriptor.MessageTypes[4]; }
+      get { return global::Ntreev.Crema.Communication.Grpc.AdaptorReflection.Descriptor.MessageTypes[6]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]

@@ -9,8 +9,8 @@ namespace Ntreev.Crema.Communication
 {
     class ContextBase : IDisposable
     {
-        private JsonSerializerSettings settings = new JsonSerializerSettings();
-        private List<PollItem> callbackList = new List<PollItem>();
+        //private JsonSerializerSettings settings = new JsonSerializerSettings();
+        //private List<PollItem> callbackList = new List<PollItem>();
         //private IAdaptor adaptor;
 
         public ContextBase()
@@ -19,7 +19,7 @@ namespace Ntreev.Crema.Communication
             this.Dispatcher = new Dispatcher(this);
         }
 
-        public IAdaptorHost AdaptorHost { get; set; }
+        public IAdaptorClientHost AdaptorHost { get; set; }
 
         public Func<InvokeInfo, Task<InvokeResult>> InvokeDelegate { get; set; }
 
@@ -66,28 +66,6 @@ namespace Ntreev.Crema.Communication
             throw new NotImplementedException();
         }
 
-        // public Task<InvokeResult> InvokeAsync(InvokeInfo info)
-        // {
-        //     throw new NotImplementedException();
-        //     //Adaptor.AdaptorClient d;
-        //     //d.in
-        // }
-
-        // public Task<PollItem[]> PollAsync(int id)
-        // {
-        //     return this.Dispatcher.InvokeAsync(() =>
-        //     {
-        //         var items = new PollItem[this.callbackList.Count - id];
-        //         for (var i = id; i < this.callbackList.Count; i++)
-        //         {
-        //             items[id - i] = this.callbackList[i];
-        //         }
-        //         return items;
-        //     });
-        // }
-
         public Dispatcher Dispatcher { get; private set; }
-
-        //public int ID { get; private set; }
     }
 }

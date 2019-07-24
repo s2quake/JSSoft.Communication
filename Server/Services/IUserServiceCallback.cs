@@ -11,6 +11,6 @@ namespace Ntreev.Crema.Services.Users
         void OnLoggedIn(string userID);
 
         [ServiceContract]
-         void OnAdd(string userID, int test);
+        void OnLoggedOut(string userID);
     }
 }

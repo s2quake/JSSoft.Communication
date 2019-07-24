@@ -18,19 +18,11 @@ namespace Ntreev.Crema.Services.Users
         [ServiceContract]
         public async Task<int> LoginAsync(string user)
         {
-            await Task.Delay(100);
-            Console.WriteLine("LoginAsync");
+            await Task.Delay(1);
+            Console.WriteLine($"login: {user}");
             this.cancellation = new CancellationTokenSource();
-            this.task = Task.Run(()=>
-            {
-                while(!this.cancellation.IsCancellationRequested)
-                {
-                    this.Callback.OnLoggedIn(user);
-                    Thread.Sleep(1000);
-                }
-            });
+            this.Callback.OnLoggedIn(user);
             return 0;
-            //Task.Run(()=> this.Callback.OnAdd("WER", 0));
         }
 
         [ServiceContract]

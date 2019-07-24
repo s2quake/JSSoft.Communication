@@ -38,12 +38,12 @@ namespace Ntreev.Crema.Services.Users
 
         void IUserServiceCallback.OnLoggedIn(string userID)
         {
-            Console.WriteLine(userID);
+            Console.WriteLine($"{nameof(IUserServiceCallback.OnLoggedIn)}: '{userID}'");
         }
 
-        void IUserServiceCallback.OnAdd(string userID, int test)
+        void IUserServiceCallback.OnLoggedOut(string userID)
         {
-
+            Console.WriteLine($"{nameof(IUserServiceCallback.OnLoggedOut)}: '{userID}'");
         }
 
         #endregion

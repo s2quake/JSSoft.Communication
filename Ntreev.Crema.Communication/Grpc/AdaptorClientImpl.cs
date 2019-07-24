@@ -14,20 +14,18 @@ namespace Ntreev.Crema.Communication.Grpc
         private static readonly JsonSerializerSettings settings = new JsonSerializerSettings();
         private readonly Dictionary<string, IService> serviceByName = new Dictionary<string, IService>();
         private readonly Dictionary<string, MethodInfo> methodByName = new Dictionary<string, MethodInfo>();
+        private readonly Dictionary<IService, int> idByService = new Dictionary<IService, int>();
         private readonly Channel channel;
-        private readonly IService[] services;
         private AsyncDuplexStreamingCall<PollRequest, PollReply> call;
         private CancellationTokenSource cancellation;
         private Task task;
-        private Dictionary<IService, int> idByService = new Dictionary<IService, int>();
-
 
         public AdaptorClientImpl(Channel channel, IEnumerable<IService> services)
             : base(channel)
         {
+            this.Ping(new PingRequest() { Time = DateTime.UtcNow.Ticks });
             this.channel = channel;
             this.serviceByName = services.ToDictionary(item => item.Name);
-            this.services = services.ToArray();
             this.idByService = services.ToDictionary(item => item, item => 0);
             this.cancellation = new CancellationTokenSource();
             foreach (var item in services)
@@ -46,23 +44,19 @@ namespace Ntreev.Crema.Communication.Grpc
 
         public int ID { get; set; }
 
-        private void OnPoll(PollItem pollItem)
+        private void InvokeCallback(IService service, string name, object[] args)
         {
-            var methodName = $"{pollItem.ServiceName}.{pollItem.Name}";
-            var service = this.serviceByName[pollItem.ServiceName];
-            if(this.methodByName.ContainsKey(methodName) == false)
+            var methodName = $"{service.Name}.{name}";
+            if (this.methodByName.ContainsKey(methodName) == false)
                 throw new InvalidOperationException();
             var methodInfo = this.methodByName[methodName];
-            methodInfo.Invoke(service, pollItem.Datas);
+            methodInfo.Invoke(service, args);
         }
 
         private static void RegisterMethod(Dictionary<string, MethodInfo> methodByName, IService service)
         {
-            var query = from callMethod in service.CallbackType.GetMethods()
-                        join implMethod in service.GetType().GetMethods()
-                        on callMethod.ToString() equals implMethod.ToString()
-                        select implMethod;
-            foreach (var item in query.ToArray())
+            var methods = service.CallbackType.GetMethods();
+            foreach (var item in methods)
             {
                 if (item.GetCustomAttribute(typeof(ServiceContractAttribute)) is ServiceContractAttribute attr)
                 {
@@ -72,13 +66,13 @@ namespace Ntreev.Crema.Communication.Grpc
             }
         }
 
-        public async Task PollAsync(CancellationToken cancellation)
+        private async Task PollAsync(CancellationToken cancellation)
         {
             var count = this.idByService.Count;
             this.call = this.Poll();
             while (!cancellation.IsCancellationRequested)
             {
-                foreach (var item in this.services)
+                foreach (var item in this.serviceByName.Values)
                 {
                     var id = this.idByService[item];
                     var request = new PollRequest() { Id = id, ServiceName = item.Name };
@@ -99,29 +93,29 @@ namespace Ntreev.Crema.Communication.Grpc
             {
                 if (item.Id >= 0)
                 {
-                    var pollItem = ToPollItem(item);
-                    this.OnPoll(pollItem);
+                    var args = GetArguments(item.Types_, item.Datas);
+                    this.InvokeCallback(service, item.Name, args);
                     id = item.Id + 1;
                 }
             }
             return id;
         }
 
-        private static PollItem ToPollItem(PollReplyItem replyItem)
+        private static object[] GetArguments(IReadOnlyList<string> types, IReadOnlyList<string> datas)
         {
-            var pollItem = new PollItem()
+            if (types == null)
+                throw new ArgumentNullException(nameof(types));
+            if (datas == null)
+                throw new ArgumentNullException(nameof(datas));
+            if (types.Count != datas.Count)
+                throw new ArgumentException($"length of '{nameof(types)}' and '{nameof(datas)}' is different.");
+            var args = new object[types.Count];
+            for (var i = 0; i < types.Count; i++)
             {
-                ID = replyItem.Id,
-                Name = replyItem.Name,
-                Types = new Type[replyItem.Types_.Count],
-                Datas = new string[replyItem.Datas.Count]
-            };
-            for (var i = 0; i < replyItem.Types_.Count; i++)
-            {
-                pollItem.Types[i] = Type.GetType(replyItem.Types_[i]);
-                pollItem.Datas[i] = JsonConvert.DeserializeObject(replyItem.Datas[i], pollItem.Types[i], settings);
+                var type = Type.GetType(types[i]);
+                args[i] = JsonConvert.DeserializeObject(datas[i], type, settings);
             }
-            return pollItem;
+            return args;
         }
 
         private static InvokeRequest ToInvokeReqeust(InvokeInfo info)

@@ -17,8 +17,7 @@ namespace Ntreev.Crema.Communication
         private AdaptorClientImpl apdatorImpl;
         private ServiceInstanceBuilder instanceBuilder = new ServiceInstanceBuilder();
 
-        [ImportingConstructor]
-        public AdaptorClientHost([ImportMany]IEnumerable<IService> services)
+        public AdaptorClientHost(IEnumerable<IService> services)
         {
             this.services = services.ToArray();
         }
@@ -27,19 +26,6 @@ namespace Ntreev.Crema.Communication
         {
             this.channel = new Channel($"{host}:{port}", ChannelCredentials.Insecure);
             this.apdatorImpl = new AdaptorClientImpl(this.channel, this.services);
-            //this.Ports.Add(new Grpc.Core.ServerPort(host, port, Grpc.Core.ServerCredentials.Insecure));
-            // foreach (var item in adaptors)
-            // {
-            //     // if (item is AdaptorImpl adator)
-            //     // {
-            //     //     //this.Services.Add(Adaptor.BindService(adator));
-            //     // }
-            //     // else
-            //     // {
-            //     //     throw new ArgumentException("item is invalid adator", nameof(adaptors));
-            //     // }
-            // }
-            //this.channel.s
         }
 
         public void Close()

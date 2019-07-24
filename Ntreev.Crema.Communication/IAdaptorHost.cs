@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Ntreev.Crema.Communication
 {
-    public interface IAdaptorHost
+    interface IAdaptorHost
     {
         void Open(string host, int port);
 

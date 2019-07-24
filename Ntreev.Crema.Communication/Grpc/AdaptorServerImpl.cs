@@ -28,6 +28,11 @@ namespace Ntreev.Crema.Communication.Grpc
             }
         }
 
+        public override Task<PingReply> Ping(PingRequest request, ServerCallContext context)
+        {
+            return Task.Run(() => new PingReply() { Time = DateTime.UtcNow.Ticks });
+        }
+
         public override async Task<InvokeReply> Invoke(InvokeRequest request, ServerCallContext context)
         {
             var info = ToInvokeInfo(request);
@@ -125,11 +130,8 @@ namespace Ntreev.Crema.Communication.Grpc
 
         private static void RegisterMethod(Dictionary<string, MethodInfo> methodByName, IService service)
         {
-            var query = from baseMethod in service.ServiceType.GetMethods()
-                        join implMethod in service.GetType().GetMethods()
-                        on baseMethod.ToString() equals implMethod.ToString()
-                        select implMethod;
-            foreach (var item in query.ToArray())
+            var methods = service.ServiceType.GetMethods();
+            foreach (var item in methods)
             {
                 if (item.GetCustomAttribute(typeof(ServiceContractAttribute)) is ServiceContractAttribute attr)
                 {

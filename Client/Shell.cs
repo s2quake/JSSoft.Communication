@@ -43,7 +43,7 @@ namespace Client
             base.Start();
         }
 
-        void IShell.Cancel()
+        void IShell.Stop()
         {
             base.Cancel();
             this.serviceHost.Close();
