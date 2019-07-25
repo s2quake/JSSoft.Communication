@@ -43,10 +43,10 @@ namespace Ntreev.Crema.Communication.Grpc
             var instanceType = service.CallbackType;
             var typeName = $"{instanceType.Name}Impl";
             var typeNamespace = instanceType.Namespace;
-            var implType = instanceBuilder.CreateType(typeName, typeNamespace, typeof(CallbackBase), instanceType);
-            var instance = TypeDescriptor.CreateInstance(null, implType, null, null) as CallbackBase;
-            instance.ServiceName = service.Name;
-            instance.InvokeDelegate = this.adaptor.InvokeDelegate;
+            var implType = instanceBuilder.CreateType(typeName, typeNamespace, typeof(ContextBase), instanceType);
+            var instance = TypeDescriptor.CreateInstance(null, implType, null, null) as ContextBase;
+            instance.Service = service;
+            instance.Invoker = this.adaptor;
             return instance;
         }
 

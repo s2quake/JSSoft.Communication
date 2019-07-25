@@ -9,7 +9,6 @@ namespace Ntreev.Crema.Communication
     public abstract class ServiceHostBase : IServiceHost
     {
         private readonly IAdaptorHostProvider adpatorHostProvider;
-        
         private readonly ServiceInstanceBuilder instanceBuilder;
         private Dictionary<IService, object> instanceByService;
         private IAdaptorHost adaptorHost;

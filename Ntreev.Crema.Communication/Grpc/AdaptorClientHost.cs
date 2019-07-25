@@ -41,8 +41,8 @@ namespace Ntreev.Crema.Communication.Grpc
             var typeNamespace = instanceType.Namespace;
             var implType = instanceBuilder.CreateType(typeName, typeNamespace, typeof(ContextBase), instanceType);
             var instance = TypeDescriptor.CreateInstance(null, implType, null, null) as ContextBase;
-            instance.AdaptorHost = this.apdatorImpl;
-            instance.ServiceName = service.Name;
+            instance.Service = service;
+            instance.Invoker = this.apdatorImpl;
             return instance;
         }
 

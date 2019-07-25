@@ -4,12 +4,12 @@ namespace Ntreev.Crema.Communication
 {
     public sealed class ServiceToken
     {
-        internal ServiceToken(IAdaptorHost adaptorHost)
+        internal ServiceToken(object value)
         {
-            this.AdaptorHost = adaptorHost;
+            this.Value = value;
         }
 
-        internal IAdaptorHost AdaptorHost { get; }
+        internal object Value { get; }
 
         internal static readonly ServiceToken Empty = new ServiceToken(null);
     }

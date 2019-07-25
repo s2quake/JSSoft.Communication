@@ -9,7 +9,7 @@ using Ntreev.Library.Threading;
 
 namespace Ntreev.Crema.Communication.Grpc
 {
-    class AdaptorServerImpl : Adaptor.AdaptorBase, IAdaptorServerHost
+    class AdaptorServerImpl : Adaptor.AdaptorBase, IContextInvoker
     {
         private static readonly JsonSerializerSettings settings = new JsonSerializerSettings();
         private readonly Dictionary<string, IService> serviceByName = new Dictionary<string, IService>();
@@ -35,15 +35,16 @@ namespace Ntreev.Crema.Communication.Grpc
 
         public override async Task<InvokeReply> Invoke(InvokeRequest request, ServerCallContext context)
         {
-            var info = ToInvokeInfo(request);
-            if (this.serviceByName.ContainsKey(info.ServiceName) == false)
+            if (this.serviceByName.ContainsKey(request.ServiceName) == false)
                 throw new InvalidOperationException();
-            var service = this.serviceByName[info.ServiceName];
-            var methodName = $"{info.ServiceName}.{info.Name}";
+            var service = this.serviceByName[request.ServiceName];
+            var methodName = $"{request.ServiceName}.{request.Name}";
             if (this.methodByName.ContainsKey(methodName) == false)
                 throw new InvalidOperationException();
+
+            var args = AdaptorUtility.GetArguments(request.Types_, request.Datas);
             var method = methodByName[methodName];
-            var value = await Task.Run(() => method.Invoke(service, info.Datas));
+            var value = await Task.Run(() => method.Invoke(service, args));
             var valueType = method.ReturnType;
             if (value is Task task)
             {
@@ -63,7 +64,7 @@ namespace Ntreev.Crema.Communication.Grpc
             }
             var reply = new InvokeReply()
             {
-                ServiceName = info.ServiceName,
+                ServiceName = request.ServiceName,
                 Type = valueType.AssemblyQualifiedName,
             };
             if (valueType != typeof(void))
@@ -102,12 +103,27 @@ namespace Ntreev.Crema.Communication.Grpc
             });
         }
 
-        public void InvokeDelegate(string serviceName, string name, object[] args)
+        private static void RegisterMethod(Dictionary<string, MethodInfo> methodByName, IService service)
+        {
+            var methods = service.ServiceType.GetMethods();
+            foreach (var item in methods)
+            {
+                if (item.GetCustomAttribute(typeof(ServiceContractAttribute)) is ServiceContractAttribute attr)
+                {
+                    var methodName = attr.Name ?? item.Name;
+                    methodByName.Add($"{service.Name}.{methodName}", item);
+                }
+            }
+        }
+
+        #region IContextInvoker
+
+        void IContextInvoker.Invoke(IService service, string name, object[] args)
         {
             this.dispatcher.InvokeAsync(() =>
             {
                 var length = args.Length / 2;
-                var callbacks = this.callbacksByName[serviceName];
+                var callbacks = this.callbacksByName[service.Name];
                 var types = new string[length];
                 var datas = new string[length];
                 var pollItem = new PollReplyItem()
@@ -128,76 +144,21 @@ namespace Ntreev.Crema.Communication.Grpc
             });
         }
 
-        private static void RegisterMethod(Dictionary<string, MethodInfo> methodByName, IService service)
+        T IContextInvoker.Invoke<T>(IService service, string name, object[] args)
         {
-            var methods = service.ServiceType.GetMethods();
-            foreach (var item in methods)
-            {
-                if (item.GetCustomAttribute(typeof(ServiceContractAttribute)) is ServiceContractAttribute attr)
-                {
-                    var methodName = attr.Name ?? item.Name;
-                    methodByName.Add($"{service.Name}.{methodName}", item);
-                }
-            }
+            throw new NotImplementedException();
         }
 
-        private static InvokeInfo ToInvokeInfo(InvokeRequest request)
+        Task IContextInvoker.InvokeAsync(IService service, string name, object[] args)
         {
-            var info = new InvokeInfo()
-            {
-                ServiceName = request.ServiceName,
-                Name = request.Name,
-                Types = new Type[request.Types_.Count],
-                Datas = new object[request.Datas.Count]
-            };
-            for (var i = 0; i < request.Types_.Count; i++)
-            {
-                info.Types[i] = Type.GetType(request.Types_[i]);
-                info.Datas[i] = JsonConvert.DeserializeObject(request.Datas[i], info.Types[i], settings);
-            }
-            return info;
+            throw new NotImplementedException();
         }
 
-        private static InvokeReply ToInvokeReply(InvokeResult result)
+        Task<T> IContextInvoker.InvokeAsync<T>(IService service, string name, object[] args)
         {
-            var reply = new InvokeReply()
-            {
-                Type = result.Type.AssemblyQualifiedName,
-                Data = JsonConvert.SerializeObject(result.Data, result.Type, settings)
-            };
-            return reply;
+            throw new NotImplementedException();
         }
 
-        private static PollReply ToPollReply(PollItem[] results)
-        {
-            var replyItemList = new List<PollReplyItem>(results.Length);
-            var reply = new PollReply();
-            for (var i = 0; i < results.Length; i++)
-            {
-                var item = results[i];
-                replyItemList.Add(ToPollReplyItem(item));
-            }
-            reply.Items.AddRange(replyItemList);
-            return reply;
-        }
-
-        private static PollReplyItem ToPollReplyItem(PollItem pollItem)
-        {
-            var types = new string[pollItem.Types.Length];
-            var datas = new string[pollItem.Datas.Length];
-            var replyItem = new PollReplyItem()
-            {
-                Id = pollItem.ID,
-                Name = pollItem.Name,
-            };
-            for (var i = 0; i < types.Length; i++)
-            {
-                types[i] = pollItem.Types[i].AssemblyQualifiedName;
-                datas[i] = JsonConvert.SerializeObject(pollItem.Datas[i], pollItem.Types[i], settings);
-            }
-            replyItem.Types_.AddRange(types);
-            replyItem.Datas.AddRange(datas);
-            return replyItem;
-        }
+        #endregion
     }
 }

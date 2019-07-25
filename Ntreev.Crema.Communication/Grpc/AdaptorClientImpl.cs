@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 
 namespace Ntreev.Crema.Communication.Grpc
 {
-    class AdaptorClientImpl : Adaptor.AdaptorClient, IAdaptorClientHost
+    class AdaptorClientImpl : Adaptor.AdaptorClient, IContextInvoker
     {
         private static readonly JsonSerializerSettings settings = new JsonSerializerSettings();
         private readonly Dictionary<string, IService> serviceByName = new Dictionary<string, IService>();
@@ -33,13 +33,6 @@ namespace Ntreev.Crema.Communication.Grpc
                 RegisterMethod(this.methodByName, item);
             }
             this.task = this.PollAsync(this.cancellation.Token);
-        }
-
-        public async Task<InvokeResult> InvokeAsync(InvokeInfo info)
-        {
-            var request = ToInvokeReqeust(info);
-            var reply = await Task.Run(() => this.Invoke(request));
-            return ToInvokeResult(reply);
         }
 
         public int ID { get; set; }
@@ -93,7 +86,7 @@ namespace Ntreev.Crema.Communication.Grpc
             {
                 if (item.Id >= 0)
                 {
-                    var args = GetArguments(item.Types_, item.Datas);
+                    var args = AdaptorUtility.GetArguments(item.Types_, item.Datas);
                     this.InvokeCallback(service, item.Name, args);
                     id = item.Id + 1;
                 }
@@ -101,68 +94,62 @@ namespace Ntreev.Crema.Communication.Grpc
             return id;
         }
 
-        private static object[] GetArguments(IReadOnlyList<string> types, IReadOnlyList<string> datas)
-        {
-            if (types == null)
-                throw new ArgumentNullException(nameof(types));
-            if (datas == null)
-                throw new ArgumentNullException(nameof(datas));
-            if (types.Count != datas.Count)
-                throw new ArgumentException($"length of '{nameof(types)}' and '{nameof(datas)}' is different.");
-            var args = new object[types.Count];
-            for (var i = 0; i < types.Count; i++)
-            {
-                var type = Type.GetType(types[i]);
-                args[i] = JsonConvert.DeserializeObject(datas[i], type, settings);
-            }
-            return args;
-        }
+        #region IContextInvoker
 
-        private static InvokeRequest ToInvokeReqeust(InvokeInfo info)
+        void IContextInvoker.Invoke(IService service, string name, object[] args)
         {
-            var types = new string[info.Types.Length];
-            var datas = new string[info.Datas.Length];
+            var (types, datas) = AdaptorUtility.GetStrings(args);
             var request = new InvokeRequest()
             {
-                ServiceName = info.ServiceName,
-                Name = info.Name,
+                ServiceName = service.Name,
+                Name = name,
             };
-            for (var i = 0; i < info.Types.Length; i++)
-            {
-                types[i] = info.Types[i].AssemblyQualifiedName;
-                datas[i] = JsonConvert.SerializeObject(info.Datas[i], info.Types[i], settings);
-            }
             request.Types_.AddRange(types);
             request.Datas.AddRange(datas);
-            return request;
+            this.Invoke(request);
         }
 
-        private static InvokeResult ToInvokeResult(InvokeReply reply)
+        T IContextInvoker.Invoke<T>(IService service, string name, object[] args)
         {
-            var result = new InvokeResult();
-            result.Type = Type.GetType(reply.Type);
-            result.Data = JsonConvert.DeserializeObject(reply.Data, result.Type, settings);
-            return result;
+            var (types, datas) = AdaptorUtility.GetStrings(args);
+            var request = new InvokeRequest()
+            {
+                ServiceName = service.Name,
+                Name = name,
+            };
+            request.Types_.AddRange(types);
+            request.Datas.AddRange(datas);
+            var reply = this.Invoke(request);
+            return AdaptorUtility.GetValue<T>(reply.Type, reply.Data);
         }
 
-        void IAdaptorClientHost.Invoke(string serviceName, string name, object[] args)
+        async Task IContextInvoker.InvokeAsync(IService service, string name, object[] args)
         {
-            throw new NotImplementedException();
+            var (types, datas) = AdaptorUtility.GetStrings(args);
+            var request = new InvokeRequest()
+            {
+                ServiceName = service.Name,
+                Name = name,
+            };
+            request.Types_.AddRange(types);
+            request.Datas.AddRange(datas);
+            await this.InvokeAsync(request);
         }
 
-        T IAdaptorClientHost.Invoke<T>(string serviceName, string name, object[] args)
+        async Task<T> IContextInvoker.InvokeAsync<T>(IService service, string name, object[] args)
         {
-            throw new NotImplementedException();
+            var (types, datas) = AdaptorUtility.GetStrings(args);
+            var request = new InvokeRequest()
+            {
+                ServiceName = service.Name,
+                Name = name,
+            };
+            request.Types_.AddRange(types);
+            request.Datas.AddRange(datas);
+            var reply = await this.InvokeAsync(request);
+            return AdaptorUtility.GetValue<T>(reply.Type, reply.Data);
         }
 
-        Task IAdaptorClientHost.InvokeAsync(string serviceName, string name, object[] args)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<T> IAdaptorClientHost.InvokeAsync<T>(string serviceName, string name, object[] args)
-        {
-            throw new NotImplementedException();
-        }
+        #endregion
     }
 }
