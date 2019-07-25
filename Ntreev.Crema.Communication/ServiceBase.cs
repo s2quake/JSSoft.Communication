@@ -4,7 +4,7 @@ using Ntreev.Library.Threading;
 
 namespace Ntreev.Crema.Communication
 {
-    public abstract class ServiceBase : IService
+    public abstract class ServiceBase : IService, IDisposable
     {
         private readonly Type serviceType;
         private readonly Type callbackType;

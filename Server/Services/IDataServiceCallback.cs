@@ -1,9 +1,6 @@
-using System;
-using System.ServiceModel;
 using Ntreev.Crema.Communication;
-using Ntreev.Crema.Services;
 
-namespace Ntreev.Crema.Services.Data
+namespace Server.Services
 {
     public interface IDataServiceCallback
     {

@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.Composition;
+using System.Threading.Tasks;
 using Ntreev.Crema.Communication;
 using Ntreev.Crema.Services;
 using Ntreev.Library.Commands;
@@ -49,16 +50,16 @@ namespace Client
 
         #region IShell
 
-        void IShell.Start()
+        async Task IShell.StartAsync()
         {
-            this.serviceHost.Open();
+            await this.serviceHost.OpenAsync();
             base.Start();
         }
 
-        void IShell.Stop()
+        async Task IShell.StopAsync()
         {
             base.Cancel();
-            this.serviceHost.Close();
+            await this.serviceHost.CloseAsync();
         }
 
         #endregion

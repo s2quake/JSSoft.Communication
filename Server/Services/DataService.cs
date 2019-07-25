@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 using Ntreev.Crema.Communication;
 using Ntreev.Library.Threading;
 
-namespace Ntreev.Crema.Services.Data
+namespace Server.Services
 {
     [Export(typeof(IService))]
     class DataService : ServerServiceBase<IDataService, IDataServiceCallback>, IDataService

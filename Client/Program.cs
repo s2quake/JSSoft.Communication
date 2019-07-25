@@ -9,13 +9,13 @@ namespace Client
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             try
             {
                 using (var shell = Shell.Create())
                 {
-                    shell.Start();
+                    await shell.StartAsync();
                 }
             }
             catch (Exception e)

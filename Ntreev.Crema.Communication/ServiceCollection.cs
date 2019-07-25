@@ -22,16 +22,6 @@ namespace Ntreev.Crema.Communication
             this.itemList = new List<IService>(services); 
         }
 
-        public void Add(IService item)
-        {
-            this.itemList.Add(item);
-        }
-
-        public void Remove(IService item)
-        {
-            this.itemList.Remove(item);
-        }
-
         public int IndexOf(IService item)
         {
             return this.itemList.IndexOf(item);

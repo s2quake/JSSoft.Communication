@@ -1,17 +1,22 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Communication
 {
     public interface IServiceHost
     {
-        void Open();
+        Task OpenAsync();
 
-        void Close();
+        Task CloseAsync();
 
         IReadOnlyList<IService> Services { get; }
 
+        string Host { get; set; }
+        
         int Port { get; set; }
+
+        bool IsOpened { get; }
 
         event EventHandler Opened;
 

@@ -9,13 +9,12 @@ using System.Threading.Tasks;
 namespace Ntreev.Crema.Services.Commands
 {
     [Export(typeof(ICommand))]
-    class UserCommands : CommandMethodBase
+    class UserCommand : CommandMethodBase
     {
         [Import]
         private Lazy<IUserService> userService = null;
 
-        public UserCommands()
-            : base("user")
+        public UserCommand()
         {
             
         }

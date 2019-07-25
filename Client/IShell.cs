@@ -1,11 +1,12 @@
 using System;
+using System.Threading.Tasks;
 
 namespace Client
 {
     public interface IShell : IDisposable
     {
-        void Stop();
+        Task StopAsync();
 
-        void Start();
+        Task StartAsync();
     }
 }

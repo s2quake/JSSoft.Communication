@@ -1,19 +1,19 @@
 using System;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.Threading.Tasks;
 using Ntreev.Library.Commands;
 using Server;
 
-namespace Ntreev.Crema.Services.Commands
+namespace Server.Commands
 {
     [Export(typeof(ICommand))]
-    class ExitCommand : CommandBase
+    class ExitCommand : CommandAsyncBase
     {
         [Import]
         private Lazy<IShell> shell = null;
 
         public ExitCommand()
-            : base("exit")
         {
 
         }
@@ -25,9 +25,9 @@ namespace Ntreev.Crema.Services.Commands
             get; set;
         }
 
-        protected override void OnExecute()
+        protected override Task OnExecuteAsync()
         {
-            this.shell.Value.Stop();
+            return this.shell.Value.StopAsync();
         }
     }
 }

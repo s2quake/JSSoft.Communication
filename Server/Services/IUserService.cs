@@ -1,8 +1,7 @@
-using System;
 using System.Threading.Tasks;
 using Ntreev.Crema.Communication;
 
-namespace Ntreev.Crema.Services.Users
+namespace Server.Services
 {
     public interface IUserService
     {
