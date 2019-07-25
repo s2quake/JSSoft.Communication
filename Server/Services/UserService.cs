@@ -13,14 +13,11 @@ namespace Ntreev.Crema.Services.Users
     [Export(typeof(IService))]
     class UserService : ServerServiceBase<IUserService, IUserServiceCallback>, IUserService
     {
-        private Task task;
-        private CancellationTokenSource cancellation;
         [ServiceContract]
         public async Task<int> LoginAsync(string user)
         {
             await Task.Delay(1);
             Console.WriteLine($"login: {user}");
-            this.cancellation = new CancellationTokenSource();
             this.Callback.OnLoggedIn(user);
             return 0;
         }
@@ -28,9 +25,8 @@ namespace Ntreev.Crema.Services.Users
         [ServiceContract]
         public async Task<(int, string)> LogoutAsync(string user, int count)
         {
-            this.cancellation.Cancel();
-            this.cancellation = null;
-            await this.task;
+            await Task.Delay(1);
+            this.Callback.OnLoggedOut(user);
             return (1, "ser");
         }
     }
