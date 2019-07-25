@@ -103,6 +103,11 @@ namespace Ntreev.Crema.Communication.Grpc
             });
         }
 
+        public void Dispose()
+        {
+            this.dispatcher.Dispose();
+        }
+        
         private static void RegisterMethod(Dictionary<string, MethodInfo> methodByName, IService service)
         {
             var methods = service.ServiceType.GetMethods();

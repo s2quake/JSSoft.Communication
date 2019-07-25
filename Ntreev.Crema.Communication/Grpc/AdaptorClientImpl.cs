@@ -35,15 +35,12 @@ namespace Ntreev.Crema.Communication.Grpc
             this.task = this.PollAsync(this.cancellation.Token);
         }
 
-        public int ID { get; set; }
-
-        private void InvokeCallback(IService service, string name, object[] args)
+        public void Dispose()
         {
-            var methodName = $"{service.Name}.{name}";
-            if (this.methodByName.ContainsKey(methodName) == false)
-                throw new InvalidOperationException();
-            var methodInfo = this.methodByName[methodName];
-            methodInfo.Invoke(service, args);
+            this.cancellation.Cancel();
+            this.cancellation = null;
+            this.task.Wait();
+            this.task = null;
         }
 
         private static void RegisterMethod(Dictionary<string, MethodInfo> methodByName, IService service)
@@ -78,6 +75,15 @@ namespace Ntreev.Crema.Communication.Grpc
             }
             this.call.Dispose();
             this.call = null;
+        }
+
+        private void InvokeCallback(IService service, string name, object[] args)
+        {
+            var methodName = $"{service.Name}.{name}";
+            if (this.methodByName.ContainsKey(methodName) == false)
+                throw new InvalidOperationException();
+            var methodInfo = this.methodByName[methodName];
+            methodInfo.Invoke(service, args);
         }
 
         private int InvokeCallback(IService service, int id, IEnumerable<PollReplyItem> pollItems)

@@ -30,6 +30,8 @@ namespace Ntreev.Crema.Communication.Grpc
 
         public void Close()
         {
+            this.apdatorImpl.Dispose();
+            this.apdatorImpl = null;
             this.channel.ShutdownAsync().Wait();
             this.channel = null;
         }

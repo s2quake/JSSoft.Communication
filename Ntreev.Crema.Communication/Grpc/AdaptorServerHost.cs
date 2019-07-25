@@ -34,6 +34,8 @@ namespace Ntreev.Crema.Communication.Grpc
 
         public void Close()
         {
+            this.adaptor.Dispose();
+            this.adaptor = null;
             this.server.ShutdownAsync().Wait();
             this.server = null;
         }
