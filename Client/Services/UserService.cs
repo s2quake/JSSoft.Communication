@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 using Grpc.Core;
 using Newtonsoft.Json;
 using Ntreev.Crema.Communication;
+using Ntreev.Crema.Services;
 
-namespace Ntreev.Crema.Services.Users
+namespace Client.Services
 {
     [Export(typeof(IService))]
     [Export(typeof(IUserService))]

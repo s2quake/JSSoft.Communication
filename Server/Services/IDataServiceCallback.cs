@@ -1,6 +1,6 @@
 using Ntreev.Crema.Communication;
 
-namespace Server.Services
+namespace Ntreev.Crema.Services
 {
     public interface IDataServiceCallback
     {

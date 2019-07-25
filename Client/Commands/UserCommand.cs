@@ -3,10 +3,11 @@ using System.ComponentModel;
 using System.ComponentModel.Composition;
 using Ntreev.Library.Commands;
 using Client;
-using Ntreev.Crema.Services.Users;
+using Client.Services;
 using System.Threading.Tasks;
+using Ntreev.Crema.Services;
 
-namespace Ntreev.Crema.Services.Commands
+namespace Client.Commands
 {
     [Export(typeof(ICommand))]
     class UserCommand : CommandMethodBase

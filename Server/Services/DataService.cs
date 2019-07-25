@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Grpc.Core;
 using Newtonsoft.Json;
 using Ntreev.Crema.Communication;
+using Ntreev.Crema.Services;
 using Ntreev.Library.Threading;
 
 namespace Server.Services

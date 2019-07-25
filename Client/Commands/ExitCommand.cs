@@ -5,7 +5,7 @@ using Ntreev.Library.Commands;
 using Client;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Services.Commands
+namespace Client.Commands
 {
     [Export(typeof(ICommand))]
     class ExitCommand : CommandAsyncBase

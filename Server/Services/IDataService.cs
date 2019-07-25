@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Ntreev.Crema.Communication;
 
-namespace Server.Services
+namespace Ntreev.Crema.Services
 {
     public interface IDataService
     {
