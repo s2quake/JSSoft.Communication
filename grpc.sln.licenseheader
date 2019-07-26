@@ -1,3 +1,5 @@
+extensions: designer.cs generated.cs
+extensions: .cs .cpp .h
 // MIT License
 // 
 // Copyright (c) 2019 Jeesu Choi
@@ -20,17 +22,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-
-namespace Ntreev.Crema.Communication
-{
-    public abstract class ServerHostBase : ServiceHostBase
-    {
-        protected ServerHostBase(IAdaptorHostProvider adaptorHostProvider, IEnumerable<IService> services)
-            : base(adaptorHostProvider, services)
-        {
-
-        }
-    }
-}
+extensions: .aspx .ascx
+<%-- 
+Copyright (c) 2011 rubicon IT GmbH
+--%>
+extensions: .vb
+'Sample license text.
+extensions:  .xml .config .xsd
+<!--
+Sample license text.
+-->
