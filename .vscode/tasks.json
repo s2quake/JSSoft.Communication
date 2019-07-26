@@ -10,7 +10,9 @@
             "group": "build",
             "args": [
                 "build", 
-                "Client"
+                "Client",
+                "--framework",
+                "netcoreapp3.0"
             ],
             "presentation": {
                 "reveal": "always"
@@ -24,7 +26,9 @@
             "group": "build",
             "args": [
                 "build", 
-                "Server"
+                "Server",
+                "--framework",
+                "netcoreapp3.0"
             ],
             "presentation": {
                 "reveal": "always"
@@ -33,9 +37,14 @@
         },
         {
             "label": "build all",
-            "command": "dotnet build",
+            "command": "dotnet",
             "type": "shell",
             "group": "build",
+            "args": [
+                "build",
+                "--framework",
+                "netcoreapp3.0"
+            ],
             "presentation": {
                 "reveal": "always"
             },

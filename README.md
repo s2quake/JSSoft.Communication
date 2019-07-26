@@ -15,7 +15,7 @@ https://github.com/s2quake/Crema 프로젝트에서 WCF 대체할 목적으로 �
     git clone https://github.com/s2quake/grpc-sample.git --recursive
     cd grpc-sample
     dotnet restore
-    dotnet build
+    dotnet build --framework netcoreapp3.0
 
 # 실행
 
