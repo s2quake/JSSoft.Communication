@@ -1,12 +1,14 @@
 # 개요
 
-https://github.com/s2quake/Crema 프로젝트에서 WCF 대체할 목적으로 Grpc 를 사용한 서버 및 클라이언트 예제입니다.
+https://github.com/grpc/grpc 를 사용하여 구현한 서버와 클라이언트입니다.
+
+https://github.com/s2quake/Crema 프로젝트에서 WCF 대체할 목적으로 작업하고 있습니다.
 
 # 도구
 
-    .NET Core 3.0
+[.NET Core 3.0](https://dotnet.microsoft.com/download/dotnet-core/3.0)
 
-    Visual Studio Code
+[Visual Studio Code](https://code.visualstudio.com/)
 
 # 빌드
 
@@ -14,7 +16,6 @@ https://github.com/s2quake/Crema 프로젝트에서 WCF 대체할 목적으로 G
     cd grpc-sample
     dotnet restore
     dotnet build
-
 
 # 실행
 
