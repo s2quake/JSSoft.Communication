@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Newtonsoft.Json;
@@ -39,7 +40,7 @@ namespace Ntreev.Crema.Communication.Grpc
         private readonly Dictionary<string, IService> serviceByName = new Dictionary<string, IService>();
         private readonly Dictionary<string, MethodInfo> methodByName = new Dictionary<string, MethodInfo>();
         private readonly Dictionary<string, CallbackCollection> callbacksByName = new Dictionary<string, CallbackCollection>();
-        private readonly Dictionary<string, object> properties = new Dictionary<string, object>();
+        private readonly PeerProperties properties = new PeerProperties();
         private Dispatcher dispatcher;
 
         public AdaptorServerImpl(IEnumerable<IService> services)
@@ -59,8 +60,12 @@ namespace Ntreev.Crema.Communication.Grpc
             var tokenString = token.ToString();
             await this.dispatcher.InvokeAsync(() =>
             {
-                this.properties.Add($"{context.Peer}.{tokenKey}", tokenString);
-                this.properties.Add($"{context.Peer}.{servicesKey}", request.ServiceName.ToArray());
+                this.properties.Add(context.Peer, tokenKey, tokenString);
+                this.properties.Add(context.Peer, servicesKey, request.ServiceName.ToArray());
+                foreach (var item in this.callbacksByName)
+                {
+                    this.properties.Add(context.Peer, $"{item.Key}.ID", item.Value.Count);
+                }
             });
             return new OpenReply() { Token = tokenString };
         }
@@ -69,8 +74,8 @@ namespace Ntreev.Crema.Communication.Grpc
         {
             await this.dispatcher.InvokeAsync(() =>
             {
-                this.properties.Remove($"{context.Peer}.{tokenKey}");
-                this.properties.Remove($"{context.Peer}.{servicesKey}");
+                this.properties.Remove(context.Peer, tokenKey);
+                this.properties.Remove(context.Peer, servicesKey);
             });
             return new CloseReply();
         }
@@ -130,32 +135,49 @@ namespace Ntreev.Crema.Communication.Grpc
             while (await requestStream.MoveNext(context.CancellationToken))
             {
                 var request = requestStream.Current;
-                var id = request.Id;
-                var serviceNames = this.properties[$"{context.Peer}.{servicesKey}"] as string[];
-                foreach (var item in serviceNames)
+                var serviceNames = this.properties[context.Peer, servicesKey] as string[];
+                var reply = new PollReply();
+                await this.dispatcher.InvokeAsync(() =>
                 {
-                    var service = this.serviceByName[item];
-                    var items = await this.PollAsync(service, id);
-                    var reply = new PollReply();
-                    reply.Items.AddRange(items);
-                    await responseStream.WriteAsync(reply);
-                }
+                    foreach (var item in serviceNames)
+                    {
+                        var service = this.serviceByName[item];
+                        var id = (int)this.properties[context.Peer, $"{item}.ID"];
+                        var items = this.Poll(service, ref id);
+                        reply.Items.AddRange(items);
+                        this.properties.Add(context.Peer, $"{item}.ID", id);
+                    }
+                });
+                await responseStream.WriteAsync(reply);
             }
         }
 
-        private Task<PollReplyItem[]> PollAsync(IService service, int id)
+        private PollReplyItem[] Poll(IService service, ref int id)
         {
-            return this.dispatcher.InvokeAsync(() =>
+            this.dispatcher.VerifyAccess();
+            var callbacks = this.callbacksByName[service.Name];
+            var items = new PollReplyItem[callbacks.Count - id];
+            for (var i = id; i < callbacks.Count; i++)
             {
-                var callbacks = this.callbacksByName[service.Name];
-                var items = new PollReplyItem[callbacks.Count - id];
-                for (var i = id; i < callbacks.Count; i++)
-                {
-                    items[i - id] = callbacks[i];
-                }
-                return items;
-            });
+                items[i - id] = callbacks[i];
+            }
+            id = callbacks.Count;
+            return items;
         }
+
+        // private Task<PollReplyItem[]> PollAsync(IService service, int id)
+        // {
+        //     return this.dispatcher.InvokeAsync(() =>
+        //     {
+        //         var callbacks = this.callbacksByName[service.Name];
+        //         var items = new PollReplyItem[callbacks.Count - id];
+        //         for (var i = id; i < callbacks.Count; i++)
+        //         {
+        //             items[i - id] = callbacks[i];
+        //         }
+        //         return items;
+        //     });
+        // }
 
         public async Task DisposeAsync()
         {

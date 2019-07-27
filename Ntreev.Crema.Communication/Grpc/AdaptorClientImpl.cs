@@ -61,12 +61,12 @@ namespace Ntreev.Crema.Communication.Grpc
 
         public async Task DisposeAsync()
         {
-            await this.CloseAsync(new CloseRequest() { Token = this.token });
-            this.token = null;
             this.cancellation.Cancel();
             this.cancellation = null;
             this.task.Wait();
             this.task = null;
+            await this.CloseAsync(new CloseRequest() { Token = this.token });
+            this.token = null;
         }
 
         private static void RegisterMethod(Dictionary<string, MethodInfo> methodByName, IService service)
@@ -85,22 +85,23 @@ namespace Ntreev.Crema.Communication.Grpc
         private async Task PollAsync(CancellationToken cancellation)
         {
             var count = this.idByService.Count;
-            this.call = this.Poll();
-            while (!cancellation.IsCancellationRequested)
+            using (this.call = this.Poll(null, null, cancellation))
             {
-                var request = new PollRequest() { Id = 0 };
-                await this.call.RequestStream.WriteAsync(request);
-                await this.call.ResponseStream.MoveNext(cancellation);
-                var reply = this.call.ResponseStream.Current;
-                foreach (var item in reply.Items)
+                while (!cancellation.IsCancellationRequested)
                 {
-                    var service = this.serviceByName[item.ServiceName];
-                    this.InvokeCallback(service, item.Id, reply.Items);
-                    this.idByService[service] = item.Id;
+                    var request = new PollRequest();
+                    await this.call.RequestStream.WriteAsync(request);
+                    await this.call.ResponseStream.MoveNext(cancellation);
+                    var reply = this.call.ResponseStream.Current;
+                    foreach (var item in reply.Items)
+                    {
+                        var service = this.serviceByName[item.ServiceName];
+                        this.InvokeCallback(service, item.Id, reply.Items);
+                        this.idByService[service] = item.Id;
+                    }
+                    await Task.Delay(1);
                 }
-                await Task.Delay(1);
             }
-            this.call.Dispose();
             this.call = null;
         }
 
