@@ -27,6 +27,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
+using Grpc.Core.Utils;
 using Newtonsoft.Json;
 
 namespace Ntreev.Crema.Communication.Grpc
@@ -46,11 +47,14 @@ namespace Ntreev.Crema.Communication.Grpc
         public AdaptorClientImpl(Channel channel, IEnumerable<IService> services)
             : base(channel)
         {
-            var reply = this.Open(new OpenRequest() { Time = DateTime.UtcNow.Ticks });
-            this.token = reply.Token;
-            this.channel = channel;
             this.serviceByName = services.ToDictionary(item => item.Name);
             this.idByService = services.ToDictionary(item => item, item => 0);
+            var request = new OpenRequest() { Time = DateTime.UtcNow.Ticks };
+            request.ServiceNames.AddRange(this.serviceByName.Keys);
+            var reply = this.Open(request);
+            this.token = reply.Token;
+            this.channel = channel;
+
             this.cancellation = new CancellationTokenSource();
             foreach (var item in services)
             {
@@ -82,27 +86,37 @@ namespace Ntreev.Crema.Communication.Grpc
             }
         }
 
-        private async Task PollAsync(CancellationToken cancellation)
+        private async Task PollAsync(CancellationToken cancellationToken)
         {
-            var count = this.idByService.Count;
-            using (this.call = this.Poll(null, null, cancellation))
+            try
             {
-                while (!cancellation.IsCancellationRequested)
+                using (this.call = this.Poll())
                 {
-                    var request = new PollRequest();
-                    await this.call.RequestStream.WriteAsync(request);
-                    await this.call.ResponseStream.MoveNext(cancellation);
-                    var reply = this.call.ResponseStream.Current;
-                    foreach (var item in reply.Items)
+                    while (!cancellationToken.IsCancellationRequested)
                     {
-                        var service = this.serviceByName[item.ServiceName];
-                        this.InvokeCallback(service, item.Id, reply.Items);
-                        this.idByService[service] = item.Id;
+                        var request = new PollRequest();
+                        await this.call.RequestStream.WriteAsync(request);
+                        await this.call.ResponseStream.MoveNext();
+                        var reply = this.call.ResponseStream.Current;
+                        if (reply.Code != 0)
+                            break;
+                        foreach (var item in reply.Items)
+                        {
+                            var service = this.serviceByName[item.ServiceName];
+                            this.InvokeCallback(service, item.Id, reply.Items);
+                            this.idByService[service] = item.Id;
+                        }
+                        await Task.Delay(1);
                     }
-                    await Task.Delay(1);
+                    await this.call.RequestStream.CompleteAsync();
+                    await this.call.ResponseStream.MoveNext();
                 }
+                this.call = null;
             }
-            this.call = null;
+            catch (Exception e)
+            {
+                GrpcEnvironment.Logger.Error(e, e.Message);
+            }
         }
 
         private void InvokeCallback(IService service, string name, object[] args)

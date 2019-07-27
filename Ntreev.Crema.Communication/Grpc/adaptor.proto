@@ -10,7 +10,7 @@ service Adaptor {
 }
 
 message OpenRequest {
-    repeated string serviceName = 1;
+    repeated string serviceNames = 1;
     int64 time = 2;
 }
 
@@ -63,5 +63,6 @@ message PollReplyItem {
 }
 
 message PollReply {
+    int32 code = 1;
     repeated PollReplyItem items = 2;
 }

@@ -27,6 +27,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
+using Grpc.Core.Logging;
 using Newtonsoft.Json;
 using Ntreev.Library.Threading;
 
@@ -40,14 +41,19 @@ namespace Ntreev.Crema.Communication.Grpc
         private readonly Dictionary<string, IService> serviceByName = new Dictionary<string, IService>();
         private readonly Dictionary<string, MethodInfo> methodByName = new Dictionary<string, MethodInfo>();
         private readonly Dictionary<string, CallbackCollection> callbacksByName = new Dictionary<string, CallbackCollection>();
+        private readonly HashSet<string> peers = new HashSet<string>();
         private readonly PeerProperties properties = new PeerProperties();
         private Dispatcher dispatcher;
+        private ILogger logger;
+        private CancellationTokenSource cancellation;
 
         public AdaptorServerImpl(IEnumerable<IService> services)
         {
             this.serviceByName = services.ToDictionary(item => item.Name);
             this.callbacksByName = services.ToDictionary(item => item.Name, item => new CallbackCollection(item));
             this.dispatcher = new Dispatcher(this);
+            this.logger = GrpcEnvironment.Logger;
+            this.cancellation = new CancellationTokenSource();
             foreach (var item in services)
             {
                 RegisterMethod(this.methodByName, item);
@@ -61,12 +67,14 @@ namespace Ntreev.Crema.Communication.Grpc
             await this.dispatcher.InvokeAsync(() =>
             {
                 this.properties.Add(context.Peer, tokenKey, tokenString);
-                this.properties.Add(context.Peer, servicesKey, request.ServiceName.ToArray());
+                this.properties.Add(context.Peer, servicesKey, request.ServiceNames.ToArray());
                 foreach (var item in this.callbacksByName)
                 {
                     this.properties.Add(context.Peer, $"{item.Key}.ID", item.Value.Count);
                 }
+
             });
+            this.logger.Debug($"Connected: {context.Peer}");
             return new OpenReply() { Token = tokenString };
         }
 
@@ -77,6 +85,7 @@ namespace Ntreev.Crema.Communication.Grpc
                 this.properties.Remove(context.Peer, tokenKey);
                 this.properties.Remove(context.Peer, servicesKey);
             });
+            this.logger.Debug($"Disconnected: {context.Peer}");
             return new CloseReply();
         }
 
@@ -132,10 +141,17 @@ namespace Ntreev.Crema.Communication.Grpc
 
         public override async Task Poll(IAsyncStreamReader<PollRequest> requestStream, IServerStreamWriter<PollReply> responseStream, ServerCallContext context)
         {
-            while (await requestStream.MoveNext(context.CancellationToken))
+            var cancellationToken = this.cancellation.Token;
+            this.peers.Add(context.Peer);
+            while (await requestStream.MoveNext())
             {
                 var request = requestStream.Current;
                 var serviceNames = this.properties[context.Peer, servicesKey] as string[];
+                if (this.dispatcher == null)
+                {
+                    await responseStream.WriteAsync(new PollReply() { Code = -1 });
+                    break;
+                }
                 var reply = new PollReply();
                 await this.dispatcher.InvokeAsync(() =>
                 {
@@ -145,11 +161,12 @@ namespace Ntreev.Crema.Communication.Grpc
                         var id = (int)this.properties[context.Peer, $"{item}.ID"];
                         var items = this.Poll(service, ref id);
                         reply.Items.AddRange(items);
-                        this.properties.Add(context.Peer, $"{item}.ID", id);
+                        this.properties[context.Peer, $"{item}.ID"] = id;
                     }
                 });
                 await responseStream.WriteAsync(reply);
             }
+            this.peers.Remove(context.Peer);
         }
 
         private PollReplyItem[] Poll(IService service, ref int id)
@@ -165,36 +182,32 @@ namespace Ntreev.Crema.Communication.Grpc
             return items;
         }
 
-        // private Task<PollReplyItem[]> PollAsync(IService service, int id)
-        // {
-        //     return this.dispatcher.InvokeAsync(() =>
-        //     {
-        //         var callbacks = this.callbacksByName[service.Name];
-        //         var items = new PollReplyItem[callbacks.Count - id];
-        //         for (var i = id; i < callbacks.Count; i++)
-        //         {
-        //             items[i - id] = callbacks[i];
-        //         }
-        //         return items;
-        //     });
-        // }
-
         public async Task DisposeAsync()
         {
-            await this.dispatcher.InvokeAsync(() =>
-            {
-                var pollItem = new PollReplyItem()
-                {
-                    ServiceName = AdaptorUtility.ClosedName,
-                    Name = AdaptorUtility.ClosedName
-                };
-                foreach (var item in this.callbacksByName.Values)
-                {
-                    item.Add(pollItem);
-                }
-            });
+            this.cancellation.Cancel();
             this.dispatcher.Dispose();
             this.dispatcher = null;
+            // await this.dispatcher.InvokeAsync(() =>
+            // {
+            //     var pollItem = new PollReplyItem()
+            //     {
+            //         ServiceName = AdaptorUtility.ClosedName,
+            //         Name = AdaptorUtility.ClosedName
+            //     };
+            //     foreach (var item in this.callbacksByName.Values)
+            //     {
+            //         item.Add(pollItem);
+            //     }
+            // });
+
+            while (this.peers.Any())
+            {
+                await Task.Delay(1);
+            }
+
+
+            //this.dispatcher.Dispose();
+            //this.dispatcher = null;
         }
 
         private void ValidateToken(string token)

@@ -77,6 +77,7 @@ namespace Server
             this.serviceHost.Port = settings.Port;
             await this.serviceHost.OpenAsync();
             base.Start();
+            Console.Title = "Server Opened";
         }
 
         async Task IShell.StopAsync()

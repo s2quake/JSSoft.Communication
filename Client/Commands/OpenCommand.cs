@@ -20,30 +20,30 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System;
+
 using System.ComponentModel.Composition;
-using Grpc.Core;
-using Grpc.Core.Logging;
+using System.Threading.Tasks;
+using Ntreev.Crema.Communication;
+using Ntreev.Library.Commands;
 
-namespace Ntreev.Crema.Communication.Grpc
+namespace Server.Commands
 {
-    [Export(typeof(IAdaptorHostProvider))]
-    class AdaptorHostProvider : IAdaptorHostProvider
+    [Export(typeof(ICommand))]
+    class OpenCommand : CommandAsyncBase
     {
-        public AdaptorHostProvider()
+        private readonly IServiceHost serviceHost;
+
+        [ImportingConstructor]
+        public OpenCommand(IServiceHost serviceHost)
         {
-            Environment.SetEnvironmentVariable("GRPC_VERBOSITY", "DEBUG");
+            this.serviceHost = serviceHost;
         }
 
-        public IAdaptorHost Create(IServiceHost serviceHost, ServiceToken token)
-        {
-            if (serviceHost is ServerHostBase)
-                return new AdaptorServerHost(serviceHost.Services);
-            else if (serviceHost is ClientHostBase)
-                return new AdaptorClientHost(serviceHost.Services);
-            throw new NotImplementedException();
-        }
+        public override bool IsEnabled => this.serviceHost.IsOpened == false;
 
-        public string Name => "grpc";
+        protected override Task OnExecuteAsync()
+        {
+            return this.serviceHost.OpenAsync();
+        }
     }
 }

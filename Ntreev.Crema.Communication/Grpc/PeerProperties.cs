@@ -25,6 +25,7 @@ namespace Ntreev.Crema.Communication.Grpc
         public object this[string peer, string key]
         {
             get => this.properties[$"{peer}.{key}"];
+            set => this.properties[$"{peer}.{key}"] = value;
         }
     }
 }
