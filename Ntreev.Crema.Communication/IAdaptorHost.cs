@@ -22,14 +22,15 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Communication
 {
     public interface IAdaptorHost : IDisposable
     {
-        void Open(string host, int port);
+        Task OpenAsync(string host, int port);
 
-        void Close();
+        Task CloseAsync();
 
         object Create(IService service);
     }

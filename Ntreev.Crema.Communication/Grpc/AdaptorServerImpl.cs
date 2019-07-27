@@ -33,11 +33,14 @@ namespace Ntreev.Crema.Communication.Grpc
 {
     class AdaptorServerImpl : Adaptor.AdaptorBase, IContextInvoker
     {
+        private const string tokenKey = "token";
+        private const string servicesKey = "services";
         private static readonly JsonSerializerSettings settings = new JsonSerializerSettings();
         private readonly Dictionary<string, IService> serviceByName = new Dictionary<string, IService>();
         private readonly Dictionary<string, MethodInfo> methodByName = new Dictionary<string, MethodInfo>();
         private readonly Dictionary<string, CallbackCollection> callbacksByName = new Dictionary<string, CallbackCollection>();
-        private readonly Dispatcher dispatcher;
+        private readonly Dictionary<string, object> properties = new Dictionary<string, object>();
+        private Dispatcher dispatcher;
 
         public AdaptorServerImpl(IEnumerable<IService> services)
         {
@@ -50,9 +53,34 @@ namespace Ntreev.Crema.Communication.Grpc
             }
         }
 
+        public override async Task<OpenReply> Open(OpenRequest request, ServerCallContext context)
+        {
+            var token = Guid.NewGuid();
+            var tokenString = token.ToString();
+            await this.dispatcher.InvokeAsync(() =>
+            {
+                this.properties.Add($"{context.Peer}.{tokenKey}", tokenString);
+                this.properties.Add($"{context.Peer}.{servicesKey}", request.ServiceName.ToArray());
+            });
+            return new OpenReply() { Token = tokenString };
+        }
+
+        public override async Task<CloseReply> Close(CloseRequest request, ServerCallContext context)
+        {
+            await this.dispatcher.InvokeAsync(() =>
+            {
+                this.properties.Remove($"{context.Peer}.{tokenKey}");
+                this.properties.Remove($"{context.Peer}.{servicesKey}");
+            });
+            return new CloseReply();
+        }
+
         public override Task<PingReply> Ping(PingRequest request, ServerCallContext context)
         {
-            return Task.Run(() => new PingReply() { Time = DateTime.UtcNow.Ticks });
+            return this.dispatcher.InvokeAsync(() =>
+            {
+                return new PingReply() { Time = DateTime.UtcNow.Ticks };
+            });
         }
 
         public override async Task<InvokeReply> Invoke(InvokeRequest request, ServerCallContext context)
@@ -74,7 +102,7 @@ namespace Ntreev.Crema.Communication.Grpc
                 var taskType = task.GetType();
                 if (taskType.GetGenericArguments().Any() == true)
                 {
-                    var propertyInfo = taskType.GetProperty("Result");
+                    var propertyInfo = taskType.GetProperty(nameof(Task<object>.Result));
                     value = propertyInfo.GetValue(task);
                     valueType = propertyInfo.PropertyType;
                 }
@@ -99,19 +127,23 @@ namespace Ntreev.Crema.Communication.Grpc
 
         public override async Task Poll(IAsyncStreamReader<PollRequest> requestStream, IServerStreamWriter<PollReply> responseStream, ServerCallContext context)
         {
-            while (await requestStream.MoveNext())
+            while (await requestStream.MoveNext(context.CancellationToken))
             {
                 var request = requestStream.Current;
                 var id = request.Id;
-                var service = this.serviceByName[request.ServiceName];
-                var items = await this.PollAsync(service, id);
-                var reply = new PollReply() { ServiceName = request.ServiceName };
-                reply.Items.AddRange(items);
-                await responseStream.WriteAsync(reply);
+                var serviceNames = this.properties[$"{context.Peer}.{servicesKey}"] as string[];
+                foreach (var item in serviceNames)
+                {
+                    var service = this.serviceByName[item];
+                    var items = await this.PollAsync(service, id);
+                    var reply = new PollReply();
+                    reply.Items.AddRange(items);
+                    await responseStream.WriteAsync(reply);
+                }
             }
         }
 
-        public Task<PollReplyItem[]> PollAsync(IService service, int id)
+        private Task<PollReplyItem[]> PollAsync(IService service, int id)
         {
             return this.dispatcher.InvokeAsync(() =>
             {
@@ -125,11 +157,48 @@ namespace Ntreev.Crema.Communication.Grpc
             });
         }
 
-        public void Dispose()
+        public async Task DisposeAsync()
         {
+            await this.dispatcher.InvokeAsync(() =>
+            {
+                var pollItem = new PollReplyItem()
+                {
+                    ServiceName = AdaptorUtility.ClosedName,
+                    Name = AdaptorUtility.ClosedName
+                };
+                foreach (var item in this.callbacksByName.Values)
+                {
+                    item.Add(pollItem);
+                }
+            });
             this.dispatcher.Dispose();
+            this.dispatcher = null;
         }
-        
+
+        private void ValidateToken(string token)
+        {
+            this.dispatcher.VerifyAccess();
+            if (token == null)
+                throw new ArgumentNullException(nameof(token));
+        }
+
+        private Task AddCallback(string serviceName, string name, object[] args)
+        {
+            var (types, datas) = AdaptorUtility.GetStrings(args);
+            return this.dispatcher.InvokeAsync(() =>
+            {
+                var callbacks = this.callbacksByName[serviceName];
+                var pollItem = new PollReplyItem()
+                {
+                    Id = callbacks.Count,
+                    Name = name,
+                };
+                pollItem.Types_.AddRange(types);
+                pollItem.Datas.AddRange(datas);
+                callbacks.Add(pollItem);
+            });
+        }
+
         private static void RegisterMethod(Dictionary<string, MethodInfo> methodByName, IService service)
         {
             var methods = service.ServiceType.GetMethods();
@@ -147,28 +216,7 @@ namespace Ntreev.Crema.Communication.Grpc
 
         void IContextInvoker.Invoke(IService service, string name, object[] args)
         {
-            this.dispatcher.InvokeAsync(() =>
-            {
-                var length = args.Length / 2;
-                var callbacks = this.callbacksByName[service.Name];
-                var types = new string[length];
-                var datas = new string[length];
-                var pollItem = new PollReplyItem()
-                {
-                    Id = callbacks.Count,
-                    Name = name,
-                };
-                for (var i = 0; i < length; i++)
-                {
-                    var type = (Type)args[i * 2 + 0];
-                    var value = args[i * 2 + 1];
-                    types[i] = type.AssemblyQualifiedName;
-                    datas[i] = JsonConvert.SerializeObject(value, type, settings);
-                }
-                pollItem.Types_.AddRange(types);
-                pollItem.Datas.AddRange(datas);
-                callbacks.Add(pollItem);
-            });
+            this.AddCallback(service.Name, name, args);
         }
 
         T IContextInvoker.Invoke<T>(IService service, string name, object[] args)

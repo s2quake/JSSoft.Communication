@@ -27,9 +27,9 @@ namespace Ntreev.Crema.Communication
 {
     public interface IService : IDisposable
     {
-        void Open(ServiceToken token, object instance);
+        Task OpenAsync(ServiceToken token, object instance);
 
-        void Close(ServiceToken token);
+        Task CloseAsync(ServiceToken token);
 
         Type ServiceType { get; }
 

@@ -56,17 +56,25 @@ namespace Ntreev.Crema.Communication
             {
                 this.adaptorHost = this.adpatorHostProvider.Create(this, ServiceToken.Empty);
                 this.instanceByService = new Dictionary<IService, object>(this.Services.Count);
-                this.adaptorHost.Open(this.Host, this.Port);
+            });
+            await this.adaptorHost.OpenAsync(this.Host, this.Port);
+            var instanceByService = await this.dispatcher.InvokeAsync(() =>
+            {
                 foreach (var item in this.Services)
                 {
                     var instance = this.adaptorHost.Create(item);
                     this.instanceByService.Add(item, instance);
-                    item.Open(ServiceToken.Empty, instance);
                 }
-                foreach (var item in this.Services)
-                {
-                    var token = this.instanceByService[item];
-                }
+                return this.instanceByService.ToArray();
+            });
+            foreach (var item in instanceByService)
+            {
+                var service = item.Key;
+                var instance = item.Value;
+                await service.OpenAsync(ServiceToken.Empty, instance);
+            }
+            await this.dispatcher.InvokeAsync(() =>
+            {
                 this.isOpened = true;
                 this.OnOpened(EventArgs.Empty);
             });
@@ -74,18 +82,20 @@ namespace Ntreev.Crema.Communication
 
         public async Task CloseAsync()
         {
+            var instanceByService = await this.dispatcher.InvokeAsync(() => this.instanceByService.ToArray());
+            foreach (var item in instanceByService)
+            {
+                var service = item.Key;
+                var instance = item.Value;
+                await service.CloseAsync(ServiceToken.Empty);
+                if (instance is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                }
+            }
+            await this.adaptorHost.CloseAsync();
             await this.dispatcher.InvokeAsync(() =>
             {
-                foreach (var item in this.Services)
-                {
-                    var instance = this.instanceByService[item];
-                    item.Close(ServiceToken.Empty);
-                    if (instance is IDisposable disposable)
-                    {
-                        disposable.Dispose();
-                    }
-                }
-                this.adaptorHost.Close();
                 this.isOpened = false;
                 this.OnClosed(EventArgs.Empty);
             });

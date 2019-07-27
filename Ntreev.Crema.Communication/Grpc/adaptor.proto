@@ -2,24 +2,46 @@ syntax = "proto3";
 package ntreev.crema.communication.grpc;
 
 service Adaptor {
+    rpc Open (OpenRequest) returns (OpenReply);
+    rpc Close (CloseRequest) returns (CloseReply);
     rpc Ping (PingRequest) returns (PingReply);
     rpc Invoke (InvokeRequest) returns (InvokeReply);
     rpc Poll (stream PollRequest) returns (stream PollReply);
 }
 
-message PingRequest {
+message OpenRequest {
+    repeated string serviceName = 1;
+    int64 time = 2;
+}
+
+message OpenReply {
+    string token = 1;
+}
+
+message CloseRequest {
+    string token = 1;
+}
+
+message CloseReply {
     int64 time = 1;
+}
+
+message PingRequest {
+    string token = 1;
+    int64 time = 2;
 }
 
 message PingReply {
     int64 time = 1;
+    string token = 2;
 }
 
 message InvokeRequest {
-    string serviceName = 1;
-    string name = 2;
-    repeated string types = 3;
-    repeated string datas = 4;
+    string token = 1;
+    string serviceName = 2;
+    string name = 3;
+    repeated string types = 4;
+    repeated string datas = 5;
 }
 
 message InvokeReply {
@@ -29,18 +51,18 @@ message InvokeReply {
 }
 
 message PollRequest {
-    string serviceName = 1;
-    int32 id = 2;
+    string token = 1;
+    int32 id = 3;
 }
 
 message PollReplyItem {
     int32 id = 1;
-    string name = 2;
-    repeated string types = 3;
-    repeated string datas = 4;
+    string serviceName = 2;
+    string name = 3;
+    repeated string types = 4;
+    repeated string datas = 5;
 }
 
 message PollReply {
-    string serviceName = 1;
     repeated PollReplyItem items = 2;
 }

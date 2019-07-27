@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Threading.Tasks;
 using Grpc.Core;
 using Ntreev.Crema.Communication.Grpc;
 
@@ -43,7 +44,7 @@ namespace Ntreev.Crema.Communication.Grpc
             this.services = services.ToArray();
         }
 
-        public void Open(string host, int port)
+        public Task OpenAsync(string host, int port)
         {
             this.adaptor = new AdaptorServerImpl(this.services);
             this.server = new Server()
@@ -51,14 +52,14 @@ namespace Ntreev.Crema.Communication.Grpc
                 Services = { Adaptor.BindService(this.adaptor) },
                 Ports = { new ServerPort(host, port, ServerCredentials.Insecure) },
             };
-            this.server.Start();
+            return Task.Run(this.server.Start);
         }
 
-        public void Close()
+        public async Task CloseAsync()
         {
-            this.adaptor.Dispose();
+            await this.adaptor.DisposeAsync();
             this.adaptor = null;
-            this.server.ShutdownAsync().Wait();
+            await this.server.ShutdownAsync();
             this.server = null;
         }
 
@@ -76,7 +77,7 @@ namespace Ntreev.Crema.Communication.Grpc
 
         public void Dispose()
         {
-            
+
         }
     }
 }

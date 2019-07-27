@@ -25,39 +25,588 @@ namespace Ntreev.Crema.Communication.Grpc {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "ChJHcnBjL2FkYXB0b3IucHJvdG8SH250cmVldi5jcmVtYS5jb21tdW5pY2F0",
-            "aW9uLmdycGMiGwoLUGluZ1JlcXVlc3QSDAoEdGltZRgBIAEoAyIZCglQaW5n",
-            "UmVwbHkSDAoEdGltZRgBIAEoAyJQCg1JbnZva2VSZXF1ZXN0EhMKC3NlcnZp",
-            "Y2VOYW1lGAEgASgJEgwKBG5hbWUYAiABKAkSDQoFdHlwZXMYAyADKAkSDQoF",
-            "ZGF0YXMYBCADKAkiPgoLSW52b2tlUmVwbHkSEwoLc2VydmljZU5hbWUYASAB",
-            "KAkSDAoEdHlwZRgCIAEoCRIMCgRkYXRhGAMgASgJIi4KC1BvbGxSZXF1ZXN0",
-            "EhMKC3NlcnZpY2VOYW1lGAEgASgJEgoKAmlkGAIgASgFIkcKDVBvbGxSZXBs",
-            "eUl0ZW0SCgoCaWQYASABKAUSDAoEbmFtZRgCIAEoCRINCgV0eXBlcxgDIAMo",
-            "CRINCgVkYXRhcxgEIAMoCSJfCglQb2xsUmVwbHkSEwoLc2VydmljZU5hbWUY",
-            "ASABKAkSPQoFaXRlbXMYAiADKAsyLi5udHJlZXYuY3JlbWEuY29tbXVuaWNh",
-            "dGlvbi5ncnBjLlBvbGxSZXBseUl0ZW0yuQIKB0FkYXB0b3ISYAoEUGluZxIs",
-            "Lm50cmVldi5jcmVtYS5jb21tdW5pY2F0aW9uLmdycGMuUGluZ1JlcXVlc3Qa",
-            "Ki5udHJlZXYuY3JlbWEuY29tbXVuaWNhdGlvbi5ncnBjLlBpbmdSZXBseRJm",
-            "CgZJbnZva2USLi5udHJlZXYuY3JlbWEuY29tbXVuaWNhdGlvbi5ncnBjLklu",
-            "dm9rZVJlcXVlc3QaLC5udHJlZXYuY3JlbWEuY29tbXVuaWNhdGlvbi5ncnBj",
-            "Lkludm9rZVJlcGx5EmQKBFBvbGwSLC5udHJlZXYuY3JlbWEuY29tbXVuaWNh",
-            "dGlvbi5ncnBjLlBvbGxSZXF1ZXN0GioubnRyZWV2LmNyZW1hLmNvbW11bmlj",
-            "YXRpb24uZ3JwYy5Qb2xsUmVwbHkoATABYgZwcm90bzM="));
+            "aW9uLmdycGMiMAoLT3BlblJlcXVlc3QSEwoLc2VydmljZU5hbWUYASADKAkS",
+            "DAoEdGltZRgCIAEoAyIaCglPcGVuUmVwbHkSDQoFdG9rZW4YASABKAkiHQoM",
+            "Q2xvc2VSZXF1ZXN0Eg0KBXRva2VuGAEgASgJIhoKCkNsb3NlUmVwbHkSDAoE",
+            "dGltZRgBIAEoAyIqCgtQaW5nUmVxdWVzdBINCgV0b2tlbhgBIAEoCRIMCgR0",
+            "aW1lGAIgASgDIigKCVBpbmdSZXBseRIMCgR0aW1lGAEgASgDEg0KBXRva2Vu",
+            "GAIgASgJIl8KDUludm9rZVJlcXVlc3QSDQoFdG9rZW4YASABKAkSEwoLc2Vy",
+            "dmljZU5hbWUYAiABKAkSDAoEbmFtZRgDIAEoCRINCgV0eXBlcxgEIAMoCRIN",
+            "CgVkYXRhcxgFIAMoCSI+CgtJbnZva2VSZXBseRITCgtzZXJ2aWNlTmFtZRgB",
+            "IAEoCRIMCgR0eXBlGAIgASgJEgwKBGRhdGEYAyABKAkiKAoLUG9sbFJlcXVl",
+            "c3QSDQoFdG9rZW4YASABKAkSCgoCaWQYAyABKAUiXAoNUG9sbFJlcGx5SXRl",
+            "bRIKCgJpZBgBIAEoBRITCgtzZXJ2aWNlTmFtZRgCIAEoCRIMCgRuYW1lGAMg",
+            "ASgJEg0KBXR5cGVzGAQgAygJEg0KBWRhdGFzGAUgAygJIkoKCVBvbGxSZXBs",
+            "eRI9CgVpdGVtcxgCIAMoCzIuLm50cmVldi5jcmVtYS5jb21tdW5pY2F0aW9u",
+            "LmdycGMuUG9sbFJlcGx5SXRlbTKABAoHQWRhcHRvchJgCgRPcGVuEiwubnRy",
+            "ZWV2LmNyZW1hLmNvbW11bmljYXRpb24uZ3JwYy5PcGVuUmVxdWVzdBoqLm50",
+            "cmVldi5jcmVtYS5jb21tdW5pY2F0aW9uLmdycGMuT3BlblJlcGx5EmMKBUNs",
+            "b3NlEi0ubnRyZWV2LmNyZW1hLmNvbW11bmljYXRpb24uZ3JwYy5DbG9zZVJl",
+            "cXVlc3QaKy5udHJlZXYuY3JlbWEuY29tbXVuaWNhdGlvbi5ncnBjLkNsb3Nl",
+            "UmVwbHkSYAoEUGluZxIsLm50cmVldi5jcmVtYS5jb21tdW5pY2F0aW9uLmdy",
+            "cGMuUGluZ1JlcXVlc3QaKi5udHJlZXYuY3JlbWEuY29tbXVuaWNhdGlvbi5n",
+            "cnBjLlBpbmdSZXBseRJmCgZJbnZva2USLi5udHJlZXYuY3JlbWEuY29tbXVu",
+            "aWNhdGlvbi5ncnBjLkludm9rZVJlcXVlc3QaLC5udHJlZXYuY3JlbWEuY29t",
+            "bXVuaWNhdGlvbi5ncnBjLkludm9rZVJlcGx5EmQKBFBvbGwSLC5udHJlZXYu",
+            "Y3JlbWEuY29tbXVuaWNhdGlvbi5ncnBjLlBvbGxSZXF1ZXN0GioubnRyZWV2",
+            "LmNyZW1hLmNvbW11bmljYXRpb24uZ3JwYy5Qb2xsUmVwbHkoATABYgZwcm90",
+            "bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.PingRequest), global::Ntreev.Crema.Communication.Grpc.PingRequest.Parser, new[]{ "Time" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.PingReply), global::Ntreev.Crema.Communication.Grpc.PingReply.Parser, new[]{ "Time" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.InvokeRequest), global::Ntreev.Crema.Communication.Grpc.InvokeRequest.Parser, new[]{ "ServiceName", "Name", "Types_", "Datas" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.OpenRequest), global::Ntreev.Crema.Communication.Grpc.OpenRequest.Parser, new[]{ "ServiceName", "Time" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.OpenReply), global::Ntreev.Crema.Communication.Grpc.OpenReply.Parser, new[]{ "Token" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.CloseRequest), global::Ntreev.Crema.Communication.Grpc.CloseRequest.Parser, new[]{ "Token" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.CloseReply), global::Ntreev.Crema.Communication.Grpc.CloseReply.Parser, new[]{ "Time" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.PingRequest), global::Ntreev.Crema.Communication.Grpc.PingRequest.Parser, new[]{ "Token", "Time" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.PingReply), global::Ntreev.Crema.Communication.Grpc.PingReply.Parser, new[]{ "Time", "Token" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.InvokeRequest), global::Ntreev.Crema.Communication.Grpc.InvokeRequest.Parser, new[]{ "Token", "ServiceName", "Name", "Types_", "Datas" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.InvokeReply), global::Ntreev.Crema.Communication.Grpc.InvokeReply.Parser, new[]{ "ServiceName", "Type", "Data" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.PollRequest), global::Ntreev.Crema.Communication.Grpc.PollRequest.Parser, new[]{ "ServiceName", "Id" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.PollReplyItem), global::Ntreev.Crema.Communication.Grpc.PollReplyItem.Parser, new[]{ "Id", "Name", "Types_", "Datas" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.PollReply), global::Ntreev.Crema.Communication.Grpc.PollReply.Parser, new[]{ "ServiceName", "Items" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.PollRequest), global::Ntreev.Crema.Communication.Grpc.PollRequest.Parser, new[]{ "Token", "Id" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.PollReplyItem), global::Ntreev.Crema.Communication.Grpc.PollReplyItem.Parser, new[]{ "Id", "ServiceName", "Name", "Types_", "Datas" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.PollReply), global::Ntreev.Crema.Communication.Grpc.PollReply.Parser, new[]{ "Items" }, null, null, null)
           }));
     }
     #endregion
 
   }
   #region Messages
+  internal sealed partial class OpenRequest : pb::IMessage<OpenRequest> {
+    private static readonly pb::MessageParser<OpenRequest> _parser = new pb::MessageParser<OpenRequest>(() => new OpenRequest());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<OpenRequest> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Ntreev.Crema.Communication.Grpc.AdaptorReflection.Descriptor.MessageTypes[0]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public OpenRequest() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public OpenRequest(OpenRequest other) : this() {
+      serviceName_ = other.serviceName_.Clone();
+      time_ = other.time_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public OpenRequest Clone() {
+      return new OpenRequest(this);
+    }
+
+    /// <summary>Field number for the "serviceName" field.</summary>
+    public const int ServiceNameFieldNumber = 1;
+    private static readonly pb::FieldCodec<string> _repeated_serviceName_codec
+        = pb::FieldCodec.ForString(10);
+    private readonly pbc::RepeatedField<string> serviceName_ = new pbc::RepeatedField<string>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public pbc::RepeatedField<string> ServiceName {
+      get { return serviceName_; }
+    }
+
+    /// <summary>Field number for the "time" field.</summary>
+    public const int TimeFieldNumber = 2;
+    private long time_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public long Time {
+      get { return time_; }
+      set {
+        time_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as OpenRequest);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(OpenRequest other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if(!serviceName_.Equals(other.serviceName_)) return false;
+      if (Time != other.Time) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      hash ^= serviceName_.GetHashCode();
+      if (Time != 0L) hash ^= Time.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+      serviceName_.WriteTo(output, _repeated_serviceName_codec);
+      if (Time != 0L) {
+        output.WriteRawTag(16);
+        output.WriteInt64(Time);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      size += serviceName_.CalculateSize(_repeated_serviceName_codec);
+      if (Time != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(Time);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(OpenRequest other) {
+      if (other == null) {
+        return;
+      }
+      serviceName_.Add(other.serviceName_);
+      if (other.Time != 0L) {
+        Time = other.Time;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            serviceName_.AddEntriesFrom(input, _repeated_serviceName_codec);
+            break;
+          }
+          case 16: {
+            Time = input.ReadInt64();
+            break;
+          }
+        }
+      }
+    }
+
+  }
+
+  internal sealed partial class OpenReply : pb::IMessage<OpenReply> {
+    private static readonly pb::MessageParser<OpenReply> _parser = new pb::MessageParser<OpenReply>(() => new OpenReply());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<OpenReply> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Ntreev.Crema.Communication.Grpc.AdaptorReflection.Descriptor.MessageTypes[1]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public OpenReply() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public OpenReply(OpenReply other) : this() {
+      token_ = other.token_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public OpenReply Clone() {
+      return new OpenReply(this);
+    }
+
+    /// <summary>Field number for the "token" field.</summary>
+    public const int TokenFieldNumber = 1;
+    private string token_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public string Token {
+      get { return token_; }
+      set {
+        token_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as OpenReply);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(OpenReply other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Token != other.Token) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Token.Length != 0) hash ^= Token.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+      if (Token.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Token);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      if (Token.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Token);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(OpenReply other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Token.Length != 0) {
+        Token = other.Token;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            Token = input.ReadString();
+            break;
+          }
+        }
+      }
+    }
+
+  }
+
+  internal sealed partial class CloseRequest : pb::IMessage<CloseRequest> {
+    private static readonly pb::MessageParser<CloseRequest> _parser = new pb::MessageParser<CloseRequest>(() => new CloseRequest());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<CloseRequest> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Ntreev.Crema.Communication.Grpc.AdaptorReflection.Descriptor.MessageTypes[2]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public CloseRequest() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public CloseRequest(CloseRequest other) : this() {
+      token_ = other.token_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public CloseRequest Clone() {
+      return new CloseRequest(this);
+    }
+
+    /// <summary>Field number for the "token" field.</summary>
+    public const int TokenFieldNumber = 1;
+    private string token_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public string Token {
+      get { return token_; }
+      set {
+        token_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as CloseRequest);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(CloseRequest other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Token != other.Token) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Token.Length != 0) hash ^= Token.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+      if (Token.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Token);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      if (Token.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Token);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(CloseRequest other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Token.Length != 0) {
+        Token = other.Token;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            Token = input.ReadString();
+            break;
+          }
+        }
+      }
+    }
+
+  }
+
+  internal sealed partial class CloseReply : pb::IMessage<CloseReply> {
+    private static readonly pb::MessageParser<CloseReply> _parser = new pb::MessageParser<CloseReply>(() => new CloseReply());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<CloseReply> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Ntreev.Crema.Communication.Grpc.AdaptorReflection.Descriptor.MessageTypes[3]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public CloseReply() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public CloseReply(CloseReply other) : this() {
+      time_ = other.time_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public CloseReply Clone() {
+      return new CloseReply(this);
+    }
+
+    /// <summary>Field number for the "time" field.</summary>
+    public const int TimeFieldNumber = 1;
+    private long time_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public long Time {
+      get { return time_; }
+      set {
+        time_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as CloseReply);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(CloseReply other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Time != other.Time) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Time != 0L) hash ^= Time.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+      if (Time != 0L) {
+        output.WriteRawTag(8);
+        output.WriteInt64(Time);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      if (Time != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(Time);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(CloseReply other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Time != 0L) {
+        Time = other.Time;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            Time = input.ReadInt64();
+            break;
+          }
+        }
+      }
+    }
+
+  }
+
   internal sealed partial class PingRequest : pb::IMessage<PingRequest> {
     private static readonly pb::MessageParser<PingRequest> _parser = new pb::MessageParser<PingRequest>(() => new PingRequest());
     private pb::UnknownFieldSet _unknownFields;
@@ -66,7 +615,7 @@ namespace Ntreev.Crema.Communication.Grpc {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ntreev.Crema.Communication.Grpc.AdaptorReflection.Descriptor.MessageTypes[0]; }
+      get { return global::Ntreev.Crema.Communication.Grpc.AdaptorReflection.Descriptor.MessageTypes[4]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -83,6 +632,7 @@ namespace Ntreev.Crema.Communication.Grpc {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public PingRequest(PingRequest other) : this() {
+      token_ = other.token_;
       time_ = other.time_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
@@ -92,8 +642,19 @@ namespace Ntreev.Crema.Communication.Grpc {
       return new PingRequest(this);
     }
 
+    /// <summary>Field number for the "token" field.</summary>
+    public const int TokenFieldNumber = 1;
+    private string token_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public string Token {
+      get { return token_; }
+      set {
+        token_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
     /// <summary>Field number for the "time" field.</summary>
-    public const int TimeFieldNumber = 1;
+    public const int TimeFieldNumber = 2;
     private long time_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public long Time {
@@ -116,6 +677,7 @@ namespace Ntreev.Crema.Communication.Grpc {
       if (ReferenceEquals(other, this)) {
         return true;
       }
+      if (Token != other.Token) return false;
       if (Time != other.Time) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
@@ -123,6 +685,7 @@ namespace Ntreev.Crema.Communication.Grpc {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override int GetHashCode() {
       int hash = 1;
+      if (Token.Length != 0) hash ^= Token.GetHashCode();
       if (Time != 0L) hash ^= Time.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
@@ -137,8 +700,12 @@ namespace Ntreev.Crema.Communication.Grpc {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
+      if (Token.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Token);
+      }
       if (Time != 0L) {
-        output.WriteRawTag(8);
+        output.WriteRawTag(16);
         output.WriteInt64(Time);
       }
       if (_unknownFields != null) {
@@ -149,6 +716,9 @@ namespace Ntreev.Crema.Communication.Grpc {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
       int size = 0;
+      if (Token.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Token);
+      }
       if (Time != 0L) {
         size += 1 + pb::CodedOutputStream.ComputeInt64Size(Time);
       }
@@ -162,6 +732,9 @@ namespace Ntreev.Crema.Communication.Grpc {
     public void MergeFrom(PingRequest other) {
       if (other == null) {
         return;
+      }
+      if (other.Token.Length != 0) {
+        Token = other.Token;
       }
       if (other.Time != 0L) {
         Time = other.Time;
@@ -177,7 +750,11 @@ namespace Ntreev.Crema.Communication.Grpc {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
-          case 8: {
+          case 10: {
+            Token = input.ReadString();
+            break;
+          }
+          case 16: {
             Time = input.ReadInt64();
             break;
           }
@@ -195,7 +772,7 @@ namespace Ntreev.Crema.Communication.Grpc {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ntreev.Crema.Communication.Grpc.AdaptorReflection.Descriptor.MessageTypes[1]; }
+      get { return global::Ntreev.Crema.Communication.Grpc.AdaptorReflection.Descriptor.MessageTypes[5]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -213,6 +790,7 @@ namespace Ntreev.Crema.Communication.Grpc {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public PingReply(PingReply other) : this() {
       time_ = other.time_;
+      token_ = other.token_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -232,6 +810,17 @@ namespace Ntreev.Crema.Communication.Grpc {
       }
     }
 
+    /// <summary>Field number for the "token" field.</summary>
+    public const int TokenFieldNumber = 2;
+    private string token_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public string Token {
+      get { return token_; }
+      set {
+        token_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
       return Equals(other as PingReply);
@@ -246,6 +835,7 @@ namespace Ntreev.Crema.Communication.Grpc {
         return true;
       }
       if (Time != other.Time) return false;
+      if (Token != other.Token) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -253,6 +843,7 @@ namespace Ntreev.Crema.Communication.Grpc {
     public override int GetHashCode() {
       int hash = 1;
       if (Time != 0L) hash ^= Time.GetHashCode();
+      if (Token.Length != 0) hash ^= Token.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -270,6 +861,10 @@ namespace Ntreev.Crema.Communication.Grpc {
         output.WriteRawTag(8);
         output.WriteInt64(Time);
       }
+      if (Token.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Token);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -280,6 +875,9 @@ namespace Ntreev.Crema.Communication.Grpc {
       int size = 0;
       if (Time != 0L) {
         size += 1 + pb::CodedOutputStream.ComputeInt64Size(Time);
+      }
+      if (Token.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Token);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -294,6 +892,9 @@ namespace Ntreev.Crema.Communication.Grpc {
       }
       if (other.Time != 0L) {
         Time = other.Time;
+      }
+      if (other.Token.Length != 0) {
+        Token = other.Token;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -310,6 +911,10 @@ namespace Ntreev.Crema.Communication.Grpc {
             Time = input.ReadInt64();
             break;
           }
+          case 18: {
+            Token = input.ReadString();
+            break;
+          }
         }
       }
     }
@@ -324,7 +929,7 @@ namespace Ntreev.Crema.Communication.Grpc {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ntreev.Crema.Communication.Grpc.AdaptorReflection.Descriptor.MessageTypes[2]; }
+      get { return global::Ntreev.Crema.Communication.Grpc.AdaptorReflection.Descriptor.MessageTypes[6]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -341,6 +946,7 @@ namespace Ntreev.Crema.Communication.Grpc {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public InvokeRequest(InvokeRequest other) : this() {
+      token_ = other.token_;
       serviceName_ = other.serviceName_;
       name_ = other.name_;
       types_ = other.types_.Clone();
@@ -353,8 +959,19 @@ namespace Ntreev.Crema.Communication.Grpc {
       return new InvokeRequest(this);
     }
 
+    /// <summary>Field number for the "token" field.</summary>
+    public const int TokenFieldNumber = 1;
+    private string token_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public string Token {
+      get { return token_; }
+      set {
+        token_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
     /// <summary>Field number for the "serviceName" field.</summary>
-    public const int ServiceNameFieldNumber = 1;
+    public const int ServiceNameFieldNumber = 2;
     private string serviceName_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public string ServiceName {
@@ -365,7 +982,7 @@ namespace Ntreev.Crema.Communication.Grpc {
     }
 
     /// <summary>Field number for the "name" field.</summary>
-    public const int NameFieldNumber = 2;
+    public const int NameFieldNumber = 3;
     private string name_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public string Name {
@@ -376,9 +993,9 @@ namespace Ntreev.Crema.Communication.Grpc {
     }
 
     /// <summary>Field number for the "types" field.</summary>
-    public const int Types_FieldNumber = 3;
+    public const int Types_FieldNumber = 4;
     private static readonly pb::FieldCodec<string> _repeated_types_codec
-        = pb::FieldCodec.ForString(26);
+        = pb::FieldCodec.ForString(34);
     private readonly pbc::RepeatedField<string> types_ = new pbc::RepeatedField<string>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public pbc::RepeatedField<string> Types_ {
@@ -386,9 +1003,9 @@ namespace Ntreev.Crema.Communication.Grpc {
     }
 
     /// <summary>Field number for the "datas" field.</summary>
-    public const int DatasFieldNumber = 4;
+    public const int DatasFieldNumber = 5;
     private static readonly pb::FieldCodec<string> _repeated_datas_codec
-        = pb::FieldCodec.ForString(34);
+        = pb::FieldCodec.ForString(42);
     private readonly pbc::RepeatedField<string> datas_ = new pbc::RepeatedField<string>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public pbc::RepeatedField<string> Datas {
@@ -408,6 +1025,7 @@ namespace Ntreev.Crema.Communication.Grpc {
       if (ReferenceEquals(other, this)) {
         return true;
       }
+      if (Token != other.Token) return false;
       if (ServiceName != other.ServiceName) return false;
       if (Name != other.Name) return false;
       if(!types_.Equals(other.types_)) return false;
@@ -418,6 +1036,7 @@ namespace Ntreev.Crema.Communication.Grpc {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override int GetHashCode() {
       int hash = 1;
+      if (Token.Length != 0) hash ^= Token.GetHashCode();
       if (ServiceName.Length != 0) hash ^= ServiceName.GetHashCode();
       if (Name.Length != 0) hash ^= Name.GetHashCode();
       hash ^= types_.GetHashCode();
@@ -435,12 +1054,16 @@ namespace Ntreev.Crema.Communication.Grpc {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
-      if (ServiceName.Length != 0) {
+      if (Token.Length != 0) {
         output.WriteRawTag(10);
+        output.WriteString(Token);
+      }
+      if (ServiceName.Length != 0) {
+        output.WriteRawTag(18);
         output.WriteString(ServiceName);
       }
       if (Name.Length != 0) {
-        output.WriteRawTag(18);
+        output.WriteRawTag(26);
         output.WriteString(Name);
       }
       types_.WriteTo(output, _repeated_types_codec);
@@ -453,6 +1076,9 @@ namespace Ntreev.Crema.Communication.Grpc {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
       int size = 0;
+      if (Token.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Token);
+      }
       if (ServiceName.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(ServiceName);
       }
@@ -471,6 +1097,9 @@ namespace Ntreev.Crema.Communication.Grpc {
     public void MergeFrom(InvokeRequest other) {
       if (other == null) {
         return;
+      }
+      if (other.Token.Length != 0) {
+        Token = other.Token;
       }
       if (other.ServiceName.Length != 0) {
         ServiceName = other.ServiceName;
@@ -492,18 +1121,22 @@ namespace Ntreev.Crema.Communication.Grpc {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
-            ServiceName = input.ReadString();
+            Token = input.ReadString();
             break;
           }
           case 18: {
-            Name = input.ReadString();
+            ServiceName = input.ReadString();
             break;
           }
           case 26: {
-            types_.AddEntriesFrom(input, _repeated_types_codec);
+            Name = input.ReadString();
             break;
           }
           case 34: {
+            types_.AddEntriesFrom(input, _repeated_types_codec);
+            break;
+          }
+          case 42: {
             datas_.AddEntriesFrom(input, _repeated_datas_codec);
             break;
           }
@@ -521,7 +1154,7 @@ namespace Ntreev.Crema.Communication.Grpc {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ntreev.Crema.Communication.Grpc.AdaptorReflection.Descriptor.MessageTypes[3]; }
+      get { return global::Ntreev.Crema.Communication.Grpc.AdaptorReflection.Descriptor.MessageTypes[7]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -706,7 +1339,7 @@ namespace Ntreev.Crema.Communication.Grpc {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ntreev.Crema.Communication.Grpc.AdaptorReflection.Descriptor.MessageTypes[4]; }
+      get { return global::Ntreev.Crema.Communication.Grpc.AdaptorReflection.Descriptor.MessageTypes[8]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -723,7 +1356,7 @@ namespace Ntreev.Crema.Communication.Grpc {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public PollRequest(PollRequest other) : this() {
-      serviceName_ = other.serviceName_;
+      token_ = other.token_;
       id_ = other.id_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
@@ -733,19 +1366,19 @@ namespace Ntreev.Crema.Communication.Grpc {
       return new PollRequest(this);
     }
 
-    /// <summary>Field number for the "serviceName" field.</summary>
-    public const int ServiceNameFieldNumber = 1;
-    private string serviceName_ = "";
+    /// <summary>Field number for the "token" field.</summary>
+    public const int TokenFieldNumber = 1;
+    private string token_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public string ServiceName {
-      get { return serviceName_; }
+    public string Token {
+      get { return token_; }
       set {
-        serviceName_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+        token_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
       }
     }
 
     /// <summary>Field number for the "id" field.</summary>
-    public const int IdFieldNumber = 2;
+    public const int IdFieldNumber = 3;
     private int id_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int Id {
@@ -768,7 +1401,7 @@ namespace Ntreev.Crema.Communication.Grpc {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (ServiceName != other.ServiceName) return false;
+      if (Token != other.Token) return false;
       if (Id != other.Id) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
@@ -776,7 +1409,7 @@ namespace Ntreev.Crema.Communication.Grpc {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override int GetHashCode() {
       int hash = 1;
-      if (ServiceName.Length != 0) hash ^= ServiceName.GetHashCode();
+      if (Token.Length != 0) hash ^= Token.GetHashCode();
       if (Id != 0) hash ^= Id.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
@@ -791,12 +1424,12 @@ namespace Ntreev.Crema.Communication.Grpc {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
-      if (ServiceName.Length != 0) {
+      if (Token.Length != 0) {
         output.WriteRawTag(10);
-        output.WriteString(ServiceName);
+        output.WriteString(Token);
       }
       if (Id != 0) {
-        output.WriteRawTag(16);
+        output.WriteRawTag(24);
         output.WriteInt32(Id);
       }
       if (_unknownFields != null) {
@@ -807,8 +1440,8 @@ namespace Ntreev.Crema.Communication.Grpc {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
       int size = 0;
-      if (ServiceName.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(ServiceName);
+      if (Token.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Token);
       }
       if (Id != 0) {
         size += 1 + pb::CodedOutputStream.ComputeInt32Size(Id);
@@ -824,8 +1457,8 @@ namespace Ntreev.Crema.Communication.Grpc {
       if (other == null) {
         return;
       }
-      if (other.ServiceName.Length != 0) {
-        ServiceName = other.ServiceName;
+      if (other.Token.Length != 0) {
+        Token = other.Token;
       }
       if (other.Id != 0) {
         Id = other.Id;
@@ -842,10 +1475,10 @@ namespace Ntreev.Crema.Communication.Grpc {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
-            ServiceName = input.ReadString();
+            Token = input.ReadString();
             break;
           }
-          case 16: {
+          case 24: {
             Id = input.ReadInt32();
             break;
           }
@@ -863,7 +1496,7 @@ namespace Ntreev.Crema.Communication.Grpc {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ntreev.Crema.Communication.Grpc.AdaptorReflection.Descriptor.MessageTypes[5]; }
+      get { return global::Ntreev.Crema.Communication.Grpc.AdaptorReflection.Descriptor.MessageTypes[9]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -881,6 +1514,7 @@ namespace Ntreev.Crema.Communication.Grpc {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public PollReplyItem(PollReplyItem other) : this() {
       id_ = other.id_;
+      serviceName_ = other.serviceName_;
       name_ = other.name_;
       types_ = other.types_.Clone();
       datas_ = other.datas_.Clone();
@@ -903,8 +1537,19 @@ namespace Ntreev.Crema.Communication.Grpc {
       }
     }
 
+    /// <summary>Field number for the "serviceName" field.</summary>
+    public const int ServiceNameFieldNumber = 2;
+    private string serviceName_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public string ServiceName {
+      get { return serviceName_; }
+      set {
+        serviceName_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
     /// <summary>Field number for the "name" field.</summary>
-    public const int NameFieldNumber = 2;
+    public const int NameFieldNumber = 3;
     private string name_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public string Name {
@@ -915,9 +1560,9 @@ namespace Ntreev.Crema.Communication.Grpc {
     }
 
     /// <summary>Field number for the "types" field.</summary>
-    public const int Types_FieldNumber = 3;
+    public const int Types_FieldNumber = 4;
     private static readonly pb::FieldCodec<string> _repeated_types_codec
-        = pb::FieldCodec.ForString(26);
+        = pb::FieldCodec.ForString(34);
     private readonly pbc::RepeatedField<string> types_ = new pbc::RepeatedField<string>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public pbc::RepeatedField<string> Types_ {
@@ -925,9 +1570,9 @@ namespace Ntreev.Crema.Communication.Grpc {
     }
 
     /// <summary>Field number for the "datas" field.</summary>
-    public const int DatasFieldNumber = 4;
+    public const int DatasFieldNumber = 5;
     private static readonly pb::FieldCodec<string> _repeated_datas_codec
-        = pb::FieldCodec.ForString(34);
+        = pb::FieldCodec.ForString(42);
     private readonly pbc::RepeatedField<string> datas_ = new pbc::RepeatedField<string>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public pbc::RepeatedField<string> Datas {
@@ -948,6 +1593,7 @@ namespace Ntreev.Crema.Communication.Grpc {
         return true;
       }
       if (Id != other.Id) return false;
+      if (ServiceName != other.ServiceName) return false;
       if (Name != other.Name) return false;
       if(!types_.Equals(other.types_)) return false;
       if(!datas_.Equals(other.datas_)) return false;
@@ -958,6 +1604,7 @@ namespace Ntreev.Crema.Communication.Grpc {
     public override int GetHashCode() {
       int hash = 1;
       if (Id != 0) hash ^= Id.GetHashCode();
+      if (ServiceName.Length != 0) hash ^= ServiceName.GetHashCode();
       if (Name.Length != 0) hash ^= Name.GetHashCode();
       hash ^= types_.GetHashCode();
       hash ^= datas_.GetHashCode();
@@ -978,8 +1625,12 @@ namespace Ntreev.Crema.Communication.Grpc {
         output.WriteRawTag(8);
         output.WriteInt32(Id);
       }
-      if (Name.Length != 0) {
+      if (ServiceName.Length != 0) {
         output.WriteRawTag(18);
+        output.WriteString(ServiceName);
+      }
+      if (Name.Length != 0) {
+        output.WriteRawTag(26);
         output.WriteString(Name);
       }
       types_.WriteTo(output, _repeated_types_codec);
@@ -994,6 +1645,9 @@ namespace Ntreev.Crema.Communication.Grpc {
       int size = 0;
       if (Id != 0) {
         size += 1 + pb::CodedOutputStream.ComputeInt32Size(Id);
+      }
+      if (ServiceName.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(ServiceName);
       }
       if (Name.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Name);
@@ -1013,6 +1667,9 @@ namespace Ntreev.Crema.Communication.Grpc {
       }
       if (other.Id != 0) {
         Id = other.Id;
+      }
+      if (other.ServiceName.Length != 0) {
+        ServiceName = other.ServiceName;
       }
       if (other.Name.Length != 0) {
         Name = other.Name;
@@ -1035,14 +1692,18 @@ namespace Ntreev.Crema.Communication.Grpc {
             break;
           }
           case 18: {
-            Name = input.ReadString();
+            ServiceName = input.ReadString();
             break;
           }
           case 26: {
-            types_.AddEntriesFrom(input, _repeated_types_codec);
+            Name = input.ReadString();
             break;
           }
           case 34: {
+            types_.AddEntriesFrom(input, _repeated_types_codec);
+            break;
+          }
+          case 42: {
             datas_.AddEntriesFrom(input, _repeated_datas_codec);
             break;
           }
@@ -1060,7 +1721,7 @@ namespace Ntreev.Crema.Communication.Grpc {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ntreev.Crema.Communication.Grpc.AdaptorReflection.Descriptor.MessageTypes[6]; }
+      get { return global::Ntreev.Crema.Communication.Grpc.AdaptorReflection.Descriptor.MessageTypes[10]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1077,7 +1738,6 @@ namespace Ntreev.Crema.Communication.Grpc {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public PollReply(PollReply other) : this() {
-      serviceName_ = other.serviceName_;
       items_ = other.items_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
@@ -1085,17 +1745,6 @@ namespace Ntreev.Crema.Communication.Grpc {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public PollReply Clone() {
       return new PollReply(this);
-    }
-
-    /// <summary>Field number for the "serviceName" field.</summary>
-    public const int ServiceNameFieldNumber = 1;
-    private string serviceName_ = "";
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public string ServiceName {
-      get { return serviceName_; }
-      set {
-        serviceName_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
-      }
     }
 
     /// <summary>Field number for the "items" field.</summary>
@@ -1121,7 +1770,6 @@ namespace Ntreev.Crema.Communication.Grpc {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (ServiceName != other.ServiceName) return false;
       if(!items_.Equals(other.items_)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
@@ -1129,7 +1777,6 @@ namespace Ntreev.Crema.Communication.Grpc {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override int GetHashCode() {
       int hash = 1;
-      if (ServiceName.Length != 0) hash ^= ServiceName.GetHashCode();
       hash ^= items_.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
@@ -1144,10 +1791,6 @@ namespace Ntreev.Crema.Communication.Grpc {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
-      if (ServiceName.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(ServiceName);
-      }
       items_.WriteTo(output, _repeated_items_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -1157,9 +1800,6 @@ namespace Ntreev.Crema.Communication.Grpc {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
       int size = 0;
-      if (ServiceName.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(ServiceName);
-      }
       size += items_.CalculateSize(_repeated_items_codec);
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -1171,9 +1811,6 @@ namespace Ntreev.Crema.Communication.Grpc {
     public void MergeFrom(PollReply other) {
       if (other == null) {
         return;
-      }
-      if (other.ServiceName.Length != 0) {
-        ServiceName = other.ServiceName;
       }
       items_.Add(other.items_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
@@ -1187,10 +1824,6 @@ namespace Ntreev.Crema.Communication.Grpc {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
-          case 10: {
-            ServiceName = input.ReadString();
-            break;
-          }
           case 18: {
             items_.AddEntriesFrom(input, _repeated_items_codec);
             break;

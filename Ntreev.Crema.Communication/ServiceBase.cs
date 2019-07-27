@@ -55,20 +55,25 @@ namespace Ntreev.Crema.Communication
 
         public Type CallbackType => this.callbackType;
 
-        public void Open(ServiceToken token, object instance)
+        public async Task OpenAsync(ServiceToken token, object instance)
         {
-            this.instance = instance;
-            this.OnOpened(EventArgs.Empty);
+            await this.dispatcher.InvokeAsync(() =>
+            {
+                this.instance = instance;
+                this.OnOpened(EventArgs.Empty);
+            });
         }
 
-        public void Close(ServiceToken token)
+        public async Task CloseAsync(ServiceToken token)
         {
-            //this.adaptorHost = null;
-            this.instance = null;
-            this.OnClosed(EventArgs.Empty);
+            await this.dispatcher.InvokeAsync(() =>
+            {
+                this.instance = null;
+                this.OnClosed(EventArgs.Empty);
+            });
         }
 
-        public string Name {get;}
+        public string Name { get; }
 
         public event EventHandler Opened;
 

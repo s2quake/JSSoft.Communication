@@ -44,17 +44,18 @@ namespace Ntreev.Crema.Communication.Grpc
             this.services = services.ToArray();
         }
 
-        public void Open(string host, int port)
+        public Task OpenAsync(string host, int port)
         {
             this.channel = new Channel($"{host}:{port}", ChannelCredentials.Insecure);
             this.apdatorImpl = new AdaptorClientImpl(this.channel, this.services);
+            return Task.Delay(1);
         }
 
-        public void Close()
+        public async Task CloseAsync()
         {
-            this.apdatorImpl.Dispose();
+            await this.apdatorImpl.DisposeAsync();
             this.apdatorImpl = null;
-            this.channel.ShutdownAsync().Wait();
+            await this.channel.ShutdownAsync();
             this.channel = null;
         }
 

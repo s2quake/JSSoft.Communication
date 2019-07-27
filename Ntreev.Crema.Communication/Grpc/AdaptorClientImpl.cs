@@ -41,11 +41,13 @@ namespace Ntreev.Crema.Communication.Grpc
         private AsyncDuplexStreamingCall<PollRequest, PollReply> call;
         private CancellationTokenSource cancellation;
         private Task task;
+        private string token;
 
         public AdaptorClientImpl(Channel channel, IEnumerable<IService> services)
             : base(channel)
         {
-            this.Ping(new PingRequest() { Time = DateTime.UtcNow.Ticks });
+            var reply = this.Open(new OpenRequest() { Time = DateTime.UtcNow.Ticks });
+            this.token = reply.Token;
             this.channel = channel;
             this.serviceByName = services.ToDictionary(item => item.Name);
             this.idByService = services.ToDictionary(item => item, item => 0);
@@ -57,8 +59,10 @@ namespace Ntreev.Crema.Communication.Grpc
             this.task = this.PollAsync(this.cancellation.Token);
         }
 
-        public void Dispose()
+        public async Task DisposeAsync()
         {
+            await this.CloseAsync(new CloseRequest() { Token = this.token });
+            this.token = null;
             this.cancellation.Cancel();
             this.cancellation = null;
             this.task.Wait();
@@ -84,16 +88,17 @@ namespace Ntreev.Crema.Communication.Grpc
             this.call = this.Poll();
             while (!cancellation.IsCancellationRequested)
             {
-                foreach (var item in this.serviceByName.Values)
+                var request = new PollRequest() { Id = 0 };
+                await this.call.RequestStream.WriteAsync(request);
+                await this.call.ResponseStream.MoveNext(cancellation);
+                var reply = this.call.ResponseStream.Current;
+                foreach (var item in reply.Items)
                 {
-                    var id = this.idByService[item];
-                    var request = new PollRequest() { Id = id, ServiceName = item.Name };
-                    await this.call.RequestStream.WriteAsync(request);
-                    await this.call.ResponseStream.MoveNext(cancellation);
-                    var reply = this.call.ResponseStream.Current;
-                    this.idByService[item] = this.InvokeCallback(item, id, reply.Items);
-                    await Task.Delay(1);
+                    var service = this.serviceByName[item.ServiceName];
+                    this.InvokeCallback(service, item.Id, reply.Items);
+                    this.idByService[service] = item.Id;
                 }
+                await Task.Delay(1);
             }
             this.call.Dispose();
             this.call = null;

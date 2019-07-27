@@ -12,12 +12,30 @@ namespace Ntreev.Crema.Communication.Grpc {
   {
     static readonly string __ServiceName = "ntreev.crema.communication.grpc.Adaptor";
 
+    static readonly grpc::Marshaller<global::Ntreev.Crema.Communication.Grpc.OpenRequest> __Marshaller_ntreev_crema_communication_grpc_OpenRequest = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Ntreev.Crema.Communication.Grpc.OpenRequest.Parser.ParseFrom);
+    static readonly grpc::Marshaller<global::Ntreev.Crema.Communication.Grpc.OpenReply> __Marshaller_ntreev_crema_communication_grpc_OpenReply = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Ntreev.Crema.Communication.Grpc.OpenReply.Parser.ParseFrom);
+    static readonly grpc::Marshaller<global::Ntreev.Crema.Communication.Grpc.CloseRequest> __Marshaller_ntreev_crema_communication_grpc_CloseRequest = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Ntreev.Crema.Communication.Grpc.CloseRequest.Parser.ParseFrom);
+    static readonly grpc::Marshaller<global::Ntreev.Crema.Communication.Grpc.CloseReply> __Marshaller_ntreev_crema_communication_grpc_CloseReply = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Ntreev.Crema.Communication.Grpc.CloseReply.Parser.ParseFrom);
     static readonly grpc::Marshaller<global::Ntreev.Crema.Communication.Grpc.PingRequest> __Marshaller_ntreev_crema_communication_grpc_PingRequest = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Ntreev.Crema.Communication.Grpc.PingRequest.Parser.ParseFrom);
     static readonly grpc::Marshaller<global::Ntreev.Crema.Communication.Grpc.PingReply> __Marshaller_ntreev_crema_communication_grpc_PingReply = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Ntreev.Crema.Communication.Grpc.PingReply.Parser.ParseFrom);
     static readonly grpc::Marshaller<global::Ntreev.Crema.Communication.Grpc.InvokeRequest> __Marshaller_ntreev_crema_communication_grpc_InvokeRequest = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Ntreev.Crema.Communication.Grpc.InvokeRequest.Parser.ParseFrom);
     static readonly grpc::Marshaller<global::Ntreev.Crema.Communication.Grpc.InvokeReply> __Marshaller_ntreev_crema_communication_grpc_InvokeReply = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Ntreev.Crema.Communication.Grpc.InvokeReply.Parser.ParseFrom);
     static readonly grpc::Marshaller<global::Ntreev.Crema.Communication.Grpc.PollRequest> __Marshaller_ntreev_crema_communication_grpc_PollRequest = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Ntreev.Crema.Communication.Grpc.PollRequest.Parser.ParseFrom);
     static readonly grpc::Marshaller<global::Ntreev.Crema.Communication.Grpc.PollReply> __Marshaller_ntreev_crema_communication_grpc_PollReply = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Ntreev.Crema.Communication.Grpc.PollReply.Parser.ParseFrom);
+
+    static readonly grpc::Method<global::Ntreev.Crema.Communication.Grpc.OpenRequest, global::Ntreev.Crema.Communication.Grpc.OpenReply> __Method_Open = new grpc::Method<global::Ntreev.Crema.Communication.Grpc.OpenRequest, global::Ntreev.Crema.Communication.Grpc.OpenReply>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "Open",
+        __Marshaller_ntreev_crema_communication_grpc_OpenRequest,
+        __Marshaller_ntreev_crema_communication_grpc_OpenReply);
+
+    static readonly grpc::Method<global::Ntreev.Crema.Communication.Grpc.CloseRequest, global::Ntreev.Crema.Communication.Grpc.CloseReply> __Method_Close = new grpc::Method<global::Ntreev.Crema.Communication.Grpc.CloseRequest, global::Ntreev.Crema.Communication.Grpc.CloseReply>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "Close",
+        __Marshaller_ntreev_crema_communication_grpc_CloseRequest,
+        __Marshaller_ntreev_crema_communication_grpc_CloseReply);
 
     static readonly grpc::Method<global::Ntreev.Crema.Communication.Grpc.PingRequest, global::Ntreev.Crema.Communication.Grpc.PingReply> __Method_Ping = new grpc::Method<global::Ntreev.Crema.Communication.Grpc.PingRequest, global::Ntreev.Crema.Communication.Grpc.PingReply>(
         grpc::MethodType.Unary,
@@ -50,6 +68,16 @@ namespace Ntreev.Crema.Communication.Grpc {
     [grpc::BindServiceMethod(typeof(Adaptor), "BindService")]
     public abstract partial class AdaptorBase
     {
+      public virtual global::System.Threading.Tasks.Task<global::Ntreev.Crema.Communication.Grpc.OpenReply> Open(global::Ntreev.Crema.Communication.Grpc.OpenRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      public virtual global::System.Threading.Tasks.Task<global::Ntreev.Crema.Communication.Grpc.CloseReply> Close(global::Ntreev.Crema.Communication.Grpc.CloseRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
       public virtual global::System.Threading.Tasks.Task<global::Ntreev.Crema.Communication.Grpc.PingReply> Ping(global::Ntreev.Crema.Communication.Grpc.PingRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
@@ -90,6 +118,38 @@ namespace Ntreev.Crema.Communication.Grpc {
       {
       }
 
+      public virtual global::Ntreev.Crema.Communication.Grpc.OpenReply Open(global::Ntreev.Crema.Communication.Grpc.OpenRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return Open(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      public virtual global::Ntreev.Crema.Communication.Grpc.OpenReply Open(global::Ntreev.Crema.Communication.Grpc.OpenRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_Open, null, options, request);
+      }
+      public virtual grpc::AsyncUnaryCall<global::Ntreev.Crema.Communication.Grpc.OpenReply> OpenAsync(global::Ntreev.Crema.Communication.Grpc.OpenRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return OpenAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      public virtual grpc::AsyncUnaryCall<global::Ntreev.Crema.Communication.Grpc.OpenReply> OpenAsync(global::Ntreev.Crema.Communication.Grpc.OpenRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_Open, null, options, request);
+      }
+      public virtual global::Ntreev.Crema.Communication.Grpc.CloseReply Close(global::Ntreev.Crema.Communication.Grpc.CloseRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return Close(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      public virtual global::Ntreev.Crema.Communication.Grpc.CloseReply Close(global::Ntreev.Crema.Communication.Grpc.CloseRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_Close, null, options, request);
+      }
+      public virtual grpc::AsyncUnaryCall<global::Ntreev.Crema.Communication.Grpc.CloseReply> CloseAsync(global::Ntreev.Crema.Communication.Grpc.CloseRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return CloseAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      public virtual grpc::AsyncUnaryCall<global::Ntreev.Crema.Communication.Grpc.CloseReply> CloseAsync(global::Ntreev.Crema.Communication.Grpc.CloseRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_Close, null, options, request);
+      }
       public virtual global::Ntreev.Crema.Communication.Grpc.PingReply Ping(global::Ntreev.Crema.Communication.Grpc.PingRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
         return Ping(request, new grpc::CallOptions(headers, deadline, cancellationToken));
@@ -142,6 +202,8 @@ namespace Ntreev.Crema.Communication.Grpc {
     public static grpc::ServerServiceDefinition BindService(AdaptorBase serviceImpl)
     {
       return grpc::ServerServiceDefinition.CreateBuilder()
+          .AddMethod(__Method_Open, serviceImpl.Open)
+          .AddMethod(__Method_Close, serviceImpl.Close)
           .AddMethod(__Method_Ping, serviceImpl.Ping)
           .AddMethod(__Method_Invoke, serviceImpl.Invoke)
           .AddMethod(__Method_Poll, serviceImpl.Poll).Build();
@@ -153,6 +215,8 @@ namespace Ntreev.Crema.Communication.Grpc {
     /// <param name="serviceImpl">An object implementing the server-side handling logic.</param>
     public static void BindService(grpc::ServiceBinderBase serviceBinder, AdaptorBase serviceImpl)
     {
+      serviceBinder.AddMethod(__Method_Open, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Ntreev.Crema.Communication.Grpc.OpenRequest, global::Ntreev.Crema.Communication.Grpc.OpenReply>(serviceImpl.Open));
+      serviceBinder.AddMethod(__Method_Close, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Ntreev.Crema.Communication.Grpc.CloseRequest, global::Ntreev.Crema.Communication.Grpc.CloseReply>(serviceImpl.Close));
       serviceBinder.AddMethod(__Method_Ping, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Ntreev.Crema.Communication.Grpc.PingRequest, global::Ntreev.Crema.Communication.Grpc.PingReply>(serviceImpl.Ping));
       serviceBinder.AddMethod(__Method_Invoke, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Ntreev.Crema.Communication.Grpc.InvokeRequest, global::Ntreev.Crema.Communication.Grpc.InvokeReply>(serviceImpl.Invoke));
       serviceBinder.AddMethod(__Method_Poll, serviceImpl == null ? null : new grpc::DuplexStreamingServerMethod<global::Ntreev.Crema.Communication.Grpc.PollRequest, global::Ntreev.Crema.Communication.Grpc.PollReply>(serviceImpl.Poll));

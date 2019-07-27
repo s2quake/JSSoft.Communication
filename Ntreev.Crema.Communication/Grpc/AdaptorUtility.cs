@@ -29,6 +29,8 @@ namespace Ntreev.Crema.Communication.Grpc
     static class AdaptorUtility
     {
         private static readonly JsonSerializerSettings settings = new JsonSerializerSettings();
+
+        public const string ClosedName = "3784a424-f19d-4466-8f4f-3a1d9967e95a";
         
         public static object[] GetArguments(IReadOnlyList<string> types, IReadOnlyList<string> datas)
         {
