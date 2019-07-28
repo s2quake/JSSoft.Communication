@@ -64,9 +64,9 @@ namespace Ntreev.Crema.Communication
 
         public static (Type, object)[] GetArguments(string text)
         {
-            var datas = ((string, string)[])JsonConvert.DeserializeObject(text, typeof((string, string)), settings);
+            var datas = ((string, string)[])JsonConvert.DeserializeObject(text, typeof((string, string)[]), settings);
             var items = new (Type, object)[text.Length];
-            for (var i = 0; i < text.Length; i++)
+            for (var i = 0; i < datas.Length; i++)
             {
                 var type = datas[i].Item1;
                 var value = datas[i].Item2;
