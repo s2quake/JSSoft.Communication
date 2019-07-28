@@ -38,7 +38,7 @@ namespace Ntreev.Crema.Communication
         {
             return new (Type, object)[]
             {
-                 (typeof(string), e.Message)
+                (typeof(string), e.Message)
             };
         }
     }

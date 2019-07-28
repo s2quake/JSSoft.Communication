@@ -26,7 +26,7 @@ using System.ComponentModel.Composition;
 namespace Ntreev.Crema.Communication
 {
     [Export(typeof(IExceptionSerializer))]
-    class ArgumetnExceptionSerializer : ExceptionSerializerBase<ArgumentException>
+    class ArgumentExceptionSerializer : ExceptionSerializerBase<ArgumentException>
     {
         protected override ArgumentException Deserialize((Type, object)[] args)
         {
@@ -39,8 +39,8 @@ namespace Ntreev.Crema.Communication
         {
             return new (Type, object)[]
             {
-                 (typeof(string), e.Message),
-                 (typeof(string), e.ParamName)
+                (typeof(string), e.Message),
+                (typeof(string), e.ParamName)
             };
         }
     }

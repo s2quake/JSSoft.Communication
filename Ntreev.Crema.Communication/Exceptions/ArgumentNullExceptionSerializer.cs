@@ -21,36 +21,27 @@
 // SOFTWARE.
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
 
-namespace Ntreev.Crema.Communication.Grpc
+namespace Ntreev.Crema.Communication
 {
-    [Export(typeof(IAdaptorHostProvider))]
-    class AdaptorHostProvider : IAdaptorHostProvider
+    [Export(typeof(IExceptionSerializer))]
+    class ArgumentNullExceptionSerializer : ExceptionSerializerBase<ArgumentNullException>
     {
-        private readonly IEnumerable<IService> services;
-        private readonly IEnumerable<IExceptionSerializer> exceptionSerializers;
-
-        [ImportingConstructor]
-        public AdaptorHostProvider([ImportMany]IEnumerable<IService> services,
-                                   [ImportMany]IEnumerable<IExceptionSerializer> exceptionSerializers)
+        protected override ArgumentNullException Deserialize((Type, object)[] args)
         {
-            Environment.SetEnvironmentVariable("GRPC_VERBOSITY", "DEBUG");
-            this.services = services.ToArray();
-            this.exceptionSerializers = exceptionSerializers.ToArray();
+            var paramName = args[0].Item2 as string;
+            var message = args[1].Item2 as string;
+            return new ArgumentNullException(paramName, message);
         }
 
-        public IAdaptorHost Create(IServiceHost serviceHost, ServiceToken token)
+        protected override (Type, object)[] Serialize(ArgumentNullException e)
         {
-            if (serviceHost is ServerHostBase)
-                return new AdaptorServerHost(this.services, this.exceptionSerializers);
-            else if (serviceHost is ClientHostBase)
-                return new AdaptorClientHost(this.services, this.exceptionSerializers);
-            throw new NotImplementedException();
+            return new (Type, object)[]
+            {
+                (typeof(string), e.ParamName),
+                (typeof(string), e.Message)
+            };
         }
-
-        public string Name => "grpc";
     }
 }
