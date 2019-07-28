@@ -30,6 +30,7 @@ namespace Server
 {
     [Export(typeof(IShell))]
     [Export(typeof(IServiceProvider))]
+    [Export(typeof(Shell))]
     class Shell : CommandContextTerminal, IShell, IServiceProvider
     {
         private readonly IServiceHost serviceHost;
@@ -58,6 +59,8 @@ namespace Server
             }
         }
 
+        internal Guid Token { get; set; }
+
         #region IServiceProvider
 
         object IServiceProvider.GetService(Type serviceType)
@@ -76,16 +79,16 @@ namespace Server
         {
             Console.Title = $"Server localhost:{settings.Port}";
             this.serviceHost.Port = settings.Port;
-            await this.serviceHost.OpenAsync();
+            this.Token = await this.serviceHost.OpenAsync();
             base.Start();
-            
+
         }
 
         async Task IShell.StopAsync()
         {
             base.Cancel();
             if (this.serviceHost.IsOpened == true)
-                await this.serviceHost.CloseAsync();
+                await this.serviceHost.CloseAsync(this.Token);
         }
 
         #endregion

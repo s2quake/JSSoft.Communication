@@ -26,13 +26,18 @@ namespace Ntreev.Crema.Communication
 {
     public sealed class ServiceToken
     {
-        internal ServiceToken(object value)
+        internal ServiceToken(Guid guid)
         {
-            this.Value = value;
+            this.Guid = guid;
         }
 
-        internal object Value { get; }
+        internal Guid Guid { get; }
 
-        internal static readonly ServiceToken Empty = new ServiceToken(null);
+        internal static ServiceToken NewToken()
+        {
+            return new ServiceToken(Guid.NewGuid());
+        }
+
+        internal static readonly ServiceToken Empty = new ServiceToken(Guid.Empty);
     }
 }

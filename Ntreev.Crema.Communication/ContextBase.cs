@@ -36,14 +36,14 @@ namespace Ntreev.Crema.Communication
 
         }
 
-        public IContextInvoker Invoker { get; set; }
-
-        public IService Service { get; set; }
-
         public void Dispose()
         {
 
         }
+
+        public IContextInvoker Invoker { get; set; }
+
+        public IService Service { get; set; }
 
         protected void Invoke(string name, params object[] args)
         {

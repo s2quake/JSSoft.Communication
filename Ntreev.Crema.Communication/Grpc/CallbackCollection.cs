@@ -34,7 +34,6 @@ namespace Ntreev.Crema.Communication.Grpc
         public CallbackCollection(IService service)
         {
             this.service = service;
-
         }
 
         public void Add(PollReplyItem item)

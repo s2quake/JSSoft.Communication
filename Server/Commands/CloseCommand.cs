@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 
+using System;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 using Ntreev.Crema.Communication;
@@ -32,6 +33,8 @@ namespace Server.Commands
     class CloseCommand : CommandAsyncBase
     {
         private readonly IServiceHost serviceHost;
+        [Import]
+        private Lazy<Shell> shell = null;
 
         [ImportingConstructor]
         public CloseCommand(IServiceHost serviceHost)
@@ -43,7 +46,9 @@ namespace Server.Commands
 
         protected override Task OnExecuteAsync()
         {
-            return this.serviceHost.CloseAsync();
+            return this.serviceHost.CloseAsync(this.Shell.Token);
         }
+
+        private Shell Shell => this.shell.Value;
     }
 }

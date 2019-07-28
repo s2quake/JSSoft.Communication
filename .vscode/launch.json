@@ -22,7 +22,7 @@
             "preLaunchTask": "build server",
             "args": [],
             "cwd": "${workspaceFolder}/Server",
-            "console": "externalTerminal",
+            "console": "integratedTerminal",
             "stopAtEntry": false
         },
         {

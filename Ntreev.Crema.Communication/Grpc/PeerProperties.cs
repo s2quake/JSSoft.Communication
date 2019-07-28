@@ -9,23 +9,28 @@ namespace Ntreev.Crema.Communication.Grpc
 
         public void Add(string peer, string key, object value)
         {
-            this.properties.Add($"{peer}.{key}", value);
+            this.properties.Add(GetKey(peer, key), value);
         }
 
         public void Contains(string peer, string key)
         {
-            this.properties.ContainsKey($"{peer}.{key}");
+            this.properties.ContainsKey(GetKey(peer, key));
         }
 
         public void Remove(string peer, string key)
         {
-            this.properties.Remove($"{peer}.{key}");
+            this.properties.Remove(GetKey(peer, key));
         }
 
         public object this[string peer, string key]
         {
-            get => this.properties[$"{peer}.{key}"];
-            set => this.properties[$"{peer}.{key}"] = value;
+            get => this.properties[GetKey(peer, key)];
+            set => this.properties[GetKey(peer, key)] = value;
+        }
+
+        private static string GetKey(string peer, string key)
+        {
+            return $"{peer}.{key}";
         }
     }
 }

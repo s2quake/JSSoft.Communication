@@ -106,7 +106,7 @@ namespace Ntreev.Crema.Communication.Grpc
             if (this.methodByName.ContainsKey(methodName) == false)
                 throw new InvalidOperationException();
 
-            var args = AdaptorUtility.GetArguments(request.Types_, request.Datas);
+            var args = AdaptorUtility.GetArguments(request.TypeNames, request.DataTexts);
             var method = methodByName[methodName];
             var value = await Task.Run(() => method.Invoke(service, args));
             var valueType = method.ReturnType;
@@ -135,7 +135,6 @@ namespace Ntreev.Crema.Communication.Grpc
             {
                 reply.Data = JsonConvert.SerializeObject(value, valueType, settings);
             }
-
             return reply;
         }
 
@@ -187,27 +186,10 @@ namespace Ntreev.Crema.Communication.Grpc
             this.cancellation.Cancel();
             this.dispatcher.Dispose();
             this.dispatcher = null;
-            // await this.dispatcher.InvokeAsync(() =>
-            // {
-            //     var pollItem = new PollReplyItem()
-            //     {
-            //         ServiceName = AdaptorUtility.ClosedName,
-            //         Name = AdaptorUtility.ClosedName
-            //     };
-            //     foreach (var item in this.callbacksByName.Values)
-            //     {
-            //         item.Add(pollItem);
-            //     }
-            // });
-
             while (this.peers.Any())
             {
                 await Task.Delay(1);
             }
-
-
-            //this.dispatcher.Dispose();
-            //this.dispatcher = null;
         }
 
         private void ValidateToken(string token)
@@ -227,9 +209,10 @@ namespace Ntreev.Crema.Communication.Grpc
                 {
                     Id = callbacks.Count,
                     Name = name,
+                    ServiceName = serviceName
                 };
-                pollItem.Types_.AddRange(types);
-                pollItem.Datas.AddRange(datas);
+                pollItem.TypeNames.AddRange(types);
+                pollItem.DataTexts.AddRange(datas);
                 callbacks.Add(pollItem);
             });
         }

@@ -58,6 +58,8 @@ namespace Client
             }
         }
 
+        internal Guid Token { get; set; }
+
         #region IServiceProvider
 
         object IServiceProvider.GetService(Type serviceType)
@@ -75,14 +77,14 @@ namespace Client
         async Task IShell.StartAsync(Settings settings)
         {
             Console.Title = $"Client {settings.Host}:{settings.Port}";
-            await this.serviceHost.OpenAsync();
+            this.Token = await this.serviceHost.OpenAsync();
             base.Start();
         }
 
         async Task IShell.StopAsync()
         {
             base.Cancel();
-            await this.serviceHost.CloseAsync();
+            await this.serviceHost.CloseAsync(this.Token);
         }
 
         #endregion

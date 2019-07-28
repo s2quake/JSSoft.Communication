@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 
+using System;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 using Ntreev.Crema.Communication;
@@ -32,6 +33,8 @@ namespace Server.Commands
     class OpenCommand : CommandAsyncBase
     {
         private readonly IServiceHost serviceHost;
+        [Import]
+        private Lazy<Shell> shell = null;
 
         [ImportingConstructor]
         public OpenCommand(IServiceHost serviceHost)
@@ -41,9 +44,11 @@ namespace Server.Commands
 
         public override bool IsEnabled => this.serviceHost.IsOpened == false;
 
-        protected override Task OnExecuteAsync()
+        protected override async Task OnExecuteAsync()
         {
-            return this.serviceHost.OpenAsync();
+            this.Shell.Token = await this.serviceHost.OpenAsync();
         }
+
+        private Shell Shell => this.shell.Value;
     }
 }

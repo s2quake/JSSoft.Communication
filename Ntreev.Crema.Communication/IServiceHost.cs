@@ -28,9 +28,9 @@ namespace Ntreev.Crema.Communication
 {
     public interface IServiceHost
     {
-        Task OpenAsync();
+        Task<Guid> OpenAsync();
 
-        Task CloseAsync();
+        Task CloseAsync(Guid token);
 
         IReadOnlyList<IService> Services { get; }
 

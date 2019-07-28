@@ -28,7 +28,6 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading.Tasks;
 using Grpc.Core;
-using Ntreev.Crema.Communication.Grpc;
 
 namespace Ntreev.Crema.Communication.Grpc
 {
@@ -81,5 +80,10 @@ namespace Ntreev.Crema.Communication.Grpc
         }
 
         public event EventHandler<DisconnectionReasonEventArgs> Disconnected;
+
+        protected virtual void OnDisconnected(DisconnectionReasonEventArgs e)
+        {
+            this.Disconnected?.Invoke(this, e);
+        }
     }
 }

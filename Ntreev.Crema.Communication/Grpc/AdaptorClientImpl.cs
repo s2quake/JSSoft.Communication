@@ -148,7 +148,7 @@ namespace Ntreev.Crema.Communication.Grpc
             {
                 if (item.Id >= 0)
                 {
-                    var args = AdaptorUtility.GetArguments(item.Types_, item.Datas);
+                    var args = AdaptorUtility.GetArguments(item.TypeNames, item.DataTexts);
                     this.InvokeCallback(service, item.Name, args);
                     id = item.Id + 1;
                 }
@@ -166,8 +166,8 @@ namespace Ntreev.Crema.Communication.Grpc
                 ServiceName = service.Name,
                 Name = name,
             };
-            request.Types_.AddRange(types);
-            request.Datas.AddRange(datas);
+            request.TypeNames.AddRange(types);
+            request.DataTexts.AddRange(datas);
             this.Invoke(request);
         }
 
@@ -179,8 +179,8 @@ namespace Ntreev.Crema.Communication.Grpc
                 ServiceName = service.Name,
                 Name = name,
             };
-            request.Types_.AddRange(types);
-            request.Datas.AddRange(datas);
+            request.TypeNames.AddRange(types);
+            request.DataTexts.AddRange(datas);
             var reply = this.Invoke(request);
             return AdaptorUtility.GetValue<T>(reply.Type, reply.Data);
         }
@@ -193,8 +193,8 @@ namespace Ntreev.Crema.Communication.Grpc
                 ServiceName = service.Name,
                 Name = name,
             };
-            request.Types_.AddRange(types);
-            request.Datas.AddRange(datas);
+            request.TypeNames.AddRange(types);
+            request.DataTexts.AddRange(datas);
             await this.InvokeAsync(request);
         }
 
@@ -206,8 +206,8 @@ namespace Ntreev.Crema.Communication.Grpc
                 ServiceName = service.Name,
                 Name = name,
             };
-            request.Types_.AddRange(types);
-            request.Datas.AddRange(datas);
+            request.TypeNames.AddRange(types);
+            request.DataTexts.AddRange(datas);
             var reply = await this.InvokeAsync(request);
             return AdaptorUtility.GetValue<T>(reply.Type, reply.Data);
         }
