@@ -72,8 +72,9 @@ namespace Client
 
         #region IShell
 
-        async Task IShell.StartAsync()
+        async Task IShell.StartAsync(Settings settings)
         {
+            Console.Title = $"Client {settings.Host}:{settings.Port}";
             await this.serviceHost.OpenAsync();
             base.Start();
         }

@@ -23,6 +23,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Ntreev.Library.Commands;
 
 namespace Client
 {
@@ -32,9 +33,12 @@ namespace Client
         {
             try
             {
+                var settings = new Settings();
+                var parser = new CommandLineParser(settings);
+                parser.Parse(Environment.CommandLine);
                 using (var shell = Shell.Create())
                 {
-                    await shell.StartAsync();
+                    await shell.StartAsync(settings);
                 }
             }
             catch (Exception e)

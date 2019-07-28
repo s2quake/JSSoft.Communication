@@ -21,14 +21,25 @@
 // SOFTWARE.
 
 using System;
-using System.Threading.Tasks;
+using System.ComponentModel;
+using Ntreev.Library.Commands;
 
 namespace Client
 {
-    public interface IShell : IDisposable
+    public class Settings
     {
-        Task StartAsync(Settings settings);
+        [CommandProperty]
+        [DefaultValue("localhost")]
+        public string Host
+        {
+            get; set;
+        }
 
-        Task StopAsync();
+        [CommandProperty]
+        [DefaultValue(4004)]
+        public int Port
+        {
+            get; set;
+        }
     }
 }

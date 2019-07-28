@@ -74,16 +74,18 @@ namespace Server
 
         async Task IShell.StartAsync(Settings settings)
         {
+            Console.Title = $"Server localhost:{settings.Port}";
             this.serviceHost.Port = settings.Port;
             await this.serviceHost.OpenAsync();
             base.Start();
-            Console.Title = "Server Opened";
+            
         }
 
         async Task IShell.StopAsync()
         {
             base.Cancel();
-            await this.serviceHost.CloseAsync();
+            if (this.serviceHost.IsOpened == true)
+                await this.serviceHost.CloseAsync();
         }
 
         #endregion
