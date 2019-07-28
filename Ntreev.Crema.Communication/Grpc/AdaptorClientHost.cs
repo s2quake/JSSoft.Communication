@@ -36,7 +36,7 @@ namespace Ntreev.Crema.Communication.Grpc
     {
         private IService[] services;
         private Channel channel;
-        private AdaptorClientImpl apdatorImpl;
+        private AdaptorClientImpl adaptorImpl;
         private ServiceInstanceBuilder instanceBuilder = new ServiceInstanceBuilder();
 
         public AdaptorClientHost(IEnumerable<IService> services)
@@ -47,14 +47,16 @@ namespace Ntreev.Crema.Communication.Grpc
         public Task OpenAsync(string host, int port)
         {
             this.channel = new Channel($"{host}:{port}", ChannelCredentials.Insecure);
-            this.apdatorImpl = new AdaptorClientImpl(this.channel, this.services);
+            this.adaptorImpl = new AdaptorClientImpl(this.channel, this.services);
+            this.adaptorImpl.Disconnected += AdaptorImpl_Disconnected;
             return Task.Delay(1);
         }
 
         public async Task CloseAsync()
         {
-            await this.apdatorImpl.DisposeAsync();
-            this.apdatorImpl = null;
+            if (this.adaptorImpl != null)
+                await this.adaptorImpl?.DisposeAsync();
+            this.adaptorImpl = null;
             await this.channel.ShutdownAsync();
             this.channel = null;
         }
@@ -67,13 +69,21 @@ namespace Ntreev.Crema.Communication.Grpc
             var implType = instanceBuilder.CreateType(typeName, typeNamespace, typeof(ContextBase), instanceType);
             var instance = TypeDescriptor.CreateInstance(null, implType, null, null) as ContextBase;
             instance.Service = service;
-            instance.Invoker = this.apdatorImpl;
+            instance.Invoker = this.adaptorImpl;
             return instance;
         }
 
         public void Dispose()
         {
 
+        }
+
+        public event EventHandler<DisconnectionReasonEventArgs> Disconnected;
+
+        private void AdaptorImpl_Disconnected(object sender, DisconnectionReasonEventArgs e)
+        {
+            this.adaptorImpl = null;
+            this.Disconnected?.Invoke(this, e);
         }
     }
 }

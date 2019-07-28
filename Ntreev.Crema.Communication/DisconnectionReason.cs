@@ -21,19 +21,13 @@
 // SOFTWARE.
 
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Communication
 {
-    public interface IAdaptorHost : IDisposable
+    public enum DisconnectionReason
     {
-        Task OpenAsync(string host, int port);
+        None,
 
-        Task CloseAsync();
-
-        object Create(IService service);
-
-        event EventHandler<DisconnectionReasonEventArgs> Disconnected;
+        Aborted,
     }
 }

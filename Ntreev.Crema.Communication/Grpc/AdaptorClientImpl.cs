@@ -73,6 +73,13 @@ namespace Ntreev.Crema.Communication.Grpc
             this.token = null;
         }
 
+        public event EventHandler<DisconnectionReasonEventArgs> Disconnected;
+
+        protected virtual void OnDisconnected(DisconnectionReasonEventArgs e)
+        {
+            this.Disconnected?.Invoke(this, e);
+        }
+
         private static void RegisterMethod(Dictionary<string, MethodInfo> methodByName, IService service)
         {
             var methods = service.CallbackType.GetMethods();
@@ -88,6 +95,7 @@ namespace Ntreev.Crema.Communication.Grpc
 
         private async Task PollAsync(CancellationToken cancellationToken)
         {
+            var exitCode = 0;
             try
             {
                 using (this.call = this.Poll())
@@ -99,7 +107,10 @@ namespace Ntreev.Crema.Communication.Grpc
                         await this.call.ResponseStream.MoveNext();
                         var reply = this.call.ResponseStream.Current;
                         if (reply.Code != 0)
+                        {
+                            exitCode = reply.Code;
                             break;
+                        }
                         foreach (var item in reply.Items)
                         {
                             var service = this.serviceByName[item.ServiceName];
@@ -115,8 +126,11 @@ namespace Ntreev.Crema.Communication.Grpc
             }
             catch (Exception e)
             {
+                exitCode = 1;
                 GrpcEnvironment.Logger.Error(e, e.Message);
             }
+            if (exitCode != 0)
+                this.OnDisconnected(new DisconnectionReasonEventArgs(exitCode));
         }
 
         private void InvokeCallback(IService service, string name, object[] args)

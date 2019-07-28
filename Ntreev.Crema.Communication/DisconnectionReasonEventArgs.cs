@@ -21,19 +21,21 @@
 // SOFTWARE.
 
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Communication
 {
-    public interface IAdaptorHost : IDisposable
+    public class DisconnectionReasonEventArgs : EventArgs
     {
-        Task OpenAsync(string host, int port);
+        public DisconnectionReasonEventArgs(int exitCode)
+        {
+            if (exitCode == -1)
+                this.Reason = DisconnectionReason.None;
+            else if (exitCode == 1)
+                this.Reason = DisconnectionReason.Aborted;
+            else
+                throw new ArgumentException($"invalid exit code: {exitCode}", nameof(exitCode));
+        }
 
-        Task CloseAsync();
-
-        object Create(IService service);
-
-        event EventHandler<DisconnectionReasonEventArgs> Disconnected;
+        public DisconnectionReason Reason { get; }
     }
 }

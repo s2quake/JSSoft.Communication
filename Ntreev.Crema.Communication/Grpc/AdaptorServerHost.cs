@@ -79,5 +79,7 @@ namespace Ntreev.Crema.Communication.Grpc
         {
 
         }
+
+        public event EventHandler<DisconnectionReasonEventArgs> Disconnected;
     }
 }

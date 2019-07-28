@@ -55,6 +55,7 @@ namespace Ntreev.Crema.Communication
             await this.dispatcher.InvokeAsync(() =>
             {
                 this.adaptorHost = this.adpatorHostProvider.Create(this, ServiceToken.Empty);
+                this.adaptorHost.Disconnected += AdaptorHost_Disconnected;
                 this.instanceByService = new Dictionary<IService, object>(this.Services.Count);
             });
             await this.adaptorHost.OpenAsync(this.Host, this.Port);
@@ -92,6 +93,7 @@ namespace Ntreev.Crema.Communication
                 {
                     disposable.Dispose();
                 }
+                this.adaptorHost.Disconnected -= AdaptorHost_Disconnected;
             }
             await this.adaptorHost.CloseAsync();
             await this.dispatcher.InvokeAsync(() =>
@@ -144,6 +146,11 @@ namespace Ntreev.Crema.Communication
         protected virtual void OnClosed(EventArgs e)
         {
             this.Closed?.Invoke(this, e);
+        }
+
+        private async void AdaptorHost_Disconnected(object sender, DisconnectionReasonEventArgs e)
+        {
+            await this.CloseAsync();
         }
 
         #region IServiecHost
