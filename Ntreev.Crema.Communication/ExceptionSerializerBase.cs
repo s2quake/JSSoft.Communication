@@ -21,17 +21,37 @@
 // SOFTWARE.
 
 using System;
-using System.Threading.Tasks;
-using Ntreev.Crema.Communication;
 
-namespace Ntreev.Crema.Services
+namespace Ntreev.Crema.Communication
 {
-    public interface IDataService
+    public abstract class ExceptionSerializerBase<T> : IExceptionSerializer where T : Exception
     {
-        [ServiceContract]
-        Task<DateTime> CreateTypeAsync(string typeName);
+        public Type ExceptionType => typeof(T);
 
-        [ServiceContract]
-        Task<DateTime> CreateTableAsync(string tableName);
+        /// <example>
+        /// return new Exception(args[0].Item2 as string);
+        /// </example>
+        protected abstract T Deserialize((Type, object)[] args);
+
+        /// <example>
+        /// return new (Type, object)[] { (typeof(string), e.Message) };
+        /// </example>
+        protected abstract (Type, object)[] Serialize(T e);
+
+        #region IExceptionSerializer
+
+        Exception IExceptionSerializer.Deserialize(string text)
+        {
+            var args = SerializerUtility.GetArguments(text);
+            return this.Deserialize(args);
+        }
+
+        string IExceptionSerializer.Serialize(Exception e)
+        {
+            var args = this.Serialize((T)e);
+            return SerializerUtility.GetStrings(args);
+        }
+
+        #endregion
     }
 }

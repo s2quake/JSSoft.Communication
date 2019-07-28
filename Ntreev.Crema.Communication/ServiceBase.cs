@@ -43,17 +43,13 @@ namespace Ntreev.Crema.Communication
             this.dispatcher = new Dispatcher(this);
         }
 
-        public void Dispose()
-        {
-            this.dispatcher.Dispose();
-            this.dispatcher = null;
-        }
-
         protected object Instance => this.instance;
 
         public Type ServiceType => this.serviceType;
 
         public Type CallbackType => this.callbackType;
+
+        public Dispatcher Dispatcher => this.dispatcher;
 
         public async Task OpenAsync(ServiceToken token, object instance)
         {
@@ -88,5 +84,20 @@ namespace Ntreev.Crema.Communication
         {
             this.Closed?.Invoke(this, e);
         }
+
+        internal void Dispose()
+        {
+            this.dispatcher.Dispose();
+            this.dispatcher = null;
+        }
+
+        #region IDisposable
+
+        void IDisposable.Dispose()
+        {
+
+        }
+
+        #endregion
     }
 }

@@ -32,25 +32,25 @@ namespace Ntreev.Crema.Communication.Grpc {
             "dGltZRgCIAEoAyIoCglQaW5nUmVwbHkSDAoEdGltZRgBIAEoAxINCgV0b2tl",
             "bhgCIAEoCSJnCg1JbnZva2VSZXF1ZXN0Eg0KBXRva2VuGAEgASgJEhMKC3Nl",
             "cnZpY2VOYW1lGAIgASgJEgwKBG5hbWUYAyABKAkSEQoJdHlwZU5hbWVzGAQg",
-            "AygJEhEKCWRhdGFUZXh0cxgFIAMoCSI+CgtJbnZva2VSZXBseRITCgtzZXJ2",
-            "aWNlTmFtZRgBIAEoCRIMCgR0eXBlGAIgASgJEgwKBGRhdGEYAyABKAkiHAoL",
-            "UG9sbFJlcXVlc3QSDQoFdG9rZW4YASABKAkiZAoNUG9sbFJlcGx5SXRlbRIK",
-            "CgJpZBgBIAEoBRITCgtzZXJ2aWNlTmFtZRgCIAEoCRIMCgRuYW1lGAMgASgJ",
-            "EhEKCXR5cGVOYW1lcxgEIAMoCRIRCglkYXRhVGV4dHMYBSADKAkiWAoJUG9s",
-            "bFJlcGx5EgwKBGNvZGUYASABKAUSPQoFaXRlbXMYAiADKAsyLi5udHJlZXYu",
-            "Y3JlbWEuY29tbXVuaWNhdGlvbi5ncnBjLlBvbGxSZXBseUl0ZW0ygAQKB0Fk",
-            "YXB0b3ISYAoET3BlbhIsLm50cmVldi5jcmVtYS5jb21tdW5pY2F0aW9uLmdy",
-            "cGMuT3BlblJlcXVlc3QaKi5udHJlZXYuY3JlbWEuY29tbXVuaWNhdGlvbi5n",
-            "cnBjLk9wZW5SZXBseRJjCgVDbG9zZRItLm50cmVldi5jcmVtYS5jb21tdW5p",
-            "Y2F0aW9uLmdycGMuQ2xvc2VSZXF1ZXN0GisubnRyZWV2LmNyZW1hLmNvbW11",
-            "bmljYXRpb24uZ3JwYy5DbG9zZVJlcGx5EmAKBFBpbmcSLC5udHJlZXYuY3Jl",
-            "bWEuY29tbXVuaWNhdGlvbi5ncnBjLlBpbmdSZXF1ZXN0GioubnRyZWV2LmNy",
-            "ZW1hLmNvbW11bmljYXRpb24uZ3JwYy5QaW5nUmVwbHkSZgoGSW52b2tlEi4u",
-            "bnRyZWV2LmNyZW1hLmNvbW11bmljYXRpb24uZ3JwYy5JbnZva2VSZXF1ZXN0",
-            "GiwubnRyZWV2LmNyZW1hLmNvbW11bmljYXRpb24uZ3JwYy5JbnZva2VSZXBs",
-            "eRJkCgRQb2xsEiwubnRyZWV2LmNyZW1hLmNvbW11bmljYXRpb24uZ3JwYy5Q",
-            "b2xsUmVxdWVzdBoqLm50cmVldi5jcmVtYS5jb21tdW5pY2F0aW9uLmdycGMu",
-            "UG9sbFJlcGx5KAEwAWIGcHJvdG8z"));
+            "AygJEhEKCWRhdGFUZXh0cxgFIAMoCSI3CgtJbnZva2VSZXBseRIMCgRjb2Rl",
+            "GAEgASgFEgwKBHR5cGUYAiABKAkSDAoEZGF0YRgDIAEoCSIcCgtQb2xsUmVx",
+            "dWVzdBINCgV0b2tlbhgBIAEoCSJkCg1Qb2xsUmVwbHlJdGVtEgoKAmlkGAEg",
+            "ASgFEhMKC3NlcnZpY2VOYW1lGAIgASgJEgwKBG5hbWUYAyABKAkSEQoJdHlw",
+            "ZU5hbWVzGAQgAygJEhEKCWRhdGFUZXh0cxgFIAMoCSJYCglQb2xsUmVwbHkS",
+            "DAoEY29kZRgBIAEoBRI9CgVpdGVtcxgCIAMoCzIuLm50cmVldi5jcmVtYS5j",
+            "b21tdW5pY2F0aW9uLmdycGMuUG9sbFJlcGx5SXRlbTKABAoHQWRhcHRvchJg",
+            "CgRPcGVuEiwubnRyZWV2LmNyZW1hLmNvbW11bmljYXRpb24uZ3JwYy5PcGVu",
+            "UmVxdWVzdBoqLm50cmVldi5jcmVtYS5jb21tdW5pY2F0aW9uLmdycGMuT3Bl",
+            "blJlcGx5EmMKBUNsb3NlEi0ubnRyZWV2LmNyZW1hLmNvbW11bmljYXRpb24u",
+            "Z3JwYy5DbG9zZVJlcXVlc3QaKy5udHJlZXYuY3JlbWEuY29tbXVuaWNhdGlv",
+            "bi5ncnBjLkNsb3NlUmVwbHkSYAoEUGluZxIsLm50cmVldi5jcmVtYS5jb21t",
+            "dW5pY2F0aW9uLmdycGMuUGluZ1JlcXVlc3QaKi5udHJlZXYuY3JlbWEuY29t",
+            "bXVuaWNhdGlvbi5ncnBjLlBpbmdSZXBseRJmCgZJbnZva2USLi5udHJlZXYu",
+            "Y3JlbWEuY29tbXVuaWNhdGlvbi5ncnBjLkludm9rZVJlcXVlc3QaLC5udHJl",
+            "ZXYuY3JlbWEuY29tbXVuaWNhdGlvbi5ncnBjLkludm9rZVJlcGx5EmQKBFBv",
+            "bGwSLC5udHJlZXYuY3JlbWEuY29tbXVuaWNhdGlvbi5ncnBjLlBvbGxSZXF1",
+            "ZXN0GioubnRyZWV2LmNyZW1hLmNvbW11bmljYXRpb24uZ3JwYy5Qb2xsUmVw",
+            "bHkoATABYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
@@ -61,7 +61,7 @@ namespace Ntreev.Crema.Communication.Grpc {
             new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.PingRequest), global::Ntreev.Crema.Communication.Grpc.PingRequest.Parser, new[]{ "Token", "Time" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.PingReply), global::Ntreev.Crema.Communication.Grpc.PingReply.Parser, new[]{ "Time", "Token" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.InvokeRequest), global::Ntreev.Crema.Communication.Grpc.InvokeRequest.Parser, new[]{ "Token", "ServiceName", "Name", "TypeNames", "DataTexts" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.InvokeReply), global::Ntreev.Crema.Communication.Grpc.InvokeReply.Parser, new[]{ "ServiceName", "Type", "Data" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.InvokeReply), global::Ntreev.Crema.Communication.Grpc.InvokeReply.Parser, new[]{ "Code", "Type", "Data" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.PollRequest), global::Ntreev.Crema.Communication.Grpc.PollRequest.Parser, new[]{ "Token" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.PollReplyItem), global::Ntreev.Crema.Communication.Grpc.PollReplyItem.Parser, new[]{ "Id", "ServiceName", "Name", "TypeNames", "DataTexts" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.PollReply), global::Ntreev.Crema.Communication.Grpc.PollReply.Parser, new[]{ "Code", "Items" }, null, null, null)
@@ -1171,7 +1171,7 @@ namespace Ntreev.Crema.Communication.Grpc {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public InvokeReply(InvokeReply other) : this() {
-      serviceName_ = other.serviceName_;
+      code_ = other.code_;
       type_ = other.type_;
       data_ = other.data_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
@@ -1182,14 +1182,14 @@ namespace Ntreev.Crema.Communication.Grpc {
       return new InvokeReply(this);
     }
 
-    /// <summary>Field number for the "serviceName" field.</summary>
-    public const int ServiceNameFieldNumber = 1;
-    private string serviceName_ = "";
+    /// <summary>Field number for the "code" field.</summary>
+    public const int CodeFieldNumber = 1;
+    private int code_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public string ServiceName {
-      get { return serviceName_; }
+    public int Code {
+      get { return code_; }
       set {
-        serviceName_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+        code_ = value;
       }
     }
 
@@ -1228,7 +1228,7 @@ namespace Ntreev.Crema.Communication.Grpc {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (ServiceName != other.ServiceName) return false;
+      if (Code != other.Code) return false;
       if (Type != other.Type) return false;
       if (Data != other.Data) return false;
       return Equals(_unknownFields, other._unknownFields);
@@ -1237,7 +1237,7 @@ namespace Ntreev.Crema.Communication.Grpc {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override int GetHashCode() {
       int hash = 1;
-      if (ServiceName.Length != 0) hash ^= ServiceName.GetHashCode();
+      if (Code != 0) hash ^= Code.GetHashCode();
       if (Type.Length != 0) hash ^= Type.GetHashCode();
       if (Data.Length != 0) hash ^= Data.GetHashCode();
       if (_unknownFields != null) {
@@ -1253,9 +1253,9 @@ namespace Ntreev.Crema.Communication.Grpc {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
-      if (ServiceName.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(ServiceName);
+      if (Code != 0) {
+        output.WriteRawTag(8);
+        output.WriteInt32(Code);
       }
       if (Type.Length != 0) {
         output.WriteRawTag(18);
@@ -1273,8 +1273,8 @@ namespace Ntreev.Crema.Communication.Grpc {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
       int size = 0;
-      if (ServiceName.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(ServiceName);
+      if (Code != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Code);
       }
       if (Type.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Type);
@@ -1293,8 +1293,8 @@ namespace Ntreev.Crema.Communication.Grpc {
       if (other == null) {
         return;
       }
-      if (other.ServiceName.Length != 0) {
-        ServiceName = other.ServiceName;
+      if (other.Code != 0) {
+        Code = other.Code;
       }
       if (other.Type.Length != 0) {
         Type = other.Type;
@@ -1313,8 +1313,8 @@ namespace Ntreev.Crema.Communication.Grpc {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
-          case 10: {
-            ServiceName = input.ReadString();
+          case 8: {
+            Code = input.ReadInt32();
             break;
           }
           case 18: {

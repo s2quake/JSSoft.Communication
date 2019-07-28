@@ -36,6 +36,7 @@ namespace Ntreev.Crema.Communication.Grpc
     {
         private static readonly JsonSerializerSettings settings = new JsonSerializerSettings();
         private readonly Dictionary<string, IService> serviceByName = new Dictionary<string, IService>();
+        private readonly Dictionary<Type, IExceptionSerializer> exceptionSerializerByType = new Dictionary<Type, IExceptionSerializer>();
         private readonly Dictionary<string, MethodInfo> methodByName = new Dictionary<string, MethodInfo>();
         private readonly Dictionary<IService, int> idByService = new Dictionary<IService, int>();
         private readonly Channel channel;
@@ -44,10 +45,11 @@ namespace Ntreev.Crema.Communication.Grpc
         private Task task;
         private string token;
 
-        public AdaptorClientImpl(Channel channel, IEnumerable<IService> services)
+        public AdaptorClientImpl(Channel channel, IEnumerable<IService> services, IEnumerable<IExceptionSerializer> exceptionSerializers)
             : base(channel)
         {
             this.serviceByName = services.ToDictionary(item => item.Name);
+            this.exceptionSerializerByType = exceptionSerializers.ToDictionary(item => item.ExceptionType);
             this.idByService = services.ToDictionary(item => item, item => 0);
             var request = new OpenRequest() { Time = DateTime.UtcNow.Ticks };
             request.ServiceNames.AddRange(this.serviceByName.Keys);
@@ -148,7 +150,7 @@ namespace Ntreev.Crema.Communication.Grpc
             {
                 if (item.Id >= 0)
                 {
-                    var args = AdaptorUtility.GetArguments(item.TypeNames, item.DataTexts);
+                    var args = SerializerUtility.GetArguments(item.TypeNames, item.DataTexts);
                     this.InvokeCallback(service, item.Name, args);
                     id = item.Id + 1;
                 }
@@ -156,24 +158,28 @@ namespace Ntreev.Crema.Communication.Grpc
             return id;
         }
 
+        private void ThrowException(string type, string data)
+        {
+            var exceptionType = Type.GetType(type);
+            var serializer = this.GetExceptionSerializer(exceptionType);
+            var exception = serializer.Deserialize(data);
+            throw exception;
+        }
+
+        private IExceptionSerializer GetExceptionSerializer(Type exceptionType)
+        {
+            if (this.exceptionSerializerByType.ContainsKey(exceptionType) == true)
+            {
+                return this.exceptionSerializerByType[exceptionType];
+            }
+            return this.exceptionSerializerByType[typeof(Exception)];
+        }
+
         #region IContextInvoker
 
         void IContextInvoker.Invoke(IService service, string name, object[] args)
         {
-            var (types, datas) = AdaptorUtility.GetStrings(args);
-            var request = new InvokeRequest()
-            {
-                ServiceName = service.Name,
-                Name = name,
-            };
-            request.TypeNames.AddRange(types);
-            request.DataTexts.AddRange(datas);
-            this.Invoke(request);
-        }
-
-        T IContextInvoker.Invoke<T>(IService service, string name, object[] args)
-        {
-            var (types, datas) = AdaptorUtility.GetStrings(args);
+            var (types, datas) = SerializerUtility.GetStrings(args);
             var request = new InvokeRequest()
             {
                 ServiceName = service.Name,
@@ -182,12 +188,15 @@ namespace Ntreev.Crema.Communication.Grpc
             request.TypeNames.AddRange(types);
             request.DataTexts.AddRange(datas);
             var reply = this.Invoke(request);
-            return AdaptorUtility.GetValue<T>(reply.Type, reply.Data);
+            if (reply.Code != 0)
+            {
+                this.ThrowException(reply.Type, reply.Data);
+            }
         }
 
-        async Task IContextInvoker.InvokeAsync(IService service, string name, object[] args)
+        T IContextInvoker.Invoke<T>(IService service, string name, object[] args)
         {
-            var (types, datas) = AdaptorUtility.GetStrings(args);
+            var (types, datas) = SerializerUtility.GetStrings(args);
             var request = new InvokeRequest()
             {
                 ServiceName = service.Name,
@@ -195,12 +204,17 @@ namespace Ntreev.Crema.Communication.Grpc
             };
             request.TypeNames.AddRange(types);
             request.DataTexts.AddRange(datas);
-            await this.InvokeAsync(request);
+            var reply = this.Invoke(request);
+            if (reply.Code != 0)
+            {
+                this.ThrowException(reply.Type, reply.Data);
+            }
+            return SerializerUtility.GetValue<T>(reply.Type, reply.Data);
         }
 
-        async Task<T> IContextInvoker.InvokeAsync<T>(IService service, string name, object[] args)
+        async Task IContextInvoker.InvokeAsync(IService service, string name, object[] args)
         {
-            var (types, datas) = AdaptorUtility.GetStrings(args);
+            var (types, datas) = SerializerUtility.GetStrings(args);
             var request = new InvokeRequest()
             {
                 ServiceName = service.Name,
@@ -209,7 +223,28 @@ namespace Ntreev.Crema.Communication.Grpc
             request.TypeNames.AddRange(types);
             request.DataTexts.AddRange(datas);
             var reply = await this.InvokeAsync(request);
-            return AdaptorUtility.GetValue<T>(reply.Type, reply.Data);
+            if (reply.Code != 0)
+            {
+                this.ThrowException(reply.Type, reply.Data);
+            }
+        }
+
+        async Task<T> IContextInvoker.InvokeAsync<T>(IService service, string name, object[] args)
+        {
+            var (types, datas) = SerializerUtility.GetStrings(args);
+            var request = new InvokeRequest()
+            {
+                ServiceName = service.Name,
+                Name = name,
+            };
+            request.TypeNames.AddRange(types);
+            request.DataTexts.AddRange(datas);
+            var reply = await this.InvokeAsync(request);
+            if (reply.Code != 0)
+            {
+                this.ThrowException(reply.Type, reply.Data);
+            }
+            return SerializerUtility.GetValue<T>(reply.Type, reply.Data);
         }
 
         #endregion

@@ -24,9 +24,9 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace Ntreev.Crema.Communication.Grpc
+namespace Ntreev.Crema.Communication
 {
-    static class AdaptorUtility
+    static class SerializerUtility
     {
         private static readonly JsonSerializerSettings settings = new JsonSerializerSettings();
 
@@ -60,6 +60,33 @@ namespace Ntreev.Crema.Communication.Grpc
                 datas[i] = JsonConvert.SerializeObject(value, type, settings);
             }
             return (types, datas);
+        }
+
+        public static (Type, object)[] GetArguments(string text)
+        {
+            var datas = ((string, string)[])JsonConvert.DeserializeObject(text, typeof((string, string)), settings);
+            var items = new (Type, object)[text.Length];
+            for (var i = 0; i < text.Length; i++)
+            {
+                var type = datas[i].Item1;
+                var value = datas[i].Item2;
+                items[i].Item1 = Type.GetType(type);
+                items[i].Item2 = JsonConvert.DeserializeObject(value, items[i].Item1, settings);
+            }
+            return items;
+        }
+
+        public static string GetStrings(params (Type, object)[] args)
+        {
+            var items = new (string, string)[args.Length];
+            for (var i = 0; i < args.Length; i++)
+            {
+                var type = (Type)args[i].Item1;
+                var value = args[i].Item2;
+                items[i].Item1 = type.AssemblyQualifiedName;
+                items[i].Item2 = JsonConvert.SerializeObject(value, type, settings);
+            }
+            return JsonConvert.SerializeObject(items, typeof((string, string)), settings);
         }
 
         public static T GetValue<T>(string type, string data)

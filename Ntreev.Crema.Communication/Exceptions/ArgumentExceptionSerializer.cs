@@ -21,38 +21,27 @@
 // SOFTWARE.
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using Grpc.Core;
-using Grpc.Core.Logging;
 
-namespace Ntreev.Crema.Communication.Grpc
+namespace Ntreev.Crema.Communication
 {
-    [Export(typeof(IAdaptorHostProvider))]
-    class AdaptorHostProvider : IAdaptorHostProvider
+    [Export(typeof(IExceptionSerializer))]
+    class ArgumetnExceptionSerializer : ExceptionSerializerBase<ArgumentException>
     {
-        private readonly IEnumerable<IService> services;
-        private readonly IEnumerable<IExceptionSerializer> exceptionSerializers;
-
-        [ImportingConstructor]
-        public AdaptorHostProvider([ImportMany]IEnumerable<IService> services,
-                                   [ImportMany]IEnumerable<IExceptionSerializer> exceptionSerializers)
+        protected override ArgumentException Deserialize((Type, object)[] args)
         {
-            Environment.SetEnvironmentVariable("GRPC_VERBOSITY", "DEBUG");
-            this.services = services.ToArray();
-            this.exceptionSerializers = exceptionSerializers.ToArray();
+            var message = args[0].Item2 as string;
+            var paramName = args[1].Item2 as string;
+            return new ArgumentException(message, paramName);
         }
 
-        public IAdaptorHost Create(IServiceHost serviceHost, ServiceToken token)
+        protected override (Type, object)[] Serialize(ArgumentException e)
         {
-            if (serviceHost is ServerHostBase)
-                return new AdaptorServerHost(this.services, this.exceptionSerializers);
-            else if (serviceHost is ClientHostBase)
-                return new AdaptorClientHost(this.services, this.exceptionSerializers);
-            throw new NotImplementedException();
+            return new (Type, object)[]
+            {
+                 (typeof(string), e.Message),
+                 (typeof(string), e.ParamName)
+            };
         }
-
-        public string Name => "grpc";
     }
 }

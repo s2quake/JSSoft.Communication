@@ -45,7 +45,7 @@ message InvokeRequest {
 }
 
 message InvokeReply {
-    string serviceName = 1;
+    int32 code = 1;
     string type = 2;
     string data = 3;
 }

@@ -34,18 +34,20 @@ namespace Ntreev.Crema.Communication.Grpc
     class AdaptorServerHost : IAdaptorHost
     {
         private IService[] services;
+        private IExceptionSerializer[] exceptionSerializers;
         private Server server;
         private AdaptorServerImpl adaptor;
         private ServiceInstanceBuilder instanceBuilder = new ServiceInstanceBuilder();
 
-        public AdaptorServerHost(IEnumerable<IService> services)
+        public AdaptorServerHost(IEnumerable<IService> services, IEnumerable<IExceptionSerializer> exceptionSerializers)
         {
             this.services = services.ToArray();
+            this.exceptionSerializers = exceptionSerializers.ToArray();
         }
 
         public Task OpenAsync(string host, int port)
         {
-            this.adaptor = new AdaptorServerImpl(this.services);
+            this.adaptor = new AdaptorServerImpl(this.services, this.exceptionSerializers);
             this.server = new Server()
             {
                 Services = { Adaptor.BindService(this.adaptor) },

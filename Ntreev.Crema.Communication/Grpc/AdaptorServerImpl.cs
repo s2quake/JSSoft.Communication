@@ -39,6 +39,7 @@ namespace Ntreev.Crema.Communication.Grpc
         private const string servicesKey = "services";
         private static readonly JsonSerializerSettings settings = new JsonSerializerSettings();
         private readonly Dictionary<string, IService> serviceByName = new Dictionary<string, IService>();
+        private readonly Dictionary<Type, IExceptionSerializer> exceptionSerializerByType = new Dictionary<Type, IExceptionSerializer>();
         private readonly Dictionary<string, MethodInfo> methodByName = new Dictionary<string, MethodInfo>();
         private readonly Dictionary<string, CallbackCollection> callbacksByName = new Dictionary<string, CallbackCollection>();
         private readonly HashSet<string> peers = new HashSet<string>();
@@ -47,9 +48,10 @@ namespace Ntreev.Crema.Communication.Grpc
         private ILogger logger;
         private CancellationTokenSource cancellation;
 
-        public AdaptorServerImpl(IEnumerable<IService> services)
+        public AdaptorServerImpl(IEnumerable<IService> services, IEnumerable<IExceptionSerializer> exceptionSerializers)
         {
             this.serviceByName = services.ToDictionary(item => item.Name);
+            this.exceptionSerializerByType = exceptionSerializers.ToDictionary(item => item.ExceptionType);
             this.callbacksByName = services.ToDictionary(item => item.Name, item => new CallbackCollection(item));
             this.dispatcher = new Dispatcher(this);
             this.logger = GrpcEnvironment.Logger;
@@ -97,18 +99,9 @@ namespace Ntreev.Crema.Communication.Grpc
             });
         }
 
-        public override async Task<InvokeReply> Invoke(InvokeRequest request, ServerCallContext context)
+        private async Task<(Type, object)> InvokeAsync(MethodInfo method, object instance, object[] args)
         {
-            if (this.serviceByName.ContainsKey(request.ServiceName) == false)
-                throw new InvalidOperationException();
-            var service = this.serviceByName[request.ServiceName];
-            var methodName = $"{request.ServiceName}.{request.Name}";
-            if (this.methodByName.ContainsKey(methodName) == false)
-                throw new InvalidOperationException();
-
-            var args = AdaptorUtility.GetArguments(request.TypeNames, request.DataTexts);
-            var method = methodByName[methodName];
-            var value = await Task.Run(() => method.Invoke(service, args));
+            var value = await Task.Run(() => method.Invoke(instance, args));
             var valueType = method.ReturnType;
             if (value is Task task)
             {
@@ -126,16 +119,45 @@ namespace Ntreev.Crema.Communication.Grpc
                     valueType = typeof(void);
                 }
             }
-            var reply = new InvokeReply()
+            return (valueType, value);
+        }
+
+        public override async Task<InvokeReply> Invoke(InvokeRequest request, ServerCallContext context)
+        {
+            if (this.serviceByName.ContainsKey(request.ServiceName) == false)
+                throw new InvalidOperationException();
+            var service = this.serviceByName[request.ServiceName];
+            var methodName = $"{request.ServiceName}.{request.Name}";
+            if (this.methodByName.ContainsKey(methodName) == false)
+                throw new InvalidOperationException();
+
+            var args = SerializerUtility.GetArguments(request.TypeNames, request.DataTexts);
+            var method = methodByName[methodName];
+            try
             {
-                ServiceName = request.ServiceName,
-                Type = valueType.AssemblyQualifiedName,
-            };
-            if (valueType != typeof(void))
-            {
-                reply.Data = JsonConvert.SerializeObject(value, valueType, settings);
+                var (valueType, value) = await this.InvokeAsync(method, service, args);
+                var reply = new InvokeReply()
+                {
+                    Type = valueType.AssemblyQualifiedName,
+                };
+                if (valueType != typeof(void))
+                {
+                    reply.Data = JsonConvert.SerializeObject(value, valueType, settings);
+                }
+                return reply;
             }
-            return reply;
+            catch (Exception e)
+            {
+                var serializer = this.GetExceptionSerializer(e);
+                var data = serializer.Serialize(e);
+                var reply = new InvokeReply()
+                {
+                    Code = 1,
+                    Type = serializer.ExceptionType.AssemblyQualifiedName,
+                    Data = data
+                };
+                return reply;
+            }
         }
 
         public override async Task Poll(IAsyncStreamReader<PollRequest> requestStream, IServerStreamWriter<PollReply> responseStream, ServerCallContext context)
@@ -201,7 +223,7 @@ namespace Ntreev.Crema.Communication.Grpc
 
         private Task AddCallback(string serviceName, string name, object[] args)
         {
-            var (types, datas) = AdaptorUtility.GetStrings(args);
+            var (types, datas) = SerializerUtility.GetStrings(args);
             return this.dispatcher.InvokeAsync(() =>
             {
                 var callbacks = this.callbacksByName[serviceName];
@@ -215,6 +237,15 @@ namespace Ntreev.Crema.Communication.Grpc
                 pollItem.DataTexts.AddRange(datas);
                 callbacks.Add(pollItem);
             });
+        }
+
+        private IExceptionSerializer GetExceptionSerializer(Exception e)
+        {
+            if (this.exceptionSerializerByType.ContainsKey(e.GetType()) == true)
+            {
+                return this.exceptionSerializerByType[e.GetType()];
+            }
+            return this.exceptionSerializerByType[typeof(Exception)];
         }
 
         private static void RegisterMethod(Dictionary<string, MethodInfo> methodByName, IService service)

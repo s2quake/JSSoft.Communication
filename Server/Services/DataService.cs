@@ -35,20 +35,29 @@ namespace Server.Services
     [Export(typeof(IService))]
     class DataService : ServerServiceBase<IDataService, IDataServiceCallback>, IDataService
     {
-        [ServiceContract]
-        public async Task<int> LoginAsync(string Data)
+        private readonly Dictionary<string, string> typeByName = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> tableByName = new Dictionary<string, string>();
+
+        public Task<DateTime> CreateTypeAsync(string typeName)
         {
-            await Task.Delay(100);
-            Console.WriteLine("LoginAsync");
-            return 0;
-            //Task.Run(()=> this.Callback.OnAdd("WER", 0));
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                if (this.typeByName.ContainsKey(typeName) == true)
+                    throw new ArgumentNullException(nameof(typeByName));
+                this.typeByName.Add(typeName, string.Empty);
+                return DateTime.UtcNow;
+            });
         }
 
-        [ServiceContract]
-        public async Task<(int, string)> LogoutAsync(string Data, int count)
+        public Task<DateTime> CreateTableAsync(string tableName)
         {
-            await Task.Delay(100);
-            return (1, "ser");
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                if (this.tableByName.ContainsKey(tableName) == true)
+                    throw new ArgumentNullException(nameof(tableName));
+                this.tableByName.Add(tableName, string.Empty);
+                return DateTime.UtcNow;
+            });
         }
     }
 }

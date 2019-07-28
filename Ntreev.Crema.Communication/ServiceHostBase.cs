@@ -141,6 +141,8 @@ namespace Ntreev.Crema.Communication
 
         public bool IsOpened => this.isOpened;
 
+        public Dispatcher Dispatcher => this.dispatcher;
+
         public event EventHandler Opened;
 
         public event EventHandler Closed;
