@@ -30,6 +30,7 @@ using Ntreev.Library.Commands;
 namespace Client
 {
     [Export(typeof(IShell))]
+    [Export(typeof(Shell))]
     class Shell : CommandContextTerminal, IShell, IServiceProvider
     {
         private readonly IServiceHost serviceHost;
