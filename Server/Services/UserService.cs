@@ -34,8 +34,9 @@ namespace Server.Services
         [ServiceContract]
         public async Task<int> LoginAsync(string user)
         {
+            if (user == "null")
+                throw new ArgumentNullException(nameof(user));
             await Task.Delay(1);
-            throw new ArgumentException("123");
             Console.WriteLine($"login: {user}");
             this.Callback.OnLoggedIn(user);
             return 0;

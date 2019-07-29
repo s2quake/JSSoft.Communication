@@ -110,7 +110,7 @@ namespace Ntreev.Crema.Communication
             this.token = ServiceToken.Empty;
         }
 
-        public void Dispose()
+        internal void Dispose()
         {
             this.dispatcher.Dispose();
         }
@@ -165,6 +165,15 @@ namespace Ntreev.Crema.Communication
         #region IServiecHost
 
         IReadOnlyList<IService> IServiceHost.Services => this.Services;
+
+        #endregion
+
+        #region IDisposable
+
+        void IDisposable.Dispose()
+        {
+            this.Dispose();
+        }
 
         #endregion
     }

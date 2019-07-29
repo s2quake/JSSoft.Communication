@@ -19,7 +19,6 @@
             "type": "coreclr",
             "request": "launch",
             "program": "${workspaceFolder}/Server/bin/Debug/netcoreapp3.0/Server.dll",
-            "preLaunchTask": "build server",
             "args": [],
             "cwd": "${workspaceFolder}/Server",
             "console": "integratedTerminal",

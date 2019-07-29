@@ -26,22 +26,25 @@ using System.ComponentModel.Composition;
 namespace Ntreev.Crema.Communication
 {
     [Export(typeof(IExceptionSerializer))]
-    class ArgumentExceptionSerializer : ExceptionSerializerBase<ArgumentException>
+    class ExceptionSerializer : ExceptionSerializerBase<Exception>
     {
-        protected override ArgumentException Deserialize((Type, object)[] args)
+        public ExceptionSerializer()
+            : base(-1)
         {
-            var message = args[0].Item2 as string;
-            var paramName = args[1].Item2 as string;
-            return new ArgumentException(message, paramName);
+
         }
 
-        protected override (Type, object)[] Serialize(ArgumentException e)
+        public override Type[] ArgumentTypes => new Type[] { typeof(string) };
+
+        protected override Exception Deserialize(object[] args)
         {
-            return new (Type, object)[]
-            {
-                (typeof(string), e.Message),
-                (typeof(string), e.ParamName)
-            };
+            var message = args[0] as string;
+            return new Exception(message);
+        }
+
+        protected override object[] Serialize(Exception e)
+        {
+            return new object[] { e.Message };
         }
     }
 }

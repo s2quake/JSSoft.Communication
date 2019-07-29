@@ -28,8 +28,10 @@ namespace Ntreev.Crema.Communication
     {
         Type ExceptionType { get; }
 
-        string Serialize(Exception e);
+        int ExceptionCode { get; }
 
-        Exception Deserialize(string text);
+        string Serialize(object value);
+
+        object Deserialize(string text);
     }
 }

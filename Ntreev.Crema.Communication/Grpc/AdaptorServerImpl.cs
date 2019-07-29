@@ -40,7 +40,7 @@ namespace Ntreev.Crema.Communication.Grpc
         private static readonly JsonSerializerSettings settings = new JsonSerializerSettings();
         private readonly Dictionary<string, IService> serviceByName = new Dictionary<string, IService>();
         private readonly Dictionary<Type, IExceptionSerializer> exceptionSerializerByType = new Dictionary<Type, IExceptionSerializer>();
-        private readonly Dictionary<string, MethodInfo> methodByName = new Dictionary<string, MethodInfo>();
+        private readonly Dictionary<string, MethodDescriptor> methodDescriptorByName = new Dictionary<string, MethodDescriptor>();
         private readonly Dictionary<string, CallbackCollection> callbacksByName = new Dictionary<string, CallbackCollection>();
         private readonly HashSet<string> peers = new HashSet<string>();
         private readonly PeerProperties properties = new PeerProperties();
@@ -58,7 +58,7 @@ namespace Ntreev.Crema.Communication.Grpc
             this.cancellation = new CancellationTokenSource();
             foreach (var item in services)
             {
-                RegisterMethod(this.methodByName, item);
+                RegisterMethod(this.methodDescriptorByName, item);
             }
         }
 
@@ -99,28 +99,29 @@ namespace Ntreev.Crema.Communication.Grpc
             });
         }
 
-        private async Task<(Type, object)> InvokeAsync(MethodInfo method, object instance, object[] args)
-        {
-            var value = await Task.Run(() => method.Invoke(instance, args));
-            var valueType = method.ReturnType;
-            if (value is Task task)
-            {
-                await task;
-                var taskType = task.GetType();
-                if (taskType.GetGenericArguments().Any() == true)
-                {
-                    var propertyInfo = taskType.GetProperty(nameof(Task<object>.Result));
-                    value = propertyInfo.GetValue(task);
-                    valueType = propertyInfo.PropertyType;
-                }
-                else
-                {
-                    value = null;
-                    valueType = typeof(void);
-                }
-            }
-            return (valueType, value);
-        }
+        // private async Task<(Type, object)> InvokeAsync(MethodInfo method, object instance, IEnumerable<string> datas)
+        // {
+        //     var args = SerializerUtility.GetArguments(this.ParameterTypes, datas);
+        //     var value = await Task.Run(() => method.Invoke(instance, args));
+        //     var valueType = method.ReturnType;
+        //     if (value is Task task)
+        //     {
+        //         await task;
+        //         var taskType = task.GetType();
+        //         if (taskType.GetGenericArguments().Any() == true)
+        //         {
+        //             var propertyInfo = taskType.GetProperty(nameof(Task<object>.Result));
+        //             value = propertyInfo.GetValue(task);
+        //             valueType = propertyInfo.PropertyType;
+        //         }
+        //         else
+        //         {
+        //             value = null;
+        //             valueType = typeof(void);
+        //         }
+        //     }
+        //     return (valueType, value);
+        // }
 
         public override async Task<InvokeReply> Invoke(InvokeRequest request, ServerCallContext context)
         {
@@ -128,18 +129,14 @@ namespace Ntreev.Crema.Communication.Grpc
                 throw new InvalidOperationException();
             var service = this.serviceByName[request.ServiceName];
             var methodName = $"{request.ServiceName}.{request.Name}";
-            if (this.methodByName.ContainsKey(methodName) == false)
+            if (this.methodDescriptorByName.ContainsKey(methodName) == false)
                 throw new InvalidOperationException();
 
-            var args = SerializerUtility.GetArguments(request.TypeNames, request.DataTexts);
-            var method = methodByName[methodName];
+            var methodDescriptor = methodDescriptorByName[methodName];
             try
             {
-                var (valueType, value) = await this.InvokeAsync(method, service, args);
-                var reply = new InvokeReply()
-                {
-                    Type = valueType.AssemblyQualifiedName,
-                };
+                var (valueType, value) = await methodDescriptor.InvokeAsync(service, request.Datas);
+                var reply = new InvokeReply();
                 if (valueType != typeof(void))
                 {
                     reply.Data = JsonConvert.SerializeObject(value, valueType, settings);
@@ -152,8 +149,7 @@ namespace Ntreev.Crema.Communication.Grpc
                 var data = serializer.Serialize(e);
                 var reply = new InvokeReply()
                 {
-                    Code = 1,
-                    Type = serializer.ExceptionType.AssemblyQualifiedName,
+                    Code = serializer.ExceptionCode,
                     Data = data
                 };
                 return reply;
@@ -223,7 +219,7 @@ namespace Ntreev.Crema.Communication.Grpc
 
         private Task AddCallback(string serviceName, string name, object[] args)
         {
-            var (types, datas) = SerializerUtility.GetStrings(args);
+            var datas = SerializerUtility.GetStrings(args);
             return this.dispatcher.InvokeAsync(() =>
             {
                 var callbacks = this.callbacksByName[serviceName];
@@ -233,8 +229,7 @@ namespace Ntreev.Crema.Communication.Grpc
                     Name = name,
                     ServiceName = serviceName
                 };
-                pollItem.TypeNames.AddRange(types);
-                pollItem.DataTexts.AddRange(datas);
+                pollItem.Datas.AddRange(datas);
                 callbacks.Add(pollItem);
             });
         }
@@ -248,7 +243,7 @@ namespace Ntreev.Crema.Communication.Grpc
             return this.exceptionSerializerByType[typeof(Exception)];
         }
 
-        private static void RegisterMethod(Dictionary<string, MethodInfo> methodByName, IService service)
+        private static void RegisterMethod(Dictionary<string, MethodDescriptor> methodDescriptorByName, IService service)
         {
             var methods = service.ServiceType.GetMethods();
             foreach (var item in methods)
@@ -256,7 +251,8 @@ namespace Ntreev.Crema.Communication.Grpc
                 if (item.GetCustomAttribute(typeof(ServiceContractAttribute)) is ServiceContractAttribute attr)
                 {
                     var methodName = attr.Name ?? item.Name;
-                    methodByName.Add($"{service.Name}.{methodName}", item);
+                    var methodDescriptor = new MethodDescriptor(item);
+                    methodDescriptorByName.Add($"{service.Name}.{methodName}", methodDescriptor);
                 }
             }
         }

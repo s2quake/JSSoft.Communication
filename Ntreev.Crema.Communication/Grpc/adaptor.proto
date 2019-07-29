@@ -40,13 +40,11 @@ message InvokeRequest {
     string token = 1;
     string serviceName = 2;
     string name = 3;
-    repeated string typeNames = 4;
-    repeated string dataTexts = 5;
+    repeated string datas = 4;
 }
 
 message InvokeReply {
     int32 code = 1;
-    string type = 2;
     string data = 3;
 }
 
@@ -58,8 +56,7 @@ message PollReplyItem {
     int32 id = 1;
     string serviceName = 2;
     string name = 3;
-    repeated string typeNames = 4;
-    repeated string dataTexts = 5;
+    repeated string datas = 4;
 }
 
 message PollReply {

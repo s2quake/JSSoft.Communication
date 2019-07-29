@@ -22,26 +22,37 @@
 
 using System;
 using System.ComponentModel.Composition;
+using System.Reflection;
 
 namespace Ntreev.Crema.Communication
 {
     [Export(typeof(IExceptionSerializer))]
     class ArgumentNullExceptionSerializer : ExceptionSerializerBase<ArgumentNullException>
     {
-        protected override ArgumentNullException Deserialize((Type, object)[] args)
+        public ArgumentNullExceptionSerializer()
+            : base(-3)
         {
-            var paramName = args[0].Item2 as string;
-            var message = args[1].Item2 as string;
+
+        }
+
+        public override Type[] ArgumentTypes => new Type[]
+        {
+            typeof(string),
+            typeof(string)
+        };
+
+        protected override ArgumentNullException Deserialize(object[] args)
+        {
+            var paramName = args[0] as string;
+            var message = args[1] as string;
             return new ArgumentNullException(paramName, message);
         }
 
-        protected override (Type, object)[] Serialize(ArgumentNullException e)
+        protected override object[] Serialize(ArgumentNullException e)
         {
-            return new (Type, object)[]
-            {
-                (typeof(string), e.ParamName),
-                (typeof(string), e.Message)
-            };
+            var messageField = typeof(ArgumentNullException).GetField("_message", BindingFlags.NonPublic | BindingFlags.Instance);
+            
+            return new object[] { e.ParamName, e.Message };
         }
     }
 }

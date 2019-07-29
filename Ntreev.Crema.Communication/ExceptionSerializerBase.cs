@@ -24,32 +24,35 @@ using System;
 
 namespace Ntreev.Crema.Communication
 {
-    public abstract class ExceptionSerializerBase<T> : IExceptionSerializer where T : Exception
+    public abstract class ExceptionSerializerBase<T> : IExceptionSerializer
     {
+        protected ExceptionSerializerBase(int exceptionCode)
+        {
+            this.ExceptionCode = exceptionCode;
+        }
+
         public Type ExceptionType => typeof(T);
 
-        /// <example>
-        /// return new Exception(args[0].Item2 as string);
-        /// </example>
-        protected abstract T Deserialize((Type, object)[] args);
+        public int ExceptionCode { get; }
 
-        /// <example>
-        /// return new (Type, object)[] { (typeof(string), e.Message) };
-        /// </example>
-        protected abstract (Type, object)[] Serialize(T e);
+        public abstract Type[] ArgumentTypes { get; }
 
-        #region IExceptionSerializer
+        protected abstract T Deserialize(object[] args);
 
-        Exception IExceptionSerializer.Deserialize(string text)
+        protected abstract object[] Serialize(T e);
+
+        #region IDataSerializer
+
+        object IExceptionSerializer.Deserialize(string text)
         {
-            var args = SerializerUtility.GetArguments(text);
+            var args = SerializerUtility.GetArguments(this.ArgumentTypes, text);
             return this.Deserialize(args);
         }
 
-        string IExceptionSerializer.Serialize(Exception e)
+        string IExceptionSerializer.Serialize(object e)
         {
             var args = this.Serialize((T)e);
-            return SerializerUtility.GetStrings(args);
+            return SerializerUtility.GetStrings(this.ArgumentTypes, args);
         }
 
         #endregion

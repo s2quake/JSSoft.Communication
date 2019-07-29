@@ -95,7 +95,7 @@ namespace Ntreev.Crema.Communication
 
         void IDisposable.Dispose()
         {
-
+            this.Dispose();
         }
 
         #endregion
