@@ -43,15 +43,15 @@ namespace Client.Commands
         }
 
         [CommandMethod]
-        public Task LoginAsync(string userID)
+        public Task LoginAsync(string userID, string password)
         {
-            return this.UserService.LoginAsync(userID);
+            return this.UserService.LoginAsync(userID, password);
         }
 
         [CommandMethod]
-        public async Task LoginOutAsync(string userID)
+        public async Task LogoutAsync(string userID)
         {
-            var value = await this.UserService.LogoutAsync(userID, 0);
+            await this.UserService.LogoutAsync(Guid.Empty);
         }
 
         private IUserService UserService => this.userService.Value;

@@ -43,19 +43,50 @@ namespace Client.Services
 
         }
 
-        #region IUserServiceCallback
-
-        public Task<int> LoginAsync(string user)
+        public Task CreateAsync(string userID, string password)
         {
-            return this.Service.LoginAsync(user);
+            return this.Service.CreateAsync(userID, password);
         }
 
-        public Task<(int, string)> LogoutAsync(string user, int count)
+        public Task DeleteAsync(Guid token, string userID)
         {
-            return this.Service.LogoutAsync(user, count);
+            return this.Service.DeleteAsync(token, userID);
         }
 
-        #endregion
+        public Task<(string, string)> GetUserInfoAsync(Guid token, string userID)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<string[]> GetUsersAsync(Guid token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> IsOnlineAsync(Guid token, string userID)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Guid> LoginAsync(string userID, string password)
+        {
+            return this.LoginAsync(userID, password);
+        }
+
+        public Task LogoutAsync(Guid token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SendMessageAsync(Guid token, string userID, string message)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SetUserInfoAsync(Guid token, string userName)
+        {
+            throw new NotImplementedException();
+        }
 
         #region IUserServiceCallback
 
