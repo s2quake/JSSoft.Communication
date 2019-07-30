@@ -34,7 +34,6 @@ using Ntreev.Crema.Services;
 namespace Client.Services
 {
     [Export(typeof(IService))]
-    [Export(typeof(IUserService))]
     class UserService : ClientServiceBase<IUserService, IUserServiceCallback>, IUserService, IUserServiceCallback
     {
         public UserService()
@@ -42,6 +41,9 @@ namespace Client.Services
         {
 
         }
+
+        [Export(typeof(IUserService))]
+        private IUserService ExportedService => this.Service;
 
         public Task CreateAsync(string userID, string password)
         {

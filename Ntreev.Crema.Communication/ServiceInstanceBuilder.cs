@@ -213,6 +213,7 @@ namespace Ntreev.Crema.Communication
             }
 
             var il = methodBuilder.GetILGenerator();
+            var label = il.DefineLabel();
             il.Emit(OpCodes.Nop);
             il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Ldstr, MethodDescriptor.GenerateName(methodInfo));
@@ -237,7 +238,10 @@ namespace Ntreev.Crema.Communication
                 il.Emit(OpCodes.Stelem_Ref);
             }
             il.Emit(OpCodes.Call, invokeMethod);
-            il.Emit(OpCodes.Nop);
+            il.Emit(OpCodes.Stloc_0);
+            il.Emit(OpCodes.Br_S, label);
+            il.MarkLabel(label);
+            il.Emit(OpCodes.Ldloc_0);
             il.Emit(OpCodes.Ret);
         }
 
