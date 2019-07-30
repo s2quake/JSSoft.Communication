@@ -68,8 +68,8 @@ namespace Ntreev.Crema.Communication.Grpc
             var instanceType = service.ServiceType;
             var typeName = $"{instanceType.Name}Impl";
             var typeNamespace = instanceType.Namespace;
-            var implType = instanceBuilder.CreateType(typeName, typeNamespace, typeof(ContextBase), instanceType);
-            var instance = TypeDescriptor.CreateInstance(null, implType, null, null) as ContextBase;
+            var implType = instanceBuilder.CreateType(typeName, typeNamespace, typeof(InstanceBase), instanceType);
+            var instance = TypeDescriptor.CreateInstance(null, implType, null, null) as InstanceBase;
             instance.Service = service;
             instance.Invoker = this.adaptorImpl;
             return instance;

@@ -21,36 +21,36 @@
 // SOFTWARE.
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
 
-namespace Ntreev.Crema.Communication.Grpc
+namespace Ntreev.Crema.Communication
 {
-    [Export(typeof(IAdaptorHostProvider))]
-    class AdaptorHostProvider : IAdaptorHostProvider
+    [Export(typeof(IExceptionSerializer))]
+    class NotImplementedExceptionSerializer : ExceptionSerializerBase<NotImplementedException>
     {
-        private readonly IEnumerable<IService> services;
-        private readonly IEnumerable<IExceptionSerializer> exceptionSerializers;
+        private static readonly NotImplementedException empty = new NotImplementedException();
 
-        [ImportingConstructor]
-        public AdaptorHostProvider([ImportMany]IEnumerable<IService> services,
-                                   [ImportMany]IEnumerable<IExceptionSerializer> exceptionSerializers)
+        public NotImplementedExceptionSerializer()
+            : base(-4)
         {
-            //Environment.SetEnvironmentVariable("GRPC_VERBOSITY", "DEBUG");
-            this.services = services.ToArray();
-            this.exceptionSerializers = exceptionSerializers.ToArray();
+
         }
 
-        public IAdaptorHost Create(IServiceHost serviceHost, ServiceToken token)
+        public override Type[] ArgumentTypes => new Type[] { typeof(string) };
+
+        protected override NotImplementedException Deserialize(object[] args)
         {
-            if (serviceHost is ServerHostBase)
-                return new AdaptorServerHost(this.services, this.exceptionSerializers);
-            else if (serviceHost is ClientHostBase)
-                return new AdaptorClientHost(this.services, this.exceptionSerializers);
-            throw new NotImplementedException();
+            var message = args[0] as string;
+            if (message == null)
+                return new NotImplementedException();
+            return new NotImplementedException(message);
         }
 
-        public string Name => "grpc";
+        protected override object[] Serialize(NotImplementedException e)
+        {
+            if (e.Message == empty.Message)
+                return new object[] { null };
+            return new object[] { e.Message };
+        }
     }
 }

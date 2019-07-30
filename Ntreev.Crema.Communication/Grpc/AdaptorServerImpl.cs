@@ -98,41 +98,16 @@ namespace Ntreev.Crema.Communication.Grpc
                 return new PingReply() { Time = DateTime.UtcNow.Ticks };
             });
         }
-
-        // private async Task<(Type, object)> InvokeAsync(MethodInfo method, object instance, IEnumerable<string> datas)
-        // {
-        //     var args = SerializerUtility.GetArguments(this.ParameterTypes, datas);
-        //     var value = await Task.Run(() => method.Invoke(instance, args));
-        //     var valueType = method.ReturnType;
-        //     if (value is Task task)
-        //     {
-        //         await task;
-        //         var taskType = task.GetType();
-        //         if (taskType.GetGenericArguments().Any() == true)
-        //         {
-        //             var propertyInfo = taskType.GetProperty(nameof(Task<object>.Result));
-        //             value = propertyInfo.GetValue(task);
-        //             valueType = propertyInfo.PropertyType;
-        //         }
-        //         else
-        //         {
-        //             value = null;
-        //             valueType = typeof(void);
-        //         }
-        //     }
-        //     return (valueType, value);
-        // }
-
+       
         public override async Task<InvokeReply> Invoke(InvokeRequest request, ServerCallContext context)
         {
             if (this.serviceByName.ContainsKey(request.ServiceName) == false)
                 throw new InvalidOperationException();
             var service = this.serviceByName[request.ServiceName];
-            var methodName = $"{request.ServiceName}.{request.Name}";
-            if (this.methodDescriptorByName.ContainsKey(methodName) == false)
+            if (this.methodDescriptorByName.ContainsKey(request.Name) == false)
                 throw new InvalidOperationException();
 
-            var methodDescriptor = methodDescriptorByName[methodName];
+            var methodDescriptor = methodDescriptorByName[request.Name];
             try
             {
                 var (valueType, value) = await methodDescriptor.InvokeAsync(service, request.Datas);
@@ -252,7 +227,7 @@ namespace Ntreev.Crema.Communication.Grpc
                 {
                     var methodName = attr.Name ?? item.Name;
                     var methodDescriptor = new MethodDescriptor(item);
-                    methodDescriptorByName.Add($"{service.Name}.{methodName}", methodDescriptor);
+                    methodDescriptorByName.Add(methodDescriptor.Name, methodDescriptor);
                 }
             }
         }

@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System;
 using System.Threading.Tasks;
 using Ntreev.Crema.Communication;
 
@@ -28,9 +29,30 @@ namespace Ntreev.Crema.Services
     public interface IUserService
     {
         [ServiceContract]
-        Task<int> LoginAsync(string user);
+        Task CreateAsync(string userID, string password);
 
         [ServiceContract]
-        Task<(int, string)> LogoutAsync(string user, int count);
+        Task DeleteAsync(Guid token, string userID);
+
+        [ServiceContract]
+        Task SetUserInfoAsync(Guid token, string userName);
+
+        [ServiceContract]
+        Task<Guid> LoginAsync(string userID, string password);
+
+        [ServiceContract]
+        Task LogoutAsync(Guid token);
+
+        [ServiceContract]
+        Task<(string, string)> GetUserInfoAsync(Guid token, string userID);
+
+        [ServiceContract]
+        Task<string[]> GetUsersAsync(Guid token);
+
+        [ServiceContract]
+        Task<bool> IsOnlineAsync(Guid token, string userID);
+
+        [ServiceContract]
+        Task SendMessageAsync(Guid token, string userID, string message);
     }
 }

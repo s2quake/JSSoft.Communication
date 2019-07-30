@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 
 namespace Ntreev.Crema.Communication
@@ -28,6 +29,8 @@ namespace Ntreev.Crema.Communication
     [Export(typeof(IExceptionSerializer))]
     class ArgumentExceptionSerializer : ExceptionSerializerBase<ArgumentException>
     {
+        private readonly Dictionary<string, string> messageByParam = new Dictionary<string, string>();
+
         public ArgumentExceptionSerializer()
             : base(-2)
         {
@@ -42,14 +45,25 @@ namespace Ntreev.Crema.Communication
 
         protected override ArgumentException Deserialize(object[] args)
         {
-            var message = args[0] as string;
-            var paramName = args[1] as string;
-            return new ArgumentException(message, paramName);
+            var paramName = args[0] as string;
+            var message = args[1] as string;
+            if (paramName != null && message != null)
+                new ArgumentException(message, paramName);
+            else if (paramName == null)
+                return new ArgumentException(message);
+            return new ArgumentException();
         }
 
         protected override object[] Serialize(ArgumentException e)
         {
-            return new object[] { e.Message, e.ParamName };
+            var paramName = e.ParamName;
+            if (this.messageByParam.ContainsKey(paramName) == false)
+            {
+                var exception = new ArgumentException(paramName);
+                this.messageByParam.Add(paramName, exception.Message);
+            }
+            var message = e.Message == this.messageByParam[paramName] ? null : e.Message;;
+            return new object[] { paramName, message };
         }
     }
 }

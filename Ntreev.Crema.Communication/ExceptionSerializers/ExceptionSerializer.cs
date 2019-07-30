@@ -28,6 +28,8 @@ namespace Ntreev.Crema.Communication
     [Export(typeof(IExceptionSerializer))]
     class ExceptionSerializer : ExceptionSerializerBase<Exception>
     {
+        private static readonly Exception empty = new Exception();
+
         public ExceptionSerializer()
             : base(-1)
         {
@@ -39,11 +41,15 @@ namespace Ntreev.Crema.Communication
         protected override Exception Deserialize(object[] args)
         {
             var message = args[0] as string;
+            if (message == null)
+                return new Exception();
             return new Exception(message);
         }
 
         protected override object[] Serialize(Exception e)
         {
+            if (e.Message == empty.Message)
+                return new object[] { null};
             return new object[] { e.Message };
         }
     }

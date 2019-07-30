@@ -22,6 +22,7 @@
 
 using System;
 using System.ComponentModel.Composition;
+using System.IO;
 using System.Threading.Tasks;
 using Ntreev.Crema.Communication;
 using Ntreev.Library.Commands;
@@ -34,15 +35,19 @@ namespace Server
     class Shell : CommandContextTerminal, IShell, IServiceProvider
     {
         private readonly IServiceHost serviceHost;
+        private readonly CommandContext commandContext;
         private bool isDisposed;
 
         [ImportingConstructor]
         public Shell(CommandContext commandContext, IServiceHost serviceHost)
            : base(commandContext)
         {
-            this.Prompt = "server";
+            this.Prompt = "";
             this.Postfix = ">";
             this.serviceHost = serviceHost;
+            this.serviceHost.Opened += ServiceHost_Opened;
+            this.serviceHost.Closed += ServiceHost_Closed;
+            this.commandContext = commandContext;
         }
 
         public static IShell Create()
@@ -60,6 +65,21 @@ namespace Server
         }
 
         internal Guid Token { get; set; }
+
+        private TextWriter Out => this.commandContext.Out;
+
+        private void ServiceHost_Opened(object sender, EventArgs e)
+        {
+            this.Prompt = $"Server:{this.serviceHost.Port}";
+            this.Out.WriteLine("서버가 시작되었습니다.");
+            this.Out.WriteLine("사용 가능한 명령을 확인려면 'help' 을(를) 입력하세요.");
+            this.Out.WriteLine();
+        }
+
+        private void ServiceHost_Closed(object sender, EventArgs e)
+        {
+            this.Prompt = string.Empty;
+        }
 
         #region IServiceProvider
 

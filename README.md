@@ -6,7 +6,7 @@ https://github.com/s2quake/Crema 프로젝트에서 WCF 대체할 목적으로 �
 
 # 도구
 
-[.NET Core 3.0](https://dotnet.microsoft.com/download/dotnet-core/3.0)
+[.NET Core 3.0.100-preview7-012821](https://dotnet.microsoft.com/download/dotnet-core/3.0)
 
 [Visual Studio Code](https://code.visualstudio.com/)
 
@@ -15,10 +15,13 @@ https://github.com/s2quake/Crema 프로젝트에서 WCF 대체할 목적으로 �
     git clone https://github.com/s2quake/grpc-sample.git --recursive
     cd grpc-sample
     dotnet restore
-    dotnet build --framework netcoreapp3.0
+    dotnet build
 
 # 실행
 
-    dotnet run --project Server --framework netcoreapp3.0
+    dotnet run --project Server
     
-    dotnet run --project Client --framework netcoreapp3.0
+    dotnet run --project Client
+
+# 서비스 계약 정의
+

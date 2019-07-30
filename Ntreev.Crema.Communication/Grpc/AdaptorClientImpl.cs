@@ -93,7 +93,7 @@ namespace Ntreev.Crema.Communication.Grpc
                 {
                     var methodName = attr.Name ?? item.Name;
                     var methodDescriptor = new MethodDescriptor(item);
-                    methodDescriptorByName.Add($"{service.Name}.{methodName}", methodDescriptor);
+                    methodDescriptorByName.Add(methodDescriptor.Name, methodDescriptor);
                 }
             }
         }
@@ -140,10 +140,9 @@ namespace Ntreev.Crema.Communication.Grpc
 
         private void InvokeCallback(IService service, string name, IReadOnlyList<string> datas)
         {
-            var methodName = $"{service.Name}.{name}";
-            if (this.methodDescriptorByName.ContainsKey(methodName) == false)
+            if (this.methodDescriptorByName.ContainsKey(name) == false)
                 throw new InvalidOperationException();
-            var methodDescriptor = this.methodDescriptorByName[methodName];
+            var methodDescriptor = this.methodDescriptorByName[name];
             methodDescriptor.Invoke(service, datas);
         }
 

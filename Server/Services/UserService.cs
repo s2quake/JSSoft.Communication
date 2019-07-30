@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 using Ntreev.Crema.Communication;
@@ -31,23 +32,51 @@ namespace Server.Services
     [Export(typeof(IService))]
     class UserService : ServerServiceBase<IUserService, IUserServiceCallback>, IUserService
     {
-        [ServiceContract]
-        public async Task<int> LoginAsync(string user)
+        private readonly Dictionary<string, UserInfo> userInfoByID = new Dictionary<string, UserInfo>();
+
+        public Task CreateAsync(string userID, string password)
         {
-            if (user == "null")
-                throw new ArgumentNullException(nameof(user));
-            await Task.Delay(1);
-            Console.WriteLine($"login: {user}");
-            this.Callback.OnLoggedIn(user);
-            return 0;
+            throw new NotImplementedException();
         }
 
-        [ServiceContract]
-        public async Task<(int, string)> LogoutAsync(string user, int count)
+        public Task DeleteAsync(Guid token, string userID)
         {
-            await Task.Delay(1);
-            this.Callback.OnLoggedOut(user);
-            return (1, "ser");
+            throw new NotImplementedException();
+        }
+
+        public Task<(string, string)> GetUserInfoAsync(Guid token, string userID)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<string[]> GetUsersAsync(Guid token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> IsOnlineAsync(Guid token, string userID)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Guid> LoginAsync(string userID, string password)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task LogoutAsync(Guid token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SendMessageAsync(Guid token, string userID, string message)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SetUserInfoAsync(Guid token, string userName)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -126,7 +126,7 @@ namespace Ntreev.Crema.Communication
             var il = methodBuilder.GetILGenerator();
             il.Emit(OpCodes.Nop);
             il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Ldstr, methodInfo.Name);
+            il.Emit(OpCodes.Ldstr, MethodDescriptor.GenerateName(methodInfo));
             il.Emit(OpCodes.Ldc_I4, arrayCount);
             il.Emit(OpCodes.Newarr, typeof(object));
 
@@ -170,7 +170,7 @@ namespace Ntreev.Crema.Communication
             var il = methodBuilder.GetILGenerator();
             il.Emit(OpCodes.Nop);
             il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Ldstr, methodInfo.Name);
+            il.Emit(OpCodes.Ldstr, MethodDescriptor.GenerateName(methodInfo));
             il.Emit(OpCodes.Ldc_I4, arrayCount);
             il.Emit(OpCodes.Newarr, typeof(object));
 
@@ -215,7 +215,7 @@ namespace Ntreev.Crema.Communication
             var il = methodBuilder.GetILGenerator();
             il.Emit(OpCodes.Nop);
             il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Ldstr, methodInfo.Name);
+            il.Emit(OpCodes.Ldstr, MethodDescriptor.GenerateName(methodInfo));
             il.Emit(OpCodes.Ldc_I4, arrayCount);
             il.Emit(OpCodes.Newarr, typeof(object));
 
@@ -261,7 +261,7 @@ namespace Ntreev.Crema.Communication
             var label = il.DefineLabel();
             il.Emit(OpCodes.Nop);
             il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Ldstr, methodInfo.Name);
+            il.Emit(OpCodes.Ldstr, MethodDescriptor.GenerateName(methodInfo));
             il.Emit(OpCodes.Ldc_I4, arrayCount);
             il.Emit(OpCodes.Newarr, typeof(object));
 
