@@ -28,10 +28,10 @@ namespace Ntreev.Crema.Services
 {
     public interface IDataService
     {
-        [ServiceContract]
+        [OperationContract]
         Task<DateTime> CreateTypeAsync(string typeName);
 
-        [ServiceContract]
+        [OperationContract]
         Task<DateTime> CreateTableAsync(string tableName);
     }
 }

@@ -36,7 +36,6 @@ namespace Ntreev.Crema.Communication
         private readonly IAdaptorHostProvider adpatorHostProvider;
         private readonly ServiceInstanceBuilder instanceBuilder;
         private readonly Dispatcher dispatcher;
-        private Dictionary<IService, object> instanceByService;
         private IAdaptorHost adaptorHost;
         private string host;
         private int port = defaultPort;
@@ -58,23 +57,11 @@ namespace Ntreev.Crema.Communication
             {
                 this.adaptorHost = this.adpatorHostProvider.Create(this, token);
                 this.adaptorHost.Disconnected += AdaptorHost_Disconnected;
-                this.instanceByService = new Dictionary<IService, object>(this.Services.Count);
             });
             await this.adaptorHost.OpenAsync(this.Host, this.Port);
-            var instanceByService = await this.dispatcher.InvokeAsync(() =>
+            foreach (var item in this.Services)
             {
-                foreach (var item in this.Services)
-                {
-                    var instance = this.adaptorHost.Create(item);
-                    this.instanceByService.Add(item, instance);
-                }
-                return this.instanceByService.ToArray();
-            });
-            foreach (var item in instanceByService)
-            {
-                var service = item.Key;
-                var instance = item.Value;
-                await service.OpenAsync(token, instance);
+                await item.OpenAsync(token);
             }
             await this.dispatcher.InvokeAsync(() =>
             {
@@ -89,16 +76,9 @@ namespace Ntreev.Crema.Communication
         {
             if (token == Guid.Empty || this.token.Guid != token)
                 throw new ArgumentException($"invalid token: {token}", nameof(token));
-            var instanceByService = await this.dispatcher.InvokeAsync(() => this.instanceByService.ToArray());
-            foreach (var item in instanceByService)
+            foreach (var item in this.Services)
             {
-                var service = item.Key;
-                var instance = item.Value;
-                await service.CloseAsync(this.token);
-                if (instance is IDisposable disposable)
-                {
-                    disposable.Dispose();
-                }
+                await item.CloseAsync(this.token);
                 this.adaptorHost.Disconnected -= AdaptorHost_Disconnected;
             }
             await this.adaptorHost.CloseAsync();

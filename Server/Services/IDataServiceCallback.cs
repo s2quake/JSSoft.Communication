@@ -26,10 +26,10 @@ namespace Ntreev.Crema.Services
 {
     public interface IDataServiceCallback
     {
-        [ServiceContract]
+        [OperationContract]
         void OnLoggedIn(string userID);
 
-        [ServiceContract]
+        [OperationContract]
          void OnAdd(string userID, int test);
     }
 }

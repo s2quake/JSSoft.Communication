@@ -23,20 +23,20 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Ntreev.Library.ObjectModel;
 
 namespace Ntreev.Crema.Communication.Grpc
 {
-    class PeerCollection : IEnumerable<string>
+    class PeerCollection : ContainerBase<PeerDescriptor>
     {
-
-        public IEnumerator<string> GetEnumerator()
+        public void Add(PeerDescriptor item)
         {
-            throw new NotImplementedException();
+            base.AddBase(item.Peer, item);
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
+        public void Remove(string peer)
         {
-            throw new NotImplementedException();
+            base.RemoveBase(peer);
         }
     }
 }

@@ -28,31 +28,31 @@ namespace Ntreev.Crema.Services
 {
     public interface IUserService
     {
-        [ServiceContract]
+        [OperationContract]
         Task CreateAsync(string userID, string password);
 
-        [ServiceContract]
+        [OperationContract]
         Task DeleteAsync(Guid token, string userID);
 
-        [ServiceContract]
+        [OperationContract]
         Task SetUserInfoAsync(Guid token, string userName);
 
-        [ServiceContract]
+        [OperationContract]
         Task<Guid> LoginAsync(string userID, string password);
 
-        [ServiceContract]
+        [OperationContract]
         Task LogoutAsync(Guid token);
 
-        [ServiceContract]
+        [OperationContract]
         Task<(string, string)> GetUserInfoAsync(Guid token, string userID);
 
-        [ServiceContract]
+        [OperationContract]
         Task<string[]> GetUsersAsync(Guid token);
 
-        [ServiceContract]
+        [OperationContract]
         Task<bool> IsOnlineAsync(Guid token, string userID);
 
-        [ServiceContract]
+        [OperationContract]
         Task SendMessageAsync(Guid token, string userID, string message);
     }
 }

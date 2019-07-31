@@ -89,7 +89,7 @@ namespace Ntreev.Crema.Communication.Grpc
             var methods = service.CallbackType.GetMethods();
             foreach (var item in methods)
             {
-                if (item.GetCustomAttribute(typeof(ServiceContractAttribute)) is ServiceContractAttribute attr)
+                if (item.GetCustomAttribute(typeof(OperationContractAttribute)) is OperationContractAttribute attr)
                 {
                     var methodName = attr.Name ?? item.Name;
                     var methodDescriptor = new MethodDescriptor(item);

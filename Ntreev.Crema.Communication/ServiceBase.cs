@@ -51,11 +51,11 @@ namespace Ntreev.Crema.Communication
 
         public Dispatcher Dispatcher => this.dispatcher;
 
-        public async Task OpenAsync(ServiceToken token, object instance)
+        public async Task OpenAsync(ServiceToken token)
         {
             await this.dispatcher.InvokeAsync(() =>
             {
-                this.instance = instance;
+                // this.instance = instance;
                 this.OnOpened(EventArgs.Empty);
             });
         }

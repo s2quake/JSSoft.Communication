@@ -28,7 +28,23 @@ namespace Ntreev.Crema.Communication.Grpc
 {
     class PeerDescriptor
     {
+        public PeerDescriptor(string peer)
+        {
+            this.Peer = peer;
+        }
 
-        
+        public string Peer { get; }
+
+        public IService[] Services { get; set; }
+
+        public Guid Token { get; set; } = Guid.NewGuid();
+
+        public DateTime Ping { get; set; }
+
+        public Dictionary<IService, object> Instances { get; } = new Dictionary<IService, object>();
+
+        public Dictionary<IService, object> Callbacks { get; } = new Dictionary<IService, object>();
+
+        public Dictionary<string, object> Properties { get; } = new Dictionary<string, object>();
     }
 }

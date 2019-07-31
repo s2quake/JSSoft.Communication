@@ -25,14 +25,14 @@ using System;
 namespace Ntreev.Crema.Communication
 {
     [AttributeUsage(AttributeTargets.Method)]
-    public class ServiceContractAttribute : Attribute
+    public class OperationContractAttribute : Attribute
     {
-        public ServiceContractAttribute()
+        public OperationContractAttribute()
         {
 
         }
 
-        public ServiceContractAttribute(string name)
+        public OperationContractAttribute(string name)
         {
             this.Name = name ?? throw new ArgumentNullException(nameof(name));
             Ntreev.Library.IdentifierValidator.Validate(this.Name);

@@ -61,6 +61,13 @@ namespace Ntreev.Crema.Communication
             return datas;
         }
 
+        public static string GetString(object value, Type type)
+        {
+            if (type == typeof(void))
+                return null;
+            return JsonConvert.SerializeObject(value, type, settings);
+        }
+
         public static object[] GetArguments(Type[] types, string text)
         {
             var datas = (string[])JsonConvert.DeserializeObject(text, typeof(string[]), settings);

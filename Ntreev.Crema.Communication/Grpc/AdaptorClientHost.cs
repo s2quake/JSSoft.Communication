@@ -81,6 +81,8 @@ namespace Ntreev.Crema.Communication.Grpc
         }
 
         public event EventHandler<DisconnectionReasonEventArgs> Disconnected;
+        public event EventHandler<PeerEventArgs> PeerAdded;
+        public event EventHandler<PeerEventArgs> PeerRemoved;
 
         private void AdaptorImpl_Disconnected(object sender, DisconnectionReasonEventArgs e)
         {

@@ -32,7 +32,7 @@ namespace Ntreev.Crema.Communication
 
         Task CloseAsync();
 
-        object Create(IService service);
+        //object Create(IService service);
 
         event EventHandler<PeerEventArgs> PeerAdded;
 
