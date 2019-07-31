@@ -21,23 +21,14 @@
 // SOFTWARE.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Communication
+namespace Ntreev.Crema.Communication.Grpc
 {
-    public interface IAdaptorHost : IDisposable
+    class PeerDescriptor
     {
-        Task OpenAsync(string host, int port);
 
-        Task CloseAsync();
-
-        object Create(IService service);
-
-        event EventHandler<PeerEventArgs> PeerAdded;
-
-        event EventHandler<PeerEventArgs> PeerRemoved;
-
-        event EventHandler<DisconnectionReasonEventArgs> Disconnected;
+        
     }
 }

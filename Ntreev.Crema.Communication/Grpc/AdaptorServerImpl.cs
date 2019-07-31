@@ -47,8 +47,9 @@ namespace Ntreev.Crema.Communication.Grpc
         private Dispatcher dispatcher;
         private ILogger logger;
         private CancellationTokenSource cancellation;
+        private readonly AdaptorServerHost adaptorHost;
 
-        public AdaptorServerImpl(IEnumerable<IService> services, IEnumerable<IExceptionSerializer> exceptionSerializers)
+        public AdaptorServerImpl(AdaptorServerHost adaptorHost, IEnumerable<IService> services, IEnumerable<IExceptionSerializer> exceptionSerializers)
         {
             this.serviceByName = services.ToDictionary(item => item.Name);
             this.exceptionSerializerByType = exceptionSerializers.ToDictionary(item => item.ExceptionType);
@@ -56,6 +57,7 @@ namespace Ntreev.Crema.Communication.Grpc
             this.dispatcher = new Dispatcher(this);
             this.logger = GrpcEnvironment.Logger;
             this.cancellation = new CancellationTokenSource();
+            this.adaptorHost = adaptorHost;
             foreach (var item in services)
             {
                 RegisterMethod(this.methodDescriptorByName, item);
@@ -74,7 +76,6 @@ namespace Ntreev.Crema.Communication.Grpc
                 {
                     this.properties.Add(context.Peer, $"{item.Key}.ID", item.Value.Count);
                 }
-
             });
             this.logger.Debug($"Connected: {context.Peer}");
             return new OpenReply() { Token = tokenString };

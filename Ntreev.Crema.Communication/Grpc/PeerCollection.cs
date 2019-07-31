@@ -21,23 +21,22 @@
 // SOFTWARE.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Communication
+namespace Ntreev.Crema.Communication.Grpc
 {
-    public interface IAdaptorHost : IDisposable
+    class PeerCollection : IEnumerable<string>
     {
-        Task OpenAsync(string host, int port);
 
-        Task CloseAsync();
+        public IEnumerator<string> GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
 
-        object Create(IService service);
-
-        event EventHandler<PeerEventArgs> PeerAdded;
-
-        event EventHandler<PeerEventArgs> PeerRemoved;
-
-        event EventHandler<DisconnectionReasonEventArgs> Disconnected;
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -47,7 +47,7 @@ namespace Ntreev.Crema.Communication.Grpc
 
         public Task OpenAsync(string host, int port)
         {
-            this.adaptor = new AdaptorServerImpl(this.services, this.exceptionSerializers);
+            this.adaptor = new AdaptorServerImpl(this, this.services, this.exceptionSerializers);
             this.server = new Server()
             {
                 Services = { Adaptor.BindService(this.adaptor) },
@@ -82,6 +82,8 @@ namespace Ntreev.Crema.Communication.Grpc
         }
 
         public event EventHandler<DisconnectionReasonEventArgs> Disconnected;
+        public event EventHandler<PeerEventArgs> PeerAdded;
+        public event EventHandler<PeerEventArgs> PeerRemoved;
 
         protected virtual void OnDisconnected(DisconnectionReasonEventArgs e)
         {

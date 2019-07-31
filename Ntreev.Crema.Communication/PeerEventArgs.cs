@@ -21,23 +21,16 @@
 // SOFTWARE.
 
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Communication
 {
-    public interface IAdaptorHost : IDisposable
+    public class PeerEventArgs : EventArgs
     {
-        Task OpenAsync(string host, int port);
+        public PeerEventArgs(object peer)
+        {
+            this.Peer = peer ?? throw new ArgumentNullException(nameof(peer));
+        }
 
-        Task CloseAsync();
-
-        object Create(IService service);
-
-        event EventHandler<PeerEventArgs> PeerAdded;
-
-        event EventHandler<PeerEventArgs> PeerRemoved;
-
-        event EventHandler<DisconnectionReasonEventArgs> Disconnected;
+        public object Peer { get; }
     }
 }
