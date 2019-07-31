@@ -32,6 +32,6 @@ namespace Ntreev.Crema.Communication
 
         }
 
-        protected U Callback => (U)base.Instance;
+        // protected U Callback => (U)base.Instance;
     }
 }

@@ -24,14 +24,12 @@ using System;
 
 namespace Ntreev.Crema.Communication
 {
-    public abstract class ClientServiceBase<T, U> : ServiceBase where T : class where U : class
+    [AttributeUsage(AttributeTargets.Interface)]
+    public class ServiceContractAttribute : Attribute
     {
-        protected ClientServiceBase()
-            : base(typeof(T), typeof(U), typeof(U))
+        public ServiceContractAttribute()
         {
 
         }
-
-        // protected T Service => (T)base.Instance;
     }
 }

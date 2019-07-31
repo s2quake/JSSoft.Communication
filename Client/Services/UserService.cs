@@ -42,17 +42,17 @@ namespace Client.Services
 
         }
 
-        [Export(typeof(IUserService))]
-        private IUserService ExportedService => this.Service;
+        // [Export(typeof(IUserService))]
+        // private IUserService ExportedService => this.Service;
 
         public Task CreateAsync(string userID, string password)
         {
-            return this.Service.CreateAsync(userID, password);
+            throw new NotImplementedException();
         }
 
         public Task DeleteAsync(Guid token, string userID)
         {
-            return this.Service.DeleteAsync(token, userID);
+            throw new NotImplementedException();
         }
 
         public Task<(string, string)> GetUserInfoAsync(Guid token, string userID)
