@@ -26,7 +26,7 @@ using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Communication
 {
-    public interface ICommunicationService
+    public interface IService
     {
         Task<Guid> OpenAsync();
 

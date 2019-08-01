@@ -33,12 +33,12 @@ namespace Client.Commands
     [Export(typeof(ICommand))]
     class CloseCommand : CommandAsyncBase
     {
-        private readonly ICommunicationService serviceHost;
+        private readonly IService serviceHost;
         [Import]
         private Lazy<Shell> shell = null;
 
         [ImportingConstructor]
-        public CloseCommand(ICommunicationService serviceHost)
+        public CloseCommand(IService serviceHost)
         {
             this.serviceHost = serviceHost;
         }

@@ -29,7 +29,7 @@ using Ntreev.Library.Threading;
 
 namespace Ntreev.Crema.Communication
 {
-    public abstract class CommunicationServiceBase : ICommunicationService, IDisposable
+    public abstract class ServiceBase : IService, IDisposable
     {
         private const string defaultHost = "localhost";
         private static readonly int defaultPort = 4004;
@@ -42,7 +42,7 @@ namespace Ntreev.Crema.Communication
         private bool isOpened;
         private ServiceToken token;
 
-        internal CommunicationServiceBase(IAdaptorHostProvider adpatorHostProvider, IEnumerable<IServiceHost> services)
+        internal ServiceBase(IAdaptorHostProvider adpatorHostProvider, IEnumerable<IServiceHost> services)
         {
             this.adpatorHostProvider = adpatorHostProvider;
             this.instanceBuilder = new ServiceInstanceBuilder();
@@ -144,7 +144,7 @@ namespace Ntreev.Crema.Communication
 
         #region IServiecHost
 
-        IReadOnlyList<IServiceHost> ICommunicationService.Services => this.Services;
+        IReadOnlyList<IServiceHost> IService.Services => this.Services;
 
         #endregion
 

@@ -27,7 +27,7 @@ namespace Ntreev.Crema.Communication
 {
     public interface IAdaptorHostProvider
     {
-        IAdaptorHost Create(ICommunicationService serviceHost, ServiceToken token);
+        IAdaptorHost Create(IService serviceHost, ServiceToken token);
 
         string Name { get; }
     }

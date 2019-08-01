@@ -25,9 +25,9 @@ using System.Collections.Generic;
 
 namespace Ntreev.Crema.Communication
 {
-    public abstract class ClientCommunicationServiceBase : CommunicationServiceBase
+    public abstract class ClientServiceBase : ServiceBase
     {
-        protected ClientCommunicationServiceBase(IAdaptorHostProvider adpatorHostProvider, IEnumerable<IServiceHost> services)
+        protected ClientServiceBase(IAdaptorHostProvider adpatorHostProvider, IEnumerable<IServiceHost> services)
             : base(adpatorHostProvider, services)
         {
 

@@ -23,16 +23,15 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
 using Ntreev.Crema.Communication;
 
-namespace Server
+namespace Client
 {
-    [Export(typeof(ICommunicationService))]
-    class ServiceHost : ServerCommunicationServiceBase
+    [Export(typeof(IService))]
+    class ClientService : ClientServiceBase
     {
         [ImportingConstructor]
-        public ServiceHost(IAdaptorHostProvider adaptorHostProvider, [ImportMany]IEnumerable<IServiceHost> services)
+        public ClientService(IAdaptorHostProvider adaptorHostProvider, [ImportMany]IEnumerable<IServiceHost> services)
             : base(adaptorHostProvider, services)
         {
      

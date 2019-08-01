@@ -22,15 +22,20 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
+using System.Linq;
+using Ntreev.Crema.Communication;
 
-namespace Ntreev.Crema.Communication
+namespace Server
 {
-    public abstract class ServerCommunicationServiceBase : CommunicationServiceBase
+    [Export(typeof(IService))]
+    class ServerService : ServerServiceBase
     {
-        protected ServerCommunicationServiceBase(IAdaptorHostProvider adaptorHostProvider, IEnumerable<IServiceHost> services)
+        [ImportingConstructor]
+        public ServerService(IAdaptorHostProvider adaptorHostProvider, [ImportMany]IEnumerable<IServiceHost> services)
             : base(adaptorHostProvider, services)
         {
-
+     
         }
     }
 }

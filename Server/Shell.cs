@@ -34,12 +34,12 @@ namespace Server
     [Export(typeof(Shell))]
     class Shell : CommandContextTerminal, IShell, IServiceProvider
     {
-        private readonly ICommunicationService serviceHost;
+        private readonly IService serviceHost;
         private readonly CommandContext commandContext;
         private bool isDisposed;
 
         [ImportingConstructor]
-        public Shell(CommandContext commandContext, ICommunicationService serviceHost)
+        public Shell(CommandContext commandContext, IService serviceHost)
            : base(commandContext)
         {
             this.Prompt = "";
