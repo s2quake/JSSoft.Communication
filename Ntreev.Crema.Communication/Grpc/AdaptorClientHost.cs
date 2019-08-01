@@ -35,7 +35,7 @@ namespace Ntreev.Crema.Communication.Grpc
 {
     class AdaptorClientHost : IAdaptorHost, IContextInvoker
     {
-        private readonly Dictionary<string, IService> serviceByName = new Dictionary<string, IService>();
+        private readonly Dictionary<string, IServiceHost> serviceByName = new Dictionary<string, IServiceHost>();
         private readonly Dictionary<Type, IExceptionSerializer> exceptionSerializerByType = new Dictionary<Type, IExceptionSerializer>();
         private readonly Dictionary<int, IExceptionSerializer> exceptionSerializerByCode = new Dictionary<int, IExceptionSerializer>();
         private readonly Dictionary<string, MethodDescriptor> methodDescriptorByName = new Dictionary<string, MethodDescriptor>();
@@ -48,10 +48,10 @@ namespace Ntreev.Crema.Communication.Grpc
         private Channel channel;
         private AdaptorClientImpl adaptorImpl;
         private ServiceInstanceBuilder instanceBuilder = new ServiceInstanceBuilder();
-        private readonly Dictionary<IService, object> serviceInstanceByService = new Dictionary<IService, object>();
-        private readonly Dictionary<IService, object> callbackInstanceByService = new Dictionary<IService, object>();
+        private readonly Dictionary<IServiceHost, object> serviceInstanceByService = new Dictionary<IServiceHost, object>();
+        private readonly Dictionary<IServiceHost, object> callbackInstanceByService = new Dictionary<IServiceHost, object>();
 
-        public AdaptorClientHost(IEnumerable<IService> services, IEnumerable<IExceptionSerializer> exceptionSerializers)
+        public AdaptorClientHost(IEnumerable<IServiceHost> services, IEnumerable<IExceptionSerializer> exceptionSerializers)
         {
             this.serviceByName = services.ToDictionary(item => item.Name);
             this.exceptionSerializerByType = exceptionSerializers.ToDictionary(item => item.ExceptionType);
@@ -104,7 +104,7 @@ namespace Ntreev.Crema.Communication.Grpc
             this.channel = null;
         }
 
-        public object Create(IService service)
+        public object Create(IServiceHost service)
         {
             var instanceType = service.ServiceType;
             var typeName = $"{instanceType.Name}Impl";
@@ -137,7 +137,7 @@ namespace Ntreev.Crema.Communication.Grpc
         //     this.Disconnected?.Invoke(this, e);
         // }
 
-        private static void RegisterMethod(Dictionary<string, MethodDescriptor> methodDescriptorByName, IService service)
+        private static void RegisterMethod(Dictionary<string, MethodDescriptor> methodDescriptorByName, IServiceHost service)
         {
             var methods = service.CallbackType.GetMethods();
             foreach (var item in methods)
@@ -172,8 +172,7 @@ namespace Ntreev.Crema.Communication.Grpc
                         foreach (var item in reply.Items)
                         {
                             var service = this.serviceByName[item.ServiceName];
-                            this.InvokeCallback(service, item.Id, reply.Items);
-                            this.idByService[service] = item.Id;
+                            this.InvokeCallback(service, reply.Items);
                         }
                         await Task.Delay(1);
                     }
@@ -194,7 +193,7 @@ namespace Ntreev.Crema.Communication.Grpc
             }
         }
 
-        private void InvokeCallback(IService service, string name, IReadOnlyList<string> datas)
+        private void InvokeCallback(IServiceHost service, string name, IReadOnlyList<string> datas)
         {
             if (this.methodDescriptorByName.ContainsKey(name) == false)
                 throw new InvalidOperationException();
@@ -202,17 +201,12 @@ namespace Ntreev.Crema.Communication.Grpc
             methodDescriptor.Invoke(service, datas);
         }
 
-        private int InvokeCallback(IService service, int id, IEnumerable<PollReplyItem> pollItems)
+        private void InvokeCallback(IServiceHost service, IEnumerable<PollReplyItem> pollItems)
         {
             foreach (var item in pollItems)
             {
-                if (item.Id >= 0)
-                {
-                    this.InvokeCallback(service, item.Name, item.Datas);
-                    id = item.Id + 1;
-                }
+                this.InvokeCallback(service, item.Name, item.Datas);
             }
-            return id;
         }
 
         private void ThrowException(int code, string data)

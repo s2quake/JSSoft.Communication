@@ -22,15 +22,22 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
+using System.Threading.Tasks;
+using Grpc.Core;
+using Newtonsoft.Json;
+using Ntreev.Crema.Communication;
+using Ntreev.Crema.Services;
+using Ntreev.Library.Threading;
 
-namespace Ntreev.Crema.Communication
+namespace Server.Services
 {
-    public abstract class ClientHostBase : ServiceHostBase
+    [Export(typeof(IServiceHost))]
+    class DataServiceHost : ServerServiceHostBase<IDataService, IDataServiceCallback>
     {
-        protected ClientHostBase(IAdaptorHostProvider adpatorHostProvider, IEnumerable<IService> services)
-            : base(adpatorHostProvider, services)
+        public override object CreateInstance(object obj)
         {
-
+            return new DataService(obj as IDataServiceCallback);
         }
     }
 }

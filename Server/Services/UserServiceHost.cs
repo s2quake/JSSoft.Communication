@@ -22,13 +22,19 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
+using System.Threading.Tasks;
+using Ntreev.Crema.Communication;
+using Ntreev.Crema.Services;
 
-namespace Ntreev.Crema.Communication
+namespace Server.Services
 {
-    public interface IAdaptorHostProvider
+    [Export(typeof(IServiceHost))]
+    class UserServiceHost : ServerServiceHostBase<IUserService, IUserServiceCallback>
     {
-        IAdaptorHost Create(ICommunicationService serviceHost, ServiceToken token);
-
-        string Name { get; }
+        public override object CreateInstance(object obj)
+        {
+            return new UserService(obj as IUserServiceCallback);
+        }
     }
 }

@@ -22,13 +22,26 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Communication
 {
-    public interface IAdaptorHostProvider
+    public interface ICommunicationService
     {
-        IAdaptorHost Create(ICommunicationService serviceHost, ServiceToken token);
+        Task<Guid> OpenAsync();
 
-        string Name { get; }
+        Task CloseAsync(Guid token);
+
+        IReadOnlyList<IServiceHost> Services { get; }
+
+        string Host { get; set; }
+        
+        int Port { get; set; }
+
+        bool IsOpened { get; }
+
+        event EventHandler Opened;
+
+        event EventHandler Closed;
     }
 }

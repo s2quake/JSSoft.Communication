@@ -21,26 +21,21 @@
 // SOFTWARE.
 
 using System;
-using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace Ntreev.Crema.Communication
 {
-    public interface IService : IDisposable
+    public abstract class ServerServiceHostBase<T, U> : ServiceHostBase where T : class where U : class
     {
-        Task OpenAsync(ServiceToken token);
+        protected ServerServiceHostBase()
+            : base(typeof(T), typeof(U), typeof(T))
+        {
 
-        Task CloseAsync(ServiceToken token);
+        }
 
-        object CreateInstance(object obj);
-
-        Type ServiceType { get; }
-
-        Type CallbackType { get; }
-
-        string Name { get; }
-
-        event EventHandler Opened;
-
-        event EventHandler Closed;
+        public override object CreateInstance(object obj)
+        {
+            return TypeDescriptor.CreateInstance(null, this.ServiceType, null, null);
+        }
     }
 }

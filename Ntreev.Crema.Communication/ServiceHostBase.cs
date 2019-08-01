@@ -21,9 +21,6 @@
 // SOFTWARE.
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using System.Threading.Tasks;
 using Ntreev.Library.Threading;
 
@@ -31,97 +28,47 @@ namespace Ntreev.Crema.Communication
 {
     public abstract class ServiceHostBase : IServiceHost, IDisposable
     {
-        private const string defaultHost = "localhost";
-        private static readonly int defaultPort = 4004;
-        private readonly IAdaptorHostProvider adpatorHostProvider;
-        private readonly ServiceInstanceBuilder instanceBuilder;
-        private readonly Dispatcher dispatcher;
-        private IAdaptorHost adaptorHost;
-        private string host;
-        private int port = defaultPort;
-        private bool isOpened;
+        private readonly Type serviceType;
+        private readonly Type callbackType;
         private ServiceToken token;
+        private Dispatcher dispatcher;
 
-        internal ServiceHostBase(IAdaptorHostProvider adpatorHostProvider, IEnumerable<IService> services)
+        internal ServiceHostBase(Type serviceType, Type callbackType, Type validationType)
         {
-            this.adpatorHostProvider = adpatorHostProvider;
-            this.instanceBuilder = new ServiceInstanceBuilder();
-            this.Services = new ServiceCollection(this, services);
+            if (validationType.IsAssignableFrom(this.GetType()) == false)
+                throw new ArgumentException("invalid type", nameof(validationType));
+            this.Name = serviceType.Name;
+            this.serviceType = serviceType;
+            this.callbackType = callbackType;
             this.dispatcher = new Dispatcher(this);
         }
 
-        public async Task<Guid> OpenAsync()
-        {
-            var token = ServiceToken.NewToken();
-            await this.dispatcher.InvokeAsync(() =>
-            {
-                this.adaptorHost = this.adpatorHostProvider.Create(this, token);
-                this.adaptorHost.Disconnected += AdaptorHost_Disconnected;
-            });
-            await this.adaptorHost.OpenAsync(this.Host, this.Port);
-            foreach (var item in this.Services)
-            {
-                await item.OpenAsync(token);
-            }
-            await this.dispatcher.InvokeAsync(() =>
-            {
-                this.isOpened = true;
-                this.OnOpened(EventArgs.Empty);
-            });
-            this.token = token;
-            return this.token.Guid;
-        }
+        public Type ServiceType => this.serviceType;
 
-        public async Task CloseAsync(Guid token)
-        {
-            if (token == Guid.Empty || this.token.Guid != token)
-                throw new ArgumentException($"invalid token: {token}", nameof(token));
-            foreach (var item in this.Services)
-            {
-                await item.CloseAsync(this.token);
-                this.adaptorHost.Disconnected -= AdaptorHost_Disconnected;
-            }
-            await this.adaptorHost.CloseAsync();
-            await this.dispatcher.InvokeAsync(() =>
-            {
-                this.isOpened = false;
-                this.OnClosed(EventArgs.Empty);
-            });
-            this.token = ServiceToken.Empty;
-        }
-
-        internal void Dispose()
-        {
-            this.dispatcher.Dispose();
-        }
-
-        public ServiceCollection Services { get; }
-
-        public string Host
-        {
-            get => this.host ?? defaultHost;
-            set
-            {
-                if (this.isOpened == true)
-                    throw new InvalidOperationException("cannot set host when service is open.");
-                this.host = value;
-            }
-        }
-
-        public int Port
-        {
-            get => this.port;
-            set
-            {
-                if (this.isOpened == true)
-                    throw new InvalidOperationException("cannot set port when service is open.");
-                this.port = value;
-            }
-        }
-
-        public bool IsOpened => this.isOpened;
+        public Type CallbackType => this.callbackType;
 
         public Dispatcher Dispatcher => this.dispatcher;
+
+        public async Task OpenAsync(ServiceToken token)
+        {
+            this.token = token;
+            await this.dispatcher.InvokeAsync(() =>
+            {
+                this.OnOpened(EventArgs.Empty);
+            });
+        }
+
+        public async Task CloseAsync(ServiceToken token)
+        {
+            await this.dispatcher.InvokeAsync(() =>
+            {
+                this.OnClosed(EventArgs.Empty);
+            });
+        }
+
+        public abstract object CreateInstance(object obj);
+
+        public string Name { get; }
 
         public event EventHandler Opened;
 
@@ -137,16 +84,11 @@ namespace Ntreev.Crema.Communication
             this.Closed?.Invoke(this, e);
         }
 
-        private async void AdaptorHost_Disconnected(object sender, DisconnectionReasonEventArgs e)
+        internal void Dispose()
         {
-            await this.CloseAsync(this.token.Guid);
+            this.dispatcher.Dispose();
+            this.dispatcher = null;
         }
-
-        #region IServiecHost
-
-        IReadOnlyList<IService> IServiceHost.Services => this.Services;
-
-        #endregion
 
         #region IDisposable
 

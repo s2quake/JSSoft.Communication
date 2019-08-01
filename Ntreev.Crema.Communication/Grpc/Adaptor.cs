@@ -33,22 +33,22 @@ namespace Ntreev.Crema.Communication.Grpc {
             "bhgCIAEoCSJQCg1JbnZva2VSZXF1ZXN0Eg0KBXRva2VuGAEgASgJEhMKC3Nl",
             "cnZpY2VOYW1lGAIgASgJEgwKBG5hbWUYAyABKAkSDQoFZGF0YXMYBCADKAki",
             "KQoLSW52b2tlUmVwbHkSDAoEY29kZRgBIAEoBRIMCgRkYXRhGAMgASgJIhwK",
-            "C1BvbGxSZXF1ZXN0Eg0KBXRva2VuGAEgASgJIk0KDVBvbGxSZXBseUl0ZW0S",
-            "CgoCaWQYASABKAUSEwoLc2VydmljZU5hbWUYAiABKAkSDAoEbmFtZRgDIAEo",
-            "CRINCgVkYXRhcxgEIAMoCSJYCglQb2xsUmVwbHkSDAoEY29kZRgBIAEoBRI9",
-            "CgVpdGVtcxgCIAMoCzIuLm50cmVldi5jcmVtYS5jb21tdW5pY2F0aW9uLmdy",
-            "cGMuUG9sbFJlcGx5SXRlbTKABAoHQWRhcHRvchJgCgRPcGVuEiwubnRyZWV2",
-            "LmNyZW1hLmNvbW11bmljYXRpb24uZ3JwYy5PcGVuUmVxdWVzdBoqLm50cmVl",
-            "di5jcmVtYS5jb21tdW5pY2F0aW9uLmdycGMuT3BlblJlcGx5EmMKBUNsb3Nl",
-            "Ei0ubnRyZWV2LmNyZW1hLmNvbW11bmljYXRpb24uZ3JwYy5DbG9zZVJlcXVl",
-            "c3QaKy5udHJlZXYuY3JlbWEuY29tbXVuaWNhdGlvbi5ncnBjLkNsb3NlUmVw",
-            "bHkSYAoEUGluZxIsLm50cmVldi5jcmVtYS5jb21tdW5pY2F0aW9uLmdycGMu",
-            "UGluZ1JlcXVlc3QaKi5udHJlZXYuY3JlbWEuY29tbXVuaWNhdGlvbi5ncnBj",
-            "LlBpbmdSZXBseRJmCgZJbnZva2USLi5udHJlZXYuY3JlbWEuY29tbXVuaWNh",
-            "dGlvbi5ncnBjLkludm9rZVJlcXVlc3QaLC5udHJlZXYuY3JlbWEuY29tbXVu",
-            "aWNhdGlvbi5ncnBjLkludm9rZVJlcGx5EmQKBFBvbGwSLC5udHJlZXYuY3Jl",
-            "bWEuY29tbXVuaWNhdGlvbi5ncnBjLlBvbGxSZXF1ZXN0GioubnRyZWV2LmNy",
-            "ZW1hLmNvbW11bmljYXRpb24uZ3JwYy5Qb2xsUmVwbHkoATABYgZwcm90bzM="));
+            "C1BvbGxSZXF1ZXN0Eg0KBXRva2VuGAEgASgJIkEKDVBvbGxSZXBseUl0ZW0S",
+            "EwoLc2VydmljZU5hbWUYAiABKAkSDAoEbmFtZRgDIAEoCRINCgVkYXRhcxgE",
+            "IAMoCSJYCglQb2xsUmVwbHkSDAoEY29kZRgBIAEoBRI9CgVpdGVtcxgCIAMo",
+            "CzIuLm50cmVldi5jcmVtYS5jb21tdW5pY2F0aW9uLmdycGMuUG9sbFJlcGx5",
+            "SXRlbTKABAoHQWRhcHRvchJgCgRPcGVuEiwubnRyZWV2LmNyZW1hLmNvbW11",
+            "bmljYXRpb24uZ3JwYy5PcGVuUmVxdWVzdBoqLm50cmVldi5jcmVtYS5jb21t",
+            "dW5pY2F0aW9uLmdycGMuT3BlblJlcGx5EmMKBUNsb3NlEi0ubnRyZWV2LmNy",
+            "ZW1hLmNvbW11bmljYXRpb24uZ3JwYy5DbG9zZVJlcXVlc3QaKy5udHJlZXYu",
+            "Y3JlbWEuY29tbXVuaWNhdGlvbi5ncnBjLkNsb3NlUmVwbHkSYAoEUGluZxIs",
+            "Lm50cmVldi5jcmVtYS5jb21tdW5pY2F0aW9uLmdycGMuUGluZ1JlcXVlc3Qa",
+            "Ki5udHJlZXYuY3JlbWEuY29tbXVuaWNhdGlvbi5ncnBjLlBpbmdSZXBseRJm",
+            "CgZJbnZva2USLi5udHJlZXYuY3JlbWEuY29tbXVuaWNhdGlvbi5ncnBjLklu",
+            "dm9rZVJlcXVlc3QaLC5udHJlZXYuY3JlbWEuY29tbXVuaWNhdGlvbi5ncnBj",
+            "Lkludm9rZVJlcGx5EmQKBFBvbGwSLC5udHJlZXYuY3JlbWEuY29tbXVuaWNh",
+            "dGlvbi5ncnBjLlBvbGxSZXF1ZXN0GioubnRyZWV2LmNyZW1hLmNvbW11bmlj",
+            "YXRpb24uZ3JwYy5Qb2xsUmVwbHkoATABYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
@@ -61,7 +61,7 @@ namespace Ntreev.Crema.Communication.Grpc {
             new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.InvokeRequest), global::Ntreev.Crema.Communication.Grpc.InvokeRequest.Parser, new[]{ "Token", "ServiceName", "Name", "Datas" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.InvokeReply), global::Ntreev.Crema.Communication.Grpc.InvokeReply.Parser, new[]{ "Code", "Data" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.PollRequest), global::Ntreev.Crema.Communication.Grpc.PollRequest.Parser, new[]{ "Token" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.PollReplyItem), global::Ntreev.Crema.Communication.Grpc.PollReplyItem.Parser, new[]{ "Id", "ServiceName", "Name", "Datas" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.PollReplyItem), global::Ntreev.Crema.Communication.Grpc.PollReplyItem.Parser, new[]{ "ServiceName", "Name", "Datas" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Ntreev.Crema.Communication.Grpc.PollReply), global::Ntreev.Crema.Communication.Grpc.PollReply.Parser, new[]{ "Code", "Items" }, null, null, null)
           }));
     }
@@ -1435,7 +1435,6 @@ namespace Ntreev.Crema.Communication.Grpc {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public PollReplyItem(PollReplyItem other) : this() {
-      id_ = other.id_;
       serviceName_ = other.serviceName_;
       name_ = other.name_;
       datas_ = other.datas_.Clone();
@@ -1445,17 +1444,6 @@ namespace Ntreev.Crema.Communication.Grpc {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public PollReplyItem Clone() {
       return new PollReplyItem(this);
-    }
-
-    /// <summary>Field number for the "id" field.</summary>
-    public const int IdFieldNumber = 1;
-    private int id_;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public int Id {
-      get { return id_; }
-      set {
-        id_ = value;
-      }
     }
 
     /// <summary>Field number for the "serviceName" field.</summary>
@@ -1503,7 +1491,6 @@ namespace Ntreev.Crema.Communication.Grpc {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (Id != other.Id) return false;
       if (ServiceName != other.ServiceName) return false;
       if (Name != other.Name) return false;
       if(!datas_.Equals(other.datas_)) return false;
@@ -1513,7 +1500,6 @@ namespace Ntreev.Crema.Communication.Grpc {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override int GetHashCode() {
       int hash = 1;
-      if (Id != 0) hash ^= Id.GetHashCode();
       if (ServiceName.Length != 0) hash ^= ServiceName.GetHashCode();
       if (Name.Length != 0) hash ^= Name.GetHashCode();
       hash ^= datas_.GetHashCode();
@@ -1530,10 +1516,6 @@ namespace Ntreev.Crema.Communication.Grpc {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
-      if (Id != 0) {
-        output.WriteRawTag(8);
-        output.WriteInt32(Id);
-      }
       if (ServiceName.Length != 0) {
         output.WriteRawTag(18);
         output.WriteString(ServiceName);
@@ -1551,9 +1533,6 @@ namespace Ntreev.Crema.Communication.Grpc {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
       int size = 0;
-      if (Id != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Id);
-      }
       if (ServiceName.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(ServiceName);
       }
@@ -1571,9 +1550,6 @@ namespace Ntreev.Crema.Communication.Grpc {
     public void MergeFrom(PollReplyItem other) {
       if (other == null) {
         return;
-      }
-      if (other.Id != 0) {
-        Id = other.Id;
       }
       if (other.ServiceName.Length != 0) {
         ServiceName = other.ServiceName;
@@ -1593,10 +1569,6 @@ namespace Ntreev.Crema.Communication.Grpc {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
-          case 8: {
-            Id = input.ReadInt32();
-            break;
-          }
           case 18: {
             ServiceName = input.ReadString();
             break;

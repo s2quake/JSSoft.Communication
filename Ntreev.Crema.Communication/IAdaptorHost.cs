@@ -34,9 +34,9 @@ namespace Ntreev.Crema.Communication
 
         //object Create(IService service);
 
-        event EventHandler<PeerEventArgs> PeerAdded;
+        // event EventHandler<PeerEventArgs> PeerAdded;
 
-        event EventHandler<PeerEventArgs> PeerRemoved;
+        // event EventHandler<PeerEventArgs> PeerRemoved;
 
         event EventHandler<DisconnectionReasonEventArgs> Disconnected;
     }

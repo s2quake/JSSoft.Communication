@@ -43,17 +43,17 @@ namespace Ntreev.Crema.Communication.Grpc
 
         public string Peer { get; }
 
-        public IService[] Services { get; set; }
+        public IServiceHost[] Services { get; set; }
 
         public Guid Token { get; set; } = Guid.NewGuid();
 
         public DateTime Ping { get; set; }
 
-        public Dictionary<IService, object> ServiceInstances { get; } = new Dictionary<IService, object>();
+        public Dictionary<IServiceHost, object> ServiceInstances { get; } = new Dictionary<IServiceHost, object>();
 
-        public Dictionary<IService, object> CallbackInstances { get; } = new Dictionary<IService, object>();
+        public Dictionary<IServiceHost, object> CallbackInstances { get; } = new Dictionary<IServiceHost, object>();
 
-        public Dictionary<IService, CallbackCollection> Callbacks { get; } = new Dictionary<IService, CallbackCollection>();
+        public Dictionary<IServiceHost, CallbackCollection> Callbacks { get; } = new Dictionary<IServiceHost, CallbackCollection>();
 
         public Dictionary<string, object> Properties { get; } = new Dictionary<string, object>();
 

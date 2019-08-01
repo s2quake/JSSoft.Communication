@@ -21,21 +21,16 @@
 // SOFTWARE.
 
 using System;
-using System.ComponentModel;
+using System.Collections.Generic;
 
 namespace Ntreev.Crema.Communication
 {
-    public abstract class ServerServiceBase<T, U> : ServiceBase where T : class where U : class
+    public abstract class ClientCommunicationServiceBase : CommunicationServiceBase
     {
-        protected ServerServiceBase()
-            : base(typeof(T), typeof(U), typeof(T))
+        protected ClientCommunicationServiceBase(IAdaptorHostProvider adpatorHostProvider, IEnumerable<IServiceHost> services)
+            : base(adpatorHostProvider, services)
         {
 
-        }
-
-        public override object CreateInstance(object obj)
-        {
-            return TypeDescriptor.CreateInstance(null, this.ServiceType, null, null);
         }
     }
 }

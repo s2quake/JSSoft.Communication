@@ -27,34 +27,34 @@ using System.Linq;
 
 namespace Ntreev.Crema.Communication
 {
-    public class ServiceCollection : IEnumerable<IService>, IReadOnlyList<IService>
+    public class ServiceHostCollection : IEnumerable<IServiceHost>, IReadOnlyList<IServiceHost>
     {
-        private readonly List<IService> itemList;
-        private readonly IServiceHost serviceHost;
+        private readonly List<IServiceHost> itemList;
+        private readonly ICommunicationService serviceHost;
 
-        internal ServiceCollection(IServiceHost serviceHost)
-            : this(serviceHost, Enumerable.Empty<IService>())
+        internal ServiceHostCollection(ICommunicationService serviceHost)
+            : this(serviceHost, Enumerable.Empty<IServiceHost>())
         {
             this.serviceHost = serviceHost;
         }
 
-        internal ServiceCollection(IServiceHost serviceHost, IEnumerable<IService> services)
+        internal ServiceHostCollection(ICommunicationService serviceHost, IEnumerable<IServiceHost> services)
         {
             this.serviceHost = serviceHost;
-            this.itemList = new List<IService>(services); 
+            this.itemList = new List<IServiceHost>(services); 
         }
 
-        public int IndexOf(IService item)
+        public int IndexOf(IServiceHost item)
         {
             return this.itemList.IndexOf(item);
         }
 
-        public IService this[int index]
+        public IServiceHost this[int index]
         {
             get => this.itemList[index];
         }
 
-        public bool Contains(IService item)
+        public bool Contains(IServiceHost item)
         {
             return this.itemList.Contains(item);
         }
@@ -63,7 +63,7 @@ namespace Ntreev.Crema.Communication
 
         #region IEnumerable
 
-        IEnumerator<IService> IEnumerable<IService>.GetEnumerator()
+        IEnumerator<IServiceHost> IEnumerable<IServiceHost>.GetEnumerator()
         {
             foreach (var item in this.itemList)
             {

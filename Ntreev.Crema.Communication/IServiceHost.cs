@@ -21,24 +21,23 @@
 // SOFTWARE.
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Communication
 {
-    public interface IServiceHost
+    public interface IServiceHost : IDisposable
     {
-        Task<Guid> OpenAsync();
+        Task OpenAsync(ServiceToken token);
 
-        Task CloseAsync(Guid token);
+        Task CloseAsync(ServiceToken token);
 
-        IReadOnlyList<IService> Services { get; }
+        object CreateInstance(object obj);
 
-        string Host { get; set; }
-        
-        int Port { get; set; }
+        Type ServiceType { get; }
 
-        bool IsOpened { get; }
+        Type CallbackType { get; }
+
+        string Name { get; }
 
         event EventHandler Opened;
 

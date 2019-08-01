@@ -37,7 +37,7 @@ namespace Ntreev.Crema.Communication.Grpc
 {
     class AdaptorServerHost : IAdaptorHost, IContextInvoker
     {
-        private readonly Dictionary<string, IService> serviceByName = new Dictionary<string, IService>();
+        private readonly Dictionary<string, IServiceHost> serviceByName = new Dictionary<string, IServiceHost>();
         private readonly Dictionary<Type, IExceptionSerializer> exceptionSerializerByType = new Dictionary<Type, IExceptionSerializer>();
         private readonly Dictionary<string, MethodDescriptor> methodDescriptorByName = new Dictionary<string, MethodDescriptor>();
         //private readonly Dictionary<string, CallbackCollection> callbacksByName = new Dictionary<string, CallbackCollection>();
@@ -50,7 +50,7 @@ namespace Ntreev.Crema.Communication.Grpc
         private ServiceInstanceBuilder instanceBuilder = new ServiceInstanceBuilder();
         private readonly PeerCollection peers = new PeerCollection();
 
-        public AdaptorServerHost(IEnumerable<IService> services, IEnumerable<IExceptionSerializer> exceptionSerializers)
+        public AdaptorServerHost(IEnumerable<IServiceHost> services, IEnumerable<IExceptionSerializer> exceptionSerializers)
         {
             this.serviceByName = services.ToDictionary(item => item.Name);
             this.exceptionSerializerByType = exceptionSerializers.ToDictionary(item => item.ExceptionType);
@@ -154,7 +154,7 @@ namespace Ntreev.Crema.Communication.Grpc
             this.peerHashes.Remove(context.Peer);
         }
 
-        public object CreateCallback(string peer, IService service)
+        public object CreateCallback(string peer, IServiceHost service)
         {
             var instanceType = service.CallbackType;
             var typeName = $"{instanceType.Name}Impl";
@@ -194,23 +194,22 @@ namespace Ntreev.Crema.Communication.Grpc
         private Task AddCallback(InstanceBase instance, string name, object[] args)
         {
             var datas = SerializerUtility.GetStrings(args);
+            var pollItem = new PollReplyItem()
+            {
+                Name = name,
+                ServiceName = instance.ServiceName
+            };
             return this.dispatcher.InvokeAsync(() =>
             {
                 var peerDescriptor = this.peers[instance.Peer];
                 var service = instance.Service;
                 var callbacks = peerDescriptor.Callbacks[service];
-                var pollItem = new PollReplyItem()
-                {
-                    Id = callbacks.Count,
-                    Name = name,
-                    ServiceName = instance.ServiceName
-                };
                 pollItem.Datas.AddRange(datas);
                 callbacks.Add(pollItem);
             });
         }
 
-        private PollReplyItem[] Poll(PeerDescriptor peerDescriptor, IService service)
+        private PollReplyItem[] Poll(PeerDescriptor peerDescriptor, IServiceHost service)
         {
             this.dispatcher.VerifyAccess();
             var callbacks = peerDescriptor.Callbacks[service];
@@ -242,7 +241,7 @@ namespace Ntreev.Crema.Communication.Grpc
             return peerDescriptor;
         }
 
-        private static void RegisterMethod(Dictionary<string, MethodDescriptor> methodDescriptorByName, IService service)
+        private static void RegisterMethod(Dictionary<string, MethodDescriptor> methodDescriptorByName, IServiceHost service)
         {
             var methods = service.ServiceType.GetMethods();
             foreach (var item in methods)

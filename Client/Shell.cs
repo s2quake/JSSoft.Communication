@@ -33,11 +33,11 @@ namespace Client
     [Export(typeof(Shell))]
     class Shell : CommandContextTerminal, IShell, IServiceProvider
     {
-        private readonly IServiceHost serviceHost;
+        private readonly ICommunicationService serviceHost;
         private bool isDisposed;
 
         [ImportingConstructor]
-        public Shell(CommandContext commandContext, IServiceHost serviceHost)
+        public Shell(CommandContext commandContext, ICommunicationService serviceHost)
            : base(commandContext)
         {
             this.Prompt = "client";

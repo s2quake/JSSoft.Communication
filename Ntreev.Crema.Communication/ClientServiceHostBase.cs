@@ -25,9 +25,9 @@ using System.ComponentModel;
 
 namespace Ntreev.Crema.Communication
 {
-    public abstract class ClientServiceBase<T, U> : ServiceBase where T : class where U : class
+    public abstract class ClientServiceHostBase<T, U> : ServiceHostBase where T : class where U : class
     {
-        protected ClientServiceBase()
+        protected ClientServiceHostBase()
             : base(typeof(T), typeof(U), typeof(U))
         {
 

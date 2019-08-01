@@ -43,7 +43,7 @@ namespace Ntreev.Crema.Communication
 
         public IContextInvoker Invoker { get; set; }
 
-        public IService Service { get; set; }
+        public IServiceHost Service { get; set; }
 
         public string ServiceName => this.Service.Name;
 

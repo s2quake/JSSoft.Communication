@@ -33,8 +33,8 @@ using Ntreev.Crema.Services;
 
 namespace Client.Services
 {
-    [Export(typeof(IService))]
-    class UserService : ClientServiceBase<IUserService, IUserServiceCallback>, IUserServiceCallback
+    [Export(typeof(IServiceHost))]
+    class UserService : ClientServiceHostBase<IUserService, IUserServiceCallback>, IUserServiceCallback
     {
         private IUserService userService;
         public UserService()

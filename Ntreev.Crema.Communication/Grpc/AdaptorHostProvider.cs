@@ -30,11 +30,11 @@ namespace Ntreev.Crema.Communication.Grpc
     [Export(typeof(IAdaptorHostProvider))]
     class AdaptorHostProvider : IAdaptorHostProvider
     {
-        private readonly IEnumerable<IService> services;
+        private readonly IEnumerable<IServiceHost> services;
         private readonly IEnumerable<IExceptionSerializer> exceptionSerializers;
 
         [ImportingConstructor]
-        public AdaptorHostProvider([ImportMany]IEnumerable<IService> services,
+        public AdaptorHostProvider([ImportMany]IEnumerable<IServiceHost> services,
                                    [ImportMany]IEnumerable<IExceptionSerializer> exceptionSerializers)
         {
             //Environment.SetEnvironmentVariable("GRPC_VERBOSITY", "DEBUG");
@@ -42,11 +42,11 @@ namespace Ntreev.Crema.Communication.Grpc
             this.exceptionSerializers = exceptionSerializers.ToArray();
         }
 
-        public IAdaptorHost Create(IServiceHost serviceHost, ServiceToken token)
+        public IAdaptorHost Create(ICommunicationService serviceHost, ServiceToken token)
         {
-            if (serviceHost is ServerHostBase)
+            if (serviceHost is ServerCommunicationServiceBase)
                 return new AdaptorServerHost(this.services, this.exceptionSerializers);
-            else if (serviceHost is ClientHostBase)
+            else if (serviceHost is ClientCommunicationServiceBase)
                 return new AdaptorClientHost(this.services, this.exceptionSerializers);
             throw new NotImplementedException();
         }

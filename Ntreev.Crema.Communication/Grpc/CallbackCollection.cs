@@ -29,9 +29,9 @@ namespace Ntreev.Crema.Communication.Grpc
     class CallbackCollection : IEnumerable<PollReplyItem>, IReadOnlyList<PollReplyItem>
     {
         private readonly List<PollReplyItem> itemList = new List<PollReplyItem>();
-        private readonly IService service;
+        private readonly IServiceHost service;
 
-        public CallbackCollection(IService service)
+        public CallbackCollection(IServiceHost service)
         {
             this.service = service;
         }

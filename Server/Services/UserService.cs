@@ -21,18 +21,19 @@
 // SOFTWARE.
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 using Ntreev.Crema.Communication;
-using Ntreev.Crema.Services;
 
-namespace Server.Services
+namespace Ntreev.Crema.Services
 {
-    [Export(typeof(IService))]
-    class UserService : ServerServiceBase<IUserService, IUserServiceCallback>, IUserService
+    public class UserService : IUserService
     {
-        private readonly Dictionary<string, UserInfo> userInfoByID = new Dictionary<string, UserInfo>();
+        private readonly IUserServiceCallback callback;
+
+        public UserService(IUserServiceCallback callback)
+        {
+            this.callback = callback;
+        }
 
         public Task CreateAsync(string userID, string password)
         {
