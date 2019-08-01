@@ -34,12 +34,19 @@ using Ntreev.Crema.Services;
 namespace Client.Services
 {
     [Export(typeof(IService))]
-    class UserService : ClientServiceBase<IUserService, IUserServiceCallback>, IUserService, IUserServiceCallback
+    class UserService : ClientServiceBase<IUserService, IUserServiceCallback>, IUserServiceCallback
     {
+        private IUserService userService;
         public UserService()
             : base()
         {
 
+        }
+
+        public override object CreateInstance(object obj)
+        {
+            this.userService = obj as IUserService;
+            return this;
         }
 
         // [Export(typeof(IUserService))]

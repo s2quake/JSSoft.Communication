@@ -32,11 +32,20 @@ namespace Ntreev.Crema.Communication.Grpc
         public void Add(PeerDescriptor item)
         {
             base.AddBase(item.Peer, item);
+            item.Disposed += Item_Disposed;
         }
 
         public void Remove(string peer)
         {
+            var item = base[peer];
+            item.Disposed -= Item_Disposed;
             base.RemoveBase(peer);
+        }
+
+        private void Item_Disposed(object sender, EventArgs e)
+        {
+            if (sender is PeerDescriptor item)
+                base.RemoveBase(item.Peer);
         }
     }
 }

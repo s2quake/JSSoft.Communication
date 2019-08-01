@@ -28,12 +28,12 @@ namespace Ntreev.Crema.Communication
 {
     interface IContextInvoker
     {
-        void Invoke(IService service, string name, object[] args);
+        void Invoke(InstanceBase instance, string name, object[] args);
 
-        T Invoke<T>(IService service, string name, object[] args);
+        T Invoke<T>(InstanceBase instance, string name, object[] args);
 
-        Task InvokeAsync(IService service, string name, object[] args);
+        Task InvokeAsync(InstanceBase instance, string name, object[] args);
 
-        Task<T> InvokeAsync<T>(IService service, string name, object[] args);
+        Task<T> InvokeAsync<T>(InstanceBase instance, string name, object[] args);
     }
 }

@@ -30,7 +30,7 @@ namespace Ntreev.Crema.Communication
     {
         private readonly Type serviceType;
         private readonly Type callbackType;
-        // private object instance;
+        private ServiceToken token;
         private Dispatcher dispatcher;
 
         internal ServiceBase(Type serviceType, Type callbackType, Type validationType)
@@ -43,8 +43,6 @@ namespace Ntreev.Crema.Communication
             this.dispatcher = new Dispatcher(this);
         }
 
-        // protected object Instance => this.instance;
-
         public Type ServiceType => this.serviceType;
 
         public Type CallbackType => this.callbackType;
@@ -53,9 +51,9 @@ namespace Ntreev.Crema.Communication
 
         public async Task OpenAsync(ServiceToken token)
         {
+            this.token = token;
             await this.dispatcher.InvokeAsync(() =>
             {
-                // this.instance = instance;
                 this.OnOpened(EventArgs.Empty);
             });
         }
@@ -64,10 +62,11 @@ namespace Ntreev.Crema.Communication
         {
             await this.dispatcher.InvokeAsync(() =>
             {
-                // this.instance = null;
                 this.OnClosed(EventArgs.Empty);
             });
         }
+
+        public abstract object CreateInstance(object obj);
 
         public string Name { get; }
 

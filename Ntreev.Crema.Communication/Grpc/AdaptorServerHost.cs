@@ -40,7 +40,7 @@ namespace Ntreev.Crema.Communication.Grpc
         private readonly Dictionary<string, IService> serviceByName = new Dictionary<string, IService>();
         private readonly Dictionary<Type, IExceptionSerializer> exceptionSerializerByType = new Dictionary<Type, IExceptionSerializer>();
         private readonly Dictionary<string, MethodDescriptor> methodDescriptorByName = new Dictionary<string, MethodDescriptor>();
-        private readonly Dictionary<string, CallbackCollection> callbacksByName = new Dictionary<string, CallbackCollection>();
+        //private readonly Dictionary<string, CallbackCollection> callbacksByName = new Dictionary<string, CallbackCollection>();
         private readonly HashSet<string> peerHashes = new HashSet<string>();
         private Dispatcher dispatcher;
         private ILogger logger;
@@ -66,21 +66,7 @@ namespace Ntreev.Crema.Communication.Grpc
         {
             var token = await this.dispatcher.InvokeAsync(() =>
             {
-                var peerDescriptor = new PeerDescriptor(context.Peer)
-                {
-                    Services = request.ServiceNames.Select(item => this.serviceByName[item]).ToArray(),
-                };
-                foreach (var item in this.callbacksByName)
-                {
-                    peerDescriptor.Properties.Add($"{item.Key}.ID", item.Value.Count);
-                }
-                foreach (var item in peerDescriptor.Services)
-                {                    
-                    var instance = TypeDescriptor.CreateInstance(null, item.ServiceType, null, null);
-                    peerDescriptor.Instances.Add(item, instance);
-                    var callback = this.Create(item);
-                    peerDescriptor.Callbacks.Add(item, callback);
-                }
+                var peerDescriptor = this.CreatePeerDescriptor(context.Peer, request.ServiceNames);
                 this.peers.Add(peerDescriptor);
                 return peerDescriptor.Token;
             });
@@ -92,7 +78,8 @@ namespace Ntreev.Crema.Communication.Grpc
         {
             await this.dispatcher.InvokeAsync(() =>
             {
-                this.peers.Remove(context.Peer);
+                var peerDescriptor = this.peers[context.Peer];
+                peerDescriptor.Dispose();
             });
             this.logger.Debug($"Disconnected: {context.Peer}");
             return new CloseReply();
@@ -143,10 +130,10 @@ namespace Ntreev.Crema.Communication.Grpc
         {
             var cancellationToken = this.cancellation.Token;
             this.peerHashes.Add(context.Peer);
+            var peerDescriptor = await this.dispatcher.InvokeAsync(() => this.peers[context.Peer]);
             while (await requestStream.MoveNext())
             {
                 var request = requestStream.Current;
-                var peerDescriptor = this.peers[context.Peer];
                 var services = peerDescriptor.Services;
                 if (this.cancellation.IsCancellationRequested == true)
                 {
@@ -158,10 +145,8 @@ namespace Ntreev.Crema.Communication.Grpc
                 {
                     foreach (var item in services)
                     {
-                        var id = (int)peerDescriptor.Properties[$"{item.Name}.ID"];
-                        var items = this.Poll(item, ref id);
+                        var items = this.Poll(peerDescriptor, item);
                         reply.Items.AddRange(items);
-                        peerDescriptor.Properties[$"{item}.ID"] = id;
                     }
                 });
                 await responseStream.WriteAsync(reply);
@@ -169,7 +154,7 @@ namespace Ntreev.Crema.Communication.Grpc
             this.peerHashes.Remove(context.Peer);
         }
 
-        public object Create(IService service)
+        public object CreateCallback(string peer, IService service)
         {
             var instanceType = service.CallbackType;
             var typeName = $"{instanceType.Name}Impl";
@@ -178,6 +163,7 @@ namespace Ntreev.Crema.Communication.Grpc
             var instance = TypeDescriptor.CreateInstance(null, implType, null, null) as InstanceBase;
             instance.Service = service;
             instance.Invoker = this;
+            instance.Peer = peer;
             return instance;
         }
 
@@ -205,34 +191,30 @@ namespace Ntreev.Crema.Communication.Grpc
                 throw new ArgumentNullException(nameof(token));
         }
 
-        private Task AddCallback(string serviceName, string name, object[] args)
+        private Task AddCallback(InstanceBase instance, string name, object[] args)
         {
             var datas = SerializerUtility.GetStrings(args);
             return this.dispatcher.InvokeAsync(() =>
             {
-                var callbacks = this.callbacksByName[serviceName];
+                var peerDescriptor = this.peers[instance.Peer];
+                var service = instance.Service;
+                var callbacks = peerDescriptor.Callbacks[service];
                 var pollItem = new PollReplyItem()
                 {
                     Id = callbacks.Count,
                     Name = name,
-                    ServiceName = serviceName
+                    ServiceName = instance.ServiceName
                 };
                 pollItem.Datas.AddRange(datas);
                 callbacks.Add(pollItem);
             });
         }
 
-        private PollReplyItem[] Poll(IService service, ref int id)
+        private PollReplyItem[] Poll(PeerDescriptor peerDescriptor, IService service)
         {
             this.dispatcher.VerifyAccess();
-            var callbacks = this.callbacksByName[service.Name];
-            var items = new PollReplyItem[callbacks.Count - id];
-            for (var i = id; i < callbacks.Count; i++)
-            {
-                items[i - id] = callbacks[i];
-            }
-            id = callbacks.Count;
-            return items;
+            var callbacks = peerDescriptor.Callbacks[service];
+            return callbacks.Flush();
         }
 
         private IExceptionSerializer GetExceptionSerializer(Exception e)
@@ -242,6 +224,22 @@ namespace Ntreev.Crema.Communication.Grpc
                 return this.exceptionSerializerByType[e.GetType()];
             }
             return this.exceptionSerializerByType[typeof(Exception)];
+        }
+
+        private PeerDescriptor CreatePeerDescriptor(string peer, IEnumerable<string> serviceNames)
+        {
+            var peerDescriptor = new PeerDescriptor(peer)
+            {
+                Services = serviceNames.Select(item => this.serviceByName[item]).ToArray(),
+            };
+            foreach (var item in peerDescriptor.Services)
+            {
+                var callback = this.CreateCallback(peerDescriptor.Peer, item);
+                peerDescriptor.CallbackInstances.Add(item, callback);
+                var instance = item.CreateInstance(callback);
+                peerDescriptor.ServiceInstances.Add(item, instance);
+            }
+            return peerDescriptor;
         }
 
         private static void RegisterMethod(Dictionary<string, MethodDescriptor> methodDescriptorByName, IService service)
@@ -260,22 +258,22 @@ namespace Ntreev.Crema.Communication.Grpc
 
         #region IContextInvoker
 
-        void IContextInvoker.Invoke(IService service, string name, object[] args)
+        void IContextInvoker.Invoke(InstanceBase instance, string name, object[] args)
         {
-            this.AddCallback(service.Name, name, args);
+            this.AddCallback(instance, name, args);
         }
 
-        T IContextInvoker.Invoke<T>(IService service, string name, object[] args)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task IContextInvoker.InvokeAsync(IService service, string name, object[] args)
+        T IContextInvoker.Invoke<T>(InstanceBase instance, string name, object[] args)
         {
             throw new NotImplementedException();
         }
 
-        Task<T> IContextInvoker.InvokeAsync<T>(IService service, string name, object[] args)
+        Task IContextInvoker.InvokeAsync(InstanceBase instance, string name, object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<T> IContextInvoker.InvokeAsync<T>(InstanceBase instance, string name, object[] args)
         {
             throw new NotImplementedException();
         }

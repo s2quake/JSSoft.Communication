@@ -61,6 +61,13 @@ namespace Ntreev.Crema.Communication.Grpc
             return this.itemList.Contains(item);
         }
 
+        public PollReplyItem[] Flush()
+        {
+            var items = this.itemList.ToArray();
+            this.itemList.Clear();
+            return items;
+        }
+
         public int Count => this.itemList.Count;
 
         #region IEnumerable

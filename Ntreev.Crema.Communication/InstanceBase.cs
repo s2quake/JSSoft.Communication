@@ -45,24 +45,28 @@ namespace Ntreev.Crema.Communication
 
         public IService Service { get; set; }
 
+        public string ServiceName => this.Service.Name;
+
+        public string Peer { get; set; }
+
         protected void Invoke(string name, params object[] args)
         {
-            this.Invoker.Invoke(this.Service, name, args);
+            this.Invoker.Invoke(this, name, args);
         }
 
         protected T Invoke<T>(string name, params object[] args)
         {
-            return this.Invoker.Invoke<T>(this.Service, name, args);
+            return this.Invoker.Invoke<T>(this, name, args);
         }
 
         protected Task InvokeAsync(string name, params object[] args)
         {
-            return this.Invoker.InvokeAsync(this.Service, name, args);
+            return this.Invoker.InvokeAsync(this, name, args);
         }
 
         protected Task<T> InvokeAsync<T>(string name, params object[] args)
         {
-            return this.Invoker.InvokeAsync<T>(this.Service, name, args);
+            return this.Invoker.InvokeAsync<T>(this, name, args);
         }
     }
 }

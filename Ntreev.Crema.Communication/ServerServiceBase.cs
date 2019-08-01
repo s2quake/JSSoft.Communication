@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 using System;
+using System.ComponentModel;
 
 namespace Ntreev.Crema.Communication
 {
@@ -32,6 +33,9 @@ namespace Ntreev.Crema.Communication
 
         }
 
-        // protected U Callback => (U)base.Instance;
+        public override object CreateInstance(object obj)
+        {
+            return TypeDescriptor.CreateInstance(null, this.ServiceType, null, null);
+        }
     }
 }

@@ -21,16 +21,24 @@
 // SOFTWARE.
 
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
 namespace Ntreev.Crema.Communication.Grpc
 {
-    class PeerDescriptor
+    sealed class PeerDescriptor
     {
         public PeerDescriptor(string peer)
         {
             this.Peer = peer;
+        }
+
+        public void Dispose()
+        {
+            this.ServiceInstances.DisposeAll();
+            this.CallbackInstances.DisposeAll();
+            this.Disposed?.Invoke(this, EventArgs.Empty);
         }
 
         public string Peer { get; }
@@ -41,10 +49,14 @@ namespace Ntreev.Crema.Communication.Grpc
 
         public DateTime Ping { get; set; }
 
-        public Dictionary<IService, object> Instances { get; } = new Dictionary<IService, object>();
+        public Dictionary<IService, object> ServiceInstances { get; } = new Dictionary<IService, object>();
 
-        public Dictionary<IService, object> Callbacks { get; } = new Dictionary<IService, object>();
+        public Dictionary<IService, object> CallbackInstances { get; } = new Dictionary<IService, object>();
+
+        public Dictionary<IService, CallbackCollection> Callbacks { get; } = new Dictionary<IService, CallbackCollection>();
 
         public Dictionary<string, object> Properties { get; } = new Dictionary<string, object>();
+
+        public event EventHandler Disposed;
     }
 }

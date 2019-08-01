@@ -31,6 +31,8 @@ namespace Ntreev.Crema.Communication
 
         Task CloseAsync(ServiceToken token);
 
+        object CreateInstance(object obj);
+
         Type ServiceType { get; }
 
         Type CallbackType { get; }
