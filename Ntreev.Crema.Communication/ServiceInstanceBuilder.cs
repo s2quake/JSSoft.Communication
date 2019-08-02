@@ -114,7 +114,8 @@ namespace Ntreev.Crema.Communication
         {
             var parameterInfos = methodInfo.GetParameters();
             var parameterTypes = parameterInfos.Select(i => i.ParameterType).ToArray();
-            var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, MethodAttributes.Public | MethodAttributes.Virtual, CallingConventions.Standard, typeof(void), parameterTypes);
+            var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, MethodAttributes.Public | MethodAttributes.Virtual, 
+                                                        CallingConventions.Standard, methodInfo.ReturnType, parameterTypes);
             var invokeMethod = typeBuilder.BaseType.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
                                                    .FirstOrDefault(item => item.Name == nameof(IContextInvoker.Invoke) && item.IsGenericMethod == false);
             var arrayCount = parameterInfos.Length * 2;
@@ -158,7 +159,8 @@ namespace Ntreev.Crema.Communication
         {
             var parameterInfos = methodInfo.GetParameters();
             var parameterTypes = parameterInfos.Select(i => i.ParameterType).ToArray();
-            var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, MethodAttributes.Public | MethodAttributes.Virtual, CallingConventions.Standard, typeof(void), parameterTypes);
+            var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, MethodAttributes.Public | MethodAttributes.Virtual, 
+                                                        CallingConventions.Standard, methodInfo.ReturnType, parameterTypes);
             var invokeMethod = typeBuilder.BaseType.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
                                                    .FirstOrDefault(item => item.Name == nameof(IContextInvoker.Invoke) && item.IsGenericMethod == true);
             var arrayCount = parameterInfos.Length * 2;
@@ -249,7 +251,7 @@ namespace Ntreev.Crema.Communication
             var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, MethodAttributes.Public | MethodAttributes.Virtual,
                                                 CallingConventions.Standard, methodInfo.ReturnType, parameterTypes);
             var invokeMethod = typeBuilder.BaseType.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
-                                                   .FirstOrDefault(item => item.Name == nameof(IContextInvoker.Invoke) && item.IsGenericMethod == true);
+                                                   .FirstOrDefault(item => item.Name == nameof(IContextInvoker.InvokeAsync) && item.IsGenericMethod == true);
             var arrayCount = parameterInfos.Length * 2;
             var typeofMethod = typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle));
 
@@ -286,10 +288,6 @@ namespace Ntreev.Crema.Communication
 
             var genericMethod = invokeMethod.MakeGenericMethod(methodInfo.ReturnType.GetGenericArguments());
             il.Emit(OpCodes.Call, genericMethod);
-            // il.Emit(OpCodes.Stloc_0);
-            // il.Emit(OpCodes.Br_S, label);
-            // il.MarkLabel(label);
-            // il.Emit(OpCodes.Ldloc_0);
             il.Emit(OpCodes.Nop);
             il.Emit(OpCodes.Ret);
         }

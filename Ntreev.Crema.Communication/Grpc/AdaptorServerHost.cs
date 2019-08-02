@@ -102,13 +102,27 @@ namespace Ntreev.Crema.Communication.Grpc
             if (this.methodDescriptorByName.ContainsKey(request.Name) == false)
                 throw new InvalidOperationException();
 
-            var methodDescriptor = methodDescriptorByName[request.Name];
+            var methodDescriptor = this.methodDescriptorByName[request.Name];
+            var peerDescriptor = this.peers[context.Peer];
             try
             {
-                var (valueType, value) = await methodDescriptor.InvokeAsync(service, request.Datas);
+                var instance = peerDescriptor.ServiceInstances[service];
+                var (valueType, value) = await methodDescriptor.InvokeAsync(instance, request.Datas);
                 var reply = new InvokeReply()
                 {
                     Data = SerializerUtility.GetString(value, valueType)
+                };
+                return reply;
+            }
+            catch (TargetInvocationException e)
+            {
+                var exception = e.InnerException ?? e;
+                var serializer = this.GetExceptionSerializer(exception);
+                var data = serializer.Serialize(exception);
+                var reply = new InvokeReply()
+                {
+                    Code = serializer.ExceptionCode,
+                    Data = data
                 };
                 return reply;
             }
