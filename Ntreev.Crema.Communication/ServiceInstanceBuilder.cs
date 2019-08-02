@@ -97,12 +97,13 @@ namespace Ntreev.Crema.Communication
                 {
                     CreateGenericInvokeAsync(typeBuilder, item);
                 }
+                else if (returnType == typeof(void))
+                {
+                    CreateInvoke(typeBuilder, item);
+                }
                 else
                 {
-                    if (returnType == typeof(void))
-                        CreateInvoke(typeBuilder, item);
-                    else
-                        CreateGenericInvoke(typeBuilder, item);
+                    CreateGenericInvoke(typeBuilder, item);
                 }
             }
 
@@ -201,7 +202,7 @@ namespace Ntreev.Crema.Communication
         {
             var parameterInfos = methodInfo.GetParameters();
             var parameterTypes = parameterInfos.Select(i => i.ParameterType).ToArray();
-            var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, MethodAttributes.Public | MethodAttributes.Virtual, 
+            var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, MethodAttributes.Public | MethodAttributes.Virtual,
                                                     CallingConventions.Standard, methodInfo.ReturnType, parameterTypes);
             var invokeMethod = typeBuilder.BaseType.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
                                                    .FirstOrDefault(item => item.Name == nameof(IContextInvoker.InvokeAsync) && item.IsGenericMethod == false);
@@ -214,7 +215,6 @@ namespace Ntreev.Crema.Communication
             }
 
             var il = methodBuilder.GetILGenerator();
-            il.Emit(OpCodes.Nop);
             il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Ldstr, MethodDescriptor.GenerateName(methodInfo));
             il.Emit(OpCodes.Ldc_I4, arrayCount);
