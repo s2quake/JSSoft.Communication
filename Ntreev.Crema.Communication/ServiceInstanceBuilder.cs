@@ -89,12 +89,13 @@ namespace Ntreev.Crema.Communication
             foreach (var item in methods)
             {
                 var returnType = item.ReturnType;
-                if (returnType.IsSubclassOf(typeof(Task)) == true)
+                if (returnType == typeof(Task))
                 {
-                    if (returnType.GetGenericArguments().Length > 0)
-                        CreateGenericInvokeAsync(typeBuilder, item);
-                    else
-                        CreateInvokeAsync(typeBuilder, item);
+                    CreateInvokeAsync(typeBuilder, item);
+                }
+                else if (returnType.IsSubclassOf(typeof(Task)) == true)
+                {
+                    CreateGenericInvokeAsync(typeBuilder, item);
                 }
                 else
                 {
@@ -201,7 +202,7 @@ namespace Ntreev.Crema.Communication
             var parameterInfos = methodInfo.GetParameters();
             var parameterTypes = parameterInfos.Select(i => i.ParameterType).ToArray();
             var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, MethodAttributes.Public | MethodAttributes.Virtual, 
-                                                    CallingConventions.Standard, typeof(void), parameterTypes);
+                                                    CallingConventions.Standard, methodInfo.ReturnType, parameterTypes);
             var invokeMethod = typeBuilder.BaseType.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
                                                    .FirstOrDefault(item => item.Name == nameof(IContextInvoker.InvokeAsync) && item.IsGenericMethod == false);
             var arrayCount = parameterInfos.Length * 2;
@@ -213,7 +214,6 @@ namespace Ntreev.Crema.Communication
             }
 
             var il = methodBuilder.GetILGenerator();
-            var label = il.DefineLabel();
             il.Emit(OpCodes.Nop);
             il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Ldstr, MethodDescriptor.GenerateName(methodInfo));
@@ -238,10 +238,7 @@ namespace Ntreev.Crema.Communication
                 il.Emit(OpCodes.Stelem_Ref);
             }
             il.Emit(OpCodes.Call, invokeMethod);
-            il.Emit(OpCodes.Stloc_0);
-            il.Emit(OpCodes.Br_S, label);
-            il.MarkLabel(label);
-            il.Emit(OpCodes.Ldloc_0);
+            il.Emit(OpCodes.Nop);
             il.Emit(OpCodes.Ret);
         }
 

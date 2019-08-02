@@ -28,7 +28,7 @@ namespace Ntreev.Crema.Communication
     public abstract class ClientServiceHostBase<T, U> : ServiceHostBase where T : class where U : class
     {
         protected ClientServiceHostBase()
-            : base(typeof(T), typeof(U), typeof(U))
+            : base(typeof(T), typeof(U))
         {
 
         }

@@ -39,24 +39,21 @@ namespace Ntreev.Crema.Communication.Grpc
         private readonly Dictionary<Type, IExceptionSerializer> exceptionSerializerByType = new Dictionary<Type, IExceptionSerializer>();
         private readonly Dictionary<int, IExceptionSerializer> exceptionSerializerByCode = new Dictionary<int, IExceptionSerializer>();
         private readonly Dictionary<string, MethodDescriptor> methodDescriptorByName = new Dictionary<string, MethodDescriptor>();
-        // private readonly Dictionary<IService, int> idByService = new Dictionary<IService, int>();
+        private readonly Dictionary<IServiceHost, object> serviceInstanceByService = new Dictionary<IServiceHost, object>();
+        private readonly Dictionary<IServiceHost, object> callbackInstanceByService = new Dictionary<IServiceHost, object>();
         private AsyncDuplexStreamingCall<PollRequest, PollReply> call;
         private CancellationTokenSource cancellation;
         private Task task;
         private string token;
-
         private Channel channel;
         private AdaptorClientImpl adaptorImpl;
         private ServiceInstanceBuilder instanceBuilder = new ServiceInstanceBuilder();
-        private readonly Dictionary<IServiceHost, object> serviceInstanceByService = new Dictionary<IServiceHost, object>();
-        private readonly Dictionary<IServiceHost, object> callbackInstanceByService = new Dictionary<IServiceHost, object>();
 
         public AdaptorClientHost(IEnumerable<IServiceHost> services, IEnumerable<IExceptionSerializer> exceptionSerializers)
         {
             this.serviceByName = services.ToDictionary(item => item.Name);
             this.exceptionSerializerByType = exceptionSerializers.ToDictionary(item => item.ExceptionType);
             this.exceptionSerializerByCode = exceptionSerializers.ToDictionary(item => item.ExceptionCode);
-            // this.idByService = services.ToDictionary(item => item, item => 0);
             foreach (var item in services)
             {
                 RegisterMethod(this.methodDescriptorByName, item);
@@ -127,15 +124,6 @@ namespace Ntreev.Crema.Communication.Grpc
         {
             this.Disconnected?.Invoke(this, e);
         }
-
-        public event EventHandler<PeerEventArgs> PeerAdded;
-        public event EventHandler<PeerEventArgs> PeerRemoved;
-
-        // private void AdaptorImpl_Disconnected(object sender, DisconnectionReasonEventArgs e)
-        // {
-        //     this.adaptorImpl = null;
-        //     this.Disconnected?.Invoke(this, e);
-        // }
 
         private static void RegisterMethod(Dictionary<string, MethodDescriptor> methodDescriptorByName, IServiceHost service)
         {

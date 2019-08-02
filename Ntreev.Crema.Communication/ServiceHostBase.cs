@@ -33,10 +33,8 @@ namespace Ntreev.Crema.Communication
         private ServiceToken token;
         private Dispatcher dispatcher;
 
-        internal ServiceHostBase(Type serviceType, Type callbackType, Type validationType)
+        internal ServiceHostBase(Type serviceType, Type callbackType)
         {
-            if (validationType.IsAssignableFrom(this.GetType()) == false)
-                throw new ArgumentException("invalid type", nameof(validationType));
             this.Name = serviceType.Name;
             this.serviceType = serviceType;
             this.callbackType = callbackType;

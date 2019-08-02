@@ -22,6 +22,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Reflection;
 using System.Threading;
@@ -34,10 +35,13 @@ using Ntreev.Crema.Services;
 namespace Client.Services
 {
     [Export(typeof(IServiceHost))]
-    class UserService : ClientServiceHostBase<IUserService, IUserServiceCallback>, IUserServiceCallback
+    class UserServiceHost : ClientServiceHostBase<IUserService, IUserServiceCallback>, IUserServiceCallback, INotifyPropertyChanged
     {
         private IUserService userService;
-        public UserService()
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public UserServiceHost()
             : base()
         {
 
@@ -46,55 +50,17 @@ namespace Client.Services
         public override object CreateInstance(object obj)
         {
             this.userService = obj as IUserService;
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.UserService)));
             return this;
         }
 
-        // [Export(typeof(IUserService))]
-        // private IUserService ExportedService => this.Service;
+        [Export(typeof(IUserService))]
+        public IUserService UserService => this.userService;
 
-        public Task CreateAsync(string userID, string password)
+        protected override void OnClosed(EventArgs e)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task DeleteAsync(Guid token, string userID)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<(string, string)> GetUserInfoAsync(Guid token, string userID)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<string[]> GetUsersAsync(Guid token)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> IsOnlineAsync(Guid token, string userID)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Guid> LoginAsync(string userID, string password)
-        {
-            return this.LoginAsync(userID, password);
-        }
-
-        public Task LogoutAsync(Guid token)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task SendMessageAsync(Guid token, string userID, string message)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task SetUserInfoAsync(Guid token, string userName)
-        {
-            throw new NotImplementedException();
+            this.userService = null;
+            base.OnClosed(e);
         }
 
         #region IUserServiceCallback

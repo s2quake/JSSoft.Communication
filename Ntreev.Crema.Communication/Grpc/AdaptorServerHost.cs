@@ -40,15 +40,14 @@ namespace Ntreev.Crema.Communication.Grpc
         private readonly Dictionary<string, IServiceHost> serviceByName = new Dictionary<string, IServiceHost>();
         private readonly Dictionary<Type, IExceptionSerializer> exceptionSerializerByType = new Dictionary<Type, IExceptionSerializer>();
         private readonly Dictionary<string, MethodDescriptor> methodDescriptorByName = new Dictionary<string, MethodDescriptor>();
-        //private readonly Dictionary<string, CallbackCollection> callbacksByName = new Dictionary<string, CallbackCollection>();
         private readonly HashSet<string> peerHashes = new HashSet<string>();
+        private readonly PeerCollection peers = new PeerCollection();
+        private readonly ServiceInstanceBuilder instanceBuilder = new ServiceInstanceBuilder();
         private Dispatcher dispatcher;
         private ILogger logger;
         private CancellationTokenSource cancellation;
         private Server server;
         private AdaptorServerImpl adaptor;
-        private ServiceInstanceBuilder instanceBuilder = new ServiceInstanceBuilder();
-        private readonly PeerCollection peers = new PeerCollection();
 
         public AdaptorServerHost(IEnumerable<IServiceHost> services, IEnumerable<IExceptionSerializer> exceptionSerializers)
         {
@@ -159,7 +158,7 @@ namespace Ntreev.Crema.Communication.Grpc
             var instanceType = service.CallbackType;
             var typeName = $"{instanceType.Name}Impl";
             var typeNamespace = instanceType.Namespace;
-            var implType = instanceBuilder.CreateType(typeName, typeNamespace, typeof(InstanceBase), instanceType);
+            var implType = this.instanceBuilder.CreateType(typeName, typeNamespace, typeof(InstanceBase), instanceType);
             var instance = TypeDescriptor.CreateInstance(null, implType, null, null) as InstanceBase;
             instance.Service = service;
             instance.Invoker = this;
@@ -174,10 +173,6 @@ namespace Ntreev.Crema.Communication.Grpc
         }
 
         public event EventHandler<DisconnectionReasonEventArgs> Disconnected;
-
-        public event EventHandler<PeerEventArgs> PeerAdded;
-
-        public event EventHandler<PeerEventArgs> PeerRemoved;
 
         protected virtual void OnDisconnected(DisconnectionReasonEventArgs e)
         {
@@ -237,7 +232,9 @@ namespace Ntreev.Crema.Communication.Grpc
                 peerDescriptor.CallbackInstances.Add(item, callback);
                 var instance = item.CreateInstance(callback);
                 peerDescriptor.ServiceInstances.Add(item, instance);
+                peerDescriptor.Callbacks.Add(item, new CallbackCollection(item));
             }
+            
             return peerDescriptor;
         }
 

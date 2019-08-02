@@ -32,12 +32,6 @@ namespace Ntreev.Crema.Communication
 
         Task CloseAsync();
 
-        //object Create(IService service);
-
-        // event EventHandler<PeerEventArgs> PeerAdded;
-
-        // event EventHandler<PeerEventArgs> PeerRemoved;
-
         event EventHandler<DisconnectionReasonEventArgs> Disconnected;
     }
 }

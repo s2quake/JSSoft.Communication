@@ -53,7 +53,7 @@ namespace Ntreev.Crema.Communication
             return $"{methodInfo.ReturnType} {methodInfo.ReflectedType}.{methodInfo.Name}({parameterTypeNames})";
         }
 
-        public string Name{get;}
+        public string Name { get; }
 
         public MethodInfo MethodInfo { get; }
 
