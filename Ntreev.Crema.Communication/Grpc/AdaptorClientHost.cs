@@ -92,7 +92,6 @@ namespace Ntreev.Crema.Communication.Grpc
             this.task.Wait();
             this.task = null;
             this.serviceInstanceByService.DisposeAll();
-            this.callbackInstanceByService.DisposeAll();
             if (this.adaptorImpl != null)
                 await this.adaptorImpl.CloseAsync(new CloseRequest() { Token = this.token });
             this.token = null;

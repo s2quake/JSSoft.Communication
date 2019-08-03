@@ -21,41 +21,19 @@
 // SOFTWARE.
 
 using System;
-using System.Linq;
-using System.Collections;
-using System.Collections.Generic;
+using System.Threading.Tasks;
+using Ntreev.Library.Threading;
 
-namespace Ntreev.Crema.Communication.Grpc
+namespace Ntreev.Crema.Communication
 {
-    sealed class PeerDescriptor
+    [AttributeUsage(AttributeTargets.Class)]
+    public sealed class ServiceHostAttribute : Attribute
     {
-        public PeerDescriptor(string peer)
+        public ServiceHostAttribute()
         {
-            this.Peer = peer;
+
         }
 
-        public void Dispose()
-        {
-            this.CallbackInstances.DisposeAll();
-            this.Disposed?.Invoke(this, EventArgs.Empty);
-        }
-
-        public string Peer { get; }
-
-        public IServiceHost[] Services { get; set; }
-
-        public Guid Token { get; set; } = Guid.NewGuid();
-
-        public DateTime Ping { get; set; }
-
-        public Dictionary<IServiceHost, object> ServiceInstances { get; } = new Dictionary<IServiceHost, object>();
-
-        public Dictionary<IServiceHost, object> CallbackInstances { get; } = new Dictionary<IServiceHost, object>();
-
-        public Dictionary<IServiceHost, CallbackCollection> Callbacks { get; } = new Dictionary<IServiceHost, CallbackCollection>();
-
-        public Dictionary<string, object> Properties { get; } = new Dictionary<string, object>();
-
-        public event EventHandler Disposed;
+        public bool PerPeer { get; set; }
     }
 }

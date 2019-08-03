@@ -54,7 +54,7 @@ namespace Ntreev.Crema.Communication.Grpc
             this.serviceByName = services.ToDictionary(item => item.Name);
             this.exceptionSerializerByType = exceptionSerializers.ToDictionary(item => item.ExceptionType);
             this.logger = GrpcEnvironment.Logger;
-            this.dispatcher = new Dispatcher(this);
+            
             foreach (var item in services)
             {
                 RegisterMethod(this.methodDescriptorByName, item);
@@ -294,6 +294,7 @@ namespace Ntreev.Crema.Communication.Grpc
 
         Task IAdaptorHost.OpenAsync(string host, int port)
         {
+            this.dispatcher = new Dispatcher(this);
             this.adaptor = new AdaptorServerImpl(this);
             this.server = new Server()
             {
@@ -309,13 +310,14 @@ namespace Ntreev.Crema.Communication.Grpc
         {
             this.adaptor = null;
             this.cancellation.Cancel();
-
             while (this.peerHashes.Any())
             {
                 await Task.Delay(1);
             }
             await this.server.ShutdownAsync();
             this.server = null;
+            await this.dispatcher.DisposeAsync();
+            this.dispatcher = null;
         }
 
         #endregion
