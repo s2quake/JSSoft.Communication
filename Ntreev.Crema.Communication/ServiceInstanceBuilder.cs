@@ -91,34 +91,33 @@ namespace Ntreev.Crema.Communication
                 var returnType = item.ReturnType;
                 if (returnType == typeof(Task))
                 {
-                    CreateInvokeAsync(typeBuilder, item);
+                    CreateInvoke(typeBuilder, item, nameof(IAdaptorHost.InvokeAsync), false);
                 }
                 else if (returnType.IsSubclassOf(typeof(Task)) == true)
                 {
-                    CreateGenericInvokeAsync(typeBuilder, item);
+                    CreateInvoke(typeBuilder, item, nameof(IAdaptorHost.InvokeAsync), true);
                 }
                 else if (returnType == typeof(void))
                 {
-                    CreateInvoke(typeBuilder, item);
+                    CreateInvoke(typeBuilder, item, nameof(IAdaptorHost.Invoke), false);
                 }
                 else
                 {
-                    CreateGenericInvoke(typeBuilder, item);
+                    CreateInvoke(typeBuilder, item, nameof(IAdaptorHost.Invoke), true);
                 }
             }
 
             return typeBuilder.CreateType();
         }
 
-        private static void CreateInvoke(TypeBuilder typeBuilder, MethodInfo methodInfo)
+        private static void CreateInvoke(TypeBuilder typeBuilder, MethodInfo methodInfo, string baseMethodName, bool isGenericMethod)
         {
             var parameterInfos = methodInfo.GetParameters();
             var parameterTypes = parameterInfos.Select(i => i.ParameterType).ToArray();
             var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, MethodAttributes.Public | MethodAttributes.Virtual, 
                                                         CallingConventions.Standard, methodInfo.ReturnType, parameterTypes);
             var invokeMethod = typeBuilder.BaseType.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
-                                                   .FirstOrDefault(item => item.Name == nameof(IAdaptorHost.Invoke) && item.IsGenericMethod == false);
-            var arrayCount = parameterInfos.Length * 2;
+                                                   .FirstOrDefault(item => item.Name == baseMethodName && item.IsGenericMethod == isGenericMethod);
             var typeofMethod = typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle));
 
             for (var i = 0; i < parameterInfos.Length; i++)
@@ -127,22 +126,24 @@ namespace Ntreev.Crema.Communication
             }
 
             var il = methodBuilder.GetILGenerator();
-            il.Emit(OpCodes.Nop);
-            il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Ldstr, MethodDescriptor.GenerateName(methodInfo));
-            il.Emit(OpCodes.Ldc_I4, arrayCount);
-            il.Emit(OpCodes.Newarr, typeof(object));
+            il.Emit(OpCodes.Ldc_I4, parameterInfos.Length);
+            il.Emit(OpCodes.Newarr, typeof(Type));
+            for (var i = 0; i < parameterInfos.Length; i++)
+            {
+                var item = parameterInfos[i];
+                il.Emit(OpCodes.Dup);
+                il.Emit(OpCodes.Ldc_I4, i);
+                il.Emit(OpCodes.Ldtoken, item.ParameterType);
+                il.Emit(OpCodes.Call, typeofMethod);
+                il.Emit(OpCodes.Stelem_Ref);
+            }
+            il.Emit(OpCodes.Stloc_0);
 
             for (var i = 0; i < parameterInfos.Length; i++)
             {
                 var item = parameterInfos[i];
                 il.Emit(OpCodes.Dup);
-                il.Emit(OpCodes.Ldc_I4, i * 2 + 0);
-                il.Emit(OpCodes.Ldtoken, item.ParameterType);
-                il.Emit(OpCodes.Call, typeofMethod);
-                il.Emit(OpCodes.Stelem_Ref);
-                il.Emit(OpCodes.Dup);
-                il.Emit(OpCodes.Ldc_I4, i * 2 + 1);
+                il.Emit(OpCodes.Ldc_I4, i);
                 il.Emit(OpCodes.Ldarg, i + 1);
                 if (item.ParameterType.IsClass == false)
                 {
@@ -150,8 +151,11 @@ namespace Ntreev.Crema.Communication
                 }
                 il.Emit(OpCodes.Stelem_Ref);
             }
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Ldstr, MethodDescriptor.GenerateName(methodInfo));
+            il.Emit(OpCodes.Ldloc_0);
+            il.Emit(OpCodes.Ldloc_1);
             il.Emit(OpCodes.Call, invokeMethod);
-            il.Emit(OpCodes.Nop);
             il.Emit(OpCodes.Ret);
         }
 

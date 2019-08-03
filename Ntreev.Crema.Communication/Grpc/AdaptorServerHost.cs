@@ -165,9 +165,9 @@ namespace Ntreev.Crema.Communication.Grpc
                 throw new ArgumentNullException(nameof(token));
         }
 
-        private Task AddCallback(InstanceBase instance, string name, object[] args)
+        private Task AddCallback(InstanceBase instance, string name, Type[] types, object[] args)
         {
-            var datas = SerializerUtility.GetStrings(args);
+            var datas = this.dataSerializer.SerializeMany(types, args);
             var pollItem = new PollReplyItem()
             {
                 Name = name,
@@ -219,22 +219,22 @@ namespace Ntreev.Crema.Communication.Grpc
             await this.Dispatcher.DisposeAsync();
         }
 
-        void IAdaptorHost.Invoke(InstanceBase instance, string name, object[] args)
+        void IAdaptorHost.Invoke(InstanceBase instance, string name, Type[] types, object[] args)
         {
-            this.AddCallback(instance, name, args);
+            this.AddCallback(instance, name, types, args);
         }
 
-        T IAdaptorHost.Invoke<T>(InstanceBase instance, string name, object[] args)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task IAdaptorHost.InvokeAsync(InstanceBase instance, string name, object[] args)
+        T IAdaptorHost.Invoke<T>(InstanceBase instance, string name, Type[] types, object[] args)
         {
             throw new NotImplementedException();
         }
 
-        Task<T> IAdaptorHost.InvokeAsync<T>(InstanceBase instance, string name, object[] args)
+        Task IAdaptorHost.InvokeAsync(InstanceBase instance, string name, Type[] types, object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<T> IAdaptorHost.InvokeAsync<T>(InstanceBase instance, string name, Type[] types, object[] args)
         {
             throw new NotImplementedException();
         }

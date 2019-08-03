@@ -21,30 +21,33 @@
 // SOFTWARE.
 
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Ntreev.Library.ObjectModel;
 
 namespace Ntreev.Crema.Communication
 {
-    public interface IAdaptorHost : IDisposable
+    public static class IDataSerializerExtensions
     {
-        Task OpenAsync(string host, int port);
+        public static string[] SerializeMany(this IDataSerializer serializer, Type[] types, object[] datas)
+        {
+            var items = new string[datas.Length];
+            for (var i = 0; i < datas.Length; i++)
+            {
+                var type = (Type)types[i];
+                var value = datas[i];
+                items[i] = serializer.Serialize(type, value);
+            }
+            return items;
+        }
 
-        Task CloseAsync();
-
-        void Invoke(InstanceBase instance, string name, Type[] types, object[] args);
-
-        T Invoke<T>(InstanceBase instance, string name, Type[] types, object[] args);
-
-        Task InvokeAsync(InstanceBase instance, string name, Type[] types, object[] args);
-
-        Task<T> InvokeAsync<T>(InstanceBase instance, string name, Type[] types, object[] args);
-
-        bool HandleException(int errorCode, Exception e);
-
-        IContainer<IPeer> Peers { get; }
-
-        event EventHandler<DisconnectionReasonEventArgs> Disconnected;
+        public static object[] DeserializeMany(this IDataSerializer serializer, Type[] types, string[] texts)
+        {
+            var items = new object[texts.Length];
+            for (var i = 0; i < texts.Length; i++)
+            {
+                var type = types[i];
+                var value = texts[i];
+                items[i] = serializer.Deserialize(type, value);
+            }
+            return items;
+        }
     }
 }

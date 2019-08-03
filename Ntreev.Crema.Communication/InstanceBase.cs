@@ -36,11 +36,6 @@ namespace Ntreev.Crema.Communication
 
         }
 
-        public void Dispose()
-        {
-
-        }
-
         internal IAdaptorHost AdaptorHost { get; set; }
 
         internal IServiceHost Service { get; set; }
@@ -49,24 +44,24 @@ namespace Ntreev.Crema.Communication
 
         internal IPeer Peer { get; set; }
 
-        protected void Invoke(string name, params object[] args)
+        protected void Invoke(string name, Type[] types, object[] args)
         {
-            this.AdaptorHost.Invoke(this, name, args);
+            this.AdaptorHost.Invoke(this, name, types, args);
         }
 
-        protected T Invoke<T>(string name, params object[] args)
+        protected T Invoke<T>(string name, Type[] types, object[] args)
         {
-            return this.AdaptorHost.Invoke<T>(this, name, args);
+            return this.AdaptorHost.Invoke<T>(this, name, types, args);
         }
 
-        protected Task InvokeAsync(string name, params object[] args)
+        protected Task InvokeAsync(string name, Type[] types, object[] args)
         {
-            return this.AdaptorHost.InvokeAsync(this, name, args);
+            return this.AdaptorHost.InvokeAsync(this, name, types, args);
         }
 
-        protected Task<T> InvokeAsync<T>(string name, params object[] args)
+        protected Task<T> InvokeAsync<T>(string name, Type[] types, object[] args)
         {
-            return this.AdaptorHost.InvokeAsync<T>(this, name, args);
+            return this.AdaptorHost.InvokeAsync<T>(this, name, types, args);
         }
     }
 }

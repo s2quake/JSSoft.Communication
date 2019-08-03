@@ -75,9 +75,9 @@ namespace Ntreev.Crema.Communication
             return (valueType, value);
         }
 
-        internal void Invoke(object instance, IReadOnlyList<string> datas)
+        internal void Invoke(object instance, object[] args)
         {
-            var args = SerializerUtility.GetArguments(this.ParameterTypes, datas);
+            // var args = SerializerUtility.GetArguments(this.ParameterTypes, datas);
             this.MethodInfo.Invoke(instance, args);
         }
 

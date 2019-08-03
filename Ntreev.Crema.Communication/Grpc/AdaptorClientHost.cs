@@ -49,6 +49,7 @@ namespace Ntreev.Crema.Communication.Grpc
         private Channel channel;
         private AdaptorClientImpl adaptorImpl;
         private ServiceInstanceBuilder instanceBuilder = new ServiceInstanceBuilder();
+        private IDataSerializer dataSerializer;
 
         public AdaptorClientHost(IServiceContext serviceContext)
         {
@@ -69,7 +70,7 @@ namespace Ntreev.Crema.Communication.Grpc
             this.token = reply.Token;
 
             this.cancellation = new CancellationTokenSource();
-          
+            this.dataSerializer = this.serviceContext.GetService(typeof(IDataSerializer)) as IDataSerializer;
             this.task = this.PollAsync(this.cancellation.Token);
 
             // this.adaptorImpl.Disconnected += AdaptorImpl_Disconnected;
@@ -181,9 +182,9 @@ namespace Ntreev.Crema.Communication.Grpc
 
         #region IAdaptorHost
 
-        void IAdaptorHost.Invoke(InstanceBase instance, string name, object[] args)
+        void IAdaptorHost.Invoke(InstanceBase instance, string name, Type[] types, object[] args)
         {
-            var datas = SerializerUtility.GetStrings(args);
+            var datas = this.dataSerializer.SerializeMany(types, args);
             var request = new InvokeRequest()
             {
                 ServiceName = instance.ServiceName,
@@ -197,9 +198,9 @@ namespace Ntreev.Crema.Communication.Grpc
             }
         }
 
-        T IAdaptorHost.Invoke<T>(InstanceBase instance, string name, object[] args)
+        T IAdaptorHost.Invoke<T>(InstanceBase instance, string name, Type[] types, object[] args)
         {
-            var datas = SerializerUtility.GetStrings(args);
+            var datas = this.dataSerializer.SerializeMany(types, args);
             var request = new InvokeRequest()
             {
                 ServiceName = instance.ServiceName,
@@ -214,9 +215,9 @@ namespace Ntreev.Crema.Communication.Grpc
             return SerializerUtility.GetValue<T>(reply.Data);
         }
 
-        async Task IAdaptorHost.InvokeAsync(InstanceBase instance, string name, object[] args)
+        async Task IAdaptorHost.InvokeAsync(InstanceBase instance, string name, Type[] types, object[] args)
         {
-            var datas = SerializerUtility.GetStrings(args);
+            var datas = this.dataSerializer.SerializeMany(types, args);
             var request = new InvokeRequest()
             {
                 ServiceName = instance.ServiceName,
@@ -230,9 +231,9 @@ namespace Ntreev.Crema.Communication.Grpc
             }
         }
 
-        async Task<T> IAdaptorHost.InvokeAsync<T>(InstanceBase instance, string name, object[] args)
+        async Task<T> IAdaptorHost.InvokeAsync<T>(InstanceBase instance, string name, Type[] types, object[] args)
         {
-            var datas = SerializerUtility.GetStrings(args);
+            var datas = this.dataSerializer.SerializeMany(types, args);
             var request = new InvokeRequest()
             {
                 ServiceName = instance.ServiceName,
