@@ -36,10 +36,10 @@ namespace Ntreev.Crema.Communication.Grpc
 {
     class AdaptorClientHost : IAdaptorHost
     {
-        private readonly Dictionary<string, IServiceHost> serviceByName = new Dictionary<string, IServiceHost>();
+        private readonly IServiceContext serviceContext;
+        private readonly IContainer<IServiceHost> services;
         private readonly Dictionary<Type, IExceptionSerializer> exceptionSerializerByType = new Dictionary<Type, IExceptionSerializer>();
         private readonly Dictionary<int, IExceptionSerializer> exceptionSerializerByCode = new Dictionary<int, IExceptionSerializer>();
-        private readonly Dictionary<string, MethodDescriptor> methodDescriptorByName = new Dictionary<string, MethodDescriptor>();
         private readonly Dictionary<IServiceHost, object> serviceInstanceByService = new Dictionary<IServiceHost, object>();
         private readonly Dictionary<IServiceHost, object> callbackInstanceByService = new Dictionary<IServiceHost, object>();
         private AsyncDuplexStreamingCall<PollRequest, PollReply> call;
@@ -50,15 +50,12 @@ namespace Ntreev.Crema.Communication.Grpc
         private AdaptorClientImpl adaptorImpl;
         private ServiceInstanceBuilder instanceBuilder = new ServiceInstanceBuilder();
 
-        public AdaptorClientHost(IEnumerable<IServiceHost> services, IEnumerable<IExceptionSerializer> exceptionSerializers)
+        public AdaptorClientHost(IServiceContext serviceContext, IEnumerable<IExceptionSerializer> exceptionSerializers)
         {
-            this.serviceByName = services.ToDictionary(item => item.Name);
+            this.serviceContext = serviceContext;
+            this.services = serviceContext.Services;
             this.exceptionSerializerByType = exceptionSerializers.ToDictionary(item => item.ExceptionType);
             this.exceptionSerializerByCode = exceptionSerializers.ToDictionary(item => item.ExceptionCode);
-            foreach (var item in services)
-            {
-                RegisterMethod(this.methodDescriptorByName, item);
-            }
         }
 
         public Task OpenAsync(string host, int port)
@@ -67,19 +64,12 @@ namespace Ntreev.Crema.Communication.Grpc
             this.adaptorImpl = new AdaptorClientImpl(this.channel);
 
             var request = new OpenRequest() { Time = DateTime.UtcNow.Ticks };
-            request.ServiceNames.AddRange(this.serviceByName.Keys);
+            request.ServiceNames.AddRange(this.services.Keys);
             var reply = this.adaptorImpl.Open(request);
             this.token = reply.Token;
 
             this.cancellation = new CancellationTokenSource();
-            // foreach (var item in this.serviceByName.Values)
-            // {
-            //     var serviceInstance = this.Create(item);
-            //     var callbackInstance = item.CreateInstance(serviceInstance);
-            //     this.serviceInstanceByService.Add(item, serviceInstance);
-            //     this.callbackInstanceByService.Add(item, callbackInstance);
-            // }
-
+          
             this.task = this.PollAsync(this.cancellation.Token);
 
             // this.adaptorImpl.Disconnected += AdaptorImpl_Disconnected;
@@ -101,18 +91,6 @@ namespace Ntreev.Crema.Communication.Grpc
             this.channel = null;
         }
 
-        // public object Create(IServiceHost service)
-        // {
-        //     var instanceType = service.InstanceType;
-        //     var typeName = $"{instanceType.Name}Impl";
-        //     var typeNamespace = instanceType.Namespace;
-        //     var implType = instanceBuilder.CreateType(typeName, typeNamespace, typeof(InstanceBase), instanceType);
-        //     var instance = TypeDescriptor.CreateInstance(null, implType, null, null) as InstanceBase;
-        //     instance.Service = service;
-        //     instance.Invoker = this;
-        //     return instance;
-        // }
-
         public void Dispose()
         {
 
@@ -125,20 +103,6 @@ namespace Ntreev.Crema.Communication.Grpc
         protected virtual void OnDisconnected(DisconnectionReasonEventArgs e)
         {
             this.Disconnected?.Invoke(this, e);
-        }
-
-        private static void RegisterMethod(Dictionary<string, MethodDescriptor> methodDescriptorByName, IServiceHost service)
-        {
-            var methods = service.ImplementedType.GetMethods();
-            foreach (var item in methods)
-            {
-                if (item.GetCustomAttribute(typeof(OperationContractAttribute)) is OperationContractAttribute attr)
-                {
-                    var methodName = attr.Name ?? item.Name;
-                    var methodDescriptor = new MethodDescriptor(item);
-                    methodDescriptorByName.Add(methodDescriptor.Name, methodDescriptor);
-                }
-            }
         }
 
         private async Task PollAsync(CancellationToken cancellationToken)
@@ -161,7 +125,7 @@ namespace Ntreev.Crema.Communication.Grpc
                         }
                         foreach (var item in reply.Items)
                         {
-                            var service = this.serviceByName[item.ServiceName];
+                            var service = this.services[item.ServiceName];
                             this.InvokeCallback(service, reply.Items);
                         }
                         await Task.Delay(1);
@@ -183,12 +147,12 @@ namespace Ntreev.Crema.Communication.Grpc
             }
         }
 
-        private void InvokeCallback(IServiceHost service, string name, IReadOnlyList<string> datas)
+        private void InvokeCallback(IServiceHost serviceHost, string name, IReadOnlyList<string> datas)
         {
-            if (this.methodDescriptorByName.ContainsKey(name) == false)
+            if (serviceHost.Methods.ContainsKey(name) == false)
                 throw new InvalidOperationException();
-            var methodDescriptor = this.methodDescriptorByName[name];
-            methodDescriptor.Invoke(service, datas);
+            var methodDescriptor = serviceHost.Methods[name];
+            methodDescriptor.Invoke(serviceHost, datas);
         }
 
         private void InvokeCallback(IServiceHost service, IEnumerable<PollReplyItem> pollItems)

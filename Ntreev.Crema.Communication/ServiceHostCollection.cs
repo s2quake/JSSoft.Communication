@@ -24,61 +24,18 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Ntreev.Library.ObjectModel;
 
 namespace Ntreev.Crema.Communication
 {
-    public class ServiceHostCollection : IEnumerable<IServiceHost>, IReadOnlyList<IServiceHost>
+    public class ServiceHostCollection : ContainerBase<IServiceHost>
     {
-        private readonly List<IServiceHost> itemList;
-        private readonly IServiceContext serviceHost;
-
-        internal ServiceHostCollection(IServiceContext serviceHost)
-            : this(serviceHost, Enumerable.Empty<IServiceHost>())
+        public ServiceHostCollection(IEnumerable<IServiceHost> services)
         {
-            this.serviceHost = serviceHost;
-        }
-
-        internal ServiceHostCollection(IServiceContext serviceHost, IEnumerable<IServiceHost> services)
-        {
-            this.serviceHost = serviceHost;
-            this.itemList = new List<IServiceHost>(services); 
-        }
-
-        public int IndexOf(IServiceHost item)
-        {
-            return this.itemList.IndexOf(item);
-        }
-
-        public IServiceHost this[int index]
-        {
-            get => this.itemList[index];
-        }
-
-        public bool Contains(IServiceHost item)
-        {
-            return this.itemList.Contains(item);
-        }
-
-        public int Count => this.itemList.Count;
-
-        #region IEnumerable
-
-        IEnumerator<IServiceHost> IEnumerable<IServiceHost>.GetEnumerator()
-        {
-            foreach (var item in this.itemList)
+            foreach (var item in services)
             {
-                yield return item;
+                this.AddBase(item.Name, item);
             }
         }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            foreach (var item in this.itemList)
-            {
-                yield return item;
-            }
-        }
-
-        #endregion
     }
 }

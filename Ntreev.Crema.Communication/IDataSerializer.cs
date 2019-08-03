@@ -21,30 +21,15 @@
 // SOFTWARE.
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
 
-namespace Ntreev.Crema.Communication.Grpc
+namespace Ntreev.Crema.Communication
 {
-    [Export(typeof(IAdaptorHostProvider))]
-    class AdaptorHostProvider : IAdaptorHostProvider
+    public interface IDataSerializer
     {
-        [ImportingConstructor]
-        public AdaptorHostProvider()
-        {
-            //Environment.SetEnvironmentVariable("GRPC_VERBOSITY", "DEBUG");
-        }
+        string Name { get; }
+        
+        string Serialize(Type type, object data);
 
-        public IAdaptorHost Create(IServiceContext serviceContext, ServiceToken token)
-        {
-            if (serviceContext is ServerContextBase)
-                return new AdaptorServerHost(serviceContext);
-            else if (serviceContext is ClientContextBase)
-                return new AdaptorClientHost(serviceContext, this.exceptionSerializers);
-            throw new NotImplementedException();
-        }
-
-        public string Name => "grpc";
+        object Deserialize(Type type, string text);
     }
 }

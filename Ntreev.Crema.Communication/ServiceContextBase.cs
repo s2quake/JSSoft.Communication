@@ -27,6 +27,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Ntreev.Library.ObjectModel;
 using Ntreev.Library.Threading;
 
 namespace Ntreev.Crema.Communication
@@ -37,6 +38,7 @@ namespace Ntreev.Crema.Communication
         private static readonly int defaultPort = 4004;
         private readonly Dictionary<Type, IExceptionSerializer> exceptionSerializerByType = new Dictionary<Type, IExceptionSerializer>();
         private readonly IAdaptorHostProvider adpatorHostProvider;
+        private readonly IDataSerializer[] serializers;
         private readonly ServiceInstanceBuilder instanceBuilder;
         private readonly Dispatcher dispatcher;
         private IAdaptorHost adaptorHost;
@@ -45,11 +47,12 @@ namespace Ntreev.Crema.Communication
         private bool isOpened;
         private ServiceToken token;
 
-        internal ServiceContextBase(IAdaptorHostProvider adpatorHostProvider, IEnumerable<IServiceHost> services)
+        internal ServiceContextBase(IAdaptorHostProvider adpatorHostProvider, IEnumerable<IServiceHost> services, IEnumerable<IDataSerializer> serializers)
         {
             this.adpatorHostProvider = adpatorHostProvider;
+            this.serializers = serializers.ToArray();
             this.instanceBuilder = new ServiceInstanceBuilder();
-            this.Services = new ServiceHostCollection(this, services);
+            this.Services = new ServiceHostCollection(services);
             this.dispatcher = new Dispatcher(this);
         }
 
@@ -78,22 +81,22 @@ namespace Ntreev.Crema.Communication
 
         private void Peers_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            switch(e.Action)
+            switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                {
-                    foreach(IPeer item in e.NewItems)
                     {
+                        foreach (IPeer item in e.NewItems)
+                        {
 
+                        }
                     }
-                }
-                break;
+                    break;
             }
         }
 
         private void CreateInstance(IAdaptorHost adaptorHost, IPeer peer)
         {
-            foreach(var item in peer.Services)
+            foreach (var item in peer.Services)
             {
                 var remoteType = item.InstanceType;
                 var typeName = $"{remoteType.Name}Impl";
@@ -182,7 +185,7 @@ namespace Ntreev.Crema.Communication
 
         #region IServiecHost
 
-        IReadOnlyList<IServiceHost> IServiceContext.Services => this.Services;
+        IContainer<IServiceHost> IServiceContext.Services => this.Services;
 
         #endregion
 

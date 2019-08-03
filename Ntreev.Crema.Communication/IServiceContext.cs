@@ -23,6 +23,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Ntreev.Library.ObjectModel;
 using Ntreev.Library.Threading;
 
 namespace Ntreev.Crema.Communication
@@ -33,7 +34,7 @@ namespace Ntreev.Crema.Communication
 
         Task CloseAsync(Guid token);
 
-        IReadOnlyList<IServiceHost> Services { get; }
+        IContainer<IServiceHost> Services { get; }
 
         string Host { get; set; }
         

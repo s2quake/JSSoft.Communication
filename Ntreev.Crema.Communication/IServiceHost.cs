@@ -23,21 +23,24 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Ntreev.Library.ObjectModel;
 
 namespace Ntreev.Crema.Communication
 {
     public interface IServiceHost : IDisposable
     {
-        Task OpenAsync(ServiceToken token);
+        Task OpenAsync(ServiceToken token, IDataSerializer serializer);
 
         Task CloseAsync(ServiceToken token);
 
         /// <return>
-        /// 1. exitcode
+        /// 1. code
         /// 2. type of value
         /// 3. value
         /// </return>
-        Task<(Type, object)> InvokeAsync(string name, IReadOnlyList<string> args);
+        Task<(int, Type, object)> InvokeAsync(object instance, string name, object[] args);
+
+        IContainer<MethodDescriptor> Methods { get; }
 
         object CreateInstance(object obj);
 

@@ -24,17 +24,18 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using Ntreev.Library.ObjectModel;
 using Ntreev.Library.Threading;
 
 namespace Ntreev.Crema.Communication
 {
     public abstract class ServiceHostBase : IServiceHost, IDisposable
     {
-        private readonly Dictionary<string, MethodDescriptor> methodDescriptorByName = new Dictionary<string, MethodDescriptor>();
         private readonly Type instanceType;
         private readonly Type implementedType;
-        private ServiceToken token;
         private Dispatcher dispatcher;
+        private ServiceToken token;
+        private IDataSerializer serializer;
 
         internal ServiceHostBase(string name, Type instanceType, Type implementedType)
         {
@@ -42,7 +43,7 @@ namespace Ntreev.Crema.Communication
             this.instanceType = instanceType;
             this.implementedType = implementedType;
             this.dispatcher = new Dispatcher(this);
-            this.InitializeMethods();
+            this.Methods = new MethodDescriptorCollection(instanceType);
         }
 
         public Type InstanceType => this.instanceType;
@@ -51,9 +52,12 @@ namespace Ntreev.Crema.Communication
 
         public Dispatcher Dispatcher => this.dispatcher;
 
-        public async Task OpenAsync(ServiceToken token)
+        public MethodDescriptorCollection Methods { get; }
+
+        public async Task OpenAsync(ServiceToken token, IDataSerializer serializer)
         {
             this.token = token;
+            this.serializer = serializer;
             await this.dispatcher.InvokeAsync(() =>
             {
                 this.OnOpened(EventArgs.Empty);
@@ -92,35 +96,36 @@ namespace Ntreev.Crema.Communication
             this.dispatcher = null;
         }
 
-        private void InitializeMethods()
+        #region IServiceHost
+
+        IContainer<MethodDescriptor> IServiceHost.Methods => this.Methods;
+
+        async Task<(int, Type, object)> IServiceHost.InvokeAsync(object instance, string name, object[] args)
         {
-            var methods = this.InstanceType.GetMethods();
-            foreach (var item in methods)
+            try
             {
-                if (item.GetCustomAttribute(typeof(OperationContractAttribute)) is OperationContractAttribute attr)
-                {
-                    var methodName = attr.Name ?? item.Name;
-                    var methodDescriptor = new MethodDescriptor(item);
-                    this.methodDescriptorByName.Add(methodDescriptor.Name, methodDescriptor);
-                }
+                var methodDescriptor = this.Methods[name];
+                var (type, value) = await methodDescriptor.InvokeAsync(instance, args);
+                return (0, type, value);
+            }
+            catch (TargetInvocationException e)
+            {
+                var exception = e.InnerException ?? e;
+                return (-1, exception.GetType(), exception);
+            }
+            catch (Exception e)
+            {
+                return (-1, e.GetType(), e);
             }
         }
+
+        #endregion
 
         #region IDisposable
 
         void IDisposable.Dispose()
         {
             this.Dispose();
-        }
-
-        public Task<(Type, object)> InvokeAsync(string name, object[] args)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<(Type, object)> InvokeAsync(string name, IReadOnlyList<string> args)
-        {
-            throw new NotImplementedException();
         }
 
         #endregion

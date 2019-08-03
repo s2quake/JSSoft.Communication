@@ -7,18 +7,28 @@ using System.Collections.Generic;
 
 namespace Ntreev.Crema.Communication
 {
-    sealed class MethodDescriptor
+    public sealed class MethodDescriptor
     {
-        public MethodDescriptor(MethodInfo methodInfo)
+        internal MethodDescriptor(MethodInfo methodInfo)
         {
             this.MethodInfo = methodInfo;
             this.ParameterTypes = methodInfo.GetParameters().Select(item => item.ParameterType).ToArray();
+            this.ReturnType = methodInfo.ReturnType;
+            if (this.ReturnType == typeof(Task))
+            {
+                this.ReturnType = typeof(void);
+                this.IsAsync = true;
+            }
+            else if (this.ReturnType.IsSubclassOf(typeof(Task)) == true)
+            {
+                this.ReturnType = this.ReturnType.GetGenericArguments().First();
+                this.IsAsync = true;
+            }
             this.Name = GenerateName(methodInfo);
         }
 
-        public async Task<(Type, object)> InvokeAsync(object instance, IReadOnlyList<string> datas)
+        internal async Task<(Type, object)> InvokeAsync(object instance, object[] args)
         {
-            var args = SerializerUtility.GetArguments(this.ParameterTypes, datas);
             var value = await Task.Run(() => this.MethodInfo.Invoke(instance, args));
             var valueType = this.MethodInfo.ReturnType;
             if (value is Task task)
@@ -40,13 +50,13 @@ namespace Ntreev.Crema.Communication
             return (valueType, value);
         }
 
-        public void Invoke(object instance, IReadOnlyList<string> datas)
+        internal void Invoke(object instance, IReadOnlyList<string> datas)
         {
             var args = SerializerUtility.GetArguments(this.ParameterTypes, datas);
             this.MethodInfo.Invoke(instance, args);
         }
 
-        public static string GenerateName(MethodInfo methodInfo)
+        internal static string GenerateName(MethodInfo methodInfo)
         {
             var parameterTypes = methodInfo.GetParameters().Select(item => item.ParameterType).ToArray();
             var parameterTypeNames = string.Join<Type>(", ", parameterTypes);
@@ -55,8 +65,12 @@ namespace Ntreev.Crema.Communication
 
         public string Name { get; }
 
-        public MethodInfo MethodInfo { get; }
+        internal MethodInfo MethodInfo { get; }
 
         public Type[] ParameterTypes { get; }
+
+        public Type ReturnType { get; }
+
+        public bool IsAsync { get; }
     }
 }
