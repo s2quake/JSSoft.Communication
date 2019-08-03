@@ -23,7 +23,7 @@
 using System;
 using System.ComponentModel.Composition;
 
-namespace Ntreev.Crema.Communication
+namespace Ntreev.Crema.Communication.ExceptionSerializers
 {
     [Export(typeof(IExceptionSerializer))]
     class ExceptionSerializer : ExceptionSerializerBase<Exception>
@@ -37,6 +37,8 @@ namespace Ntreev.Crema.Communication
         }
 
         public override Type[] ArgumentTypes => new Type[] { typeof(string) };
+
+        public static readonly ExceptionSerializer Default = new ExceptionSerializer();
 
         protected override Exception Deserialize(object[] args)
         {

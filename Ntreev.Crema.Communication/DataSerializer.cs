@@ -30,6 +30,12 @@ namespace Ntreev.Crema.Communication
     {
         public const string DefaultName = "json";
 
+        [ImportingConstructor]
+        public DataSerializer()
+        {
+
+        }
+
         public string Name => DefaultName;
 
         public string Serialize(Type type, object data)

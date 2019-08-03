@@ -139,7 +139,8 @@ namespace Ntreev.Crema.Communication
         {
             if (serviceType == typeof(IDataSerializer) && this.IsOpened == true)
                 return this.dataSerializer;
-
+            if (serviceType == typeof(IComponentProvider))
+                return this.componentProvider;
             return null;
         }
 

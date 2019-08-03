@@ -27,7 +27,32 @@ namespace Ntreev.Crema.Communication
             this.Name = GenerateName(methodInfo);
         }
 
-        internal async Task<(Type, object)> InvokeAsync(object instance, object[] args)
+        public async Task<(int, Type, object)> InvokeAsync(IServiceProvider serviceProvider, object instance, object[] args)
+        {
+            var componentProvider = serviceProvider.GetService(typeof(IComponentProvider)) as IComponentProvider;
+            if (componentProvider == null)
+            {
+                throw new InvalidOperationException("can not get interface of IComponentProvider at serviceProvider");
+            }
+            try
+            {
+                var (type, value) = await this.InvokeAsync(instance, args);
+                return (0, type, value);
+            }
+            catch (TargetInvocationException e)
+            {
+                var exception = e.InnerException ?? e;
+                var exceptionSerializer = componentProvider.GetExceptionSerializer(exception);
+                return (exceptionSerializer.ExceptionCode, exception.GetType(), exception);
+            }
+            catch (Exception e)
+            {
+                var exceptionSerializer = componentProvider.GetExceptionSerializer(e);
+                return (exceptionSerializer.ExceptionCode, e.GetType(), e);
+            }
+        }
+
+        private async Task<(Type, object)> InvokeAsync(object instance, object[] args)
         {
             var value = await Task.Run(() => this.MethodInfo.Invoke(instance, args));
             var valueType = this.MethodInfo.ReturnType;

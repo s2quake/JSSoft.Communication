@@ -24,7 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 
-namespace Ntreev.Crema.Communication
+namespace Ntreev.Crema.Communication.ExceptionSerializers
 {
     [Export(typeof(IExceptionSerializer))]
     class ArgumentExceptionSerializer : ExceptionSerializerBase<ArgumentException>

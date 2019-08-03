@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Reflection;
 
-namespace Ntreev.Crema.Communication
+namespace Ntreev.Crema.Communication.ExceptionSerializers
 {
     [Export(typeof(IExceptionSerializer))]
     class ArgumentNullExceptionSerializer : ExceptionSerializerBase<ArgumentNullException>

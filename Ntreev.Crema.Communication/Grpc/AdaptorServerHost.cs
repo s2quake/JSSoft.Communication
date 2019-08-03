@@ -46,6 +46,7 @@ namespace Ntreev.Crema.Communication.Grpc
         private CancellationTokenSource cancellation;
         private Server server;
         private AdaptorServerImpl adaptor;
+        private IDataSerializer dataSerializer;
 
         public AdaptorServerHost(IServiceContext serviceContext)
         {
@@ -104,11 +105,11 @@ namespace Ntreev.Crema.Communication.Grpc
             var peerDescriptor = this.peers[context.Peer];
             var instance = peerDescriptor.ServiceInstances[service];
             var args = SerializerUtility.GetArguments(methodDescriptor.ParameterTypes, request.Datas);
-            var (code, valueType, value) = await service.InvokeAsync(instance, methodDescriptor.Name, args);
+            var (code, valueType, value) = await methodDescriptor.InvokeAsync(this.serviceContext, instance, args);
             var reply = new InvokeReply()
             {
                 Code = code,
-                Data = SerializerUtility.GetString(value, valueType)
+                Data = this.dataSerializer.Serialize(valueType, value)
             };
             return reply;
         }
@@ -200,6 +201,7 @@ namespace Ntreev.Crema.Communication.Grpc
                 Ports = { new ServerPort(host, port, ServerCredentials.Insecure) },
             };
             this.cancellation = new CancellationTokenSource();
+            this.dataSerializer = this.serviceContext.GetService(typeof(IDataSerializer)) as IDataSerializer;
             return Task.Run(this.server.Start);
         }
 
@@ -211,6 +213,7 @@ namespace Ntreev.Crema.Communication.Grpc
             {
                 await Task.Delay(1);
             }
+            this.dataSerializer = null;
             await this.server.ShutdownAsync();
             this.server = null;
             await this.Dispatcher.DisposeAsync();

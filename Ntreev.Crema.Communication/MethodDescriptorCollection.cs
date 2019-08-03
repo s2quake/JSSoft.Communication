@@ -10,7 +10,7 @@ namespace Ntreev.Crema.Communication
 {
     public sealed class MethodDescriptorCollection : ContainerBase<MethodDescriptor>
     {
-        internal MethodDescriptorCollection(Type instanceType)
+        public MethodDescriptorCollection(Type instanceType)
         {
             var methods = instanceType.GetMethods();
             foreach (var item in methods)

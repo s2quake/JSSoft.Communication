@@ -27,6 +27,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Ntreev.Crema.Communication.ExceptionSerializers;
 using Ntreev.Library.ObjectModel;
 using Ntreev.Library.Threading;
 
@@ -44,6 +45,12 @@ namespace Ntreev.Crema.Communication
         {
             var type = dataSerializerType ?? DataSerializer.DefaultName;
             return componentProvider.DataSerializers.First(item => item.Name == type);
+        }
+
+        public static IExceptionSerializer GetExceptionSerializer(this IComponentProvider componentProvider, Exception e)
+        {
+            var exceptionSerializer = componentProvider.ExceptionSerializers.FirstOrDefault(item => item.ExceptionType == e.GetType());
+            return exceptionSerializer ?? ExceptionSerializer.Default;
         }
     }
 }

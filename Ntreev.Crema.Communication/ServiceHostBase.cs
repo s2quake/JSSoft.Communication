@@ -99,24 +99,24 @@ namespace Ntreev.Crema.Communication
 
         IContainer<MethodDescriptor> IServiceHost.Methods => this.Methods;
 
-        async Task<(int, Type, object)> IServiceHost.InvokeAsync(object instance, string name, object[] args)
-        {
-            try
-            {
-                var methodDescriptor = this.Methods[name];
-                var (type, value) = await methodDescriptor.InvokeAsync(instance, args);
-                return (0, type, value);
-            }
-            catch (TargetInvocationException e)
-            {
-                var exception = e.InnerException ?? e;
-                return (-1, exception.GetType(), exception);
-            }
-            catch (Exception e)
-            {
-                return (-1, e.GetType(), e);
-            }
-        }
+        // async Task<(int, Type, object)> IServiceHost.InvokeAsync(object instance, string name, object[] args)
+        // {
+        //     try
+        //     {
+        //         var methodDescriptor = this.Methods[name];
+        //         var (type, value) = await methodDescriptor.InvokeAsync(instance, args);
+        //         return (0, type, value);
+        //     }
+        //     catch (TargetInvocationException e)
+        //     {
+        //         var exception = e.InnerException ?? e;
+        //         return (-1, exception.GetType(), exception);
+        //     }
+        //     catch (Exception e)
+        //     {
+        //         return (-1, e.GetType(), e);
+        //     }
+        // }
 
         #endregion
 

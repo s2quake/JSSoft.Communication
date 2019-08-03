@@ -23,7 +23,7 @@
 using System;
 using System.ComponentModel.Composition;
 
-namespace Ntreev.Crema.Communication
+namespace Ntreev.Crema.Communication.ExceptionSerializers
 {
     [Export(typeof(IExceptionSerializer))]
     class NotImplementedExceptionSerializer : ExceptionSerializerBase<NotImplementedException>
