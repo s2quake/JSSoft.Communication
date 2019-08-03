@@ -54,10 +54,9 @@ namespace Ntreev.Crema.Communication
 
         public MethodDescriptorCollection Methods { get; }
 
-        public async Task OpenAsync(ServiceToken token, IDataSerializer serializer)
+        public async Task OpenAsync(ServiceToken token)
         {
             this.token = token;
-            this.serializer = serializer;
             await this.dispatcher.InvokeAsync(() =>
             {
                 this.OnOpened(EventArgs.Empty);

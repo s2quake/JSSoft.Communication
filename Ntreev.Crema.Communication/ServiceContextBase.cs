@@ -36,35 +36,37 @@ namespace Ntreev.Crema.Communication
     {
         private const string defaultHost = "localhost";
         private static readonly int defaultPort = 4004;
+        private readonly IComponentProvider componentProvider;
         private readonly Dictionary<Type, IExceptionSerializer> exceptionSerializerByType = new Dictionary<Type, IExceptionSerializer>();
-        private readonly IAdaptorHostProvider adpatorHostProvider;
-        private readonly IDataSerializer[] serializers;
         private readonly ServiceInstanceBuilder instanceBuilder;
         private readonly Dispatcher dispatcher;
+        private IAdaptorHostProvider adpatorHostProvider;
+        private IDataSerializer dataSerializer;
         private IAdaptorHost adaptorHost;
         private string host;
         private int port = defaultPort;
         private bool isOpened;
         private ServiceToken token;
 
-        internal ServiceContextBase(IAdaptorHostProvider adpatorHostProvider, IEnumerable<IServiceHost> services, IEnumerable<IDataSerializer> serializers)
+        internal ServiceContextBase(IComponentProvider componentProvider)
         {
-            this.adpatorHostProvider = adpatorHostProvider;
-            this.serializers = serializers.ToArray();
+            this.componentProvider = componentProvider;
             this.instanceBuilder = new ServiceInstanceBuilder();
-            this.Services = new ServiceHostCollection(services);
+            this.Services = new ServiceHostCollection(componentProvider.Services);
             this.dispatcher = new Dispatcher(this);
         }
 
         public async Task<Guid> OpenAsync()
         {
             var token = ServiceToken.NewToken();
-            await this.dispatcher.InvokeAsync(() =>
+            await this.dispatcher.InvokeAsync((Action)(() =>
             {
+                this.dataSerializer = this.componentProvider.GetDataSerializer(this.DataSerializerType);
+                this.adpatorHostProvider = this.componentProvider.GetAdaptorHostProvider(this.AdaptorHostType);
                 this.adaptorHost = this.adpatorHostProvider.Create(this, token);
                 this.adaptorHost.Peers.CollectionChanged += Peers_CollectionChanged;
                 this.adaptorHost.Disconnected += AdaptorHost_Disconnected;
-            });
+            }));
             await this.adaptorHost.OpenAsync(this.Host, this.Port);
             foreach (var item in this.Services)
             {
@@ -121,6 +123,8 @@ namespace Ntreev.Crema.Communication
                 await item.CloseAsync(this.token);
                 this.adaptorHost.Disconnected -= AdaptorHost_Disconnected;
                 this.adaptorHost.Peers.CollectionChanged -= Peers_CollectionChanged;
+                this.adaptorHost = null;
+                this.dataSerializer = null;
             }
             await this.adaptorHost.CloseAsync();
             await this.dispatcher.InvokeAsync(() =>
@@ -130,6 +134,18 @@ namespace Ntreev.Crema.Communication
             });
             this.token = ServiceToken.Empty;
         }
+
+        public object GetService(Type serviceType)
+        {
+            if (serviceType == typeof(IDataSerializer) && this.IsOpened == true)
+                return this.dataSerializer;
+
+            return null;
+        }
+
+        public string AdaptorHostType { get; set; }
+
+        public string DataSerializerType { get; set; }
 
         internal void Dispose()
         {

@@ -24,18 +24,29 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
-using Ntreev.Crema.Communication;
 
-namespace Server
+namespace Ntreev.Crema.Communication
 {
-    [Export(typeof(IServiceContext))]
-    class ServerContext : ServerContextBase
+    [Export(typeof(IAdaptorHostProvider))]
+    public class AdaptorHostProvider : IAdaptorHostProvider
     {
+        public const string DefaultName = "grpc";
+
         [ImportingConstructor]
-        public ServerContext(IComponentProvider componentProvider)
-            : base(componentProvider)
+        public AdaptorHostProvider()
         {
-     
+
         }
+
+        public IAdaptorHost Create(IServiceContext serviceContext, ServiceToken token)
+        {
+            if (serviceContext is ServerContextBase)
+                return new Grpc.AdaptorServerHost(serviceContext);
+            else if (serviceContext is ClientContextBase)
+                return new Grpc.AdaptorClientHost(serviceContext);
+            throw new NotImplementedException();
+        }
+
+        public string Name => DefaultName;
     }
 }

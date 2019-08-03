@@ -50,12 +50,12 @@ namespace Ntreev.Crema.Communication.Grpc
         private AdaptorClientImpl adaptorImpl;
         private ServiceInstanceBuilder instanceBuilder = new ServiceInstanceBuilder();
 
-        public AdaptorClientHost(IServiceContext serviceContext, IEnumerable<IExceptionSerializer> exceptionSerializers)
+        public AdaptorClientHost(IServiceContext serviceContext)
         {
             this.serviceContext = serviceContext;
             this.services = serviceContext.Services;
-            this.exceptionSerializerByType = exceptionSerializers.ToDictionary(item => item.ExceptionType);
-            this.exceptionSerializerByCode = exceptionSerializers.ToDictionary(item => item.ExceptionCode);
+            // this.exceptionSerializerByType = exceptionSerializers.ToDictionary(item => item.ExceptionType);
+            // this.exceptionSerializerByCode = exceptionSerializers.ToDictionary(item => item.ExceptionCode);
         }
 
         public Task OpenAsync(string host, int port)
@@ -245,6 +245,11 @@ namespace Ntreev.Crema.Communication.Grpc
                 this.ThrowException(reply.Code, reply.Data);
             }
             return SerializerUtility.GetValue<T>(reply.Data);
+        }
+
+        public bool HandleException(int errorCode, Exception e)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

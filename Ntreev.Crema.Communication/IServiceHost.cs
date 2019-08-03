@@ -29,7 +29,7 @@ namespace Ntreev.Crema.Communication
 {
     public interface IServiceHost : IDisposable
     {
-        Task OpenAsync(ServiceToken token, IDataSerializer serializer);
+        Task OpenAsync(ServiceToken token);
 
         Task CloseAsync(ServiceToken token);
 

@@ -31,8 +31,8 @@ namespace Client
     class ClientContext : ClientContextBase
     {
         [ImportingConstructor]
-        public ClientContext(IAdaptorHostProvider adaptorHostProvider, [ImportMany]IEnumerable<IServiceHost> services)
-            : base(adaptorHostProvider, services)
+        public ClientContext(IComponentProvider componentProvider)
+            : base(componentProvider)
         {
      
         }

@@ -22,20 +22,24 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
-using Ntreev.Crema.Communication;
+using System.Reflection;
+using System.Threading.Tasks;
+using Ntreev.Library.ObjectModel;
+using Ntreev.Library.Threading;
 
-namespace Server
+namespace Ntreev.Crema.Communication
 {
-    [Export(typeof(IServiceContext))]
-    class ServerContext : ServerContextBase
+    public interface IComponentProvider
     {
-        [ImportingConstructor]
-        public ServerContext(IComponentProvider componentProvider)
-            : base(componentProvider)
-        {
-     
-        }
+        IAdaptorHostProvider[] AdaptorHostProviders { get; }
+
+        IServiceHost[] Services { get; }
+
+        IDataSerializer[] DataSerializers { get; }
+
+        IExceptionSerializer[] ExceptionSerializers { get; }
     }
 }

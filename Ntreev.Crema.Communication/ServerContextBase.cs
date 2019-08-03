@@ -27,8 +27,8 @@ namespace Ntreev.Crema.Communication
 {
     public abstract class ServerContextBase : ServiceContextBase
     {
-        protected ServerContextBase(IAdaptorHostProvider adaptorHostProvider, IEnumerable<IServiceHost> services)
-            : base(adaptorHostProvider, services)
+        protected ServerContextBase(IComponentProvider componentProvider)
+            : base(componentProvider)
         {
 
         }

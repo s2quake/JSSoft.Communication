@@ -21,21 +21,25 @@
 // SOFTWARE.
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using Ntreev.Crema.Communication;
 
-namespace Server
+namespace Ntreev.Crema.Communication
 {
-    [Export(typeof(IServiceContext))]
-    class ServerContext : ServerContextBase
+    [Export(typeof(IDataSerializer))]
+    public class DataSerializer : IDataSerializer
     {
-        [ImportingConstructor]
-        public ServerContext(IComponentProvider componentProvider)
-            : base(componentProvider)
+        public const string DefaultName = "json";
+
+        public string Name => DefaultName;
+
+        public string Serialize(Type type, object data)
         {
-     
+            throw new NotImplementedException();
+        }
+
+        public object Deserialize(Type type, string text)
+        {
+            throw new NotImplementedException();
         }
     }
 }

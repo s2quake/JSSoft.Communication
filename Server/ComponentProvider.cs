@@ -21,21 +21,25 @@
 // SOFTWARE.
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
 using Ntreev.Crema.Communication;
 
 namespace Server
 {
-    [Export(typeof(IServiceContext))]
-    class ServerContext : ServerContextBase
+    [Export(typeof(IComponentProvider))]
+    class ComponentProvider : IComponentProvider
     {
-        [ImportingConstructor]
-        public ServerContext(IComponentProvider componentProvider)
-            : base(componentProvider)
-        {
-     
-        }
+        [ImportMany] private IServiceHost[] services;
+        [ImportMany] private IDataSerializer[] dataSerializers;
+        [ImportMany] private IExceptionSerializer[] exceptionSerializers;
+
+        [ImportMany]
+        public IAdaptorHostProvider[] AdaptorHostProviders { get; private set; }
+
+        public IServiceHost[] Services => this.services;
+
+        public IDataSerializer[] DataSerializers => this.dataSerializers;
+
+        public IExceptionSerializer[] ExceptionSerializers => this.exceptionSerializers;
     }
 }
