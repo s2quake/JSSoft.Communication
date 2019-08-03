@@ -22,17 +22,20 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Ntreev.Library.Threading;
 
 namespace Ntreev.Crema.Communication
 {
-    public abstract class ServiceBase : IService, IDisposable
+    public abstract class ServiceContextBase : IServiceContext, IDisposable
     {
         private const string defaultHost = "localhost";
         private static readonly int defaultPort = 4004;
+        private readonly Dictionary<Type, IExceptionSerializer> exceptionSerializerByType = new Dictionary<Type, IExceptionSerializer>();
         private readonly IAdaptorHostProvider adpatorHostProvider;
         private readonly ServiceInstanceBuilder instanceBuilder;
         private readonly Dispatcher dispatcher;
@@ -42,7 +45,7 @@ namespace Ntreev.Crema.Communication
         private bool isOpened;
         private ServiceToken token;
 
-        internal ServiceBase(IAdaptorHostProvider adpatorHostProvider, IEnumerable<IServiceHost> services)
+        internal ServiceContextBase(IAdaptorHostProvider adpatorHostProvider, IEnumerable<IServiceHost> services)
         {
             this.adpatorHostProvider = adpatorHostProvider;
             this.instanceBuilder = new ServiceInstanceBuilder();
@@ -56,6 +59,7 @@ namespace Ntreev.Crema.Communication
             await this.dispatcher.InvokeAsync(() =>
             {
                 this.adaptorHost = this.adpatorHostProvider.Create(this, token);
+                this.adaptorHost.Peers.CollectionChanged += Peers_CollectionChanged;
                 this.adaptorHost.Disconnected += AdaptorHost_Disconnected;
             });
             await this.adaptorHost.OpenAsync(this.Host, this.Port);
@@ -72,6 +76,39 @@ namespace Ntreev.Crema.Communication
             return this.token.Guid;
         }
 
+        private void Peers_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            switch(e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                {
+                    foreach(IPeer item in e.NewItems)
+                    {
+
+                    }
+                }
+                break;
+            }
+        }
+
+        private void CreateInstance(IAdaptorHost adaptorHost, IPeer peer)
+        {
+            foreach(var item in peer.Services)
+            {
+                var remoteType = item.InstanceType;
+                var typeName = $"{remoteType.Name}Impl";
+                var typeNamespace = remoteType.Namespace;
+                var implType = this.instanceBuilder.CreateType(typeName, typeNamespace, typeof(InstanceBase), remoteType);
+                var instance = TypeDescriptor.CreateInstance(null, implType, null, null) as InstanceBase;
+                instance.Service = item;
+                instance.AdaptorHost = adaptorHost;
+                instance.Peer = peer;
+
+                var impl = item.CreateInstance(instance);
+                peer.AddInstance(item, instance, impl);
+            }
+        }
+
         public async Task CloseAsync(Guid token)
         {
             if (token == Guid.Empty || this.token.Guid != token)
@@ -80,6 +117,7 @@ namespace Ntreev.Crema.Communication
             {
                 await item.CloseAsync(this.token);
                 this.adaptorHost.Disconnected -= AdaptorHost_Disconnected;
+                this.adaptorHost.Peers.CollectionChanged -= Peers_CollectionChanged;
             }
             await this.adaptorHost.CloseAsync();
             await this.dispatcher.InvokeAsync(() =>
@@ -144,7 +182,7 @@ namespace Ntreev.Crema.Communication
 
         #region IServiecHost
 
-        IReadOnlyList<IServiceHost> IService.Services => this.Services;
+        IReadOnlyList<IServiceHost> IServiceContext.Services => this.Services;
 
         #endregion
 

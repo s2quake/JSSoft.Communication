@@ -21,41 +21,16 @@
 // SOFTWARE.
 
 using System;
-using System.Linq;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace Ntreev.Crema.Communication
 {
-    sealed class PeerDescriptor
+    public abstract class ServerContextBase : ServiceContextBase
     {
-        public PeerDescriptor(string peer)
+        protected ServerContextBase(IAdaptorHostProvider adaptorHostProvider, IEnumerable<IServiceHost> services)
+            : base(adaptorHostProvider, services)
         {
-            this.Peer = peer;
+
         }
-
-        public void Dispose()
-        {
-            this.CallbackInstances.DisposeAll();
-            this.Disposed?.Invoke(this, EventArgs.Empty);
-        }
-
-        public string Peer { get; }
-
-        public IServiceHost[] Services { get; set; }
-
-        public Guid Token { get; set; } = Guid.NewGuid();
-
-        public DateTime Ping { get; set; }
-
-        public Dictionary<IServiceHost, object> ServiceInstances { get; } = new Dictionary<IServiceHost, object>();
-
-        public Dictionary<IServiceHost, object> CallbackInstances { get; } = new Dictionary<IServiceHost, object>();
-
-        // public Dictionary<IServiceHost, CallbackCollection> Callbacks { get; } = new Dictionary<IServiceHost, CallbackCollection>();
-
-        public Dictionary<string, object> Properties { get; } = new Dictionary<string, object>();
-
-        public event EventHandler Disposed;
     }
 }

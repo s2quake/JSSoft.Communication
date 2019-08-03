@@ -31,12 +31,12 @@ namespace Server.Commands
     [Export(typeof(ICommand))]
     class OpenCommand : CommandAsyncBase
     {
-        private readonly IService serviceHost;
+        private readonly IServiceContext serviceHost;
         [Import]
         private Lazy<Shell> shell = null;
 
         [ImportingConstructor]
-        public OpenCommand(IService serviceHost)
+        public OpenCommand(IServiceContext serviceHost)
         {
             this.serviceHost = serviceHost;
         }

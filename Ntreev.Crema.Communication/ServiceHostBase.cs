@@ -21,6 +21,8 @@
 // SOFTWARE.
 
 using System;
+using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 using Ntreev.Library.Threading;
 
@@ -28,22 +30,24 @@ namespace Ntreev.Crema.Communication
 {
     public abstract class ServiceHostBase : IServiceHost, IDisposable
     {
-        private readonly Type serviceType;
-        private readonly Type callbackType;
+        private readonly Dictionary<string, MethodDescriptor> methodDescriptorByName = new Dictionary<string, MethodDescriptor>();
+        private readonly Type instanceType;
+        private readonly Type implementedType;
         private ServiceToken token;
         private Dispatcher dispatcher;
 
-        internal ServiceHostBase(Type serviceType, Type callbackType)
+        internal ServiceHostBase(string name, Type instanceType, Type implementedType)
         {
-            this.Name = serviceType.Name;
-            this.serviceType = serviceType;
-            this.callbackType = callbackType;
+            this.Name = name;
+            this.instanceType = instanceType;
+            this.implementedType = implementedType;
             this.dispatcher = new Dispatcher(this);
+            this.InitializeMethods();
         }
 
-        public Type ServiceType => this.serviceType;
+        public Type InstanceType => this.instanceType;
 
-        public Type CallbackType => this.callbackType;
+        public Type ImplementedType => this.implementedType;
 
         public Dispatcher Dispatcher => this.dispatcher;
 
@@ -88,11 +92,35 @@ namespace Ntreev.Crema.Communication
             this.dispatcher = null;
         }
 
+        private void InitializeMethods()
+        {
+            var methods = this.InstanceType.GetMethods();
+            foreach (var item in methods)
+            {
+                if (item.GetCustomAttribute(typeof(OperationContractAttribute)) is OperationContractAttribute attr)
+                {
+                    var methodName = attr.Name ?? item.Name;
+                    var methodDescriptor = new MethodDescriptor(item);
+                    this.methodDescriptorByName.Add(methodDescriptor.Name, methodDescriptor);
+                }
+            }
+        }
+
         #region IDisposable
 
         void IDisposable.Dispose()
         {
             this.Dispose();
+        }
+
+        public Task<(Type, object)> InvokeAsync(string name, object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<(Type, object)> InvokeAsync(string name, IReadOnlyList<string> args)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

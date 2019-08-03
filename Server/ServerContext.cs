@@ -22,26 +22,20 @@
 
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.ComponentModel.Composition;
+using System.Linq;
+using Ntreev.Crema.Communication;
 
-namespace Ntreev.Crema.Communication
+namespace Server
 {
-    public interface IService
+    [Export(typeof(IServiceContext))]
+    class ServerContext : ServerContextBase
     {
-        Task<Guid> OpenAsync();
-
-        Task CloseAsync(Guid token);
-
-        IReadOnlyList<IServiceHost> Services { get; }
-
-        string Host { get; set; }
-        
-        int Port { get; set; }
-
-        bool IsOpened { get; }
-
-        event EventHandler Opened;
-
-        event EventHandler Closed;
+        [ImportingConstructor]
+        public ServerContext(IAdaptorHostProvider adaptorHostProvider, [ImportMany]IEnumerable<IServiceHost> services)
+            : base(adaptorHostProvider, services)
+        {
+     
+        }
     }
 }

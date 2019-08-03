@@ -42,11 +42,11 @@ namespace Ntreev.Crema.Communication.Grpc
             this.exceptionSerializers = exceptionSerializers.ToArray();
         }
 
-        public IAdaptorHost Create(IService serviceHost, ServiceToken token)
+        public IAdaptorHost Create(IServiceContext serviceHost, ServiceToken token)
         {
-            if (serviceHost is ServerServiceBase)
-                return new AdaptorServerHost(this.services, this.exceptionSerializers);
-            else if (serviceHost is ClientServiceBase)
+            if (serviceHost is ServerContextBase)
+                return new AdaptorServerHost(serviceHost, this.services, this.exceptionSerializers);
+            else if (serviceHost is ClientContextBase)
                 return new AdaptorClientHost(this.services, this.exceptionSerializers);
             throw new NotImplementedException();
         }

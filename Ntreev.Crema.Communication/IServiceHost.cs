@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Communication
@@ -31,11 +32,18 @@ namespace Ntreev.Crema.Communication
 
         Task CloseAsync(ServiceToken token);
 
+        /// <return>
+        /// 1. exitcode
+        /// 2. type of value
+        /// 3. value
+        /// </return>
+        Task<(Type, object)> InvokeAsync(string name, IReadOnlyList<string> args);
+
         object CreateInstance(object obj);
 
-        Type ServiceType { get; }
+        Type InstanceType { get; }
 
-        Type CallbackType { get; }
+        Type ImplementedType { get; }
 
         string Name { get; }
 

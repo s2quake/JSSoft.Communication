@@ -25,10 +25,10 @@ using System.Collections.Generic;
 
 namespace Ntreev.Crema.Communication
 {
-    public abstract class ServerServiceBase : ServiceBase
+    public abstract class ClientContextBase : ServiceContextBase
     {
-        protected ServerServiceBase(IAdaptorHostProvider adaptorHostProvider, IEnumerable<IServiceHost> services)
-            : base(adaptorHostProvider, services)
+        protected ClientContextBase(IAdaptorHostProvider adpatorHostProvider, IEnumerable<IServiceHost> services)
+            : base(adpatorHostProvider, services)
         {
 
         }

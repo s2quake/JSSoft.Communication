@@ -23,6 +23,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Ntreev.Library.ObjectModel;
 
 namespace Ntreev.Crema.Communication
 {
@@ -31,6 +32,16 @@ namespace Ntreev.Crema.Communication
         Task OpenAsync(string host, int port);
 
         Task CloseAsync();
+
+        void Invoke(InstanceBase instance, string name, object[] args);
+
+        T Invoke<T>(InstanceBase instance, string name, object[] args);
+
+        Task InvokeAsync(InstanceBase instance, string name, object[] args);
+
+        Task<T> InvokeAsync<T>(InstanceBase instance, string name, object[] args);
+
+        IContainer<IPeer> Peers { get; }
 
         event EventHandler<DisconnectionReasonEventArgs> Disconnected;
     }

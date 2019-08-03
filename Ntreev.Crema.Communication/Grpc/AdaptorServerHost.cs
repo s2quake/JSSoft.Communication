@@ -31,39 +31,41 @@ using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Grpc.Core.Logging;
+using Ntreev.Library.ObjectModel;
 using Ntreev.Library.Threading;
 
 namespace Ntreev.Crema.Communication.Grpc
 {
-    class AdaptorServerHost : IAdaptorHost, IContextInvoker
+    class AdaptorServerHost : IAdaptorHost
     {
+        private readonly IServiceContext service;
         private readonly Dictionary<string, IServiceHost> serviceByName = new Dictionary<string, IServiceHost>();
         private readonly Dictionary<Type, IExceptionSerializer> exceptionSerializerByType = new Dictionary<Type, IExceptionSerializer>();
-        private readonly Dictionary<string, MethodDescriptor> methodDescriptorByName = new Dictionary<string, MethodDescriptor>();
+        // private readonly Dictionary<string, MethodDescriptor> methodDescriptorByName = new Dictionary<string, MethodDescriptor>();
         private readonly HashSet<string> peerHashes = new HashSet<string>();
         private readonly PeerCollection peers = new PeerCollection();
         private readonly ServiceInstanceBuilder instanceBuilder = new ServiceInstanceBuilder();
-        private Dispatcher dispatcher;
         private ILogger logger;
         private CancellationTokenSource cancellation;
         private Server server;
         private AdaptorServerImpl adaptor;
 
-        public AdaptorServerHost(IEnumerable<IServiceHost> services, IEnumerable<IExceptionSerializer> exceptionSerializers)
+        public AdaptorServerHost(IServiceContext service, IEnumerable<IServiceHost> services, IEnumerable<IExceptionSerializer> exceptionSerializers)
         {
+            this.service = service;
             this.serviceByName = services.ToDictionary(item => item.Name);
             this.exceptionSerializerByType = exceptionSerializers.ToDictionary(item => item.ExceptionType);
             this.logger = GrpcEnvironment.Logger;
             
-            foreach (var item in services)
-            {
-                RegisterMethod(this.methodDescriptorByName, item);
-            }
+            // foreach (var item in services)
+            // {
+            //     RegisterMethod(this.methodDescriptorByName, item);
+            // }
         }
 
         internal async Task<OpenReply> Open(OpenRequest request, ServerCallContext context)
         {
-            var token = await this.dispatcher.InvokeAsync(() =>
+            var token = await this.Dispatcher.InvokeAsync(() =>
             {
                 var peerDescriptor = this.CreatePeerDescriptor(context.Peer, request.ServiceNames);
                 this.peers.Add(peerDescriptor);
@@ -75,7 +77,7 @@ namespace Ntreev.Crema.Communication.Grpc
 
         internal async Task<CloseReply> Close(CloseRequest request, ServerCallContext context)
         {
-            await this.dispatcher.InvokeAsync(() =>
+            await this.Dispatcher.InvokeAsync(() =>
             {
                 var peerDescriptor = this.peers[context.Peer];
                 peerDescriptor.Dispose();
@@ -86,7 +88,7 @@ namespace Ntreev.Crema.Communication.Grpc
 
         internal Task<PingReply> Ping(PingRequest request, ServerCallContext context)
         {
-            return this.dispatcher.InvokeAsync(() =>
+            return this.Dispatcher.InvokeAsync(() =>
             {
                 var peerDescriptor = this.peers[context.Peer];
                 peerDescriptor.Ping = DateTime.UtcNow;
@@ -99,15 +101,15 @@ namespace Ntreev.Crema.Communication.Grpc
             if (this.serviceByName.ContainsKey(request.ServiceName) == false)
                 throw new InvalidOperationException();
             var service = this.serviceByName[request.ServiceName];
-            if (this.methodDescriptorByName.ContainsKey(request.Name) == false)
-                throw new InvalidOperationException();
+            // if (this.methodDescriptorByName.ContainsKey(request.Name) == false)
+            //     throw new InvalidOperationException();
 
-            var methodDescriptor = this.methodDescriptorByName[request.Name];
+            //var methodDescriptor = this.methodDescriptorByName[request.Name];
             var peerDescriptor = this.peers[context.Peer];
             try
             {
                 var instance = peerDescriptor.ServiceInstances[service];
-                var (valueType, value) = await methodDescriptor.InvokeAsync(instance, request.Datas);
+                var (valueType, value) = await service.InvokeAsync(request.Name, request.Datas);
                 var reply = new InvokeReply()
                 {
                     Data = SerializerUtility.GetString(value, valueType)
@@ -143,7 +145,7 @@ namespace Ntreev.Crema.Communication.Grpc
         {
             var cancellationToken = this.cancellation.Token;
             this.peerHashes.Add(context.Peer);
-            var peerDescriptor = await this.dispatcher.InvokeAsync(() => this.peers[context.Peer]);
+            var peerDescriptor = await this.Dispatcher.InvokeAsync(() => this.peers[context.Peer]);
             while (await requestStream.MoveNext())
             {
                 var request = requestStream.Current;
@@ -154,7 +156,7 @@ namespace Ntreev.Crema.Communication.Grpc
                     break;
                 }
                 var reply = new PollReply();
-                await this.dispatcher.InvokeAsync(() =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     foreach (var item in services)
                     {
@@ -167,24 +169,14 @@ namespace Ntreev.Crema.Communication.Grpc
             this.peerHashes.Remove(context.Peer);
         }
 
-        public object CreateCallback(string peer, IServiceHost service)
-        {
-            var instanceType = service.CallbackType;
-            var typeName = $"{instanceType.Name}Impl";
-            var typeNamespace = instanceType.Namespace;
-            var implType = this.instanceBuilder.CreateType(typeName, typeNamespace, typeof(InstanceBase), instanceType);
-            var instance = TypeDescriptor.CreateInstance(null, implType, null, null) as InstanceBase;
-            instance.Service = service;
-            instance.Invoker = this;
-            instance.Peer = peer;
-            return instance;
-        }
-
         public void Dispose()
         {
-            this.dispatcher.Dispose();
-            this.dispatcher = null;
+            
         }
+
+        public IContainer<IPeer> Peers => this.peers;
+
+        public Dispatcher Dispatcher => this.service.Dispatcher;
 
         public event EventHandler<DisconnectionReasonEventArgs> Disconnected;
 
@@ -195,7 +187,7 @@ namespace Ntreev.Crema.Communication.Grpc
 
         private void ValidateToken(string token)
         {
-            this.dispatcher.VerifyAccess();
+            this.Dispatcher.VerifyAccess();
             if (token == null)
                 throw new ArgumentNullException(nameof(token));
         }
@@ -208,9 +200,9 @@ namespace Ntreev.Crema.Communication.Grpc
                 Name = name,
                 ServiceName = instance.ServiceName
             };
-            return this.dispatcher.InvokeAsync(() =>
+            return this.Dispatcher.InvokeAsync(() =>
             {
-                var peerDescriptor = this.peers[instance.Peer];
+                var peerDescriptor = instance.Peer as PeerDescriptor;
                 var service = instance.Service;
                 var callbacks = peerDescriptor.Callbacks[service];
                 pollItem.Datas.AddRange(datas);
@@ -220,7 +212,7 @@ namespace Ntreev.Crema.Communication.Grpc
 
         private PollReplyItem[] Poll(PeerDescriptor peerDescriptor, IServiceHost service)
         {
-            this.dispatcher.VerifyAccess();
+            this.Dispatcher.VerifyAccess();
             var callbacks = peerDescriptor.Callbacks[service];
             return callbacks.Flush();
         }
@@ -240,61 +232,27 @@ namespace Ntreev.Crema.Communication.Grpc
             {
                 Services = serviceNames.Select(item => this.serviceByName[item]).ToArray(),
             };
-            foreach (var item in peerDescriptor.Services)
-            {
-                var callback = this.CreateCallback(peerDescriptor.Peer, item);
-                peerDescriptor.CallbackInstances.Add(item, callback);
-                var instance = item.CreateInstance(callback);
-                peerDescriptor.ServiceInstances.Add(item, instance);
-                peerDescriptor.Callbacks.Add(item, new CallbackCollection(item));
-            }
-            
             return peerDescriptor;
         }
 
-        private static void RegisterMethod(Dictionary<string, MethodDescriptor> methodDescriptorByName, IServiceHost service)
-        {
-            var methods = service.ServiceType.GetMethods();
-            foreach (var item in methods)
-            {
-                if (item.GetCustomAttribute(typeof(OperationContractAttribute)) is OperationContractAttribute attr)
-                {
-                    var methodName = attr.Name ?? item.Name;
-                    var methodDescriptor = new MethodDescriptor(item);
-                    methodDescriptorByName.Add(methodDescriptor.Name, methodDescriptor);
-                }
-            }
-        }
-
-        #region IContextInvoker
-
-        void IContextInvoker.Invoke(InstanceBase instance, string name, object[] args)
-        {
-            this.AddCallback(instance, name, args);
-        }
-
-        T IContextInvoker.Invoke<T>(InstanceBase instance, string name, object[] args)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task IContextInvoker.InvokeAsync(InstanceBase instance, string name, object[] args)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<T> IContextInvoker.InvokeAsync<T>(InstanceBase instance, string name, object[] args)
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
+        // private static void RegisterMethod(Dictionary<string, MethodDescriptor> methodDescriptorByName, IServiceHost service)
+        // {
+        //     var methods = service.InstanceType.GetMethods();
+        //     foreach (var item in methods)
+        //     {
+        //         if (item.GetCustomAttribute(typeof(OperationContractAttribute)) is OperationContractAttribute attr)
+        //         {
+        //             var methodName = attr.Name ?? item.Name;
+        //             var methodDescriptor = new MethodDescriptor(item);
+        //             methodDescriptorByName.Add(methodDescriptor.Name, methodDescriptor);
+        //         }
+        //     }
+        // }
 
         #region IAdaptorHost
 
         Task IAdaptorHost.OpenAsync(string host, int port)
         {
-            this.dispatcher = new Dispatcher(this);
             this.adaptor = new AdaptorServerImpl(this);
             this.server = new Server()
             {
@@ -316,8 +274,27 @@ namespace Ntreev.Crema.Communication.Grpc
             }
             await this.server.ShutdownAsync();
             this.server = null;
-            await this.dispatcher.DisposeAsync();
-            this.dispatcher = null;
+            await this.Dispatcher.DisposeAsync();
+        }
+
+        void IAdaptorHost.Invoke(InstanceBase instance, string name, object[] args)
+        {
+            this.AddCallback(instance, name, args);
+        }
+
+        T IAdaptorHost.Invoke<T>(InstanceBase instance, string name, object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task IAdaptorHost.InvokeAsync(InstanceBase instance, string name, object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<T> IAdaptorHost.InvokeAsync<T>(InstanceBase instance, string name, object[] args)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

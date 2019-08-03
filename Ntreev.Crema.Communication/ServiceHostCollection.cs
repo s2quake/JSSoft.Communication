@@ -30,15 +30,15 @@ namespace Ntreev.Crema.Communication
     public class ServiceHostCollection : IEnumerable<IServiceHost>, IReadOnlyList<IServiceHost>
     {
         private readonly List<IServiceHost> itemList;
-        private readonly IService serviceHost;
+        private readonly IServiceContext serviceHost;
 
-        internal ServiceHostCollection(IService serviceHost)
+        internal ServiceHostCollection(IServiceContext serviceHost)
             : this(serviceHost, Enumerable.Empty<IServiceHost>())
         {
             this.serviceHost = serviceHost;
         }
 
-        internal ServiceHostCollection(IService serviceHost, IEnumerable<IServiceHost> services)
+        internal ServiceHostCollection(IServiceContext serviceHost, IEnumerable<IServiceHost> services)
         {
             this.serviceHost = serviceHost;
             this.itemList = new List<IServiceHost>(services); 

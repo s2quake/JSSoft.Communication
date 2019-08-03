@@ -24,8 +24,6 @@ using System;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using Ntreev.Library.Commands;
-using Client;
-using Client.Services;
 using System.Threading.Tasks;
 using Ntreev.Crema.Services;
 

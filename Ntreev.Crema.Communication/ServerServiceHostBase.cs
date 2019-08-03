@@ -28,14 +28,14 @@ namespace Ntreev.Crema.Communication
     public abstract class ServerServiceHostBase<T, U> : ServiceHostBase where T : class where U : class
     {
         protected ServerServiceHostBase()
-            : base(typeof(T), typeof(U))
+            : base(typeof(T).Name, typeof(U), typeof(T))
         {
 
         }
 
         public override object CreateInstance(object obj)
         {
-            return TypeDescriptor.CreateInstance(null, this.ServiceType, null, null);
+            return TypeDescriptor.CreateInstance(null, this.InstanceType, null, null);
         }
     }
 }

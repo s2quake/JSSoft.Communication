@@ -30,10 +30,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Ntreev.Crema.Communication.Grpc;
+using Ntreev.Library.ObjectModel;
 
 namespace Ntreev.Crema.Communication.Grpc
 {
-    class AdaptorClientHost : IAdaptorHost, IContextInvoker
+    class AdaptorClientHost : IAdaptorHost
     {
         private readonly Dictionary<string, IServiceHost> serviceByName = new Dictionary<string, IServiceHost>();
         private readonly Dictionary<Type, IExceptionSerializer> exceptionSerializerByType = new Dictionary<Type, IExceptionSerializer>();
@@ -71,13 +72,13 @@ namespace Ntreev.Crema.Communication.Grpc
             this.token = reply.Token;
 
             this.cancellation = new CancellationTokenSource();
-            foreach (var item in this.serviceByName.Values)
-            {
-                var serviceInstance = this.Create(item);
-                var callbackInstance = item.CreateInstance(serviceInstance);
-                this.serviceInstanceByService.Add(item, serviceInstance);
-                this.callbackInstanceByService.Add(item, callbackInstance);
-            }
+            // foreach (var item in this.serviceByName.Values)
+            // {
+            //     var serviceInstance = this.Create(item);
+            //     var callbackInstance = item.CreateInstance(serviceInstance);
+            //     this.serviceInstanceByService.Add(item, serviceInstance);
+            //     this.callbackInstanceByService.Add(item, callbackInstance);
+            // }
 
             this.task = this.PollAsync(this.cancellation.Token);
 
@@ -100,22 +101,24 @@ namespace Ntreev.Crema.Communication.Grpc
             this.channel = null;
         }
 
-        public object Create(IServiceHost service)
-        {
-            var instanceType = service.ServiceType;
-            var typeName = $"{instanceType.Name}Impl";
-            var typeNamespace = instanceType.Namespace;
-            var implType = instanceBuilder.CreateType(typeName, typeNamespace, typeof(InstanceBase), instanceType);
-            var instance = TypeDescriptor.CreateInstance(null, implType, null, null) as InstanceBase;
-            instance.Service = service;
-            instance.Invoker = this;
-            return instance;
-        }
+        // public object Create(IServiceHost service)
+        // {
+        //     var instanceType = service.InstanceType;
+        //     var typeName = $"{instanceType.Name}Impl";
+        //     var typeNamespace = instanceType.Namespace;
+        //     var implType = instanceBuilder.CreateType(typeName, typeNamespace, typeof(InstanceBase), instanceType);
+        //     var instance = TypeDescriptor.CreateInstance(null, implType, null, null) as InstanceBase;
+        //     instance.Service = service;
+        //     instance.Invoker = this;
+        //     return instance;
+        // }
 
         public void Dispose()
         {
 
         }
+
+        public IContainer<IPeer> Peers => throw new NotImplementedException();
 
         public event EventHandler<DisconnectionReasonEventArgs> Disconnected;
 
@@ -126,7 +129,7 @@ namespace Ntreev.Crema.Communication.Grpc
 
         private static void RegisterMethod(Dictionary<string, MethodDescriptor> methodDescriptorByName, IServiceHost service)
         {
-            var methods = service.CallbackType.GetMethods();
+            var methods = service.ImplementedType.GetMethods();
             foreach (var item in methods)
             {
                 if (item.GetCustomAttribute(typeof(OperationContractAttribute)) is OperationContractAttribute attr)
@@ -212,9 +215,9 @@ namespace Ntreev.Crema.Communication.Grpc
             return this.exceptionSerializerByCode[-1];
         }
 
-        #region IContextInvoker
+        #region IAdaptorHost
 
-        void IContextInvoker.Invoke(InstanceBase instance, string name, object[] args)
+        void IAdaptorHost.Invoke(InstanceBase instance, string name, object[] args)
         {
             var datas = SerializerUtility.GetStrings(args);
             var request = new InvokeRequest()
@@ -230,7 +233,7 @@ namespace Ntreev.Crema.Communication.Grpc
             }
         }
 
-        T IContextInvoker.Invoke<T>(InstanceBase instance, string name, object[] args)
+        T IAdaptorHost.Invoke<T>(InstanceBase instance, string name, object[] args)
         {
             var datas = SerializerUtility.GetStrings(args);
             var request = new InvokeRequest()
@@ -247,7 +250,7 @@ namespace Ntreev.Crema.Communication.Grpc
             return SerializerUtility.GetValue<T>(reply.Data);
         }
 
-        async Task IContextInvoker.InvokeAsync(InstanceBase instance, string name, object[] args)
+        async Task IAdaptorHost.InvokeAsync(InstanceBase instance, string name, object[] args)
         {
             var datas = SerializerUtility.GetStrings(args);
             var request = new InvokeRequest()
@@ -263,7 +266,7 @@ namespace Ntreev.Crema.Communication.Grpc
             }
         }
 
-        async Task<T> IContextInvoker.InvokeAsync<T>(InstanceBase instance, string name, object[] args)
+        async Task<T> IAdaptorHost.InvokeAsync<T>(InstanceBase instance, string name, object[] args)
         {
             var datas = SerializerUtility.GetStrings(args);
             var request = new InvokeRequest()

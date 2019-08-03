@@ -21,31 +21,30 @@
 // SOFTWARE.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using Ntreev.Library.ObjectModel;
+using System.Threading.Tasks;
+using Ntreev.Library.Threading;
 
 namespace Ntreev.Crema.Communication
 {
-    class PeerCollection : ContainerBase<PeerDescriptor>
+    public interface IServiceContext
     {
-        public void Add(PeerDescriptor item)
-        {
-            base.AddBase(item.Peer, item);
-            item.Disposed += Item_Disposed;
-        }
+        Task<Guid> OpenAsync();
 
-        public void Remove(string peer)
-        {
-            var item = base[peer];
-            item.Disposed -= Item_Disposed;
-            base.RemoveBase(peer);
-        }
+        Task CloseAsync(Guid token);
 
-        private void Item_Disposed(object sender, EventArgs e)
-        {
-            if (sender is PeerDescriptor item)
-                base.RemoveBase(item.Peer);
-        }
+        IReadOnlyList<IServiceHost> Services { get; }
+
+        string Host { get; set; }
+        
+        int Port { get; set; }
+
+        bool IsOpened { get; }
+
+        Dispatcher Dispatcher { get; }
+
+        event EventHandler Opened;
+
+        event EventHandler Closed;
     }
 }

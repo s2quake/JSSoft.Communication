@@ -21,16 +21,18 @@
 // SOFTWARE.
 
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Ntreev.Library.ObjectModel;
 
 namespace Ntreev.Crema.Communication
 {
-    public class PeerEventArgs : EventArgs
+    public interface IPeer
     {
-        public PeerEventArgs(object peer)
-        {
-            this.Peer = peer ?? throw new ArgumentNullException(nameof(peer));
-        }
+        string ID { get; }
 
-        public object Peer { get; }
+        IServiceHost[] Services { get; }
+
+        void AddInstance(IServiceHost service, object instance, object impl);
     }
 }
