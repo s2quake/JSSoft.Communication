@@ -25,7 +25,7 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Ntreev.Crema.Communication.Grpc
+namespace Ntreev.Crema.Communication
 {
     sealed class PeerDescriptor
     {
@@ -52,7 +52,7 @@ namespace Ntreev.Crema.Communication.Grpc
 
         public Dictionary<IServiceHost, object> CallbackInstances { get; } = new Dictionary<IServiceHost, object>();
 
-        public Dictionary<IServiceHost, CallbackCollection> Callbacks { get; } = new Dictionary<IServiceHost, CallbackCollection>();
+        // public Dictionary<IServiceHost, CallbackCollection> Callbacks { get; } = new Dictionary<IServiceHost, CallbackCollection>();
 
         public Dictionary<string, object> Properties { get; } = new Dictionary<string, object>();
 

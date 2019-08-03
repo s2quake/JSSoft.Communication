@@ -21,38 +21,31 @@
 // SOFTWARE.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using Ntreev.Library.ObjectModel;
 
-namespace Ntreev.Crema.Communication.Grpc
+namespace Ntreev.Crema.Communication
 {
-    class PeerProperties
+    class PeerCollection : ContainerBase<PeerDescriptor>
     {
-        private readonly Dictionary<string, object> properties = new Dictionary<string, object>();
-
-        public void Add(string peer, string key, object value)
+        public void Add(PeerDescriptor item)
         {
-            this.properties.Add(GetKey(peer, key), value);
+            base.AddBase(item.Peer, item);
+            item.Disposed += Item_Disposed;
         }
 
-        public void Contains(string peer, string key)
+        public void Remove(string peer)
         {
-            this.properties.ContainsKey(GetKey(peer, key));
+            var item = base[peer];
+            item.Disposed -= Item_Disposed;
+            base.RemoveBase(peer);
         }
 
-        public void Remove(string peer, string key)
+        private void Item_Disposed(object sender, EventArgs e)
         {
-            this.properties.Remove(GetKey(peer, key));
-        }
-
-        public object this[string peer, string key]
-        {
-            get => this.properties[GetKey(peer, key)];
-            set => this.properties[GetKey(peer, key)] = value;
-        }
-
-        private static string GetKey(string peer, string key)
-        {
-            return $"{peer}.{key}";
+            if (sender is PeerDescriptor item)
+                base.RemoveBase(item.Peer);
         }
     }
 }
