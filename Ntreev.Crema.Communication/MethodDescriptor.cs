@@ -42,12 +42,12 @@ namespace Ntreev.Crema.Communication
             catch (TargetInvocationException e)
             {
                 var exception = e.InnerException ?? e;
-                var exceptionSerializer = componentProvider.GetExceptionSerializer(exception);
+                var exceptionSerializer = componentProvider.GetExceptionDescriptor(exception);
                 return (exceptionSerializer.ExceptionCode, exception.GetType(), exception);
             }
             catch (Exception e)
             {
-                var exceptionSerializer = componentProvider.GetExceptionSerializer(e);
+                var exceptionSerializer = componentProvider.GetExceptionDescriptor(e);
                 return (exceptionSerializer.ExceptionCode, e.GetType(), e);
             }
         }
@@ -73,12 +73,6 @@ namespace Ntreev.Crema.Communication
                 }
             }
             return (valueType, value);
-        }
-
-        internal void Invoke(object instance, object[] args)
-        {
-            // var args = SerializerUtility.GetArguments(this.ParameterTypes, datas);
-            this.MethodInfo.Invoke(instance, args);
         }
 
         internal static string GenerateName(MethodInfo methodInfo)

@@ -26,7 +26,7 @@ using System.ComponentModel.Composition;
 
 namespace Ntreev.Crema.Communication.ExceptionSerializers
 {
-    [Export(typeof(IExceptionSerializer))]
+    [Export(typeof(IExceptionDescriptor))]
     class ArgumentExceptionSerializer : ExceptionSerializerBase<ArgumentException>
     {
         private readonly Dictionary<string, string> messageByParam = new Dictionary<string, string>();
@@ -37,13 +37,13 @@ namespace Ntreev.Crema.Communication.ExceptionSerializers
 
         }
 
-        public override Type[] ArgumentTypes => new Type[]
+        public override Type[] PropertyTypes => new Type[]
         {
             typeof(string),
             typeof(string)
         };
 
-        protected override ArgumentException Deserialize(object[] args)
+        protected override ArgumentException CreateInstance(object[] args)
         {
             var paramName = args[0] as string;
             var message = args[1] as string;
@@ -54,7 +54,7 @@ namespace Ntreev.Crema.Communication.ExceptionSerializers
             return new ArgumentException();
         }
 
-        protected override object[] Serialize(ArgumentException e)
+        protected override object[] SelectProperties(ArgumentException e)
         {
             var paramName = e.ParamName;
             if (this.messageByParam.ContainsKey(paramName) == false)

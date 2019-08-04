@@ -29,9 +29,10 @@ namespace Ntreev.Crema.Communication.Grpc
 {
     sealed class PeerDescriptor : IPeer
     {
-        public PeerDescriptor(string id)
+        public PeerDescriptor(string id, IServiceHost[] serviceHosts)
         {
             this.ID = id;
+            this.ServiceHosts = serviceHosts;
         }
 
         public void Dispose()
@@ -49,7 +50,7 @@ namespace Ntreev.Crema.Communication.Grpc
 
         public string ID { get; }
 
-        public IServiceHost[] Services { get; set; }
+        public IServiceHost[] ServiceHosts { get; }
 
         public Guid Token { get; set; } = Guid.NewGuid();
 

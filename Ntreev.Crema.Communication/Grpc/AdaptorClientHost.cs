@@ -37,11 +37,7 @@ namespace Ntreev.Crema.Communication.Grpc
     class AdaptorClientHost : IAdaptorHost
     {
         private readonly IServiceContext serviceContext;
-        private readonly IContainer<IServiceHost> services;
-        private readonly Dictionary<Type, IExceptionSerializer> exceptionSerializerByType = new Dictionary<Type, IExceptionSerializer>();
-        private readonly Dictionary<int, IExceptionSerializer> exceptionSerializerByCode = new Dictionary<int, IExceptionSerializer>();
-        private readonly Dictionary<IServiceHost, object> serviceInstanceByService = new Dictionary<IServiceHost, object>();
-        private readonly Dictionary<IServiceHost, object> callbackInstanceByService = new Dictionary<IServiceHost, object>();
+        private readonly IContainer<IServiceHost> serviceHosts;
         private AsyncDuplexStreamingCall<PollRequest, PollReply> call;
         private CancellationTokenSource cancellation;
         private Task task;
@@ -49,41 +45,41 @@ namespace Ntreev.Crema.Communication.Grpc
         private Channel channel;
         private AdaptorClientImpl adaptorImpl;
         private ServiceInstanceBuilder instanceBuilder = new ServiceInstanceBuilder();
-        private IDataSerializer dataSerializer;
+        private ISerializer serializer;
 
         public AdaptorClientHost(IServiceContext serviceContext)
         {
             this.serviceContext = serviceContext;
-            this.services = serviceContext.Services;
-            // this.exceptionSerializerByType = exceptionSerializers.ToDictionary(item => item.ExceptionType);
-            // this.exceptionSerializerByCode = exceptionSerializers.ToDictionary(item => item.ExceptionCode);
+            this.serviceHosts = serviceContext.ServiceHosts;
         }
 
         public Task OpenAsync(string host, int port)
         {
+            var peerDescriptor = new PeerDescriptor(host, this.serviceHosts.ToArray());
             this.channel = new Channel($"{host}:{port}", ChannelCredentials.Insecure);
             this.adaptorImpl = new AdaptorClientImpl(this.channel);
 
             var request = new OpenRequest() { Time = DateTime.UtcNow.Ticks };
-            request.ServiceNames.AddRange(this.services.Keys);
+            request.ServiceNames.AddRange(this.serviceHosts.Keys);
             var reply = this.adaptorImpl.Open(request);
             this.token = reply.Token;
 
             this.cancellation = new CancellationTokenSource();
-            this.dataSerializer = this.serviceContext.GetService(typeof(IDataSerializer)) as IDataSerializer;
+            this.serializer = this.serviceContext.GetService(typeof(ISerializer)) as ISerializer;
             this.task = this.PollAsync(this.cancellation.Token);
 
+            this.Peers.Add(peerDescriptor);
             // this.adaptorImpl.Disconnected += AdaptorImpl_Disconnected;
             return Task.Delay(1);
         }
 
         public async Task CloseAsync()
         {
+            this.Peers.Remove(this.serviceContext.Host);
             this.cancellation.Cancel();
             this.cancellation = null;
             this.task.Wait();
             this.task = null;
-            this.serviceInstanceByService.DisposeAll();
             if (this.adaptorImpl != null)
                 await this.adaptorImpl.CloseAsync(new CloseRequest() { Token = this.token });
             this.token = null;
@@ -97,7 +93,7 @@ namespace Ntreev.Crema.Communication.Grpc
 
         }
 
-        public IContainer<IPeer> Peers => throw new NotImplementedException();
+        public PeerCollection Peers { get; } = new PeerCollection();
 
         public event EventHandler<DisconnectionReasonEventArgs> Disconnected;
 
@@ -126,7 +122,7 @@ namespace Ntreev.Crema.Communication.Grpc
                         }
                         foreach (var item in reply.Items)
                         {
-                            var service = this.services[item.ServiceName];
+                            var service = this.serviceHosts[item.ServiceName];
                             this.InvokeCallback(service, reply.Items);
                         }
                         await Task.Delay(1);
@@ -148,43 +144,42 @@ namespace Ntreev.Crema.Communication.Grpc
             }
         }
 
-        private void InvokeCallback(IServiceHost serviceHost, string name, IReadOnlyList<string> datas)
+        private async void InvokeCallback(IServiceHost serviceHost, string name, string[] datas)
         {
             if (serviceHost.Methods.ContainsKey(name) == false)
                 throw new InvalidOperationException();
             var methodDescriptor = serviceHost.Methods[name];
-            methodDescriptor.Invoke(serviceHost, datas);
+            var args = this.serializer.DeserializeMany(methodDescriptor.ParameterTypes, datas);
+            var peer = this.Peers.First();
+            var instance = peer.CallbackInstances[serviceHost];
+            await methodDescriptor.InvokeAsync(this.serviceContext, instance, args);
         }
 
         private void InvokeCallback(IServiceHost service, IEnumerable<PollReplyItem> pollItems)
         {
             foreach (var item in pollItems)
             {
-                this.InvokeCallback(service, item.Name, item.Datas);
+                this.InvokeCallback(service, item.Name, item.Datas.ToArray());
             }
         }
 
         private void ThrowException(int code, string data)
         {
-            var serializer = this.GetExceptionSerializer(code);
-            var exception = (Exception)serializer.Deserialize(data);
-            throw exception;
-        }
-
-        private IExceptionSerializer GetExceptionSerializer(int exceptionCode)
-        {
-            if (this.exceptionSerializerByCode.ContainsKey(exceptionCode) == true)
+            var componentProvider = this.serviceContext.GetService(typeof(IComponentProvider)) as IComponentProvider;
+            if (componentProvider == null)
             {
-                return this.exceptionSerializerByCode[exceptionCode];
+                throw new InvalidOperationException("can not get interface of IComponentProvider at serviceProvider");
             }
-            return this.exceptionSerializerByCode[-1];
+            var exceptionDescriptor = componentProvider.GetExceptionDescriptor(code);
+            var exception = (Exception)this.serializer.Deserialize(exceptionDescriptor.ExceptionType, data);
+            throw exception;
         }
 
         #region IAdaptorHost
 
         void IAdaptorHost.Invoke(InstanceBase instance, string name, Type[] types, object[] args)
         {
-            var datas = this.dataSerializer.SerializeMany(types, args);
+            var datas = this.serializer.SerializeMany(types, args);
             var request = new InvokeRequest()
             {
                 ServiceName = instance.ServiceName,
@@ -200,7 +195,7 @@ namespace Ntreev.Crema.Communication.Grpc
 
         T IAdaptorHost.Invoke<T>(InstanceBase instance, string name, Type[] types, object[] args)
         {
-            var datas = this.dataSerializer.SerializeMany(types, args);
+            var datas = this.serializer.SerializeMany(types, args);
             var request = new InvokeRequest()
             {
                 ServiceName = instance.ServiceName,
@@ -212,12 +207,12 @@ namespace Ntreev.Crema.Communication.Grpc
             {
                 this.ThrowException(reply.Code, reply.Data);
             }
-            return SerializerUtility.GetValue<T>(reply.Data);
+            return (T)this.serializer.Deserialize(typeof(T), reply.Data);
         }
 
         async Task IAdaptorHost.InvokeAsync(InstanceBase instance, string name, Type[] types, object[] args)
         {
-            var datas = this.dataSerializer.SerializeMany(types, args);
+            var datas = this.serializer.SerializeMany(types, args);
             var request = new InvokeRequest()
             {
                 ServiceName = instance.ServiceName,
@@ -233,7 +228,7 @@ namespace Ntreev.Crema.Communication.Grpc
 
         async Task<T> IAdaptorHost.InvokeAsync<T>(InstanceBase instance, string name, Type[] types, object[] args)
         {
-            var datas = this.dataSerializer.SerializeMany(types, args);
+            var datas = this.serializer.SerializeMany(types, args);
             var request = new InvokeRequest()
             {
                 ServiceName = instance.ServiceName,
@@ -245,15 +240,11 @@ namespace Ntreev.Crema.Communication.Grpc
             {
                 this.ThrowException(reply.Code, reply.Data);
             }
-            return SerializerUtility.GetValue<T>(reply.Data);
+            return (T)this.serializer.Deserialize(typeof(T), reply.Data);
         }
 
-        public bool HandleException(int errorCode, Exception e)
-        {
-            throw new NotImplementedException();
-        }
+        IContainer<IPeer> IAdaptorHost.Peers => this.Peers;
 
         #endregion
-
     }
 }

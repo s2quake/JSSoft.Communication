@@ -31,7 +31,7 @@ namespace Ntreev.Crema.Communication
     {
         string ID { get; }
 
-        IServiceHost[] Services { get; }
+        IServiceHost[] ServiceHosts { get; }
 
         void AddInstance(IServiceHost service, object instance, object impl);
     }

@@ -21,32 +21,45 @@
 // SOFTWARE.
 
 using System;
+using System.Linq;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using Newtonsoft.Json;
 
 namespace Ntreev.Crema.Communication
 {
-    [Export(typeof(IDataSerializer))]
-    public class DataSerializer : IDataSerializer
+    [Export(typeof(ISerializer))]
+    public class serializer : ISerializer
     {
         public const string DefaultName = "json";
         private static readonly JsonSerializerSettings settings = new JsonSerializerSettings();
+        private readonly Dictionary<Type, IDataSerializer> dataSerializerByType;
 
         [ImportingConstructor]
-        public DataSerializer()
+        public serializer([ImportMany]IDataSerializer[] dataSerializers)
         {
-
+            this.dataSerializerByType = dataSerializers.ToDictionary(item => item.Type);
         }
 
         public string Name => DefaultName;
 
         public string Serialize(Type type, object data)
         {
+            if (this.dataSerializerByType.ContainsKey(type) == true)
+            {
+                var dataSerializer = this.dataSerializerByType[type];
+                return dataSerializer.Serialize(this, data);
+            }
             return JsonConvert.SerializeObject(data, type, settings);
         }
 
         public object Deserialize(Type type, string text)
         {
+            if (this.dataSerializerByType.ContainsKey(type) == true)
+            {
+                var dataSerializer = this.dataSerializerByType[type];
+                return dataSerializer.Deserialize(this, text);
+            }
             return JsonConvert.DeserializeObject(text, type, settings);
         }
 

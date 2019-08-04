@@ -24,14 +24,30 @@ using System;
 
 namespace Ntreev.Crema.Communication
 {
-    public interface IExceptionSerializer
+    public static class ISerializerExtensions
     {
-        Type ExceptionType { get; }
+        public static string[] SerializeMany(this ISerializer serializer, Type[] types, object[] args)
+        {
+            var items = new string[args.Length];
+            for (var i = 0; i < args.Length; i++)
+            {
+                var type = (Type)types[i];
+                var value = args[i];
+                items[i] = serializer.Serialize(type, value);
+            }
+            return items;
+        }
 
-        int ExceptionCode { get; }
-
-        string Serialize(object value);
-
-        object Deserialize(string text);
+        public static object[] DeserializeMany(this ISerializer serializer, Type[] types, string[] datas)
+        {
+            var items = new object[datas.Length];
+            for (var i = 0; i < datas.Length; i++)
+            {
+                var type = types[i];
+                var value = datas[i];
+                items[i] = serializer.Deserialize(type, value);
+            }
+            return items;
+        }
     }
 }

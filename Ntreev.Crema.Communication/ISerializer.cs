@@ -24,30 +24,12 @@ using System;
 
 namespace Ntreev.Crema.Communication
 {
-    public static class IDataSerializerExtensions
+    public interface ISerializer
     {
-        public static string[] SerializeMany(this IDataSerializer serializer, Type[] types, object[] datas)
-        {
-            var items = new string[datas.Length];
-            for (var i = 0; i < datas.Length; i++)
-            {
-                var type = (Type)types[i];
-                var value = datas[i];
-                items[i] = serializer.Serialize(type, value);
-            }
-            return items;
-        }
+        string Name { get; }
+        
+        string Serialize(Type type, object data);
 
-        public static object[] DeserializeMany(this IDataSerializer serializer, Type[] types, string[] texts)
-        {
-            var items = new object[texts.Length];
-            for (var i = 0; i < texts.Length; i++)
-            {
-                var type = types[i];
-                var value = texts[i];
-                items[i] = serializer.Deserialize(type, value);
-            }
-            return items;
-        }
+        object Deserialize(Type type, string text);
     }
 }

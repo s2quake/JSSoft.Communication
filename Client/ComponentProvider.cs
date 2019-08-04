@@ -29,17 +29,19 @@ namespace Client
     [Export(typeof(IComponentProvider))]
     class ComponentProvider : IComponentProvider
     {
-        [ImportMany]private IAdaptorHostProvider[] adaptorHostProviders = null;
-        [ImportMany]private IServiceHost[] services = null;
-        [ImportMany]private IDataSerializer[] dataSerializers = null;
-        [ImportMany]private IExceptionSerializer[] exceptionSerializers = null;
+       [ImportMany]
+        public IAdaptorHostProvider[] AdaptorHostProviders { get; private set; }
 
-        public IAdaptorHostProvider[] AdaptorHostProviders => this.adaptorHostProviders;
+        [ImportMany]
+        public IServiceHost[] Services { get; private set; }
 
-        public IServiceHost[] Services => this.services;
+        [ImportMany]
+        public ISerializer[] Serializers { get; private set; }
 
-        public IDataSerializer[] DataSerializers => this.dataSerializers;
+        [ImportMany]
+        public IDataSerializer[] DataSerializers { get; private set; }
 
-        public IExceptionSerializer[] ExceptionSerializers => this.exceptionSerializers;
+        [ImportMany]
+        public IExceptionDescriptor[] ExceptionSerializers { get; private set; }
     }
 }

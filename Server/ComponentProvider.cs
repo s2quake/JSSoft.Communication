@@ -29,17 +29,19 @@ namespace Server
     [Export(typeof(IComponentProvider))]
     class ComponentProvider : IComponentProvider
     {
-        [ImportMany] private IServiceHost[] services;
-        [ImportMany] private IDataSerializer[] dataSerializers;
-        [ImportMany] private IExceptionSerializer[] exceptionSerializers;
-
         [ImportMany]
         public IAdaptorHostProvider[] AdaptorHostProviders { get; private set; }
 
-        public IServiceHost[] Services => this.services;
+        [ImportMany]
+        public IServiceHost[] Services { get; private set; }
 
-        public IDataSerializer[] DataSerializers => this.dataSerializers;
+        [ImportMany]
+        public ISerializer[] Serializers { get; private set; }
 
-        public IExceptionSerializer[] ExceptionSerializers => this.exceptionSerializers;
+        [ImportMany]
+        public IDataSerializer[] DataSerializers { get; private set; }
+
+        [ImportMany]
+        public IExceptionDescriptor[] ExceptionSerializers { get; private set; }
     }
 }

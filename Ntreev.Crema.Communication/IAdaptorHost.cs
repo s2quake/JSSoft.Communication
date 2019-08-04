@@ -41,8 +41,6 @@ namespace Ntreev.Crema.Communication
 
         Task<T> InvokeAsync<T>(InstanceBase instance, string name, Type[] types, object[] args);
 
-        bool HandleException(int errorCode, Exception e);
-
         IContainer<IPeer> Peers { get; }
 
         event EventHandler<DisconnectionReasonEventArgs> Disconnected;

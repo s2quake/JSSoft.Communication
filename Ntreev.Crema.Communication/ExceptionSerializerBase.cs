@@ -24,7 +24,7 @@ using System;
 
 namespace Ntreev.Crema.Communication
 {
-    public abstract class ExceptionSerializerBase<T> : IExceptionSerializer
+    public abstract class ExceptionSerializerBase<T> : IExceptionDescriptor, IDataSerializer
     {
         protected ExceptionSerializerBase(int exceptionCode)
         {
@@ -35,25 +35,29 @@ namespace Ntreev.Crema.Communication
 
         public int ExceptionCode { get; }
 
-        public abstract Type[] ArgumentTypes { get; }
+        public abstract Type[] PropertyTypes { get; }
 
-        protected abstract T Deserialize(object[] args);
+        protected abstract T CreateInstance(object[] args);
 
-        protected abstract object[] Serialize(T e);
+        protected abstract object[] SelectProperties(T e);
 
         #region IDataSerializer
 
-        object IExceptionSerializer.Deserialize(string text)
+        object IDataSerializer.Deserialize(ISerializer serializer, string text)
         {
-            var args = SerializerUtility.GetArguments(this.ArgumentTypes, text);
-            return this.Deserialize(args);
+            var datas = (string[])serializer.Deserialize(typeof(string[]), text);
+            var args = serializer.DeserializeMany(this.PropertyTypes, datas);
+            return this.CreateInstance(args);
         }
 
-        string IExceptionSerializer.Serialize(object e)
+        string IDataSerializer.Serialize(ISerializer serializer, object data)
         {
-            var args = this.Serialize((T)e);
-            return SerializerUtility.GetStrings(this.ArgumentTypes, args);
+            var args = this.SelectProperties((T)data);
+            var datas = serializer.SerializeMany(this.PropertyTypes, args);
+            return serializer.Serialize(typeof(string[]), datas);
         }
+
+        Type IDataSerializer.Type => this.ExceptionType;
 
         #endregion
     }

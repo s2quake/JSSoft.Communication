@@ -34,7 +34,7 @@ namespace Ntreev.Crema.Communication
 
         Task CloseAsync(Guid token);
 
-        IContainer<IServiceHost> Services { get; }
+        IContainer<IServiceHost> ServiceHosts { get; }
 
         string Host { get; set; }
         

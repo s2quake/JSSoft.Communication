@@ -39,19 +39,18 @@ namespace Ntreev.Crema.Communication.Grpc
     class AdaptorServerHost : IAdaptorHost
     {
         private readonly IServiceContext serviceContext;
-        private readonly IContainer<IServiceHost> services;
+        private readonly IContainer<IServiceHost> serviceHosts;
         private readonly HashSet<string> peerHashes = new HashSet<string>();
-        private readonly PeerCollection peers = new PeerCollection();
         private ILogger logger;
         private CancellationTokenSource cancellation;
         private Server server;
         private AdaptorServerImpl adaptor;
-        private IDataSerializer dataSerializer;
+        private ISerializer serializer;
 
         public AdaptorServerHost(IServiceContext serviceContext)
         {
             this.serviceContext = serviceContext;
-            this.services = serviceContext.Services;
+            this.serviceHosts = serviceContext.ServiceHosts;
             this.logger = GrpcEnvironment.Logger;
         }
 
@@ -60,12 +59,10 @@ namespace Ntreev.Crema.Communication.Grpc
             var token = await this.Dispatcher.InvokeAsync(() =>
             {
                 var serviceNames = request.ServiceNames;
+                var serviceHosts = serviceNames.Select(item => this.serviceHosts[item]).ToArray();
                 var peer = context.Peer;
-                var peerDescriptor = new PeerDescriptor(peer)
-                {
-                    Services = serviceNames.Select(item => this.services[item]).ToArray(),
-                };
-                this.peers.Add(peerDescriptor);
+                var peerDescriptor = new PeerDescriptor(peer, serviceHosts);
+                this.Peers.Add(peerDescriptor);
                 return peerDescriptor.Token;
             });
             this.logger.Debug($"Connected: {context.Peer}");
@@ -76,7 +73,7 @@ namespace Ntreev.Crema.Communication.Grpc
         {
             await this.Dispatcher.InvokeAsync(() =>
             {
-                var peerDescriptor = this.peers[context.Peer];
+                var peerDescriptor = this.Peers[context.Peer];
                 peerDescriptor.Dispose();
             });
             this.logger.Debug($"Disconnected: {context.Peer}");
@@ -87,7 +84,7 @@ namespace Ntreev.Crema.Communication.Grpc
         {
             return this.Dispatcher.InvokeAsync(() =>
             {
-                var peerDescriptor = this.peers[context.Peer];
+                var peerDescriptor = this.Peers[context.Peer];
                 peerDescriptor.Ping = DateTime.UtcNow;
                 return new PingReply() { Time = peerDescriptor.Ping.Ticks };
             });
@@ -95,21 +92,21 @@ namespace Ntreev.Crema.Communication.Grpc
 
         internal async Task<InvokeReply> Invoke(InvokeRequest request, ServerCallContext context)
         {
-            if (this.services.ContainsKey(request.ServiceName) == false)
+            if (this.serviceHosts.ContainsKey(request.ServiceName) == false)
                 throw new InvalidOperationException();
-            var service = this.services[request.ServiceName];
+            var service = this.serviceHosts[request.ServiceName];
             if (service.Methods.ContainsKey(request.Name) == false)
                 throw new InvalidOperationException();
 
             var methodDescriptor = service.Methods[request.Name];
-            var peerDescriptor = this.peers[context.Peer];
+            var peerDescriptor = this.Peers[context.Peer];
             var instance = peerDescriptor.ServiceInstances[service];
-            var args = SerializerUtility.GetArguments(methodDescriptor.ParameterTypes, request.Datas);
+            var args = this.serializer.DeserializeMany(methodDescriptor.ParameterTypes, request.Datas.ToArray());
             var (code, valueType, value) = await methodDescriptor.InvokeAsync(this.serviceContext, instance, args);
             var reply = new InvokeReply()
             {
                 Code = code,
-                Data = this.dataSerializer.Serialize(valueType, value)
+                Data = this.serializer.Serialize(valueType, value)
             };
             return reply;
         }
@@ -118,11 +115,11 @@ namespace Ntreev.Crema.Communication.Grpc
         {
             var cancellationToken = this.cancellation.Token;
             this.peerHashes.Add(context.Peer);
-            var peerDescriptor = await this.Dispatcher.InvokeAsync(() => this.peers[context.Peer]);
+            var peerDescriptor = await this.Dispatcher.InvokeAsync(() => this.Peers[context.Peer]);
             while (await requestStream.MoveNext())
             {
                 var request = requestStream.Current;
-                var services = peerDescriptor.Services;
+                var services = peerDescriptor.ServiceHosts;
                 if (this.cancellation.IsCancellationRequested == true)
                 {
                     await responseStream.WriteAsync(new PollReply() { Code = -1 });
@@ -147,7 +144,7 @@ namespace Ntreev.Crema.Communication.Grpc
 
         }
 
-        public IContainer<IPeer> Peers => this.peers;
+        public PeerCollection Peers { get; } = new PeerCollection();
 
         public Dispatcher Dispatcher => this.serviceContext.Dispatcher;
 
@@ -167,7 +164,7 @@ namespace Ntreev.Crema.Communication.Grpc
 
         private Task AddCallback(InstanceBase instance, string name, Type[] types, object[] args)
         {
-            var datas = this.dataSerializer.SerializeMany(types, args);
+            var datas = this.serializer.SerializeMany(types, args);
             var pollItem = new PollReplyItem()
             {
                 Name = name,
@@ -201,7 +198,7 @@ namespace Ntreev.Crema.Communication.Grpc
                 Ports = { new ServerPort(host, port, ServerCredentials.Insecure) },
             };
             this.cancellation = new CancellationTokenSource();
-            this.dataSerializer = this.serviceContext.GetService(typeof(IDataSerializer)) as IDataSerializer;
+            this.serializer = this.serviceContext.GetService(typeof(ISerializer)) as ISerializer;
             return Task.Run(this.server.Start);
         }
 
@@ -213,7 +210,7 @@ namespace Ntreev.Crema.Communication.Grpc
             {
                 await Task.Delay(1);
             }
-            this.dataSerializer = null;
+            this.serializer = null;
             await this.server.ShutdownAsync();
             this.server = null;
             await this.Dispatcher.DisposeAsync();
@@ -239,10 +236,7 @@ namespace Ntreev.Crema.Communication.Grpc
             throw new NotImplementedException();
         }
 
-        bool IAdaptorHost.HandleException(int errorCode, Exception e)
-        {
-            throw new NotImplementedException();
-        }
+        IContainer<IPeer> IAdaptorHost.Peers => this.Peers;
 
         #endregion
     }

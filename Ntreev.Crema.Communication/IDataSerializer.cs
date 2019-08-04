@@ -26,10 +26,10 @@ namespace Ntreev.Crema.Communication
 {
     public interface IDataSerializer
     {
-        string Name { get; }
+        Type Type { get; }
         
-        string Serialize(Type type, object data);
+        string Serialize(ISerializer serializer, object data);
 
-        object Deserialize(Type type, string text);
+        object Deserialize(ISerializer serializer, string text);
     }
 }

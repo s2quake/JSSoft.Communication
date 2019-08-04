@@ -38,8 +38,10 @@ namespace Ntreev.Crema.Communication
 
         IServiceHost[] Services { get; }
 
+        ISerializer[] Serializers { get; }
+
         IDataSerializer[] DataSerializers { get; }
 
-        IExceptionSerializer[] ExceptionSerializers { get; }
+        IExceptionDescriptor[] ExceptionSerializers { get; }
     }
 }

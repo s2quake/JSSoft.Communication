@@ -37,11 +37,11 @@ namespace Ntreev.Crema.Communication
         private const string defaultHost = "localhost";
         private static readonly int defaultPort = 4004;
         private readonly IComponentProvider componentProvider;
-        private readonly Dictionary<Type, IExceptionSerializer> exceptionSerializerByType = new Dictionary<Type, IExceptionSerializer>();
+        private readonly Dictionary<Type, IExceptionDescriptor> exceptionSerializerByType = new Dictionary<Type, IExceptionDescriptor>();
         private readonly ServiceInstanceBuilder instanceBuilder;
         private readonly Dispatcher dispatcher;
         private IAdaptorHostProvider adpatorHostProvider;
-        private IDataSerializer dataSerializer;
+        private ISerializer serializer;
         private IAdaptorHost adaptorHost;
         private string host;
         private int port = defaultPort;
@@ -61,7 +61,7 @@ namespace Ntreev.Crema.Communication
             var token = ServiceToken.NewToken();
             await this.dispatcher.InvokeAsync((Action)(() =>
             {
-                this.dataSerializer = this.componentProvider.GetDataSerializer(this.DataSerializerType);
+                this.serializer = this.componentProvider.Getserializer(this.serializerType);
                 this.adpatorHostProvider = this.componentProvider.GetAdaptorHostProvider(this.AdaptorHostType);
                 this.adaptorHost = this.adpatorHostProvider.Create(this, token);
                 this.adaptorHost.Peers.CollectionChanged += Peers_CollectionChanged;
@@ -89,7 +89,7 @@ namespace Ntreev.Crema.Communication
                     {
                         foreach (IPeer item in e.NewItems)
                         {
-
+                            this.CreateInstance(this.adaptorHost, item);
                         }
                     }
                     break;
@@ -98,7 +98,7 @@ namespace Ntreev.Crema.Communication
 
         private void CreateInstance(IAdaptorHost adaptorHost, IPeer peer)
         {
-            foreach (var item in peer.Services)
+            foreach (var item in peer.ServiceHosts)
             {
                 var remoteType = item.InstanceType;
                 var typeName = $"{remoteType.Name}Impl";
@@ -124,7 +124,7 @@ namespace Ntreev.Crema.Communication
                 this.adaptorHost.Disconnected -= AdaptorHost_Disconnected;
                 this.adaptorHost.Peers.CollectionChanged -= Peers_CollectionChanged;
                 this.adaptorHost = null;
-                this.dataSerializer = null;
+                this.serializer = null;
             }
             await this.adaptorHost.CloseAsync();
             await this.dispatcher.InvokeAsync(() =>
@@ -137,8 +137,8 @@ namespace Ntreev.Crema.Communication
 
         public object GetService(Type serviceType)
         {
-            if (serviceType == typeof(IDataSerializer) && this.IsOpened == true)
-                return this.dataSerializer;
+            if (serviceType == typeof(ISerializer) && this.IsOpened == true)
+                return this.serializer;
             if (serviceType == typeof(IComponentProvider))
                 return this.componentProvider;
             return null;
@@ -146,7 +146,7 @@ namespace Ntreev.Crema.Communication
 
         public string AdaptorHostType { get; set; }
 
-        public string DataSerializerType { get; set; }
+        public string serializerType { get; set; }
 
         internal void Dispose()
         {
@@ -202,7 +202,7 @@ namespace Ntreev.Crema.Communication
 
         #region IServiecHost
 
-        IContainer<IServiceHost> IServiceContext.Services => this.Services;
+        IContainer<IServiceHost> IServiceContext.ServiceHosts => this.Services;
 
         #endregion
 

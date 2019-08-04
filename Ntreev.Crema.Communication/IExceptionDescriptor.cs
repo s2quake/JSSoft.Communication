@@ -21,38 +21,13 @@
 // SOFTWARE.
 
 using System;
-using System.ComponentModel.Composition;
 
-namespace Ntreev.Crema.Communication.ExceptionSerializers
+namespace Ntreev.Crema.Communication
 {
-    [Export(typeof(IExceptionDescriptor))]
-    class ExceptionSerializer : ExceptionSerializerBase<Exception>
+    public interface IExceptionDescriptor
     {
-        private static readonly Exception empty = new Exception();
+        Type ExceptionType { get; }
 
-        public ExceptionSerializer()
-            : base(-1)
-        {
-
-        }
-
-        public override Type[] PropertyTypes => new Type[] { typeof(string) };
-
-        public static readonly ExceptionSerializer Default = new ExceptionSerializer();
-
-        protected override Exception CreateInstance(object[] args)
-        {
-            var message = args[0] as string;
-            if (message == null)
-                return new Exception();
-            return new Exception(message);
-        }
-
-        protected override object[] SelectProperties(Exception e)
-        {
-            if (e.Message == empty.Message)
-                return new object[] { null};
-            return new object[] { e.Message };
-        }
+        int ExceptionCode { get; }
     }
 }

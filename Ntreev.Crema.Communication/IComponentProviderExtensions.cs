@@ -41,15 +41,21 @@ namespace Ntreev.Crema.Communication
             return componentProvider.AdaptorHostProviders.First(item => item.Name == type);
         }
 
-        public static IDataSerializer GetDataSerializer(this IComponentProvider componentProvider, string dataSerializerType)
+        public static ISerializer Getserializer(this IComponentProvider componentProvider, string serializerType)
         {
-            var type = dataSerializerType ?? DataSerializer.DefaultName;
-            return componentProvider.DataSerializers.First(item => item.Name == type);
+            var type = serializerType ?? serializer.DefaultName;
+            return componentProvider.Serializers.First(item => item.Name == type);
         }
 
-        public static IExceptionSerializer GetExceptionSerializer(this IComponentProvider componentProvider, Exception e)
+        public static IExceptionDescriptor GetExceptionDescriptor(this IComponentProvider componentProvider, Exception e)
         {
             var exceptionSerializer = componentProvider.ExceptionSerializers.FirstOrDefault(item => item.ExceptionType == e.GetType());
+            return exceptionSerializer ?? ExceptionSerializer.Default;
+        }
+
+        public static IExceptionDescriptor GetExceptionDescriptor(this IComponentProvider componentProvider, int exceptionCode)
+        {
+            var exceptionSerializer = componentProvider.ExceptionSerializers.FirstOrDefault(item => item.ExceptionCode == exceptionCode);
             return exceptionSerializer ?? ExceptionSerializer.Default;
         }
     }

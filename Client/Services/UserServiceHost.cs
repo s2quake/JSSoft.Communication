@@ -21,41 +21,40 @@
 // SOFTWARE.
 
 using System;
-using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
-using Grpc.Core;
-using Newtonsoft.Json;
 using Ntreev.Crema.Communication;
 using Ntreev.Crema.Services;
 
 namespace Client.Services
 {
-    [Export(typeof(IService))]
-    [Export(typeof(IUserService))]
-    class UserService : ClientServiceBase<IUserService, IUserServiceCallback>, IUserService, IUserServiceCallback
+    [Export(typeof(IServiceHost))]
+    class UserServiceHost : ClientServiceHostBase<IUserService, IUserServiceCallback>, IUserServiceCallback, INotifyPropertyChanged
     {
-        public UserService()
+        private IUserService userService;
+
+        public UserServiceHost()
             : base()
         {
 
         }
 
-        #region IUserServiceCallback
+        public event PropertyChangedEventHandler PropertyChanged;
 
-        public Task<int> LoginAsync(string user)
+        public override object CreateInstance(object obj)
         {
-            return this.Service.LoginAsync(user);
+            this.userService = obj as IUserService;
+            this.OnPropertyChanged(new PropertyChangedEventArgs(nameof(UserService)));
+            return this;
         }
 
-        public Task<(int, string)> LogoutAsync(string user, int count)
-        {
-            return this.Service.LogoutAsync(user, count);
-        }
+        [Export(typeof(IUserService))]
+        public IUserService UserService => this.userService;
 
-        #endregion
+        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
+        {
+            this.PropertyChanged?.Invoke(this, e);
+        }
 
         #region IUserServiceCallback
 

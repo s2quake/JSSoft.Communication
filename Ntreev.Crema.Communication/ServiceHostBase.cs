@@ -35,7 +35,7 @@ namespace Ntreev.Crema.Communication
         private readonly Type implementedType;
         private Dispatcher dispatcher;
         private ServiceToken token;
-        private IDataSerializer serializer;
+        private ISerializer serializer;
 
         internal ServiceHostBase(string name, Type instanceType, Type implementedType)
         {
