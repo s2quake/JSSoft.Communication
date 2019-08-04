@@ -31,6 +31,11 @@ namespace Ntreev.Crema.Communication
 {
     public class InstanceBase
     {
+        public const string InvokeMethod = "Invoke";
+        public const string InvokeGenericMethod = "InvokeGeneric";
+        public const string InvokeAsyncMethod = "InvokeAsync";
+        public const string InvokeGenericAsyncMethod = "InvokeGenericAsync";
+
         internal InstanceBase()
         {
 
@@ -44,21 +49,25 @@ namespace Ntreev.Crema.Communication
 
         internal IPeer Peer { get; set; }
 
+         [InstanceMethod(InvokeMethod)]
         protected void Invoke(string name, Type[] types, object[] args)
         {
             this.AdaptorHost.Invoke(this, name, types, args);
         }
 
+        [InstanceMethod(InvokeGenericMethod)]
         protected T Invoke<T>(string name, Type[] types, object[] args)
         {
             return this.AdaptorHost.Invoke<T>(this, name, types, args);
         }
 
+        [InstanceMethod(InvokeAsyncMethod)]
         protected Task InvokeAsync(string name, Type[] types, object[] args)
         {
             return this.AdaptorHost.InvokeAsync(this, name, types, args);
         }
 
+        [InstanceMethod(InvokeGenericAsyncMethod)]
         protected Task<T> InvokeAsync<T>(string name, Type[] types, object[] args)
         {
             return this.AdaptorHost.InvokeAsync<T>(this, name, types, args);

@@ -35,7 +35,6 @@ namespace Ntreev.Crema.Communication
         private readonly Type implementedType;
         private Dispatcher dispatcher;
         private ServiceToken token;
-        private ISerializer serializer;
 
         internal ServiceHostBase(string name, Type instanceType, Type implementedType)
         {
@@ -43,7 +42,7 @@ namespace Ntreev.Crema.Communication
             this.instanceType = instanceType;
             this.implementedType = implementedType;
             this.dispatcher = new Dispatcher(this);
-            this.Methods = new MethodDescriptorCollection(instanceType);
+            this.Methods = new MethodDescriptorCollection(implementedType);
         }
 
         public Type InstanceType => this.instanceType;

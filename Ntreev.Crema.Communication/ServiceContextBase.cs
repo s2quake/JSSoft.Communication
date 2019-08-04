@@ -102,8 +102,7 @@ namespace Ntreev.Crema.Communication
             {
                 var remoteType = item.InstanceType;
                 var typeName = $"{remoteType.Name}Impl";
-                var typeNamespace = remoteType.Namespace;
-                var implType = this.instanceBuilder.CreateType(typeName, typeNamespace, typeof(InstanceBase), remoteType);
+                var implType = this.instanceBuilder.CreateType(typeName, typeof(InstanceBase), remoteType);
                 var instance = TypeDescriptor.CreateInstance(null, implType, null, null) as InstanceBase;
                 instance.Service = item;
                 instance.AdaptorHost = adaptorHost;
@@ -137,7 +136,7 @@ namespace Ntreev.Crema.Communication
 
         public object GetService(Type serviceType)
         {
-            if (serviceType == typeof(ISerializer) && this.IsOpened == true)
+            if (serviceType == typeof(ISerializer))
                 return this.serializer;
             if (serviceType == typeof(IComponentProvider))
                 return this.componentProvider;
