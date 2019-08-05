@@ -37,7 +37,8 @@ namespace Ntreev.Crema.Communication
         private const string defaultHost = "localhost";
         private static readonly int defaultPort = 4004;
         private readonly IComponentProvider componentProvider;
-        private readonly Dictionary<Type, IExceptionDescriptor> exceptionSerializerByType = new Dictionary<Type, IExceptionDescriptor>();
+        private readonly InstanceCollection serviceByServiceHost = new InstanceCollection();
+        private readonly InstanceCollection callbackByServiceHost = new InstanceCollection();
         private readonly ServiceInstanceBuilder instanceBuilder;
         private readonly Dispatcher dispatcher;
         private IAdaptorHostProvider adpatorHostProvider;
@@ -46,14 +47,16 @@ namespace Ntreev.Crema.Communication
         private string host;
         private int port = defaultPort;
         private bool isOpened;
+        private bool isServer;
         private ServiceToken token;
 
         internal ServiceContextBase(IComponentProvider componentProvider)
         {
             this.componentProvider = componentProvider;
             this.instanceBuilder = new ServiceInstanceBuilder();
-            this.Services = new ServiceHostCollection(componentProvider.Services);
+            this.ServiceHosts = new ServiceHostCollection(componentProvider.Services);
             this.dispatcher = new Dispatcher(this);
+            this.isServer = IsServer(this);
         }
 
         public async Task<Guid> OpenAsync()
@@ -61,17 +64,18 @@ namespace Ntreev.Crema.Communication
             var token = ServiceToken.NewToken();
             await this.dispatcher.InvokeAsync((Action)(() =>
             {
-                this.serializer = this.componentProvider.Getserializer(this.serializerType);
+                this.serializer = this.componentProvider.Getserializer(this.SerializerType);
                 this.adpatorHostProvider = this.componentProvider.GetAdaptorHostProvider(this.AdaptorHostType);
                 this.adaptorHost = this.adpatorHostProvider.Create(this, token);
                 this.adaptorHost.Peers.CollectionChanged += Peers_CollectionChanged;
                 this.adaptorHost.Disconnected += AdaptorHost_Disconnected;
             }));
-            await this.adaptorHost.OpenAsync(this.Host, this.Port);
-            foreach (var item in this.Services)
+            foreach (var item in this.ServiceHosts)
             {
+                this.InitializeInstance(item);
                 await item.OpenAsync(token);
             }
+            await this.adaptorHost.OpenAsync(this.Host, this.Port);
             await this.dispatcher.InvokeAsync(() =>
             {
                 this.isOpened = true;
@@ -96,20 +100,50 @@ namespace Ntreev.Crema.Communication
             }
         }
 
+        private Dictionary<object, object> instanceByImpl;
+
+        private void InitializeInstance(IServiceHost serviceHost)
+        {
+            var isPerPeer = IsPerPeer(this, serviceHost);
+            if (isPerPeer == true)
+                return;
+            var (service, callback) = this.CreateInstance(serviceHost, null);
+            this.serviceByServiceHost.Add(serviceHost, service);
+            this.callbackByServiceHost.Add(serviceHost, callback);
+        }
+
+        private (object, object) CreateInstance(IServiceHost serviceHost, IPeer peer)
+        {
+            var baseType = GetInstanceType(this, serviceHost);
+            var typeName = $"{baseType.Name}Impl";
+            var instanceType = this.instanceBuilder.CreateType(typeName, typeof(InstanceBase), baseType);
+            var instance = TypeDescriptor.CreateInstance(null, instanceType, null, null) as InstanceBase;
+            instance.ServiceHost = serviceHost;
+            instance.AdaptorHost = adaptorHost;
+            instance.Peer = peer;
+
+            var impl = serviceHost.CreateInstance(instance);
+            var service = this.isServer ? impl : instance;
+            var callback = this.isServer ? instance : impl;
+            return (service, callback);
+        }
+
         private void CreateInstance(IAdaptorHost adaptorHost, IPeer peer)
         {
             foreach (var item in peer.ServiceHosts)
             {
-                var remoteType = item.InstanceType;
-                var typeName = $"{remoteType.Name}Impl";
-                var implType = this.instanceBuilder.CreateType(typeName, typeof(InstanceBase), remoteType);
-                var instance = TypeDescriptor.CreateInstance(null, implType, null, null) as InstanceBase;
-                instance.Service = item;
-                instance.AdaptorHost = adaptorHost;
-                instance.Peer = peer;
-
-                var impl = item.CreateInstance(instance);
-                peer.AddInstance(item, instance, impl);
+                var isPerPeer = IsPerPeer(this, item);
+                if (isPerPeer == true)
+                {
+                    var (service, callback) = this.CreateInstance(item, peer);
+                    peer.AddInstance(item, service, callback);
+                }
+                else
+                {
+                    var service = this.serviceByServiceHost[item];
+                    var callback = this.callbackByServiceHost[item];
+                    peer.AddInstance(item, service, callback);
+                }
             }
         }
 
@@ -117,7 +151,8 @@ namespace Ntreev.Crema.Communication
         {
             if (token == Guid.Empty || this.token.Guid != token)
                 throw new ArgumentException($"invalid token: {token}", nameof(token));
-            foreach (var item in this.Services)
+            await this.adaptorHost.CloseAsync();
+            foreach (var item in this.ServiceHosts)
             {
                 await item.CloseAsync(this.token);
                 this.adaptorHost.Disconnected -= AdaptorHost_Disconnected;
@@ -125,7 +160,6 @@ namespace Ntreev.Crema.Communication
                 this.adaptorHost = null;
                 this.serializer = null;
             }
-            await this.adaptorHost.CloseAsync();
             await this.dispatcher.InvokeAsync(() =>
             {
                 this.isOpened = false;
@@ -145,14 +179,45 @@ namespace Ntreev.Crema.Communication
 
         public string AdaptorHostType { get; set; }
 
-        public string serializerType { get; set; }
+        public string SerializerType { get; set; }
 
         internal void Dispose()
         {
             this.dispatcher.Dispose();
         }
 
-        public ServiceHostCollection Services { get; }
+        internal static bool IsServer(ServiceContextBase serviceContext)
+        {
+            if (serviceContext.GetType().GetCustomAttribute(typeof(ServiceContextAttribute)) is ServiceContextAttribute attribute)
+            {
+                return attribute.IsServer;
+            }
+            return false;
+        }
+
+        internal static Type GetInstanceType(ServiceContextBase serviceContext, IServiceHost serviceHost)
+        {
+            var isServer = IsServer(serviceContext);
+            if (isServer == true)
+            {
+                return serviceHost.CallbackType;
+            }
+            return serviceHost.ServiceType;
+        }
+
+        internal static bool IsPerPeer(ServiceContextBase serviceContext, IServiceHost serviceHost)
+        {
+            if (IsServer(serviceContext) == false)
+                return false;
+            var serviceType = serviceHost.ServiceType;
+            if (serviceType.GetCustomAttribute(typeof(ServiceContractAttribute)) is ServiceContractAttribute attribute)
+            {
+                return attribute.PerPeer;
+            }
+            return false;
+        }
+
+        public ServiceHostCollection ServiceHosts { get; }
 
         public string Host
         {
@@ -201,7 +266,7 @@ namespace Ntreev.Crema.Communication
 
         #region IServiecHost
 
-        IContainer<IServiceHost> IServiceContext.ServiceHosts => this.Services;
+        IContainer<IServiceHost> IServiceContext.ServiceHosts => this.ServiceHosts;
 
         #endregion
 

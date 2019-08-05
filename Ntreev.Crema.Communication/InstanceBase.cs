@@ -43,9 +43,9 @@ namespace Ntreev.Crema.Communication
 
         internal IAdaptorHost AdaptorHost { get; set; }
 
-        internal IServiceHost Service { get; set; }
+        internal IServiceHost ServiceHost { get; set; }
 
-        internal string ServiceName => this.Service.Name;
+        internal string ServiceName => this.ServiceHost.Name;
 
         internal IPeer Peer { get; set; }
 

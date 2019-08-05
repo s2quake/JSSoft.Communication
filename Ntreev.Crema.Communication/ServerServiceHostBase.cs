@@ -25,17 +25,18 @@ using System.ComponentModel;
 
 namespace Ntreev.Crema.Communication
 {
+    [ServiceHost(IsServer = true)]
     public abstract class ServerServiceHostBase<T, U> : ServiceHostBase where T : class where U : class
     {
         protected ServerServiceHostBase()
-            : base(typeof(T).Name, typeof(U), typeof(T))
+            : base(typeof(T), typeof(U))
         {
 
         }
 
         public override object CreateInstance(object obj)
         {
-            return TypeDescriptor.CreateInstance(null, this.InstanceType, null, null);
+            return TypeDescriptor.CreateInstance(null, this.ServiceType, null, null);
         }
     }
 }

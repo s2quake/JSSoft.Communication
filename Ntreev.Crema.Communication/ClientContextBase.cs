@@ -25,6 +25,7 @@ using System.Collections.Generic;
 
 namespace Ntreev.Crema.Communication
 {
+    [ServiceContext(IsServer = false)]
     public abstract class ClientContextBase : ServiceContextBase
     {
         protected ClientContextBase(IComponentProvider componentProvider)

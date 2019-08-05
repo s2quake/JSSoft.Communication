@@ -21,17 +21,14 @@
 // SOFTWARE.
 
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Ntreev.Library.ObjectModel;
 
 namespace Ntreev.Crema.Communication
 {
-    [AttributeUsage(AttributeTargets.Interface)]
-    public class ServiceContractAttribute : Attribute
+    class InstanceCollection : Dictionary<IServiceHost, object>
     {
-        public ServiceContractAttribute()
-        {
-
-        }
-
-        public bool PerPeer { get; set; }
+        
     }
 }

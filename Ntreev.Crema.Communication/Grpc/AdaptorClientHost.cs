@@ -69,7 +69,6 @@ namespace Ntreev.Crema.Communication.Grpc
             this.task = this.PollAsync(this.cancellation.Token);
 
             this.Peers.Add(peerDescriptor);
-            // this.adaptorImpl.Disconnected += AdaptorImpl_Disconnected;
             return Task.Delay(1);
         }
 
@@ -151,7 +150,7 @@ namespace Ntreev.Crema.Communication.Grpc
             var methodDescriptor = serviceHost.Methods[name];
             var args = this.serializer.DeserializeMany(methodDescriptor.ParameterTypes, datas);
             var peer = this.Peers.First();
-            var instance = peer.CallbackInstances[serviceHost];
+            var instance = peer.Callbacks[serviceHost];
             await methodDescriptor.InvokeAsync(this.serviceContext, instance, args);
         }
 

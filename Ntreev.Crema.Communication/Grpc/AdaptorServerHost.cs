@@ -31,6 +31,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Grpc.Core.Logging;
+using Ntreev.Library.Linq;
 using Ntreev.Library.ObjectModel;
 using Ntreev.Library.Threading;
 
@@ -100,7 +101,7 @@ namespace Ntreev.Crema.Communication.Grpc
 
             var methodDescriptor = service.Methods[request.Name];
             var peerDescriptor = this.Peers[context.Peer];
-            var instance = peerDescriptor.ServiceInstances[service];
+            var instance = peerDescriptor.Services[service];
             var args = this.serializer.DeserializeMany(methodDescriptor.ParameterTypes, request.Datas.ToArray());
             var (code, valueType, value) = await methodDescriptor.InvokeAsync(this.serviceContext, instance, args);
             var reply = new InvokeReply()
@@ -173,17 +174,21 @@ namespace Ntreev.Crema.Communication.Grpc
             return this.Dispatcher.InvokeAsync(() =>
             {
                 var peerDescriptor = instance.Peer as PeerDescriptor;
-                var service = instance.Service;
-                var callbacks = peerDescriptor.Callbacks[service];
-                pollItem.Datas.AddRange(datas);
-                callbacks.Add(pollItem);
+                var peers = peerDescriptor == null ? this.Peers : EnumerableUtility.One(peerDescriptor);
+                var service = instance.ServiceHost;
+                foreach (var item in peers)
+                {
+                    var callbacks = item.PollReplyItems[service];
+                    pollItem.Datas.AddRange(datas);
+                    callbacks.Add(pollItem);
+                }
             });
         }
 
         private PollReplyItem[] Poll(PeerDescriptor peerDescriptor, IServiceHost service)
         {
             this.Dispatcher.VerifyAccess();
-            var callbacks = peerDescriptor.Callbacks[service];
+            var callbacks = peerDescriptor.PollReplyItems[service];
             return callbacks.Flush();
         }
 

@@ -10,8 +10,10 @@ namespace Ntreev.Crema.Communication
 {
     public sealed class MethodDescriptorCollection : ContainerBase<MethodDescriptor>
     {
-        public MethodDescriptorCollection(Type instanceType)
+        public MethodDescriptorCollection(ServiceHostBase serviceHost)
         {
+            var isServer = ServiceHostBase.IsServer(serviceHost);
+            var instanceType = isServer ? serviceHost.ServiceType : serviceHost.CallbackType;
             var methods = instanceType.GetMethods();
             foreach (var item in methods)
             {

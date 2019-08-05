@@ -26,6 +26,7 @@ using Ntreev.Crema.Communication;
 
 namespace Ntreev.Crema.Services
 {
+    [ServiceContract]
     public interface IUserService
     {
         [OperationContract]

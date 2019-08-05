@@ -27,13 +27,13 @@ using Ntreev.Library.Threading;
 namespace Ntreev.Crema.Communication
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public sealed class ServiceHostAttribute : Attribute
+    sealed class ServiceHostAttribute : Attribute
     {
         public ServiceHostAttribute()
         {
 
         }
 
-        public bool PerPeer { get; set; }
+        public bool IsServer { get; set; }
     }
 }

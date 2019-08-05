@@ -23,7 +23,7 @@
             "program": "${workspaceFolder}/Server/bin/Debug/netcoreapp3.0/Server.dll",
             "args": [],
             "cwd": "${workspaceFolder}/Server",
-            "console": "integratedTerminal",
+            "console": "externalTerminal",
             "stopAtEntry": false
         },
         {

@@ -26,12 +26,12 @@ using System.Collections.Generic;
 
 namespace Ntreev.Crema.Communication.Grpc
 {
-    class CallbackCollection : IEnumerable<PollReplyItem>, IReadOnlyList<PollReplyItem>
+    class PollReplyItemCollection : IEnumerable<PollReplyItem>, IReadOnlyList<PollReplyItem>
     {
         private readonly List<PollReplyItem> itemList = new List<PollReplyItem>();
         private readonly IServiceHost service;
 
-        public CallbackCollection(IServiceHost service)
+        public PollReplyItemCollection(IServiceHost service)
         {
             this.service = service;
         }

@@ -31,32 +31,29 @@ namespace Ntreev.Crema.Communication
 {
     public abstract class ServiceHostBase : IServiceHost, IDisposable
     {
-        private readonly Type instanceType;
-        private readonly Type implementedType;
-        private Dispatcher dispatcher;
         private ServiceToken token;
 
-        internal ServiceHostBase(string name, Type instanceType, Type implementedType)
+        internal ServiceHostBase(Type serviceType, Type callbackType)
         {
-            this.Name = name;
-            this.instanceType = instanceType;
-            this.implementedType = implementedType;
-            this.dispatcher = new Dispatcher(this);
-            this.Methods = new MethodDescriptorCollection(implementedType);
+            this.Name = serviceType.Name;
+            this.ServiceType = serviceType;
+            this.CallbackType = callbackType;
+            this.Dispatcher = new Dispatcher(this);
+            this.Methods = new MethodDescriptorCollection(this);
         }
 
-        public Type InstanceType => this.instanceType;
+        public Type ServiceType { get; }
 
-        public Type ImplementedType => this.implementedType;
+        public Type CallbackType { get; }
 
-        public Dispatcher Dispatcher => this.dispatcher;
+        public Dispatcher Dispatcher { get; private set; }
 
         public MethodDescriptorCollection Methods { get; }
 
         public async Task OpenAsync(ServiceToken token)
         {
             this.token = token;
-            await this.dispatcher.InvokeAsync(() =>
+            await this.Dispatcher.InvokeAsync(() =>
             {
                 this.OnOpened(EventArgs.Empty);
             });
@@ -64,7 +61,7 @@ namespace Ntreev.Crema.Communication
 
         public async Task CloseAsync(ServiceToken token)
         {
-            await this.dispatcher.InvokeAsync(() =>
+            await this.Dispatcher.InvokeAsync(() =>
             {
                 this.OnClosed(EventArgs.Empty);
             });
@@ -90,41 +87,30 @@ namespace Ntreev.Crema.Communication
 
         internal void Dispose()
         {
-            this.dispatcher.Dispose();
-            this.dispatcher = null;
+            if (this.Dispatcher == null)
+                throw new ObjectDisposedException($"{this.GetType()}");
+            this.Dispatcher.Dispose();
+            this.Dispatcher = null;
+        }
+
+        internal static bool IsServer(ServiceHostBase serviceHost)
+        {
+            if (serviceHost.GetType().GetCustomAttribute(typeof(ServiceHostAttribute)) is ServiceHostAttribute attribute)
+            {
+                return attribute.IsServer;
+            }
+            return false;
         }
 
         #region IServiceHost
 
         IContainer<MethodDescriptor> IServiceHost.Methods => this.Methods;
 
-        // async Task<(int, Type, object)> IServiceHost.InvokeAsync(object instance, string name, object[] args)
-        // {
-        //     try
-        //     {
-        //         var methodDescriptor = this.Methods[name];
-        //         var (type, value) = await methodDescriptor.InvokeAsync(instance, args);
-        //         return (0, type, value);
-        //     }
-        //     catch (TargetInvocationException e)
-        //     {
-        //         var exception = e.InnerException ?? e;
-        //         return (-1, exception.GetType(), exception);
-        //     }
-        //     catch (Exception e)
-        //     {
-        //         return (-1, e.GetType(), e);
-        //     }
-        // }
-
         #endregion
 
         #region IDisposable
 
-        void IDisposable.Dispose()
-        {
-            this.Dispose();
-        }
+        void IDisposable.Dispose() => this.Dispose();
 
         #endregion
     }

@@ -37,9 +37,9 @@ namespace Ntreev.Crema.Communication
 
         object CreateInstance(object obj);
 
-        Type InstanceType { get; }
+        Type ServiceType { get; }
 
-        Type ImplementedType { get; }
+        Type CallbackType { get; }
 
         string Name { get; }
 

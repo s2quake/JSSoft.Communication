@@ -21,17 +21,19 @@
 // SOFTWARE.
 
 using System;
+using System.Threading.Tasks;
+using Ntreev.Library.Threading;
 
 namespace Ntreev.Crema.Communication
 {
-    [AttributeUsage(AttributeTargets.Interface)]
-    public class ServiceContractAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Class)]
+    sealed class ServiceContextAttribute : Attribute
     {
-        public ServiceContractAttribute()
+        public ServiceContextAttribute()
         {
 
         }
 
-        public bool PerPeer { get; set; }
+        public bool IsServer { get; set; }
     }
 }

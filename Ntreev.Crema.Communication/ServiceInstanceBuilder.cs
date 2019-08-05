@@ -34,13 +34,14 @@ namespace Ntreev.Crema.Communication
 {
     sealed class ServiceInstanceBuilder
     {
+        private const string ns = "Ntreev.Crema.Communication.Runtime";
         private readonly Dictionary<string, Type> typeByName = new Dictionary<string, Type>();
         private AssemblyBuilder assemblyBuilder;
         private ModuleBuilder moduleBuilder;
 
         internal ServiceInstanceBuilder()
         {
-            this.AssemblyName = new AssemblyName("Ntreev.Crema.Communication.Runtime");
+            this.AssemblyName = new AssemblyName(ns);
             this.assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(this.AssemblyName, AssemblyBuilderAccess.Run);
             this.moduleBuilder = assemblyBuilder.DefineDynamicModule(this.AssemblyName.Name);
         }

@@ -37,15 +37,15 @@ namespace Ntreev.Crema.Communication.Grpc
 
         public void Dispose()
         {
-            this.CallbackInstances.DisposeAll();
+            this.Callbacks.DisposeAll();
             this.Disposed?.Invoke(this, EventArgs.Empty);
         }
 
-        public void AddInstance(IServiceHost service, object serviceInstance, object callbackInstance)
+        public void AddInstance(IServiceHost serviceHost, object service, object callback)
         {
-            this.ServiceInstances.Add(service, serviceInstance);
-            this.CallbackInstances.Add(service, callbackInstance);
-            this.Callbacks.Add(service, new CallbackCollection(service));
+            this.Services.Add(serviceHost, service);
+            this.Callbacks.Add(serviceHost, callback);
+            this.PollReplyItems.Add(serviceHost, new PollReplyItemCollection(serviceHost));
         }
 
         public string ID { get; }
@@ -56,11 +56,11 @@ namespace Ntreev.Crema.Communication.Grpc
 
         public DateTime Ping { get; set; }
 
-        public Dictionary<IServiceHost, object> ServiceInstances { get; } = new Dictionary<IServiceHost, object>();
+        public Dictionary<IServiceHost, object> Services { get; } = new Dictionary<IServiceHost, object>();
 
-        public Dictionary<IServiceHost, object> CallbackInstances { get; } = new Dictionary<IServiceHost, object>();
+        public Dictionary<IServiceHost, object> Callbacks { get; } = new Dictionary<IServiceHost, object>();
 
-        public Dictionary<IServiceHost, CallbackCollection> Callbacks { get; } = new Dictionary<IServiceHost, CallbackCollection>();
+        public Dictionary<IServiceHost, PollReplyItemCollection> PollReplyItems { get; } = new Dictionary<IServiceHost, PollReplyItemCollection>();
 
         public Dictionary<string, object> Properties { get; } = new Dictionary<string, object>();
 
