@@ -21,17 +21,38 @@
 // SOFTWARE.
 
 using System;
+using System.Reflection.Emit;
 
 namespace Ntreev.Crema.Communication
 {
-    public abstract class ServerServiceBase<T, U> : ServiceBase where T : class where U : class
+    static class ILGeneratorExtensions
     {
-        protected ServerServiceBase()
-            : base(typeof(T), typeof(U), typeof(T))
-        {
+        private static readonly OpCode[] Ldc_I4 = { OpCodes.Ldc_I4_0, OpCodes.Ldc_I4_1, OpCodes.Ldc_I4_2, OpCodes.Ldc_I4_3,
+                                                    OpCodes.Ldc_I4_4, OpCodes.Ldc_I4_5, OpCodes.Ldc_I4_6, OpCodes.Ldc_I4_7, OpCodes.Ldc_I4_8 };
+        private static readonly OpCode[] Ldarg = { OpCodes.Ldarg_0, OpCodes.Ldarg_1, OpCodes.Ldarg_2, OpCodes.Ldarg_3 };
 
+        public static void EmitLdc_I4(this ILGenerator il, int n)
+        {
+            if (n < Ldc_I4.Length)
+            {
+                il.Emit(Ldc_I4[n]);
+            }
+            else
+            {
+                il.Emit(OpCodes.Ldc_I4_S, n);
+            }
         }
 
-        protected U Callback => (U)base.Instance;
+        public static void EmitLdarg(this ILGenerator il, int n)
+        {
+            if (n < Ldarg.Length)
+            {
+                il.Emit(Ldarg[n]);
+            }
+            else
+            {
+                il.Emit(OpCodes.Ldarg_S, n);
+            }
+        }
     }
 }

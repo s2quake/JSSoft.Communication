@@ -24,7 +24,7 @@ using System;
 
 namespace Ntreev.Crema.Communication
 {
-    [AttributeUsage(AttributeTargets.Method)]
+    [AttributeUsage(AttributeTargets.Interface)]
     public class ServiceContractAttribute : Attribute
     {
         public ServiceContractAttribute()
@@ -32,12 +32,6 @@ namespace Ntreev.Crema.Communication
 
         }
 
-        public ServiceContractAttribute(string name)
-        {
-            this.Name = name ?? throw new ArgumentNullException(nameof(name));
-            Ntreev.Library.IdentifierValidator.Validate(this.Name);
-        }
-
-        public string Name { get; }
+        public bool PerPeer { get; set; }
     }
 }

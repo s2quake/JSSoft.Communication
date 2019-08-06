@@ -21,33 +21,18 @@
 // SOFTWARE.
 
 using System;
-using System.ComponentModel.Composition;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Ntreev.Crema.Communication;
-using Ntreev.Library.Commands;
+using Ntreev.Library.ObjectModel;
 
-namespace Server.Commands
+namespace Ntreev.Crema.Communication
 {
-    [Export(typeof(ICommand))]
-    class OpenCommand : CommandAsyncBase
+    public interface IPeer
     {
-        private readonly IServiceContext serviceHost;
-        [Import]
-        private Lazy<Shell> shell = null;
+        string ID { get; }
 
-        [ImportingConstructor]
-        public OpenCommand(IServiceContext serviceHost)
-        {
-            this.serviceHost = serviceHost;
-        }
+        IServiceHost[] ServiceHosts { get; }
 
-        public override bool IsEnabled => this.serviceHost.IsOpened == false;
-
-        protected override async Task OnExecuteAsync()
-        {
-            this.Shell.Token = await this.serviceHost.OpenAsync();
-        }
-
-        private Shell Shell => this.shell.Value;
+        void AddInstance(IServiceHost serviceHost, object service, object callback);
     }
 }

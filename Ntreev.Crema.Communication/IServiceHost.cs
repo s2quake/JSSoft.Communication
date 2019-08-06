@@ -23,22 +23,27 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Ntreev.Library.ObjectModel;
 
 namespace Ntreev.Crema.Communication
 {
-    public interface IServiceHost
+    public interface IServiceHost : IDisposable
     {
-        Task<Guid> OpenAsync();
+        Task OpenAsync(ServiceToken token);
 
-        Task CloseAsync(Guid token);
+        Task CloseAsync(ServiceToken token);
 
-        IReadOnlyList<IService> Services { get; }
+        IContainer<MethodDescriptor> Methods { get; }
 
-        string Host { get; set; }
-        
-        int Port { get; set; }
+        object CreateInstance(object obj);
 
-        bool IsOpened { get; }
+        void DestroyInstance(object obj);
+
+        Type ServiceType { get; }
+
+        Type CallbackType { get; }
+
+        string Name { get; }
 
         event EventHandler Opened;
 

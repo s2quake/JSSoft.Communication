@@ -32,11 +32,17 @@ using Ntreev.Library.Threading;
 
 namespace Server.Services
 {
-    [Export(typeof(IService))]
-    class DataService : ServerServiceBase<IDataService, IDataServiceCallback>, IDataService
+    class DataService : IDataService
     {
         private readonly Dictionary<string, string> typeByName = new Dictionary<string, string>();
         private readonly Dictionary<string, string> tableByName = new Dictionary<string, string>();
+        private readonly IDataServiceCallback callback;
+
+        public DataService(IDataServiceCallback callback)
+        {
+            this.callback = callback;
+            this.Dispatcher = new Dispatcher(this);
+        }
 
         public Task<DateTime> CreateTypeAsync(string typeName)
         {
@@ -58,6 +64,14 @@ namespace Server.Services
                 this.tableByName.Add(tableName, string.Empty);
                 return DateTime.UtcNow;
             });
+        }
+
+        public Dispatcher Dispatcher { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispatcher.Dispose();
+            this.Dispatcher = null;
         }
     }
 }

@@ -24,33 +24,18 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
+using Ntreev.Crema.Communication;
 
-namespace Ntreev.Crema.Communication.Grpc
+namespace Server
 {
-    [Export(typeof(IAdaptorHostProvider))]
-    class AdaptorHostProvider : IAdaptorHostProvider
+    [Export(typeof(IServiceContext))]
+    class ServerContext : ServerContextBase
     {
-        private readonly IEnumerable<IService> services;
-        private readonly IEnumerable<IExceptionSerializer> exceptionSerializers;
-
         [ImportingConstructor]
-        public AdaptorHostProvider([ImportMany]IEnumerable<IService> services,
-                                   [ImportMany]IEnumerable<IExceptionSerializer> exceptionSerializers)
+        public ServerContext(IComponentProvider componentProvider)
+            : base(componentProvider)
         {
-            //Environment.SetEnvironmentVariable("GRPC_VERBOSITY", "DEBUG");
-            this.services = services.ToArray();
-            this.exceptionSerializers = exceptionSerializers.ToArray();
+     
         }
-
-        public IAdaptorHost Create(IServiceHost serviceHost, ServiceToken token)
-        {
-            if (serviceHost is ServerHostBase)
-                return new AdaptorServerHost(this.services, this.exceptionSerializers);
-            else if (serviceHost is ClientHostBase)
-                return new AdaptorClientHost(this.services, this.exceptionSerializers);
-            throw new NotImplementedException();
-        }
-
-        public string Name => "grpc";
     }
 }

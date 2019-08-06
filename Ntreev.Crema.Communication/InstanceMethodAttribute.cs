@@ -21,16 +21,17 @@
 // SOFTWARE.
 
 using System;
-using System.Collections.Generic;
 
 namespace Ntreev.Crema.Communication
 {
-    public abstract class ClientHostBase : ServiceHostBase
+    [AttributeUsage(AttributeTargets.Method)]
+    public class InstanceMethodAttribute : Attribute
     {
-        protected ClientHostBase(IAdaptorHostProvider adpatorHostProvider, IEnumerable<IService> services)
-            : base(adpatorHostProvider, services)
+        public InstanceMethodAttribute(string methodName)
         {
-
+            this.MethodName = methodName;
         }
+
+        public string MethodName { get; }
     }
 }

@@ -34,21 +34,24 @@ namespace Ntreev.Crema.Communication
 {
     sealed class ServiceInstanceBuilder
     {
+        private const string ns = "Ntreev.Crema.Communication.Runtime";
         private readonly Dictionary<string, Type> typeByName = new Dictionary<string, Type>();
         private AssemblyBuilder assemblyBuilder;
         private ModuleBuilder moduleBuilder;
 
         internal ServiceInstanceBuilder()
         {
-            this.AssemblyName = new AssemblyName("Ntreev.Crema.Communication.Runtime");
+            this.AssemblyName = new AssemblyName(ns);
+            this.assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(this.AssemblyName, AssemblyBuilderAccess.Run);
+            this.moduleBuilder = assemblyBuilder.DefineDynamicModule(this.AssemblyName.Name);
         }
 
-        public Type CreateType(string name, string typeNamespace, Type baseType, Type interfaceType)
+        public Type CreateType(string name, Type baseType, Type interfaceType)
         {
-            var fullname = $"{typeNamespace}.{name}";
+            var fullname = $"{this.AssemblyName}.{name}";
             if (this.typeByName.ContainsKey(fullname) == false)
             {
-                var type = CreateType(this.ModuleBuilder, name, typeNamespace, baseType, interfaceType);
+                var type = CreateType(this.moduleBuilder, name, baseType, interfaceType);
                 this.typeByName.Add(fullname, type);
             }
             return this.typeByName[fullname];
@@ -56,33 +59,7 @@ namespace Ntreev.Crema.Communication
 
         public AssemblyName AssemblyName { get; }
 
-        private AssemblyBuilder AssemblyBuilder
-        {
-            get
-            {
-                if (this.assemblyBuilder == null)
-                {
-                    this.assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(this.AssemblyName, AssemblyBuilderAccess.Run);
-                    this.moduleBuilder = assemblyBuilder.DefineDynamicModule(this.AssemblyName.Name);
-                }
-                return this.assemblyBuilder;
-            }
-        }
-
-        private ModuleBuilder ModuleBuilder
-        {
-            get
-            {
-                if (this.assemblyBuilder == null)
-                {
-                    this.assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(this.AssemblyName, AssemblyBuilderAccess.Run);
-                    this.moduleBuilder = assemblyBuilder.DefineDynamicModule(this.AssemblyName.Name);
-                }
-                return this.moduleBuilder;
-            }
-        }
-
-        private static Type CreateType(ModuleBuilder moduleBuilder, string typeName, string typeNamespace, Type baseType, Type interfaceType)
+        private static Type CreateType(ModuleBuilder moduleBuilder, string typeName, Type baseType, Type interfaceType)
         {
             var typeBuilder = moduleBuilder.DefineType(typeName, TypeAttributes.Class | TypeAttributes.Public, baseType, new Type[] { interfaceType });
             var methods = interfaceType.GetMethods();
@@ -91,77 +68,92 @@ namespace Ntreev.Crema.Communication
                 var returnType = item.ReturnType;
                 if (returnType == typeof(Task))
                 {
-                    CreateInvokeAsync(typeBuilder, item);
+                    CreateInvokeAsync(typeBuilder, item, InstanceBase.InvokeAsyncMethod);
                 }
                 else if (returnType.IsSubclassOf(typeof(Task)) == true)
                 {
-                    CreateGenericInvokeAsync(typeBuilder, item);
+                    CreateInvokeAsync(typeBuilder, item, InstanceBase.InvokeGenericAsyncMethod);
                 }
                 else if (returnType == typeof(void))
                 {
-                    CreateInvoke(typeBuilder, item);
+                    CreateInvoke(typeBuilder, item, InstanceBase.InvokeMethod);
                 }
                 else
                 {
-                    CreateGenericInvoke(typeBuilder, item);
+                    CreateInvoke(typeBuilder, item, InstanceBase.InvokeGenericMethod);
                 }
             }
 
             return typeBuilder.CreateType();
         }
 
-        private static void CreateInvoke(TypeBuilder typeBuilder, MethodInfo methodInfo)
+        private static void CreateInvoke(TypeBuilder typeBuilder, MethodInfo methodInfo, string methodName)
         {
             var parameterInfos = methodInfo.GetParameters();
             var parameterTypes = parameterInfos.Select(i => i.ParameterType).ToArray();
-            var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, MethodAttributes.Public | MethodAttributes.Virtual, CallingConventions.Standard, typeof(void), parameterTypes);
-            var invokeMethod = typeBuilder.BaseType.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
-                                                   .FirstOrDefault(item => item.Name == nameof(IContextInvoker.Invoke) && item.IsGenericMethod == false);
-            var arrayCount = parameterInfos.Length * 2;
+            var returnType = methodInfo.ReturnType;
+            var methodAttributes = MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.HideBySig;
+            var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, methodAttributes, CallingConventions.Standard, returnType, parameterTypes);
+            var invokeMethod = FindInvokeMethod(typeBuilder.BaseType, methodName, returnType);
             var typeofMethod = typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle));
 
             for (var i = 0; i < parameterInfos.Length; i++)
             {
-                methodBuilder.DefineParameter(i, ParameterAttributes.None, parameterInfos[i].Name);
+                var pb = methodBuilder.DefineParameter(i, ParameterAttributes.Lcid, parameterInfos[i].Name);
             }
 
             var il = methodBuilder.GetILGenerator();
+            il.DeclareLocal(typeof(Type[]));
+            il.DeclareLocal(typeof(object[]));
+            if (returnType != typeof(void))
+            {
+                il.DeclareLocal(returnType);
+            }
             il.Emit(OpCodes.Nop);
-            il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Ldstr, MethodDescriptor.GenerateName(methodInfo));
-            il.Emit(OpCodes.Ldc_I4, arrayCount);
-            il.Emit(OpCodes.Newarr, typeof(object));
-
+            il.EmitLdc_I4(parameterInfos.Length);
+            il.Emit(OpCodes.Newarr, typeof(Type));
             for (var i = 0; i < parameterInfos.Length; i++)
             {
                 var item = parameterInfos[i];
                 il.Emit(OpCodes.Dup);
-                il.Emit(OpCodes.Ldc_I4, i * 2 + 0);
-                il.Emit(OpCodes.Ldtoken, item.ParameterType);
+                il.EmitLdc_I4(i);
+                il.Emit(OpCodes.Ldtoken, parameterTypes[i]);
                 il.Emit(OpCodes.Call, typeofMethod);
                 il.Emit(OpCodes.Stelem_Ref);
+            }
+            il.Emit(OpCodes.Stloc_0);
+            il.EmitLdc_I4(parameterInfos.Length);
+            il.Emit(OpCodes.Newarr, typeof(object));
+            for (var i = 0; i < parameterInfos.Length; i++)
+            {
+                var item = parameterInfos[i];
                 il.Emit(OpCodes.Dup);
-                il.Emit(OpCodes.Ldc_I4, i * 2 + 1);
-                il.Emit(OpCodes.Ldarg, i + 1);
+                il.EmitLdc_I4(i);
+                il.EmitLdarg(i + 1);
                 if (item.ParameterType.IsClass == false)
                 {
-                    il.Emit(OpCodes.Box, item.ParameterType);
+                    il.Emit(OpCodes.Box, parameterTypes[i]);
                 }
                 il.Emit(OpCodes.Stelem_Ref);
             }
+            il.Emit(OpCodes.Stloc_1);
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Ldstr, MethodDescriptor.GenerateName(methodInfo));
+            il.Emit(OpCodes.Ldloc_0);
+            il.Emit(OpCodes.Ldloc_1);
             il.Emit(OpCodes.Call, invokeMethod);
             il.Emit(OpCodes.Nop);
             il.Emit(OpCodes.Ret);
         }
 
-        private static void CreateGenericInvoke(TypeBuilder typeBuilder, MethodInfo methodInfo)
+        private static void CreateInvokeAsync(TypeBuilder typeBuilder, MethodInfo methodInfo, string methodName)
         {
             var parameterInfos = methodInfo.GetParameters();
             var parameterTypes = parameterInfos.Select(i => i.ParameterType).ToArray();
-            var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, MethodAttributes.Public | MethodAttributes.Virtual, CallingConventions.Standard, typeof(void), parameterTypes);
-            var invokeMethod = typeBuilder.BaseType.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
-                                                   .FirstOrDefault(item => item.Name == nameof(IContextInvoker.Invoke) && item.IsGenericMethod == true);
-            var arrayCount = parameterInfos.Length * 2;
+            var returnType = methodInfo.ReturnType;
+            var methodAttributes = MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.HideBySig;
+            var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, methodAttributes, returnType, parameterTypes);
+            var invokeMethod = FindInvokeMethod(typeBuilder.BaseType, methodName, returnType);
             var typeofMethod = typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle));
 
             for (var i = 0; i < parameterInfos.Length; i++)
@@ -170,128 +162,76 @@ namespace Ntreev.Crema.Communication
             }
 
             var il = methodBuilder.GetILGenerator();
+            il.DeclareLocal(typeof(Type[]));
+            il.DeclareLocal(typeof(object[]));
+            il.DeclareLocal(returnType);
             il.Emit(OpCodes.Nop);
-            il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Ldstr, MethodDescriptor.GenerateName(methodInfo));
-            il.Emit(OpCodes.Ldc_I4, arrayCount);
-            il.Emit(OpCodes.Newarr, typeof(object));
-
+            il.EmitLdc_I4(parameterInfos.Length);
+            il.Emit(OpCodes.Newarr, typeof(Type));
             for (var i = 0; i < parameterInfos.Length; i++)
             {
                 var item = parameterInfos[i];
                 il.Emit(OpCodes.Dup);
-                il.Emit(OpCodes.Ldc_I4, i * 2 + 0);
-                il.Emit(OpCodes.Ldtoken, item.ParameterType);
+                il.EmitLdc_I4(i);
+                il.Emit(OpCodes.Ldtoken, parameterTypes[i]);
                 il.Emit(OpCodes.Call, typeofMethod);
                 il.Emit(OpCodes.Stelem_Ref);
+            }
+            il.Emit(OpCodes.Stloc_0);
+            il.EmitLdc_I4(parameterInfos.Length);
+            il.Emit(OpCodes.Newarr, typeof(object));
+            for (var i = 0; i < parameterInfos.Length; i++)
+            {
+                var item = parameterInfos[i];
                 il.Emit(OpCodes.Dup);
-                il.Emit(OpCodes.Ldc_I4, i * 2 + 1);
-                il.Emit(OpCodes.Ldarg, i + 1);
+                il.EmitLdc_I4(i);
+                il.EmitLdarg(i + 1);
                 if (item.ParameterType.IsClass == false)
                 {
-                    il.Emit(OpCodes.Box, item.ParameterType);
+                    il.Emit(OpCodes.Box, parameterTypes[i]);
                 }
                 il.Emit(OpCodes.Stelem_Ref);
             }
+            il.Emit(OpCodes.Stloc_1);
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Ldstr, MethodDescriptor.GenerateName(methodInfo));
+            il.Emit(OpCodes.Ldloc_0);
+            il.Emit(OpCodes.Ldloc_1);
             il.Emit(OpCodes.Call, invokeMethod);
             il.Emit(OpCodes.Nop);
             il.Emit(OpCodes.Ret);
         }
 
-        private static void CreateInvokeAsync(TypeBuilder typeBuilder, MethodInfo methodInfo)
+        private static MethodInfo FindInvokeMethod(Type baseType, string methodName, Type returnType)
         {
-            var parameterInfos = methodInfo.GetParameters();
-            var parameterTypes = parameterInfos.Select(i => i.ParameterType).ToArray();
-            var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, MethodAttributes.Public | MethodAttributes.Virtual,
-                                                    CallingConventions.Standard, methodInfo.ReturnType, parameterTypes);
-            var invokeMethod = typeBuilder.BaseType.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
-                                                   .FirstOrDefault(item => item.Name == nameof(IContextInvoker.InvokeAsync) && item.IsGenericMethod == false);
-            var arrayCount = parameterInfos.Length * 2;
-            var typeofMethod = typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle));
-
-            for (var i = 0; i < parameterInfos.Length; i++)
+            var methodInfos = baseType.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance);
+            foreach (var item in methodInfos)
             {
-                methodBuilder.DefineParameter(i, ParameterAttributes.None, parameterInfos[i].Name);
-            }
-
-            var il = methodBuilder.GetILGenerator();
-            il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Ldstr, MethodDescriptor.GenerateName(methodInfo));
-            il.Emit(OpCodes.Ldc_I4, arrayCount);
-            il.Emit(OpCodes.Newarr, typeof(object));
-
-            for (var i = 0; i < parameterInfos.Length; i++)
-            {
-                var item = parameterInfos[i];
-                il.Emit(OpCodes.Dup);
-                il.Emit(OpCodes.Ldc_I4, i * 2 + 0);
-                il.Emit(OpCodes.Ldtoken, item.ParameterType);
-                il.Emit(OpCodes.Call, typeofMethod);
-                il.Emit(OpCodes.Stelem_Ref);
-                il.Emit(OpCodes.Dup);
-                il.Emit(OpCodes.Ldc_I4, i * 2 + 1);
-                il.Emit(OpCodes.Ldarg, i + 1);
-                if (item.ParameterType.IsClass == false)
+                if (item.GetCustomAttribute<InstanceMethodAttribute>() is InstanceMethodAttribute attr && attr.MethodName == methodName)
                 {
-                    il.Emit(OpCodes.Box, item.ParameterType);
+                    if (item.IsGenericMethod == true)
+                    {
+                        if (returnType.IsGenericType == true)
+                            return item.MakeGenericMethod(returnType.GetGenericArguments());
+                        else
+                            return item.MakeGenericMethod(returnType);
+                    }
+                    return item;
                 }
-                il.Emit(OpCodes.Stelem_Ref);
             }
-            il.Emit(OpCodes.Call, invokeMethod);
-            il.Emit(OpCodes.Nop);
-            il.Emit(OpCodes.Ret);
+            throw new NotImplementedException();
         }
 
-        private static void CreateGenericInvokeAsync(TypeBuilder typeBuilder, MethodInfo methodInfo)
+        private static MethodInfo FindInvokeMethod(MethodInfo[] methodInfos, string methodName)
         {
-            var parameterInfos = methodInfo.GetParameters();
-            var parameterTypes = parameterInfos.Select(i => i.ParameterType).ToArray();
-            var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, MethodAttributes.Public | MethodAttributes.Virtual,
-                                                CallingConventions.Standard, methodInfo.ReturnType, parameterTypes);
-            var invokeMethod = typeBuilder.BaseType.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
-                                                   .FirstOrDefault(item => item.Name == nameof(IContextInvoker.Invoke) && item.IsGenericMethod == true);
-            var arrayCount = parameterInfos.Length * 2;
-            var typeofMethod = typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle));
-
-            for (var i = 0; i < parameterInfos.Length; i++)
+            foreach (var item in methodInfos)
             {
-                methodBuilder.DefineParameter(i, ParameterAttributes.None, parameterInfos[i].Name);
-            }
-
-            var il = methodBuilder.GetILGenerator();
-            var label = il.DefineLabel();
-            il.Emit(OpCodes.Nop);
-            il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Ldstr, MethodDescriptor.GenerateName(methodInfo));
-            il.Emit(OpCodes.Ldc_I4, arrayCount);
-            il.Emit(OpCodes.Newarr, typeof(object));
-
-            for (var i = 0; i < parameterInfos.Length; i++)
-            {
-                var item = parameterInfos[i];
-                il.Emit(OpCodes.Dup);
-                il.Emit(OpCodes.Ldc_I4, i * 2 + 0);
-                il.Emit(OpCodes.Ldtoken, item.ParameterType);
-                il.Emit(OpCodes.Call, typeofMethod);
-                il.Emit(OpCodes.Stelem_Ref);
-                il.Emit(OpCodes.Dup);
-                il.Emit(OpCodes.Ldc_I4, i * 2 + 1);
-                il.Emit(OpCodes.Ldarg, i + 1);
-                if (item.ParameterType.IsClass == false)
+                if (item.GetCustomAttribute<InstanceMethodAttribute>() is InstanceMethodAttribute attr && attr.MethodName == methodName)
                 {
-                    il.Emit(OpCodes.Box, item.ParameterType);
+                    return item;
                 }
-                il.Emit(OpCodes.Stelem_Ref);
             }
-
-            var genericMethod = invokeMethod.MakeGenericMethod(methodInfo.ReturnType.GetGenericArguments());
-            il.Emit(OpCodes.Call, genericMethod);
-            // il.Emit(OpCodes.Stloc_0);
-            // il.Emit(OpCodes.Br_S, label);
-            // il.MarkLabel(label);
-            // il.Emit(OpCodes.Ldloc_0);
-            il.Emit(OpCodes.Nop);
-            il.Emit(OpCodes.Ret);
+            throw new NotImplementedException();
         }
     }
 }

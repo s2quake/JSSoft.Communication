@@ -23,64 +23,29 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Ntreev.Library.ObjectModel;
 
 namespace Ntreev.Crema.Communication.Grpc
 {
-    class CallbackCollection : IEnumerable<PollReplyItem>, IReadOnlyList<PollReplyItem>
+    class PeerCollection : ContainerBase<PeerDescriptor>
     {
-        private readonly List<PollReplyItem> itemList = new List<PollReplyItem>();
-        private readonly IService service;
-
-        public CallbackCollection(IService service)
+        public void Add(PeerDescriptor item)
         {
-            this.service = service;
+            base.AddBase(item.ID, item);
+            item.Disposed += Item_Disposed;
         }
 
-        public void Add(PollReplyItem item)
+        public void Remove(string peer)
         {
-            this.itemList.Add(item);
+            var item = base[peer];
+            item.Disposed -= Item_Disposed;
+            base.RemoveBase(peer);
         }
 
-        public void Remove(PollReplyItem item)
+        private void Item_Disposed(object sender, EventArgs e)
         {
-            this.itemList.Remove(item);
+            if (sender is PeerDescriptor item)
+                base.RemoveBase(item.ID);
         }
-
-        public int IndexOf(PollReplyItem item)
-        {
-            return this.itemList.IndexOf(item);
-        }
-
-        public PollReplyItem this[int index]
-        {
-            get => this.itemList[index];
-        }
-
-        public bool Contains(PollReplyItem item)
-        {
-            return this.itemList.Contains(item);
-        }
-
-        public int Count => this.itemList.Count;
-
-        #region IEnumerable
-
-        IEnumerator<PollReplyItem> IEnumerable<PollReplyItem>.GetEnumerator()
-        {
-            foreach (var item in this.itemList)
-            {
-                yield return item;
-            }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            foreach (var item in this.itemList)
-            {
-                yield return item;
-            }
-        }
-
-        #endregion
     }
 }

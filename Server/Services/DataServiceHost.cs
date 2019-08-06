@@ -20,34 +20,26 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System;
 using System.ComponentModel.Composition;
-using System.Threading.Tasks;
 using Ntreev.Crema.Communication;
-using Ntreev.Library.Commands;
+using Ntreev.Crema.Services;
 
-namespace Server.Commands
+namespace Server.Services
 {
-    [Export(typeof(ICommand))]
-    class OpenCommand : CommandAsyncBase
+    [Export(typeof(IServiceHost))]
+    class DataServiceHost : ServerServiceHostBase<IDataService, IDataServiceCallback>
     {
-        private readonly IServiceContext serviceHost;
-        [Import]
-        private Lazy<Shell> shell = null;
-
-        [ImportingConstructor]
-        public OpenCommand(IServiceContext serviceHost)
+        public override object CreateInstance(object obj)
         {
-            this.serviceHost = serviceHost;
+            return new DataService(obj as IDataServiceCallback);
         }
 
-        public override bool IsEnabled => this.serviceHost.IsOpened == false;
-
-        protected override async Task OnExecuteAsync()
+        public override void DestroyInstance(object obj)
         {
-            this.Shell.Token = await this.serviceHost.OpenAsync();
+            if (obj is DataService dataService)
+            {
+                dataService.Dispose();
+            }
         }
-
-        private Shell Shell => this.shell.Value;
     }
 }

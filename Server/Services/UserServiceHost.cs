@@ -22,15 +22,27 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
+using System.Threading.Tasks;
+using Ntreev.Crema.Communication;
+using Ntreev.Crema.Services;
 
-namespace Ntreev.Crema.Communication
+namespace Server.Services
 {
-    public abstract class ServerHostBase : ServiceHostBase
+    [Export(typeof(IServiceHost))]
+    class UserServiceHost : ServerServiceHostBase<IUserService, IUserServiceCallback>
     {
-        protected ServerHostBase(IAdaptorHostProvider adaptorHostProvider, IEnumerable<IService> services)
-            : base(adaptorHostProvider, services)
+        public override object CreateInstance(object obj)
         {
+            return new UserService(obj as IUserServiceCallback);
+        }
 
+        public override void DestroyInstance(object obj)
+        {
+            if (obj is UserService userService)
+            {
+                userService.Dispose();
+            }
         }
     }
 }

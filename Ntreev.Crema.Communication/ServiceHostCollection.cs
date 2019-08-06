@@ -21,21 +21,21 @@
 // SOFTWARE.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.Linq;
-using Ntreev.Crema.Communication;
+using Ntreev.Library.ObjectModel;
 
-namespace Server
+namespace Ntreev.Crema.Communication
 {
-    [Export(typeof(IServiceHost))]
-    class ServiceHost : ServerHostBase
+    public class ServiceHostCollection : ContainerBase<IServiceHost>
     {
-        [ImportingConstructor]
-        public ServiceHost(IAdaptorHostProvider adaptorHostProvider, [ImportMany]IEnumerable<IService> services)
-            : base(adaptorHostProvider, services)
+        public ServiceHostCollection(IEnumerable<IServiceHost> services)
         {
-     
+            foreach (var item in services)
+            {
+                this.AddBase(item.Name, item);
+            }
         }
     }
 }

@@ -24,14 +24,20 @@ using System;
 
 namespace Ntreev.Crema.Communication
 {
-    public interface IExceptionSerializer
+    [AttributeUsage(AttributeTargets.Method)]
+    public class OperationContractAttribute : Attribute
     {
-        Type ExceptionType { get; }
+        public OperationContractAttribute()
+        {
 
-        int ExceptionCode { get; }
+        }
 
-        string Serialize(object value);
+        public OperationContractAttribute(string name)
+        {
+            this.Name = name ?? throw new ArgumentNullException(nameof(name));
+            Ntreev.Library.IdentifierValidator.Validate(this.Name);
+        }
 
-        object Deserialize(string text);
+        public string Name { get; }
     }
 }

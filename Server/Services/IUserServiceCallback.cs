@@ -26,10 +26,10 @@ namespace Ntreev.Crema.Services
 {
     public interface IUserServiceCallback
     {
-        [ServiceContract]
+        [OperationContract]
         void OnLoggedIn(string userID);
 
-        [ServiceContract]
+        [OperationContract]
         void OnLoggedOut(string userID);
     }
 }

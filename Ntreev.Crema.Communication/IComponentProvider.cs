@@ -20,18 +20,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System;
-
 namespace Ntreev.Crema.Communication
 {
-    public abstract class ClientServiceBase<T, U> : ServiceBase where T : class where U : class
+    public interface IComponentProvider
     {
-        protected ClientServiceBase()
-            : base(typeof(T), typeof(U), typeof(U))
-        {
+        IAdaptorHostProvider[] AdaptorHostProviders { get; }
 
-        }
+        IServiceHost[] Services { get; }
 
-        protected T Service => (T)base.Instance;
+        ISerializer[] Serializers { get; }
+
+        IDataSerializer[] DataSerializers { get; }
+
+        IExceptionDescriptor[] ExceptionSerializers { get; }
     }
 }

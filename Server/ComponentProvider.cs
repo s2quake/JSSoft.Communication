@@ -22,32 +22,26 @@
 
 using System;
 using System.ComponentModel.Composition;
-using System.Threading.Tasks;
 using Ntreev.Crema.Communication;
-using Ntreev.Library.Commands;
 
-namespace Server.Commands
+namespace Server
 {
-    [Export(typeof(ICommand))]
-    class OpenCommand : CommandAsyncBase
+    [Export(typeof(IComponentProvider))]
+    class ComponentProvider : IComponentProvider
     {
-        private readonly IServiceContext serviceHost;
-        [Import]
-        private Lazy<Shell> shell = null;
+        [ImportMany]
+        public IAdaptorHostProvider[] AdaptorHostProviders { get; private set; }
 
-        [ImportingConstructor]
-        public OpenCommand(IServiceContext serviceHost)
-        {
-            this.serviceHost = serviceHost;
-        }
+        [ImportMany]
+        public IServiceHost[] Services { get; private set; }
 
-        public override bool IsEnabled => this.serviceHost.IsOpened == false;
+        [ImportMany]
+        public ISerializer[] Serializers { get; private set; }
 
-        protected override async Task OnExecuteAsync()
-        {
-            this.Shell.Token = await this.serviceHost.OpenAsync();
-        }
+        [ImportMany]
+        public IDataSerializer[] DataSerializers { get; private set; }
 
-        private Shell Shell => this.shell.Value;
+        [ImportMany]
+        public IExceptionDescriptor[] ExceptionSerializers { get; private set; }
     }
 }

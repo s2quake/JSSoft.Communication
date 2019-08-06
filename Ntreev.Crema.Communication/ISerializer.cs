@@ -21,20 +21,15 @@
 // SOFTWARE.
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using Ntreev.Crema.Communication;
 
-namespace Client
+namespace Ntreev.Crema.Communication
 {
-    [Export(typeof(IServiceHost))]
-    class ServiceHost : ClientHostBase
+    public interface ISerializer
     {
-        [ImportingConstructor]
-        public ServiceHost(IAdaptorHostProvider adaptorHostProvider, [ImportMany]IEnumerable<IService> services)
-            : base(adaptorHostProvider, services)
-        {
-     
-        }
+        string Name { get; }
+        
+        string Serialize(Type type, object data);
+
+        object Deserialize(Type type, string text);
     }
 }

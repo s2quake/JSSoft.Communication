@@ -21,24 +21,20 @@
 // SOFTWARE.
 
 using System;
-using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.ComponentModel.Composition;
+using Ntreev.Crema.Communication;
 
-namespace Ntreev.Crema.Communication
+namespace Client
 {
-    public interface IService : IDisposable
+    [Export(typeof(IServiceContext))]
+    class ClientContext : ClientContextBase
     {
-        Task OpenAsync(ServiceToken token, object instance);
-
-        Task CloseAsync(ServiceToken token);
-
-        Type ServiceType { get; }
-
-        Type CallbackType { get; }
-
-        string Name { get; }
-
-        event EventHandler Opened;
-
-        event EventHandler Closed;
+        [ImportingConstructor]
+        public ClientContext(IComponentProvider componentProvider)
+            : base(componentProvider)
+        {
+     
+        }
     }
 }

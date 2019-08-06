@@ -22,17 +22,23 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 using Ntreev.Crema.Communication;
-using Ntreev.Crema.Services;
+using Ntreev.Library.Threading;
 
-namespace Server.Services
+namespace Ntreev.Crema.Services
 {
-    [Export(typeof(IService))]
-    class UserService : ServerServiceBase<IUserService, IUserServiceCallback>, IUserService
+    public class UserService : IUserService
     {
-        private readonly Dictionary<string, UserInfo> userInfoByID = new Dictionary<string, UserInfo>();
+        private readonly IUserServiceCallback callback;
+
+        private readonly Dictionary<string, UserInfo> users = new Dictionary<string, UserInfo>();
+
+        public UserService(IUserServiceCallback callback)
+        {
+            this.callback = callback;
+            this.Dispatcher = new Dispatcher(this);
+        }
 
         public Task CreateAsync(string userID, string password)
         {
@@ -61,7 +67,11 @@ namespace Server.Services
 
         public Task<Guid> LoginAsync(string userID, string password)
         {
-            throw new NotImplementedException();
+            return this.Dispatcher.InvokeAsync(()=>
+            {
+                this.callback.OnLoggedIn(userID);
+                return Guid.NewGuid();
+            });
         }
 
         public Task LogoutAsync(Guid token)
@@ -77,6 +87,14 @@ namespace Server.Services
         public Task SetUserInfoAsync(Guid token, string userName)
         {
             throw new NotImplementedException();
+        }
+
+        public Dispatcher Dispatcher { get; private set;}
+
+        public void Dispose()
+        {
+            this.Dispatcher.Dispose();
+            this.Dispatcher = null;
         }
     }
 }

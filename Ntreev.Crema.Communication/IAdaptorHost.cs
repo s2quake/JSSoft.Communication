@@ -23,16 +23,25 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Ntreev.Library.ObjectModel;
 
 namespace Ntreev.Crema.Communication
 {
-    public interface IAdaptorHost : IDisposable
+    public interface IAdaptorHost
     {
         Task OpenAsync(string host, int port);
 
         Task CloseAsync();
 
-        object Create(IService service);
+        void Invoke(InstanceBase instance, string name, Type[] types, object[] args);
+
+        T Invoke<T>(InstanceBase instance, string name, Type[] types, object[] args);
+
+        Task InvokeAsync(InstanceBase instance, string name, Type[] types, object[] args);
+
+        Task<T> InvokeAsync<T>(InstanceBase instance, string name, Type[] types, object[] args);
+
+        IContainer<IPeer> Peers { get; }
 
         event EventHandler<DisconnectionReasonEventArgs> Disconnected;
     }

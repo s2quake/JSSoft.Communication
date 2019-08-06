@@ -21,19 +21,33 @@
 // SOFTWARE.
 
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Communication
 {
-    interface IContextInvoker
+    public static class ISerializerExtensions
     {
-        void Invoke(IService service, string name, object[] args);
+        public static string[] SerializeMany(this ISerializer serializer, Type[] types, object[] args)
+        {
+            var items = new string[args.Length];
+            for (var i = 0; i < args.Length; i++)
+            {
+                var type = (Type)types[i];
+                var value = args[i];
+                items[i] = serializer.Serialize(type, value);
+            }
+            return items;
+        }
 
-        T Invoke<T>(IService service, string name, object[] args);
-
-        Task InvokeAsync(IService service, string name, object[] args);
-
-        Task<T> InvokeAsync<T>(IService service, string name, object[] args);
+        public static object[] DeserializeMany(this ISerializer serializer, Type[] types, string[] datas)
+        {
+            var items = new object[datas.Length];
+            for (var i = 0; i < datas.Length; i++)
+            {
+                var type = types[i];
+                var value = datas[i];
+                items[i] = serializer.Deserialize(type, value);
+            }
+            return items;
+        }
     }
 }

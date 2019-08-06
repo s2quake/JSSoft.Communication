@@ -26,43 +26,51 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Ntreev.Library.Threading;
 
-// https://sharplab.io/#v2:C4LglgNgNAJiDUAfAAgJgIwFgBQyAMABMugCwDcO+R6ArBdjgHYCGAtgKYDOADswMbsCAOWAAnduwBuAOgDC41szkB7VqwCujMH2bAwyxjgDeOAmaKoCsg8HYAPYACFmndqfMns570QDMREgIASUZJZQBrdgAKYkIWDigCXlE2TgJlACMAK3Y+YABtAF0CZlEAc04ASncfAk9aswBIYAALUWUAdwJGdi6hZWAg1m4Idg5GWxgAUTsBbj0DKMr6BoIAXxwan2R/ABVg0Ij2AB5dgD4Y9Di2dkTk1PTs3ILi0orqrwb6hua2zu7esIBkMRmN2BN2NNZux5vpGEsVg0NgxPrUdkQAGwHMKRACCnAAnow+JdrgkkqUHpkcnkiiVylUtt5vrVfu0uj0+sDhqNxpMZnMFvDlkzzMjRWZ0cgMacztijviiXxZaTujc7pTWGlqc86W9GaifCyfGz/pygYMeWCIVDBXCERL1ltkd4tmgrDZ7E4XOwQRACCAPRCHM5XFtjd4pYEQjjorF6WUPqsI+ZGhkfdIY0covF2MoAGZRLORSqJYAE7h5wsAZTEYEYicSbxFhu8LoajvR9eA8siAHFwexRNpVc3HSmmsgAOwEdOuTOHSLHbsXXMFouL9gDnrDvilgjlyvr2vDhv75uI2rt2qd/zS3vsRXE0flJNfR2NaezjPFx+E59roWv5PnuZYVlWUQnvWjYJi2qzXj4t6YsuExyr+25DtoIEvom44fl+c7sAusYgShwCrjc67oYOu4gfuh4QVBZ5Nq+l4+AhyLIkAA=
+// https://sharplab.io/#v2:C4LglgNgPgAgTARgLACgYAYAEMEBYDcqG2CArISqgHYCGAtgKYDOADjQMYOYBywATgwYA3AHQBhAXRriA9nToBXKmHY1gYGVVQBvVJn3Y4mAJJUmwGlU4AhGkwZ6DulAdfYAzNlwmqQmQGsGAAocLFpGABpMABUATxYGAG0AXUxgeOYomQAjACsGdmAUzBo+AHMmAEpHN0xnWv0ASGAACz4ZAHdMKgYu7hlgYzoWCAZGKmAGABMAUQAPThZ1TSDKigbMAF9UGrcYT2ifP0CAHmiAPhCEMPoGKLiE4vSEpiy8gqLU0orqlwb6hrNNqdbq9HgDIYjMYMCbTeaLZZUVbrBrbSh/Wr7bAANiOAQYAEEmLErFcbpFMGw+PQmJgcvlCsVvlVdq4AbUge0uj0+hDhqNxpNZgsGEsNEi1qyDGipfosTBsWdznjAkSSewlWTurcolSaXT3oyvuUWRi3Oy3JyQTzwYN+dDYcKEeLkbKtrs0a5dvAfOZLDY7AxIRBMCBfRYrAxbPZdhbXPLvKZjsFQiVyggomAJmmynBfhs4wZGkJSmkMrSALygro4EQPJKpbRlhIyABmZMqUWeDDbQSzwEqWxRG30Jb4Ocr1YNDM+dRzGZzRk2w8t2UDIiT+KC4R77c3gU7zcyE8lZtcnoabqx/ZVDAA4jCGHwVFrvgub98827C7Ux0fJzatb1sUTbdr2ADK/BZmUh5ge2/aDsubquH+zKYFWNr0h8IHzlEn5Dm6jQwAA7Jga72Buvj4ic/aXDuvb7vej7PuwsHlnhJqnhsF61FengKreaqkqmb6Ztmn5RNkMgyCG3zuPm/yEX+3YAWCQEZDhcFBJBz5UDBXYZL2CEGS27ZSTJiErhsqEmuhU5YUac6iYuHFlJ4SFnkWJFkeujFCew263AxVGqsSVhsS8rlVFZ0punxOI0RMyqMQ+PQsf5r7pmJwCLgptQ/pgxalipdmAQgdYaY2R4QVBekRbufYTJZyEGDZFSlWCDmzk2zn4R5GxEaR5EMJRyb+YlwB0UFe4hUxaUqP59WvCeMX6Dx7ooGiQA
 namespace Ntreev.Crema.Communication
 {
-    class InstanceBase : IDisposable
+    public class InstanceBase
     {
-        public InstanceBase()
+        public const string InvokeMethod = "Invoke";
+        public const string InvokeGenericMethod = "InvokeGeneric";
+        public const string InvokeAsyncMethod = "InvokeAsync";
+        public const string InvokeGenericAsyncMethod = "InvokeGenericAsync";
+
+        internal InstanceBase()
         {
 
         }
 
-        public void Dispose()
-        {
+        internal IAdaptorHost AdaptorHost { get; set; }
 
+        internal IServiceHost ServiceHost { get; set; }
+
+        internal string ServiceName => this.ServiceHost.Name;
+
+        internal IPeer Peer { get; set; }
+
+         [InstanceMethod(InvokeMethod)]
+        protected void Invoke(string name, Type[] types, object[] args)
+        {
+            this.AdaptorHost.Invoke(this, name, types, args);
         }
 
-        public IContextInvoker Invoker { get; set; }
-
-        public IService Service { get; set; }
-
-        protected void Invoke(string name, params object[] args)
+        [InstanceMethod(InvokeGenericMethod)]
+        protected T Invoke<T>(string name, Type[] types, object[] args)
         {
-            this.Invoker.Invoke(this.Service, name, args);
+            return this.AdaptorHost.Invoke<T>(this, name, types, args);
         }
 
-        protected T Invoke<T>(string name, params object[] args)
+        [InstanceMethod(InvokeAsyncMethod)]
+        protected Task InvokeAsync(string name, Type[] types, object[] args)
         {
-            return this.Invoker.Invoke<T>(this.Service, name, args);
+            return this.AdaptorHost.InvokeAsync(this, name, types, args);
         }
 
-        protected Task InvokeAsync(string name, params object[] args)
+        [InstanceMethod(InvokeGenericAsyncMethod)]
+        protected Task<T> InvokeAsync<T>(string name, Type[] types, object[] args)
         {
-            return this.Invoker.InvokeAsync(this.Service, name, args);
-        }
-
-        protected Task<T> InvokeAsync<T>(string name, params object[] args)
-        {
-            return this.Invoker.InvokeAsync<T>(this.Service, name, args);
+            return this.AdaptorHost.InvokeAsync<T>(this, name, types, args);
         }
     }
 }

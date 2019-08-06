@@ -25,67 +25,221 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Ntreev.Crema.Communication.Grpc;
+using Ntreev.Library.ObjectModel;
 
 namespace Ntreev.Crema.Communication.Grpc
 {
     class AdaptorClientHost : IAdaptorHost
     {
-        private IService[] services;
-        private IExceptionSerializer[] exceptionSerializers;
+        private readonly IServiceContext serviceContext;
+        private readonly IContainer<IServiceHost> serviceHosts;
+        private AsyncDuplexStreamingCall<PollRequest, PollReply> call;
+        private CancellationTokenSource cancellation;
+        private Task task;
+        private string token;
         private Channel channel;
         private AdaptorClientImpl adaptorImpl;
         private ServiceInstanceBuilder instanceBuilder = new ServiceInstanceBuilder();
+        private ISerializer serializer;
 
-        public AdaptorClientHost(IEnumerable<IService> services, IEnumerable<IExceptionSerializer> exceptionSerializers)
+        public AdaptorClientHost(IServiceContext serviceContext)
         {
-            this.services = services.ToArray();
-            this.exceptionSerializers = exceptionSerializers.ToArray();
+            this.serviceContext = serviceContext;
+            this.serviceHosts = serviceContext.ServiceHosts;
         }
 
         public Task OpenAsync(string host, int port)
         {
+            var peerDescriptor = new PeerDescriptor(host, this.serviceHosts.ToArray());
             this.channel = new Channel($"{host}:{port}", ChannelCredentials.Insecure);
-            this.adaptorImpl = new AdaptorClientImpl(this.channel, this.services, this.exceptionSerializers);
-            this.adaptorImpl.Disconnected += AdaptorImpl_Disconnected;
+            this.adaptorImpl = new AdaptorClientImpl(this.channel);
+
+            var request = new OpenRequest() { Time = DateTime.UtcNow.Ticks };
+            request.ServiceNames.AddRange(this.serviceHosts.Keys);
+            var reply = this.adaptorImpl.Open(request);
+            this.token = reply.Token;
+
+            this.cancellation = new CancellationTokenSource();
+            this.serializer = this.serviceContext.GetService(typeof(ISerializer)) as ISerializer;
+            this.task = this.PollAsync(this.cancellation.Token);
+
+            this.Peers.Add(peerDescriptor);
             return Task.Delay(1);
         }
 
         public async Task CloseAsync()
         {
+            this.Peers.Remove(this.serviceContext.Host);
+            this.cancellation.Cancel();
+            this.cancellation = null;
+            this.task?.Wait();
+            this.task = null;
             if (this.adaptorImpl != null)
-                await this.adaptorImpl?.DisposeAsync();
+                await this.adaptorImpl.CloseAsync(new CloseRequest() { Token = this.token });
+            this.token = null;
             this.adaptorImpl = null;
             await this.channel.ShutdownAsync();
             this.channel = null;
         }
 
-        public object Create(IService service)
-        {
-            var instanceType = service.ServiceType;
-            var typeName = $"{instanceType.Name}Impl";
-            var typeNamespace = instanceType.Namespace;
-            var implType = instanceBuilder.CreateType(typeName, typeNamespace, typeof(InstanceBase), instanceType);
-            var instance = TypeDescriptor.CreateInstance(null, implType, null, null) as InstanceBase;
-            instance.Service = service;
-            instance.Invoker = this.adaptorImpl;
-            return instance;
-        }
-
-        public void Dispose()
-        {
-
-        }
+        public PeerCollection Peers { get; } = new PeerCollection();
 
         public event EventHandler<DisconnectionReasonEventArgs> Disconnected;
 
-        private void AdaptorImpl_Disconnected(object sender, DisconnectionReasonEventArgs e)
+        protected virtual void OnDisconnected(DisconnectionReasonEventArgs e)
         {
-            this.adaptorImpl = null;
             this.Disconnected?.Invoke(this, e);
         }
+
+        private async Task PollAsync(CancellationToken cancellationToken)
+        {
+            var exitCode = 0;
+            try
+            {
+                using (this.call = this.adaptorImpl.Poll())
+                {
+                    while (!cancellationToken.IsCancellationRequested)
+                    {
+                        var request = new PollRequest();
+                        await this.call.RequestStream.WriteAsync(request);
+                        await this.call.ResponseStream.MoveNext();
+                        var reply = this.call.ResponseStream.Current;
+                        if (reply.Code != 0)
+                        {
+                            exitCode = reply.Code;
+                            break;
+                        }
+                        foreach (var item in reply.Items)
+                        {
+                            var service = this.serviceHosts[item.ServiceName];
+                            this.InvokeCallback(service, reply.Items);
+                        }
+                        await Task.Delay(1);
+                    }
+                    await this.call.RequestStream.CompleteAsync();
+                    await this.call.ResponseStream.MoveNext();
+                }
+                this.call = null;
+            }
+            catch (Exception e)
+            {
+                exitCode = 1;
+                GrpcEnvironment.Logger.Error(e, e.Message);
+            }
+            if (exitCode != 0)
+            {
+                this.task = null;
+                this.adaptorImpl = null;
+                this.OnDisconnected(new DisconnectionReasonEventArgs(exitCode));
+            }
+        }
+
+        private async void InvokeCallback(IServiceHost serviceHost, string name, string[] datas)
+        {
+            if (serviceHost.Methods.ContainsKey(name) == false)
+                throw new InvalidOperationException();
+            var methodDescriptor = serviceHost.Methods[name];
+            var args = this.serializer.DeserializeMany(methodDescriptor.ParameterTypes, datas);
+            var peer = this.Peers.First();
+            var instance = peer.Callbacks[serviceHost];
+            await methodDescriptor.InvokeAsync(this.serviceContext, instance, args);
+        }
+
+        private void InvokeCallback(IServiceHost service, IEnumerable<PollReplyItem> pollItems)
+        {
+            foreach (var item in pollItems)
+            {
+                this.InvokeCallback(service, item.Name, item.Datas.ToArray());
+            }
+        }
+
+        private void ThrowException(int code, string data)
+        {
+            var componentProvider = this.serviceContext.GetService(typeof(IComponentProvider)) as IComponentProvider;
+            if (componentProvider == null)
+            {
+                throw new InvalidOperationException("can not get interface of IComponentProvider at serviceProvider");
+            }
+            var exceptionDescriptor = componentProvider.GetExceptionDescriptor(code);
+            var exception = (Exception)this.serializer.Deserialize(exceptionDescriptor.ExceptionType, data);
+            throw exception;
+        }
+
+        #region IAdaptorHost
+
+        void IAdaptorHost.Invoke(InstanceBase instance, string name, Type[] types, object[] args)
+        {
+            var datas = this.serializer.SerializeMany(types, args);
+            var request = new InvokeRequest()
+            {
+                ServiceName = instance.ServiceName,
+                Name = name,
+            };
+            request.Datas.AddRange(datas);
+            var reply = this.adaptorImpl.Invoke(request);
+            if (reply.Code != 0)
+            {
+                this.ThrowException(reply.Code, reply.Data);
+            }
+        }
+
+        T IAdaptorHost.Invoke<T>(InstanceBase instance, string name, Type[] types, object[] args)
+        {
+            var datas = this.serializer.SerializeMany(types, args);
+            var request = new InvokeRequest()
+            {
+                ServiceName = instance.ServiceName,
+                Name = name,
+            };
+            request.Datas.AddRange(datas);
+            var reply = this.adaptorImpl.Invoke(request);
+            if (reply.Code != 0)
+            {
+                this.ThrowException(reply.Code, reply.Data);
+            }
+            return (T)this.serializer.Deserialize(typeof(T), reply.Data);
+        }
+
+        async Task IAdaptorHost.InvokeAsync(InstanceBase instance, string name, Type[] types, object[] args)
+        {
+            var datas = this.serializer.SerializeMany(types, args);
+            var request = new InvokeRequest()
+            {
+                ServiceName = instance.ServiceName,
+                Name = name,
+            };
+            request.Datas.AddRange(datas);
+            var reply = await this.adaptorImpl.InvokeAsync(request);
+            if (reply.Code != 0)
+            {
+                this.ThrowException(reply.Code, reply.Data);
+            }
+        }
+
+        async Task<T> IAdaptorHost.InvokeAsync<T>(InstanceBase instance, string name, Type[] types, object[] args)
+        {
+            var datas = this.serializer.SerializeMany(types, args);
+            var request = new InvokeRequest()
+            {
+                ServiceName = instance.ServiceName,
+                Name = name,
+            };
+            request.Datas.AddRange(datas);
+            var reply = await this.adaptorImpl.InvokeAsync(request);
+            if (reply.Code != 0)
+            {
+                this.ThrowException(reply.Code, reply.Data);
+            }
+            return (T)this.serializer.Deserialize(typeof(T), reply.Data);
+        }
+
+        IContainer<IPeer> IAdaptorHost.Peers => this.Peers;
+
+        #endregion
     }
 }

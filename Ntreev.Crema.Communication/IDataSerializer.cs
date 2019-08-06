@@ -21,33 +21,15 @@
 // SOFTWARE.
 
 using System;
-using System.ComponentModel.Composition;
-using System.Threading.Tasks;
-using Ntreev.Crema.Communication;
-using Ntreev.Library.Commands;
 
-namespace Server.Commands
+namespace Ntreev.Crema.Communication
 {
-    [Export(typeof(ICommand))]
-    class OpenCommand : CommandAsyncBase
+    public interface IDataSerializer
     {
-        private readonly IServiceContext serviceHost;
-        [Import]
-        private Lazy<Shell> shell = null;
+        Type Type { get; }
+        
+        string Serialize(ISerializer serializer, object data);
 
-        [ImportingConstructor]
-        public OpenCommand(IServiceContext serviceHost)
-        {
-            this.serviceHost = serviceHost;
-        }
-
-        public override bool IsEnabled => this.serviceHost.IsOpened == false;
-
-        protected override async Task OnExecuteAsync()
-        {
-            this.Shell.Token = await this.serviceHost.OpenAsync();
-        }
-
-        private Shell Shell => this.shell.Value;
+        object Deserialize(ISerializer serializer, string text);
     }
 }

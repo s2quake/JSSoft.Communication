@@ -34,5 +34,11 @@ namespace Server
         {
             get; set;
         }
+
+        [CommandProperty]
+        public bool Verbose
+        {
+            get; set;
+        }
     }
 }

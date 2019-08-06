@@ -21,33 +21,32 @@
 // SOFTWARE.
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Threading.Tasks;
-using Ntreev.Crema.Communication;
-using Ntreev.Library.Commands;
+using System.Linq;
 
-namespace Server.Commands
+namespace Ntreev.Crema.Communication
 {
-    [Export(typeof(ICommand))]
-    class OpenCommand : CommandAsyncBase
+    [Export(typeof(IAdaptorHostProvider))]
+    public class AdaptorHostProvider : IAdaptorHostProvider
     {
-        private readonly IServiceContext serviceHost;
-        [Import]
-        private Lazy<Shell> shell = null;
+        public const string DefaultName = "grpc";
 
         [ImportingConstructor]
-        public OpenCommand(IServiceContext serviceHost)
+        public AdaptorHostProvider()
         {
-            this.serviceHost = serviceHost;
+
         }
 
-        public override bool IsEnabled => this.serviceHost.IsOpened == false;
-
-        protected override async Task OnExecuteAsync()
+        public IAdaptorHost Create(IServiceContext serviceContext, ServiceToken token)
         {
-            this.Shell.Token = await this.serviceHost.OpenAsync();
+            if (serviceContext is ServerContextBase)
+                return new Grpc.AdaptorServerHost(serviceContext);
+            else if (serviceContext is ClientContextBase)
+                return new Grpc.AdaptorClientHost(serviceContext);
+            throw new NotImplementedException();
         }
 
-        private Shell Shell => this.shell.Value;
+        public string Name => DefaultName;
     }
 }

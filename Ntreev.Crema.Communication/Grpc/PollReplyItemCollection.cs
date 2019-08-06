@@ -23,47 +23,56 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
-namespace Ntreev.Crema.Communication
+namespace Ntreev.Crema.Communication.Grpc
 {
-    public class ServiceCollection : IEnumerable<IService>, IReadOnlyList<IService>
+    class PollReplyItemCollection : IEnumerable<PollReplyItem>, IReadOnlyList<PollReplyItem>
     {
-        private readonly List<IService> itemList;
-        private readonly IServiceHost serviceHost;
+        private readonly List<PollReplyItem> itemList = new List<PollReplyItem>();
+        private readonly IServiceHost service;
 
-        internal ServiceCollection(IServiceHost serviceHost)
-            : this(serviceHost, Enumerable.Empty<IService>())
+        public PollReplyItemCollection(IServiceHost service)
         {
-            this.serviceHost = serviceHost;
+            this.service = service;
         }
 
-        internal ServiceCollection(IServiceHost serviceHost, IEnumerable<IService> services)
+        public void Add(PollReplyItem item)
         {
-            this.serviceHost = serviceHost;
-            this.itemList = new List<IService>(services); 
+            this.itemList.Add(item);
         }
 
-        public int IndexOf(IService item)
+        public void Remove(PollReplyItem item)
+        {
+            this.itemList.Remove(item);
+        }
+
+        public int IndexOf(PollReplyItem item)
         {
             return this.itemList.IndexOf(item);
         }
 
-        public IService this[int index]
+        public PollReplyItem this[int index]
         {
             get => this.itemList[index];
         }
 
-        public bool Contains(IService item)
+        public bool Contains(PollReplyItem item)
         {
             return this.itemList.Contains(item);
+        }
+
+        public PollReplyItem[] Flush()
+        {
+            var items = this.itemList.ToArray();
+            this.itemList.Clear();
+            return items;
         }
 
         public int Count => this.itemList.Count;
 
         #region IEnumerable
 
-        IEnumerator<IService> IEnumerable<IService>.GetEnumerator()
+        IEnumerator<PollReplyItem> IEnumerable<PollReplyItem>.GetEnumerator()
         {
             foreach (var item in this.itemList)
             {
