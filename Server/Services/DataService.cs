@@ -66,6 +66,12 @@ namespace Server.Services
             });
         }
 
-        public Dispatcher Dispatcher { get; }
+        public Dispatcher Dispatcher { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispatcher.Dispose();
+            this.Dispatcher = null;
+        }
     }
 }

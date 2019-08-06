@@ -36,5 +36,13 @@ namespace Server.Services
         {
             return new UserService(obj as IUserServiceCallback);
         }
+
+        public override void DestroyInstance(object obj)
+        {
+            if (obj is UserService userService)
+            {
+                userService.Dispose();
+            }
+        }
     }
 }

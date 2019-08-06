@@ -21,7 +21,9 @@
             "request": "launch",
             "preLaunchTask": "build all",
             "program": "${workspaceFolder}/Server/bin/Debug/netcoreapp3.0/Server.dll",
-            "args": [],
+            "args": [
+                "--verbose"
+            ],
             "cwd": "${workspaceFolder}/Server",
             "console": "externalTerminal",
             "stopAtEntry": false

@@ -218,7 +218,6 @@ namespace Ntreev.Crema.Communication.Grpc
             this.serializer = null;
             await this.server.ShutdownAsync();
             this.server = null;
-            await this.Dispatcher.DisposeAsync();
         }
 
         void IAdaptorHost.Invoke(InstanceBase instance, string name, Type[] types, object[] args)

@@ -27,7 +27,7 @@ using Ntreev.Library.ObjectModel;
 
 namespace Ntreev.Crema.Communication
 {
-    public interface IAdaptorHost : IDisposable
+    public interface IAdaptorHost
     {
         Task OpenAsync(string host, int port);
 

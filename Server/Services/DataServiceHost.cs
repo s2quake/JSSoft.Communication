@@ -20,15 +20,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Threading.Tasks;
-using Grpc.Core;
-using Newtonsoft.Json;
 using Ntreev.Crema.Communication;
 using Ntreev.Crema.Services;
-using Ntreev.Library.Threading;
 
 namespace Server.Services
 {
@@ -38,6 +32,14 @@ namespace Server.Services
         public override object CreateInstance(object obj)
         {
             return new DataService(obj as IDataServiceCallback);
+        }
+
+        public override void DestroyInstance(object obj)
+        {
+            if (obj is DataService dataService)
+            {
+                dataService.Dispose();
+            }
         }
     }
 }

@@ -48,6 +48,11 @@ namespace Client.Services
             return this;
         }
 
+        public override void DestroyInstance(object obj)
+        {
+            
+        }
+
         [Export(typeof(IUserService))]
         public IUserService UserService => this.userService;
 

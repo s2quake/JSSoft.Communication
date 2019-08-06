@@ -77,7 +77,7 @@ namespace Ntreev.Crema.Communication.Grpc
             this.Peers.Remove(this.serviceContext.Host);
             this.cancellation.Cancel();
             this.cancellation = null;
-            this.task.Wait();
+            this.task?.Wait();
             this.task = null;
             if (this.adaptorImpl != null)
                 await this.adaptorImpl.CloseAsync(new CloseRequest() { Token = this.token });
@@ -85,11 +85,6 @@ namespace Ntreev.Crema.Communication.Grpc
             this.adaptorImpl = null;
             await this.channel.ShutdownAsync();
             this.channel = null;
-        }
-
-        public void Dispose()
-        {
-
         }
 
         public PeerCollection Peers { get; } = new PeerCollection();
@@ -138,6 +133,7 @@ namespace Ntreev.Crema.Communication.Grpc
             }
             if (exitCode != 0)
             {
+                this.task = null;
                 this.adaptorImpl = null;
                 this.OnDisconnected(new DisconnectionReasonEventArgs(exitCode));
             }

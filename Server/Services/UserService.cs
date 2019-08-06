@@ -21,8 +21,10 @@
 // SOFTWARE.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ntreev.Crema.Communication;
+using Ntreev.Library.Threading;
 
 namespace Ntreev.Crema.Services
 {
@@ -30,9 +32,12 @@ namespace Ntreev.Crema.Services
     {
         private readonly IUserServiceCallback callback;
 
+        private readonly Dictionary<string, UserInfo> users = new Dictionary<string, UserInfo>();
+
         public UserService(IUserServiceCallback callback)
         {
             this.callback = callback;
+            this.Dispatcher = new Dispatcher(this);
         }
 
         public Task CreateAsync(string userID, string password)
@@ -62,7 +67,11 @@ namespace Ntreev.Crema.Services
 
         public Task<Guid> LoginAsync(string userID, string password)
         {
-            throw new NotImplementedException();
+            return this.Dispatcher.InvokeAsync(()=>
+            {
+                this.callback.OnLoggedIn(userID);
+                return Guid.NewGuid();
+            });
         }
 
         public Task LogoutAsync(Guid token)
@@ -78,6 +87,14 @@ namespace Ntreev.Crema.Services
         public Task SetUserInfoAsync(Guid token, string userName)
         {
             throw new NotImplementedException();
+        }
+
+        public Dispatcher Dispatcher { get; private set;}
+
+        public void Dispose()
+        {
+            this.Dispatcher.Dispose();
+            this.Dispatcher = null;
         }
     }
 }

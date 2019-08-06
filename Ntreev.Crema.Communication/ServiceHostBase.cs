@@ -69,6 +69,8 @@ namespace Ntreev.Crema.Communication
 
         public abstract object CreateInstance(object obj);
 
+        public abstract void DestroyInstance(object obj);
+
         public string Name { get; }
 
         public event EventHandler Opened;

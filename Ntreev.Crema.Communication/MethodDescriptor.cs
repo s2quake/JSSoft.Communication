@@ -2,8 +2,6 @@ using System;
 using System.Reflection;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace Ntreev.Crema.Communication
 {
@@ -51,6 +49,23 @@ namespace Ntreev.Crema.Communication
                 return (exceptionSerializer.ExceptionCode, e.GetType(), e);
             }
         }
+        
+        public string Name { get; }
+
+        public Type[] ParameterTypes { get; }
+
+        public Type ReturnType { get; }
+
+        public bool IsAsync { get; }
+
+        internal static string GenerateName(MethodInfo methodInfo)
+        {
+            var parameterTypes = methodInfo.GetParameters().Select(item => item.ParameterType).ToArray();
+            var parameterTypeNames = string.Join<Type>(", ", parameterTypes);
+            return $"{methodInfo.ReturnType} {methodInfo.ReflectedType}.{methodInfo.Name}({parameterTypeNames})";
+        }
+
+        internal MethodInfo MethodInfo { get; }
 
         private async Task<(Type, object)> InvokeAsync(object instance, object[] args)
         {
@@ -74,22 +89,5 @@ namespace Ntreev.Crema.Communication
             }
             return (valueType, value);
         }
-
-        internal static string GenerateName(MethodInfo methodInfo)
-        {
-            var parameterTypes = methodInfo.GetParameters().Select(item => item.ParameterType).ToArray();
-            var parameterTypeNames = string.Join<Type>(", ", parameterTypes);
-            return $"{methodInfo.ReturnType} {methodInfo.ReflectedType}.{methodInfo.Name}({parameterTypeNames})";
-        }
-
-        public string Name { get; }
-
-        internal MethodInfo MethodInfo { get; }
-
-        public Type[] ParameterTypes { get; }
-
-        public Type ReturnType { get; }
-
-        public bool IsAsync { get; }
     }
 }

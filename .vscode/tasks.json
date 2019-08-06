@@ -12,7 +12,9 @@
                 "build", 
                 "Client",
                 "--framework",
-                "netcoreapp3.0"
+                "netcoreapp3.0",
+                "--configuration",
+                "Debug"
             ],
             "presentation": {
                 "reveal": "always"
@@ -28,7 +30,9 @@
                 "build", 
                 "Server",
                 "--framework",
-                "netcoreapp3.0"
+                "netcoreapp3.0",
+                "--configuration",
+                "Debug"
             ],
             "presentation": {
                 "reveal": "always"
@@ -43,7 +47,9 @@
             "args": [
                 "build",
                 "--framework",
-                "netcoreapp3.0"
+                "netcoreapp3.0",
+                "--configuration",
+                "Debug"
             ],
             "presentation": {
                 "reveal": "always"

@@ -24,7 +24,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Ntreev.Library.ObjectModel;
@@ -40,13 +39,11 @@ namespace Ntreev.Crema.Communication
         private readonly InstanceCollection serviceByServiceHost = new InstanceCollection();
         private readonly InstanceCollection callbackByServiceHost = new InstanceCollection();
         private readonly ServiceInstanceBuilder instanceBuilder;
-        private readonly Dispatcher dispatcher;
         private IAdaptorHostProvider adpatorHostProvider;
         private ISerializer serializer;
         private IAdaptorHost adaptorHost;
         private string host;
         private int port = defaultPort;
-        private bool isOpened;
         private bool isServer;
         private ServiceToken token;
 
@@ -55,14 +52,14 @@ namespace Ntreev.Crema.Communication
             this.componentProvider = componentProvider;
             this.instanceBuilder = new ServiceInstanceBuilder();
             this.ServiceHosts = new ServiceHostCollection(componentProvider.Services);
-            this.dispatcher = new Dispatcher(this);
+            this.Dispatcher = new Dispatcher(this);
             this.isServer = IsServer(this);
         }
 
         public async Task<Guid> OpenAsync()
         {
             var token = ServiceToken.NewToken();
-            await this.dispatcher.InvokeAsync((Action)(() =>
+            await this.Dispatcher.InvokeAsync((Action)(() =>
             {
                 this.serializer = this.componentProvider.Getserializer(this.SerializerType);
                 this.adpatorHostProvider = this.componentProvider.GetAdaptorHostProvider(this.AdaptorHostType);
@@ -76,75 +73,13 @@ namespace Ntreev.Crema.Communication
                 await item.OpenAsync(token);
             }
             await this.adaptorHost.OpenAsync(this.Host, this.Port);
-            await this.dispatcher.InvokeAsync(() =>
+            await this.Dispatcher.InvokeAsync(() =>
             {
-                this.isOpened = true;
+                this.IsOpened = true;
                 this.OnOpened(EventArgs.Empty);
             });
             this.token = token;
             return this.token.Guid;
-        }
-
-        private void Peers_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            switch (e.Action)
-            {
-                case NotifyCollectionChangedAction.Add:
-                    {
-                        foreach (IPeer item in e.NewItems)
-                        {
-                            this.CreateInstance(this.adaptorHost, item);
-                        }
-                    }
-                    break;
-            }
-        }
-
-        private Dictionary<object, object> instanceByImpl;
-
-        private void InitializeInstance(IServiceHost serviceHost)
-        {
-            var isPerPeer = IsPerPeer(this, serviceHost);
-            if (isPerPeer == true)
-                return;
-            var (service, callback) = this.CreateInstance(serviceHost, null);
-            this.serviceByServiceHost.Add(serviceHost, service);
-            this.callbackByServiceHost.Add(serviceHost, callback);
-        }
-
-        private (object, object) CreateInstance(IServiceHost serviceHost, IPeer peer)
-        {
-            var baseType = GetInstanceType(this, serviceHost);
-            var typeName = $"{baseType.Name}Impl";
-            var instanceType = this.instanceBuilder.CreateType(typeName, typeof(InstanceBase), baseType);
-            var instance = TypeDescriptor.CreateInstance(null, instanceType, null, null) as InstanceBase;
-            instance.ServiceHost = serviceHost;
-            instance.AdaptorHost = adaptorHost;
-            instance.Peer = peer;
-
-            var impl = serviceHost.CreateInstance(instance);
-            var service = this.isServer ? impl : instance;
-            var callback = this.isServer ? instance : impl;
-            return (service, callback);
-        }
-
-        private void CreateInstance(IAdaptorHost adaptorHost, IPeer peer)
-        {
-            foreach (var item in peer.ServiceHosts)
-            {
-                var isPerPeer = IsPerPeer(this, item);
-                if (isPerPeer == true)
-                {
-                    var (service, callback) = this.CreateInstance(item, peer);
-                    peer.AddInstance(item, service, callback);
-                }
-                else
-                {
-                    var service = this.serviceByServiceHost[item];
-                    var callback = this.callbackByServiceHost[item];
-                    peer.AddInstance(item, service, callback);
-                }
-            }
         }
 
         public async Task CloseAsync(Guid token)
@@ -155,14 +90,15 @@ namespace Ntreev.Crema.Communication
             foreach (var item in this.ServiceHosts)
             {
                 await item.CloseAsync(this.token);
+                this.ReleaseInstance(item);
+            }
+            await this.Dispatcher.InvokeAsync(() =>
+            {
                 this.adaptorHost.Disconnected -= AdaptorHost_Disconnected;
                 this.adaptorHost.Peers.CollectionChanged -= Peers_CollectionChanged;
                 this.adaptorHost = null;
                 this.serializer = null;
-            }
-            await this.dispatcher.InvokeAsync(() =>
-            {
-                this.isOpened = false;
+                this.IsOpened = false;
                 this.OnClosed(EventArgs.Empty);
             });
             this.token = ServiceToken.Empty;
@@ -181,9 +117,52 @@ namespace Ntreev.Crema.Communication
 
         public string SerializerType { get; set; }
 
+        public ServiceHostCollection ServiceHosts { get; }
+
+        public string Host
+        {
+            get => this.host ?? defaultHost;
+            set
+            {
+                if (this.IsOpened == true)
+                    throw new InvalidOperationException("cannot set host when service is open.");
+                this.host = value;
+            }
+        }
+
+        public int Port
+        {
+            get => this.port;
+            set
+            {
+                if (this.IsOpened == true)
+                    throw new InvalidOperationException("cannot set port when service is open.");
+                this.port = value;
+            }
+        }
+
+        public bool IsOpened { get; private set; }
+
+        public Dispatcher Dispatcher { get; private set; }
+
+        public event EventHandler Opened;
+
+        public event EventHandler Closed;
+
+        protected virtual void OnOpened(EventArgs e)
+        {
+            this.Opened?.Invoke(this, e);
+        }
+
+        protected virtual void OnClosed(EventArgs e)
+        {
+            this.Closed?.Invoke(this, e);
+        }
+
         internal void Dispose()
         {
-            this.dispatcher.Dispose();
+            this.Dispatcher.Dispose();
+            this.Dispatcher = null;
         }
 
         internal static bool IsServer(ServiceContextBase serviceContext)
@@ -217,51 +196,101 @@ namespace Ntreev.Crema.Communication
             return false;
         }
 
-        public ServiceHostCollection ServiceHosts { get; }
-
-        public string Host
-        {
-            get => this.host ?? defaultHost;
-            set
-            {
-                if (this.isOpened == true)
-                    throw new InvalidOperationException("cannot set host when service is open.");
-                this.host = value;
-            }
-        }
-
-        public int Port
-        {
-            get => this.port;
-            set
-            {
-                if (this.isOpened == true)
-                    throw new InvalidOperationException("cannot set port when service is open.");
-                this.port = value;
-            }
-        }
-
-        public bool IsOpened => this.isOpened;
-
-        public Dispatcher Dispatcher => this.dispatcher;
-
-        public event EventHandler Opened;
-
-        public event EventHandler Closed;
-
-        protected virtual void OnOpened(EventArgs e)
-        {
-            this.Opened?.Invoke(this, e);
-        }
-
-        protected virtual void OnClosed(EventArgs e)
-        {
-            this.Closed?.Invoke(this, e);
-        }
-
         private async void AdaptorHost_Disconnected(object sender, DisconnectionReasonEventArgs e)
         {
             await this.CloseAsync(this.token.Guid);
+        }
+
+        private void Peers_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    {
+                        foreach (IPeer item in e.NewItems)
+                        {
+                            this.CreateInstance(this.adaptorHost, item);
+                        }
+                    }
+                    break;
+            }
+        }
+
+        private Dictionary<object, object> instanceByImpl;
+
+        private void InitializeInstance(IServiceHost serviceHost)
+        {
+            var isPerPeer = IsPerPeer(this, serviceHost);
+            if (isPerPeer == true)
+                return;
+            var (service, callback) = this.CreateInstance(serviceHost, null);
+            this.serviceByServiceHost.Add(serviceHost, service);
+            this.callbackByServiceHost.Add(serviceHost, callback);
+        }
+
+        private void ReleaseInstance(IServiceHost serviceHost)
+        {
+            var service = null as object;
+            if (this.serviceByServiceHost.ContainsKey(serviceHost) == true)
+            {
+                service = this.serviceByServiceHost[serviceHost];
+                this.serviceByServiceHost.Remove(serviceHost);
+            }
+            var callback = null as object;
+            if (this.callbackByServiceHost.ContainsKey(serviceHost) == true)
+            {
+                callback = this.callbackByServiceHost[serviceHost];
+                this.callbackByServiceHost.Remove(serviceHost);
+            }
+            this.DestroyInstance(serviceHost, service, callback);
+        }
+
+        private (object, object) CreateInstance(IServiceHost serviceHost, IPeer peer)
+        {
+            var baseType = GetInstanceType(this, serviceHost);
+            var typeName = $"{baseType.Name}Impl";
+            var instanceType = this.instanceBuilder.CreateType(typeName, typeof(InstanceBase), baseType);
+            var instance = TypeDescriptor.CreateInstance(null, instanceType, null, null) as InstanceBase;
+            instance.ServiceHost = serviceHost;
+            instance.AdaptorHost = adaptorHost;
+            instance.Peer = peer;
+
+            var impl = serviceHost.CreateInstance(instance);
+            var service = this.isServer ? impl : instance;
+            var callback = this.isServer ? instance : impl;
+            return (service, callback);
+        }
+
+        private void DestroyInstance(IServiceHost serviceHost, object service, object callback)
+        {
+            var baseType = GetInstanceType(this, serviceHost);
+            if (this.isServer == true)
+            {
+                serviceHost.DestroyInstance(service);    
+            }
+            else
+            {
+                serviceHost.DestroyInstance(callback);
+            }
+        }
+
+        private void CreateInstance(IAdaptorHost adaptorHost, IPeer peer)
+        {
+            foreach (var item in peer.ServiceHosts)
+            {
+                var isPerPeer = IsPerPeer(this, item);
+                if (isPerPeer == true)
+                {
+                    var (service, callback) = this.CreateInstance(item, peer);
+                    peer.AddInstance(item, service, callback);
+                }
+                else
+                {
+                    var service = this.serviceByServiceHost[item];
+                    var callback = this.callbackByServiceHost[item];
+                    peer.AddInstance(item, service, callback);
+                }
+            }
         }
 
         #region IServiecHost
@@ -272,10 +301,7 @@ namespace Ntreev.Crema.Communication
 
         #region IDisposable
 
-        void IDisposable.Dispose()
-        {
-            this.Dispose();
-        }
+        void IDisposable.Dispose() => this.Dispose();
 
         #endregion
     }
