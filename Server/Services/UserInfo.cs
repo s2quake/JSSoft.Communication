@@ -10,8 +10,6 @@ namespace Ntreev.Crema.Services
 
         public string Password { get; set; }
 
-        public bool IsOnline { get; set; }
-
         public Guid Token { get; set; }
     }
 }

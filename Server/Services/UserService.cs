@@ -22,6 +22,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Ntreev.Crema.Communication;
 using Ntreev.Library.Threading;
@@ -32,7 +33,8 @@ namespace Ntreev.Crema.Services
     {
         private readonly IUserServiceCallback callback;
 
-        private readonly Dictionary<string, UserInfo> users = new Dictionary<string, UserInfo>();
+        private readonly Dictionary<string, UserInfo> userByID = new Dictionary<string, UserInfo>();
+        private readonly Dictionary<Guid, UserInfo> userByToken = new Dictionary<Guid, UserInfo>();
 
         public UserService(IUserServiceCallback callback)
         {
@@ -42,7 +44,22 @@ namespace Ntreev.Crema.Services
 
         public Task CreateAsync(string userID, string password)
         {
-            throw new NotImplementedException();
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                if (userID == null)
+                    throw new ArgumentNullException(nameof(userID));
+                if (this.userByID.ContainsKey(userID) == true)
+                    throw new ArgumentException("user is already exists.", nameof(userID));
+                if (password == null)
+                    throw new ArgumentNullException(nameof(password));
+                var userInfo = new UserInfo()
+                {
+                    UserID = userID,
+                    Password = password,
+                    UserName = string.Empty,
+                };
+                this.userByID.Add(userID, userInfo);
+            });
         }
 
         public Task DeleteAsync(Guid token, string userID)
@@ -57,26 +74,59 @@ namespace Ntreev.Crema.Services
 
         public Task<string[]> GetUsersAsync(Guid token)
         {
-            throw new NotImplementedException();
+            return this.Dispatcher.InvokeAsync(()=>
+            {
+                if (this.userByToken.ContainsKey(token) == false)
+                    throw new ArgumentException("invalid token", nameof(token));
+                return this.userByID.Keys.ToArray();
+            });
         }
 
         public Task<bool> IsOnlineAsync(Guid token, string userID)
         {
-            throw new NotImplementedException();
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                if (this.userByToken.ContainsKey(token) == false)
+                    throw new ArgumentException("invalid token", nameof(token));
+                if (userID == null)
+                    throw new ArgumentNullException(nameof(userID));
+                if (this.userByID.ContainsKey(userID) == false)
+                    throw new ArgumentException("invalid userID", nameof(userID));
+                var user = this.userByID[userID];
+                return user.Token != Guid.Empty;
+            });
         }
 
         public Task<Guid> LoginAsync(string userID, string password)
         {
-            return this.Dispatcher.InvokeAsync(()=>
+            return this.Dispatcher.InvokeAsync(() =>
             {
+                if (userID == null)
+                    throw new ArgumentNullException(nameof(userID));
+                if (this.userByID.ContainsKey(userID) == false)
+                    throw new ArgumentException("invalid userID", nameof(userID));
+                if (password == null)
+                    throw new ArgumentNullException(nameof(password));
+                var token = Guid.NewGuid();
+                var user = this.userByID[userID];
+                user.Token = token;
+                this.userByToken.Add(token, user);
                 this.callback.OnLoggedIn(userID);
-                return Guid.NewGuid();
+                return token;
             });
         }
 
         public Task LogoutAsync(Guid token)
         {
-            throw new NotImplementedException();
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                if (this.userByToken.ContainsKey(token) == false)
+                    throw new ArgumentException("invalid token.", nameof(token));
+                var user = this.userByToken[token];
+                user.Token = Guid.Empty;
+                this.userByToken.Remove(token);
+                this.callback.OnLoggedOut(user.UserID);
+            });
         }
 
         public Task SendMessageAsync(Guid token, string userID, string message)
@@ -89,7 +139,7 @@ namespace Ntreev.Crema.Services
             throw new NotImplementedException();
         }
 
-        public Dispatcher Dispatcher { get; private set;}
+        public Dispatcher Dispatcher { get; private set; }
 
         public void Dispose()
         {

@@ -20,41 +20,43 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System.ComponentModel;
+using System;
 using System.ComponentModel.Composition;
-using Ntreev.Crema.Communication;
+using Ntreev.Library.Commands;
+using System.Threading.Tasks;
 using Ntreev.Crema.Services;
 
-namespace Server.Services
+namespace Server.Commands
 {
-    [Export(typeof(IServiceHost))]
-    class UserServiceHost : ServerServiceHostBase<IUserService, IUserServiceCallback>, INotifyPropertyChanged
+    [Export(typeof(ICommand))]
+    class UserCommand : CommandMethodBase
     {
-        private IUserService userService;
+        [Import]
+        private Lazy<IUserService> userService = null;
 
-        public override object CreateInstance(object obj)
+        public UserCommand()
         {
-            this.userService = new UserService(obj as IUserServiceCallback);
-            this.OnPropertyChanged(new PropertyChangedEventArgs(nameof(UserService)));
-            return this.userService;
+            
         }
 
-        public override void DestroyInstance(object obj)
+        [CommandMethod]
+        public Task CreateAsync(string userID, string password)
         {
-            if (obj is UserService userService)
-            {
-                userService.Dispose();
-            }
+            return this.UserService.CreateAsync(userID, password);
         }
 
-        [Export(typeof(IUserService))]
-        public IUserService UserService => this.userService;
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
+        [CommandMethod]
+        public Task LoginAsync(string userID, string password)
         {
-            this.PropertyChanged?.Invoke(this, e);
+            return this.UserService.LoginAsync(userID, password);
         }
+
+        [CommandMethod]
+        public async Task LogoutAsync(string userID)
+        {
+            await this.UserService.LogoutAsync(Guid.Empty);
+        }
+
+        private IUserService UserService => this.userService.Value;
     }
 }
