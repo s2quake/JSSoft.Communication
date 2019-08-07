@@ -30,13 +30,16 @@ namespace Ntreev.Crema.Services
     public interface IUserService
     {
         [OperationContract]
-        Task CreateAsync(string userID, string password);
+        Task CreateAsync(Guid token, string userID, string password, Authority authority);
 
         [OperationContract]
         Task DeleteAsync(Guid token, string userID);
 
         [OperationContract]
-        Task SetUserInfoAsync(Guid token, string userName);
+        Task RenameAsync(Guid token, string userName);
+
+        [OperationContract]
+        Task SetAuthorityAsync(Guid token, string userID, Authority authority);
 
         [OperationContract]
         Task<Guid> LoginAsync(string userID, string password);
@@ -45,7 +48,7 @@ namespace Ntreev.Crema.Services
         Task LogoutAsync(Guid token);
 
         [OperationContract]
-        Task<(string, string)> GetUserInfoAsync(Guid token, string userID);
+        Task<(string userName, Authority authority)> GetInfoAsync(Guid token, string userID);
 
         [OperationContract]
         Task<string[]> GetUsersAsync(Guid token);

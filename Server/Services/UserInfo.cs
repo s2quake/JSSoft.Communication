@@ -10,6 +10,8 @@ namespace Ntreev.Crema.Services
 
         public string Password { get; set; }
 
+        public Authority Authority { get; set; }
+
         public Guid Token { get; set; }
     }
 }

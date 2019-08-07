@@ -21,30 +21,38 @@
 // SOFTWARE.
 
 using System;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
-using Ntreev.Library.Commands;
 using System.Threading.Tasks;
 using Ntreev.Crema.Services;
+using Ntreev.Library.Commands;
+using Server;
 
 namespace Server.Commands
 {
     [Export(typeof(ICommand))]
-    class UserCommand : CommandMethodBase
+    class LogoutCommand : CommandAsyncBase
     {
+        [Import]
+        private Lazy<Shell> shell = null;
         [Import]
         private Lazy<IUserService> userService = null;
 
-        public UserCommand()
+        public LogoutCommand()
         {
-            
+
         }
 
-        [CommandMethod]
-        public Task CreateAsync(string userID, string password)
+        public override bool IsEnabled => this.Shell.UserToken != Guid.Empty;
+
+        protected override async Task OnExecuteAsync()
         {
-            return this.UserService.CreateAsync(Guid.Empty, userID, password, Authority.Admin);
+            await this.UserService.LogoutAsync(this.Shell.UserToken);
+            this.Shell.Logout();
         }
 
         private IUserService UserService => this.userService.Value;
+
+        private Shell Shell => this.shell.Value;
     }
 }

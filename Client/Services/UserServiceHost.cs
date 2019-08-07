@@ -73,6 +73,16 @@ namespace Client.Services
             Console.WriteLine($"{nameof(IUserServiceCallback.OnLoggedOut)}: '{userID}'");
         }
 
+        void IUserServiceCallback.OnMessageReceived(string sender, string receiver, string message)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IUserServiceCallback.OnRenamed(string userID, string userName)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
     }
 }

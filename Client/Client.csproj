@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <Compile Include="..\Server\Services\Authority.cs" Link="Services\Authority.cs" />
     <Compile Include="..\Server\Services\IUserService.cs" Link="Services\IUserService.cs" />
     <Compile Include="..\Server\Services\IUserServiceCallback.cs" Link="Services\IUserServiceCallback.cs" />
     <Compile Include="..\Server\Services\IDataService.cs" Link="Services\IDataService.cs" />

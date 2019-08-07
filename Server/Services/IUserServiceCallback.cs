@@ -31,5 +31,11 @@ namespace Ntreev.Crema.Services
 
         [OperationContract]
         void OnLoggedOut(string userID);
+
+        [OperationContract]
+        void OnMessageReceived(string sender, string receiver, string message);
+
+        [OperationContract]
+        void OnRenamed(string userID, string userName);
     }
 }

@@ -64,21 +64,59 @@ namespace Server
             }
         }
 
+        public bool IsOpened { get; private set; }
+
+        internal void Login(string userID, Guid token)
+        {
+            this.UserID = userID;
+            this.UserToken = token;
+            this.UpdatePrompt();
+        }
+
+        internal void Logout()
+        {
+            this.UserID = string.Empty;
+            this.UserToken = Guid.Empty;
+            this.UpdatePrompt();
+        }
+
         internal Guid Token { get; set; }
+
+        internal Guid UserToken { get; private set; }
+
+        internal string UserID { get; set; } = string.Empty;
 
         private TextWriter Out => this.commandContext.Out;
 
+        private void UpdatePrompt()
+        {
+            if (this.IsOpened == true)
+            {
+                this.Prompt = $"Server:{this.serviceHost.Port}";
+                if (this.UserID != string.Empty)
+                    this.Prompt += $"@{this.UserID}";
+            }
+            else
+            {
+                this.Prompt = string.Empty;
+            }
+        }
+
         private void ServiceHost_Opened(object sender, EventArgs e)
         {
-            this.Prompt = $"Server:{this.serviceHost.Port}";
+            this.IsOpened = true;
+            this.UpdatePrompt();
             this.Out.WriteLine("서버가 시작되었습니다.");
             this.Out.WriteLine("사용 가능한 명령을 확인려면 'help' 을(를) 입력하세요.");
+            this.Out.WriteLine();
+            this.Out.WriteLine("로그인을 하려면 login admin admin 을(를) 입력하세요.");
             this.Out.WriteLine();
         }
 
         private void ServiceHost_Closed(object sender, EventArgs e)
         {
-            this.Prompt = string.Empty;
+            this.IsOpened = false;
+            this.UpdatePrompt();
         }
 
         #region IServiceProvider

@@ -40,23 +40,37 @@ namespace Ntreev.Crema.Services
         {
             this.callback = callback;
             this.Dispatcher = new Dispatcher(this);
+
+            this.userByID.Add("admin", new UserInfo() 
+            {
+                UserID = "admin",
+                UserName = "Administrator",
+                Authority = Authority.Admin,
+            });
         }
 
-        public Task CreateAsync(string userID, string password)
+        public Task CreateAsync(Guid token, string userID, string password, Authority authority)
         {
             return this.Dispatcher.InvokeAsync(() =>
             {
+                if (this.userByToken.ContainsKey(token) == false)
+                    throw new ArgumentException("invalid token", nameof(token));
                 if (userID == null)
                     throw new ArgumentNullException(nameof(userID));
-                if (this.userByID.ContainsKey(userID) == true)
-                    throw new ArgumentException("user is already exists.", nameof(userID));
                 if (password == null)
                     throw new ArgumentNullException(nameof(password));
+                var user = this.userByToken[token];
+                if (user.Authority != Authority.Admin)
+                    throw new InvalidOperationException("permission denied.");
+                if (this.userByID.ContainsKey(userID) == true)
+                    throw new ArgumentException("user is already exists.", nameof(userID));
+                
                 var userInfo = new UserInfo()
                 {
                     UserID = userID,
                     Password = password,
                     UserName = string.Empty,
+                    Authority = authority
                 };
                 this.userByID.Add(userID, userInfo);
             });
@@ -67,14 +81,24 @@ namespace Ntreev.Crema.Services
             throw new NotImplementedException();
         }
 
-        public Task<(string, string)> GetUserInfoAsync(Guid token, string userID)
+        public Task<(string, Authority)> GetInfoAsync(Guid token, string userID)
         {
-            throw new NotImplementedException();
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                if (this.userByToken.ContainsKey(token) == false)
+                    throw new ArgumentException("invalid token", nameof(token));
+                if (userID == null)
+                    throw new ArgumentNullException(nameof(userID));
+                if (this.userByID.ContainsKey(userID) == false)
+                    throw new ArgumentException("invalid userID", nameof(userID));
+                var user = this.userByID[userID];
+                return (user.UserName, user.Authority);
+            });
         }
 
         public Task<string[]> GetUsersAsync(Guid token)
         {
-            return this.Dispatcher.InvokeAsync(()=>
+            return this.Dispatcher.InvokeAsync(() =>
             {
                 if (this.userByToken.ContainsKey(token) == false)
                     throw new ArgumentException("invalid token", nameof(token));
@@ -112,6 +136,7 @@ namespace Ntreev.Crema.Services
                 user.Token = token;
                 this.userByToken.Add(token, user);
                 this.callback.OnLoggedIn(userID);
+                Console.WriteLine($"logged in: '{userID}'");
                 return token;
             });
         }
@@ -126,15 +151,46 @@ namespace Ntreev.Crema.Services
                 user.Token = Guid.Empty;
                 this.userByToken.Remove(token);
                 this.callback.OnLoggedOut(user.UserID);
+                Console.WriteLine($"logged out: '{user.UserID}'");
             });
         }
 
         public Task SendMessageAsync(Guid token, string userID, string message)
         {
-            throw new NotImplementedException();
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                if (this.userByToken.ContainsKey(token) == false)
+                    throw new ArgumentException("invalid token.", nameof(token));
+                if (userID == null)
+                    throw new ArgumentNullException(nameof(userID));
+                if (this.userByID.ContainsKey(userID) == false)
+                    throw new ArgumentException("invalid userID", nameof(userID));
+                if (message == null)
+                    throw new ArgumentNullException(nameof(message));
+                var user = this.userByToken[token];
+                this.callback.OnMessageReceived(user.UserID, userID, message);
+            });
         }
 
-        public Task SetUserInfoAsync(Guid token, string userName)
+        public Task RenameAsync(Guid token, string userName)
+        {
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                if (this.userByToken.ContainsKey(token) == false)
+                    throw new ArgumentException("invalid token.", nameof(token));
+                if (userName == null)
+                    throw new ArgumentNullException(nameof(userName));
+                if (userName == string.Empty)
+                    throw new ArgumentException("invalid name.", nameof(userName));
+                var user = this.userByToken[token];
+                if (user.UserName == userName)
+                    throw new ArgumentException("same name can not set.", nameof(userName));
+                user.UserName = userName;
+                this.callback.OnRenamed(user.UserID, userName);
+            });
+        }
+
+        public Task SetAuthorityAsync(Guid token, string userID, Authority authority)
         {
             throw new NotImplementedException();
         }
