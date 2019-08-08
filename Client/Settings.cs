@@ -24,7 +24,7 @@ using System;
 using System.ComponentModel;
 using Ntreev.Library.Commands;
 
-namespace Client
+namespace Ntreev.Crema.Services
 {
     public class Settings
     {

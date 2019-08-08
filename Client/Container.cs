@@ -31,7 +31,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Client
+namespace Ntreev.Crema.Services
 {
     static class Container
     {

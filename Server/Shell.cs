@@ -28,7 +28,7 @@ using Ntreev.Crema.Communication;
 using Ntreev.Crema.Services;
 using Ntreev.Library.Commands;
 
-namespace Server
+namespace Ntreev.Crema.Services
 {
     [Export(typeof(IShell))]
     [Export(typeof(IServiceProvider))]

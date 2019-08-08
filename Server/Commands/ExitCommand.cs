@@ -25,9 +25,8 @@ using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 using Ntreev.Library.Commands;
-using Server;
 
-namespace Server.Commands
+namespace Ntreev.Crema.Services.Commands
 {
     [Export(typeof(ICommand))]
     class ExitCommand : CommandAsyncBase

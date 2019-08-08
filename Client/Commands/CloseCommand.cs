@@ -24,11 +24,10 @@
 using System;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
-using Client;
 using Ntreev.Crema.Communication;
 using Ntreev.Library.Commands;
 
-namespace Client.Commands
+namespace Ntreev.Crema.Services.Commands
 {
     [Export(typeof(ICommand))]
     class CloseCommand : CommandAsyncBase

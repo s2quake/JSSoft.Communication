@@ -26,7 +26,7 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using Ntreev.Crema.Communication;
 
-namespace Server
+namespace Ntreev.Crema.Services
 {
     [Export(typeof(IServiceContext))]
     class ServerContext : ServerContextBase

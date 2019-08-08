@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using Ntreev.Library.Commands;
 
-namespace Client
+namespace Ntreev.Crema.Services
 {
     [Export(typeof(CommandContext))]
     class CommandContext : CommandContextBase

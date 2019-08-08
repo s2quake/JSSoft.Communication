@@ -8,6 +8,8 @@
     <Compile Include="..\Server\Services\IUserServiceCallback.cs" Link="Services\IUserServiceCallback.cs" />
     <Compile Include="..\Server\Services\IDataService.cs" Link="Services\IDataService.cs" />
     <Compile Include="..\Server\Services\IDataServiceCallback.cs" Link="Services\IDataServiceCallback.cs" />
+
+    <Compile Include="..\Server\Commands\LoginCommand.cs" Link="Commands\LoginCommand.cs" />
   </ItemGroup>
 
   <ItemGroup>
