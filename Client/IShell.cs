@@ -23,7 +23,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Client
+namespace Ntreev.Crema.Services
 {
     public interface IShell : IDisposable
     {

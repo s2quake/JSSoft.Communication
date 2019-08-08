@@ -26,94 +26,29 @@ using System.ComponentModel.Composition;
 using Ntreev.Crema.Communication;
 using Ntreev.Crema.Services;
 
-namespace Client.Services
+namespace Ntreev.Crema.Services.Services
 {
     [Export(typeof(IServiceHost))]
-    class UserServiceHost : ClientServiceHostBase<IUserService, IUserServiceCallback>, IUserServiceCallback, INotifyPropertyChanged, INotifyUserService
+    class UserServiceHost : ClientServiceHostBase<IUserService, IUserServiceCallback>
     {
-        private IUserService userService;
+        private readonly UserService userService;
 
-        public UserServiceHost()
+        [ImportingConstructor]
+        public UserServiceHost(UserService userService)
             : base()
         {
-
+            this.userService = userService;
         }
-
-        
 
         public override object CreateInstance(object obj)
         {
-            this.userService = obj as IUserService;
-            this.OnPropertyChanged(new PropertyChangedEventArgs(nameof(UserService)));
-            return this;
+            this.userService.SetUserService(obj as IUserService);
+            return this.userService;
         }
 
         public override void DestroyInstance(object obj)
         {
-            
+            this.userService.SetUserService(null);
         }
-
-        [Export(typeof(IUserService))]
-        public IUserService UserService => this.userService;
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public event EventHandler<UserEventArgs> LoggedIn;
-
-        public event EventHandler<UserEventArgs> LoggedOut;
-
-        public event EventHandler<UserEventArgs> Created;
-
-        public event EventHandler<UserEventArgs> Deleted;
-
-        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
-        {
-            this.PropertyChanged?.Invoke(this, e);
-        }
-
-        protected virtual void OnLoggedIn(UserEventArgs e)
-        {
-            this.LoggedIn?.Invoke(this, e);
-        }
-
-        protected virtual void OnLoggedOut(UserEventArgs e)
-        {
-            this.LoggedOut?.Invoke(this, e);
-        }
-
-        protected virtual void OnCreated(UserEventArgs e)
-        {
-            this.Created?.Invoke(this, e);
-        }
-
-        protected virtual void OnDeleted(UserEventArgs e)
-        {
-            this.Deleted?.Invoke(this, e);
-        }
-
-        #region IUserServiceCallback
-
-        void IUserServiceCallback.OnLoggedIn(string userID)
-        {
-            this.OnLoggedIn(new UserEventArgs(userID));
-        }
-
-        void IUserServiceCallback.OnLoggedOut(string userID)
-        {
-            this.OnLoggedOut(new UserEventArgs(userID));
-        }
-
-        void IUserServiceCallback.OnMessageReceived(string sender, string receiver, string message)
-        {
-            // if (receiver)
-            // Console.WriteLine($"[{userID}]");
-        }
-
-        void IUserServiceCallback.OnRenamed(string userID, string userName)
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
     }
 }

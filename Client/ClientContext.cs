@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using Ntreev.Crema.Communication;
 
-namespace Client
+namespace Ntreev.Crema.Services
 {
     [Export(typeof(IServiceContext))]
     class ClientContext : ClientContextBase

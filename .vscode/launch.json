@@ -10,7 +10,10 @@
             "request": "launch",
             "preLaunchTask": "build client",
             "program": "${workspaceFolder}/Client/bin/Debug/netcoreapp3.0/Client.dll",
-            "args": [],
+            "args": [
+                "--host",
+                "192.168.0.2"
+            ],
             "cwd": "${workspaceFolder}/Client",
             "stopAtEntry": false,
             "console": "externalTerminal"

@@ -24,7 +24,7 @@ using System;
 using System.ComponentModel.Composition;
 using Ntreev.Crema.Communication;
 
-namespace Server
+namespace Ntreev.Crema.Services
 {
     [Export(typeof(IComponentProvider))]
     class ComponentProvider : IComponentProvider

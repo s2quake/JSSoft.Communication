@@ -24,7 +24,7 @@ using System;
 using System.Threading.Tasks;
 using Ntreev.Library.Commands;
 
-namespace Server
+namespace Ntreev.Crema.Services
 {
     class Program
     {

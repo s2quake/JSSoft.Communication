@@ -119,6 +119,7 @@ namespace Ntreev.Crema.Communication.Grpc
                             var service = this.serviceHosts[item.ServiceName];
                             this.InvokeCallback(service, reply.Items);
                         }
+                        reply.Items.Clear();
                         await Task.Delay(1);
                     }
                     await this.call.RequestStream.CompleteAsync();

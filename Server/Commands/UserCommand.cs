@@ -26,7 +26,7 @@ using Ntreev.Library.Commands;
 using System.Threading.Tasks;
 using Ntreev.Crema.Services;
 
-namespace Server.Commands
+namespace Ntreev.Crema.Services.Commands
 {
     [Export(typeof(ICommand))]
     class UserCommand : CommandMethodBase

@@ -26,7 +26,7 @@ using System.Threading.Tasks;
 using Ntreev.Crema.Communication;
 using Ntreev.Library.Commands;
 
-namespace Client.Commands
+namespace Ntreev.Crema.Services.Commands
 {
     [Export(typeof(ICommand))]
     class OpenCommand : CommandAsyncBase

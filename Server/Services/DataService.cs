@@ -26,7 +26,7 @@ using System.Threading.Tasks;
 using Ntreev.Crema.Services;
 using Ntreev.Library.Threading;
 
-namespace Server.Services
+namespace Ntreev.Crema.Services.Services
 {
     class DataService : IDataService
     {
