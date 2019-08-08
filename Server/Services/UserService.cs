@@ -22,6 +22,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading.Tasks;
 using Ntreev.Crema.Communication;
@@ -29,19 +30,19 @@ using Ntreev.Library.Threading;
 
 namespace Ntreev.Crema.Services
 {
-    public class UserService : IUserService
+    [Export(typeof(IUserService))]
+    [Export(typeof(INotifyUserService))]
+    [Export(typeof(UserService))]
+    class UserService : IUserService, INotifyUserService
     {
-        private readonly IUserServiceCallback callback;
-
         private readonly Dictionary<string, UserInfo> userByID = new Dictionary<string, UserInfo>();
         private readonly Dictionary<Guid, UserInfo> userByToken = new Dictionary<Guid, UserInfo>();
 
-        public UserService(IUserServiceCallback callback)
-        {
-            this.callback = callback;
-            this.Dispatcher = new Dispatcher(this);
+        private IUserServiceCallback callback;
 
-            this.userByID.Add("admin", new UserInfo() 
+        public UserService()
+        {
+            this.userByID.Add("admin", new UserInfo()
             {
                 UserID = "admin",
                 UserName = "Administrator",
@@ -53,18 +54,9 @@ namespace Ntreev.Crema.Services
         {
             return this.Dispatcher.InvokeAsync(() =>
             {
-                if (this.userByToken.ContainsKey(token) == false)
-                    throw new ArgumentException("invalid token", nameof(token));
-                if (userID == null)
-                    throw new ArgumentNullException(nameof(userID));
-                if (password == null)
-                    throw new ArgumentNullException(nameof(password));
+                this.ValidateCreate(token, userID, password, authority);
+
                 var user = this.userByToken[token];
-                if (user.Authority != Authority.Admin)
-                    throw new InvalidOperationException("permission denied.");
-                if (this.userByID.ContainsKey(userID) == true)
-                    throw new ArgumentException("user is already exists.", nameof(userID));
-                
                 var userInfo = new UserInfo()
                 {
                     UserID = userID,
@@ -78,19 +70,19 @@ namespace Ntreev.Crema.Services
 
         public Task DeleteAsync(Guid token, string userID)
         {
-            throw new NotImplementedException();
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                this.ValidateDelete(token, userID);
+            });
         }
 
         public Task<(string, Authority)> GetInfoAsync(Guid token, string userID)
         {
             return this.Dispatcher.InvokeAsync(() =>
             {
-                if (this.userByToken.ContainsKey(token) == false)
-                    throw new ArgumentException("invalid token", nameof(token));
-                if (userID == null)
-                    throw new ArgumentNullException(nameof(userID));
-                if (this.userByID.ContainsKey(userID) == false)
-                    throw new ArgumentException("invalid userID", nameof(userID));
+                this.ValidateUser(token);
+                this.ValidateUser(userID);
+
                 var user = this.userByID[userID];
                 return (user.UserName, user.Authority);
             });
@@ -100,8 +92,8 @@ namespace Ntreev.Crema.Services
         {
             return this.Dispatcher.InvokeAsync(() =>
             {
-                if (this.userByToken.ContainsKey(token) == false)
-                    throw new ArgumentException("invalid token", nameof(token));
+                this.ValidateUser(token);
+
                 return this.userByID.Keys.ToArray();
             });
         }
@@ -110,12 +102,9 @@ namespace Ntreev.Crema.Services
         {
             return this.Dispatcher.InvokeAsync(() =>
             {
-                if (this.userByToken.ContainsKey(token) == false)
-                    throw new ArgumentException("invalid token", nameof(token));
-                if (userID == null)
-                    throw new ArgumentNullException(nameof(userID));
-                if (this.userByID.ContainsKey(userID) == false)
-                    throw new ArgumentException("invalid userID", nameof(userID));
+                this.ValidateUser(token);
+                this.ValidateUser(userID);
+
                 var user = this.userByID[userID];
                 return user.Token != Guid.Empty;
             });
@@ -125,18 +114,14 @@ namespace Ntreev.Crema.Services
         {
             return this.Dispatcher.InvokeAsync(() =>
             {
-                if (userID == null)
-                    throw new ArgumentNullException(nameof(userID));
-                if (this.userByID.ContainsKey(userID) == false)
-                    throw new ArgumentException("invalid userID", nameof(userID));
-                if (password == null)
-                    throw new ArgumentNullException(nameof(password));
+                this.ValidatePassword(userID);
+
                 var token = Guid.NewGuid();
                 var user = this.userByID[userID];
                 user.Token = token;
                 this.userByToken.Add(token, user);
                 this.callback.OnLoggedIn(userID);
-                Console.WriteLine($"logged in: '{userID}'");
+                this.OnLoggedIn(new UserEventArgs(userID));
                 return token;
             });
         }
@@ -145,13 +130,13 @@ namespace Ntreev.Crema.Services
         {
             return this.Dispatcher.InvokeAsync(() =>
             {
-                if (this.userByToken.ContainsKey(token) == false)
-                    throw new ArgumentException("invalid token.", nameof(token));
+                this.ValidateUser(token);
+
                 var user = this.userByToken[token];
                 user.Token = Guid.Empty;
                 this.userByToken.Remove(token);
                 this.callback.OnLoggedOut(user.UserID);
-                Console.WriteLine($"logged out: '{user.UserID}'");
+                this.OnLoggedOut(new UserEventArgs(user.UserID));
             });
         }
 
@@ -159,14 +144,10 @@ namespace Ntreev.Crema.Services
         {
             return this.Dispatcher.InvokeAsync(() =>
             {
-                if (this.userByToken.ContainsKey(token) == false)
-                    throw new ArgumentException("invalid token.", nameof(token));
-                if (userID == null)
-                    throw new ArgumentNullException(nameof(userID));
-                if (this.userByID.ContainsKey(userID) == false)
-                    throw new ArgumentException("invalid userID", nameof(userID));
-                if (message == null)
-                    throw new ArgumentNullException(nameof(message));
+                this.ValidateUser(token);
+                this.ValidateOnline(userID);
+                this.ValidateMessage(message);
+
                 var user = this.userByToken[token];
                 this.callback.OnMessageReceived(user.UserID, userID, message);
             });
@@ -176,15 +157,9 @@ namespace Ntreev.Crema.Services
         {
             return this.Dispatcher.InvokeAsync(() =>
             {
-                if (this.userByToken.ContainsKey(token) == false)
-                    throw new ArgumentException("invalid token.", nameof(token));
-                if (userName == null)
-                    throw new ArgumentNullException(nameof(userName));
-                if (userName == string.Empty)
-                    throw new ArgumentException("invalid name.", nameof(userName));
+                this.ValidateRename(token, userName);
+
                 var user = this.userByToken[token];
-                if (user.UserName == userName)
-                    throw new ArgumentException("same name can not set.", nameof(userName));
                 user.UserName = userName;
                 this.callback.OnRenamed(user.UserID, userName);
             });
@@ -192,15 +167,178 @@ namespace Ntreev.Crema.Services
 
         public Task SetAuthorityAsync(Guid token, string userID, Authority authority)
         {
-            throw new NotImplementedException();
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                this.ValidateSetAuthority(token, userID, authority);
+                var user = this.userByID[userID];
+                user.Authority = authority;
+            });
+        }
+
+        public void Dispose()
+        {
+            if (this.Dispatcher == null)
+                throw new ObjectDisposedException(nameof(UserService));
+            this.Dispatcher.Dispose();
+            this.Dispatcher = null;
         }
 
         public Dispatcher Dispatcher { get; private set; }
 
-        public void Dispose()
+        public event EventHandler<UserEventArgs> LoggedIn;
+
+        public event EventHandler<UserEventArgs> LoggedOut;
+
+        public event EventHandler<UserEventArgs> Created;
+
+        public event EventHandler<UserEventArgs> Deleted;
+
+        internal void SetCallback(IUserServiceCallback callback)
         {
-            this.Dispatcher.Dispose();
-            this.Dispatcher = null;
+            this.callback = callback;
+            this.Dispatcher = new Dispatcher(this);
+        }
+        
+        protected virtual void OnLoggedIn(UserEventArgs e)
+        {
+            this.LoggedIn?.Invoke(this, e);
+        }
+
+        protected virtual void OnLoggedOut(UserEventArgs e)
+        {
+            this.LoggedOut?.Invoke(this, e);
+        }
+
+        protected virtual void OnCreated(UserEventArgs e)
+        {
+            this.Created?.Invoke(this, e);
+        }
+
+        protected virtual void OnDeleted(UserEventArgs e)
+        {
+            this.Deleted?.Invoke(this, e);
+        }
+
+        private void ValidateUser(string userID)
+        {
+            this.Dispatcher.VerifyAccess();
+            if (userID == null)
+                throw new ArgumentNullException(nameof(userID));
+            if (this.userByID.ContainsKey(userID) == false)
+                throw new ArgumentException("invalid userID", nameof(userID));
+        }
+
+        private void ValidateNotUser(string userID)
+        {
+            this.Dispatcher.VerifyAccess();
+            if (userID == null)
+                throw new ArgumentNullException(nameof(userID));
+            if (this.userByID.ContainsKey(userID) == true)
+                throw new ArgumentException("user is already exists.", nameof(userID));
+        }
+
+        private void ValidateUser(Guid token)
+        {
+            this.Dispatcher.VerifyAccess();
+            if (this.userByToken.ContainsKey(token) == false)
+                throw new ArgumentException("invalid token.", nameof(token));
+        }
+
+        private void ValidatePassword(string password)
+        {
+            this.Dispatcher.VerifyAccess();
+            if (password == null)
+                throw new ArgumentNullException(nameof(password));
+            if (password == string.Empty)
+                throw new ArgumentException("invalid password.", nameof(password));
+            if (password.Length < 4)
+                throw new ArgumentException("length of password must be greater or equal than 4.", nameof(password));
+        }
+
+        private void ValidatePassword(string userID, string password)
+        {
+            this.Dispatcher.VerifyAccess();
+            this.ValidateUser(userID);
+            if (password == null)
+                throw new ArgumentNullException(nameof(password));
+            var user = this.userByID[userID];
+            if (user.Password != password)
+                throw new InvalidOperationException("wrong userID or password.");
+        }
+
+        private void ValidateCreate(Guid token, string userID, string password, Authority authority)
+        {
+            this.Dispatcher.VerifyAccess();
+            this.ValidateUser(token);
+            this.ValidateNotUser(userID);
+            this.ValidatePassword(password);
+            var user = this.userByToken[token];
+            if (user.Authority != Authority.Admin)
+                throw new InvalidOperationException("permission denied.");
+        }
+
+        private void ValidateMessage(string message)
+        {
+            this.Dispatcher.VerifyAccess();
+            if (message == null)
+                throw new ArgumentNullException(nameof(message));
+        }
+
+        private void ValidateOnline(string userID)
+        {
+            this.Dispatcher.VerifyAccess();
+            this.ValidateUser(userID);
+            var user = this.userByID[userID];
+
+            if (user.Token == Guid.Empty)
+                throw new InvalidOperationException($"user is offline.");
+        }
+
+        private void ValidateRename(Guid token, string userName)
+        {
+            this.Dispatcher.VerifyAccess();
+            this.ValidateUser(token);
+            if (userName == null)
+                throw new ArgumentNullException(nameof(userName));
+            if (userName == string.Empty)
+                throw new ArgumentException("invalid name.", nameof(userName));
+            var user = this.userByToken[token];
+            if (user.UserName == userName)
+                throw new ArgumentException("same name can not set.", nameof(userName));
+            if (user.UserID == "admin")
+                throw new InvalidOperationException("permission denied.");
+        }
+
+        private void ValidateSetAuthority(Guid token, string userID, Authority authority)
+        {
+            this.Dispatcher.VerifyAccess();
+            this.ValidateUser(token);
+            this.ValidateUser(userID);
+            var user1 = this.userByToken[token];
+            if (user1.UserID == userID)
+                throw new InvalidOperationException("can not set authority.");
+            if (user1.Authority != Authority.Admin)
+                throw new InvalidOperationException("permission denied.");
+            var user2 = this.userByID[userID];
+            if (user2.Token != Guid.Empty)
+                throw new InvalidOperationException("can not set authority of online user.");
+            if (userID == "admin")
+                throw new InvalidOperationException("permission denied.");
+        }
+
+        private void ValidateDelete(Guid token, string userID)
+        {
+            this.Dispatcher.VerifyAccess();
+            this.ValidateUser(token);
+            this.ValidateNotUser(userID);
+            var user1 = this.userByToken[token];
+            if (user1.Authority != Authority.Admin)
+                throw new InvalidOperationException("permission denied.");
+            var user2 = this.userByID[userID];
+            if (user2.Token != Guid.Empty)
+                throw new InvalidOperationException("can not delete online user.");
+            if (userID == "admin")
+                throw new InvalidOperationException("permission denied.");
         }
     }
 }

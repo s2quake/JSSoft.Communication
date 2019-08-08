@@ -2,7 +2,9 @@
 
   <ItemGroup>
     <Compile Include="..\Server\Services\Authority.cs" Link="Services\Authority.cs" />
+    <Compile Include="..\Server\Services\UserEventArgs.cs" Link="Services\UserEventArgs.cs" />
     <Compile Include="..\Server\Services\IUserService.cs" Link="Services\IUserService.cs" />
+    <Compile Include="..\Server\Services\INotifyUserService.cs" Link="Services\INotifyUserService.cs" />
     <Compile Include="..\Server\Services\IUserServiceCallback.cs" Link="Services\IUserServiceCallback.cs" />
     <Compile Include="..\Server\Services\IDataService.cs" Link="Services\IDataService.cs" />
     <Compile Include="..\Server\Services\IDataServiceCallback.cs" Link="Services\IDataServiceCallback.cs" />

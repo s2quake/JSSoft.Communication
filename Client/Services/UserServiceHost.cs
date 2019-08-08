@@ -29,7 +29,7 @@ using Ntreev.Crema.Services;
 namespace Client.Services
 {
     [Export(typeof(IServiceHost))]
-    class UserServiceHost : ClientServiceHostBase<IUserService, IUserServiceCallback>, IUserServiceCallback, INotifyPropertyChanged
+    class UserServiceHost : ClientServiceHostBase<IUserService, IUserServiceCallback>, IUserServiceCallback, INotifyPropertyChanged, INotifyUserService
     {
         private IUserService userService;
 
@@ -39,7 +39,7 @@ namespace Client.Services
 
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        
 
         public override object CreateInstance(object obj)
         {
@@ -56,26 +56,57 @@ namespace Client.Services
         [Export(typeof(IUserService))]
         public IUserService UserService => this.userService;
 
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public event EventHandler<UserEventArgs> LoggedIn;
+
+        public event EventHandler<UserEventArgs> LoggedOut;
+
+        public event EventHandler<UserEventArgs> Created;
+
+        public event EventHandler<UserEventArgs> Deleted;
+
         protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
         {
             this.PropertyChanged?.Invoke(this, e);
+        }
+
+        protected virtual void OnLoggedIn(UserEventArgs e)
+        {
+            this.LoggedIn?.Invoke(this, e);
+        }
+
+        protected virtual void OnLoggedOut(UserEventArgs e)
+        {
+            this.LoggedOut?.Invoke(this, e);
+        }
+
+        protected virtual void OnCreated(UserEventArgs e)
+        {
+            this.Created?.Invoke(this, e);
+        }
+
+        protected virtual void OnDeleted(UserEventArgs e)
+        {
+            this.Deleted?.Invoke(this, e);
         }
 
         #region IUserServiceCallback
 
         void IUserServiceCallback.OnLoggedIn(string userID)
         {
-            Console.WriteLine($"{nameof(IUserServiceCallback.OnLoggedIn)}: '{userID}'");
+            this.OnLoggedIn(new UserEventArgs(userID));
         }
 
         void IUserServiceCallback.OnLoggedOut(string userID)
         {
-            Console.WriteLine($"{nameof(IUserServiceCallback.OnLoggedOut)}: '{userID}'");
+            this.OnLoggedOut(new UserEventArgs(userID));
         }
 
         void IUserServiceCallback.OnMessageReceived(string sender, string receiver, string message)
         {
-            throw new NotImplementedException();
+            // if (receiver)
+            // Console.WriteLine($"[{userID}]");
         }
 
         void IUserServiceCallback.OnRenamed(string userID, string userName)

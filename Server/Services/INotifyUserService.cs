@@ -20,14 +20,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System;
+
 namespace Ntreev.Crema.Services
 {
-    public enum Authority
+    public interface INotifyUserService
     {
-        Admin,
+        event EventHandler<UserEventArgs> LoggedIn;
 
-        Member,
+        event EventHandler<UserEventArgs> LoggedOut;
 
-        Guest
+        event EventHandler<UserEventArgs> Created;
+
+        event EventHandler<UserEventArgs> Deleted;
     }
 }

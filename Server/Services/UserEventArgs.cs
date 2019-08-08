@@ -20,14 +20,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System;
+
 namespace Ntreev.Crema.Services
 {
-    public enum Authority
+    public class UserEventArgs : EventArgs
     {
-        Admin,
+        public UserEventArgs(string userID)
+        {
+            this.UserID = userID;
+        }
 
-        Member,
-
-        Guest
+        public string UserID { get; }
     }
 }

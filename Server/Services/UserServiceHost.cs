@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using Ntreev.Crema.Communication;
@@ -28,14 +29,19 @@ using Ntreev.Crema.Services;
 namespace Server.Services
 {
     [Export(typeof(IServiceHost))]
-    class UserServiceHost : ServerServiceHostBase<IUserService, IUserServiceCallback>, INotifyPropertyChanged
+    class UserServiceHost : ServerServiceHostBase<IUserService, IUserServiceCallback>
     {
-        private IUserService userService;
+        private UserService userService;
+
+        [ImportingConstructor]
+        public UserServiceHost(UserService userService)
+        {
+            this.userService = userService;
+        }
 
         public override object CreateInstance(object obj)
         {
-            this.userService = new UserService(obj as IUserServiceCallback);
-            this.OnPropertyChanged(new PropertyChangedEventArgs(nameof(UserService)));
+            this.userService.SetCallback(obj as IUserServiceCallback);
             return this.userService;
         }
 
@@ -45,16 +51,6 @@ namespace Server.Services
             {
                 userService.Dispose();
             }
-        }
-
-        [Export(typeof(IUserService))]
-        public IUserService UserService => this.userService;
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
-        {
-            this.PropertyChanged?.Invoke(this, e);
         }
     }
 }

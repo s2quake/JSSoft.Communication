@@ -25,6 +25,7 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Threading.Tasks;
 using Ntreev.Crema.Communication;
+using Ntreev.Crema.Services;
 using Ntreev.Library.Commands;
 
 namespace Server
@@ -32,11 +33,13 @@ namespace Server
     [Export(typeof(IShell))]
     [Export(typeof(IServiceProvider))]
     [Export(typeof(Shell))]
-    class Shell : CommandContextTerminal, IShell, IServiceProvider
+    class Shell : CommandContextTerminal, IShell, IServiceProvider, IPartImportsSatisfiedNotification
     {
         private readonly IServiceContext serviceHost;
         private readonly CommandContext commandContext;
         private bool isDisposed;
+        [Import]
+        private INotifyUserService userServiceNotification;
 
         [ImportingConstructor]
         public Shell(CommandContext commandContext, IServiceContext serviceHost)
@@ -71,6 +74,8 @@ namespace Server
             this.UserID = userID;
             this.UserToken = token;
             this.UpdatePrompt();
+            this.Out.WriteLine("사용자 관련 명령을 수행하려면 'help user' 을(를) 입력하세요.");
+            this.Out.WriteLine();
         }
 
         internal void Logout()
@@ -119,6 +124,18 @@ namespace Server
             this.UpdatePrompt();
         }
 
+        private void UserServiceNotification_LoggedIn(object sender, UserEventArgs e)
+        {
+            this.Out.WriteLine($"User logged in: {e.UserID}");
+            this.Out.WriteLine();
+        }
+
+        private void UserServiceNotification_LoggedOut(object sender, UserEventArgs e)
+        {
+            this.Out.WriteLine($"User logged out: {e.UserID}");
+            this.Out.WriteLine();
+        }
+
         #region IServiceProvider
 
         object IServiceProvider.GetService(Type serviceType)
@@ -139,7 +156,6 @@ namespace Server
             this.serviceHost.Port = settings.Port;
             this.Token = await this.serviceHost.OpenAsync();
             base.Start();
-
         }
 
         async Task IShell.StopAsync()
@@ -149,6 +165,16 @@ namespace Server
                 await this.serviceHost.CloseAsync(this.Token);
         }
 
+        #endregion
+
+        #region IPartImportsSatisfiedNotification
+
+        void IPartImportsSatisfiedNotification.OnImportsSatisfied()
+        {
+            this.userServiceNotification.LoggedIn += UserServiceNotification_LoggedIn;
+            this.userServiceNotification.LoggedOut += UserServiceNotification_LoggedOut;
+        }
+        
         #endregion
     }
 }

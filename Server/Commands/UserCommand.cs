@@ -32,19 +32,72 @@ namespace Server.Commands
     class UserCommand : CommandMethodBase
     {
         [Import]
+        private Lazy<Shell> shell = null;
+        [Import]
         private Lazy<IUserService> userService = null;
 
         public UserCommand()
         {
-            
+
         }
 
         [CommandMethod]
-        public Task CreateAsync(string userID, string password)
+        public Task CreateAsync(string userID, string password, Authority authority = Authority.Member)
         {
-            return this.UserService.CreateAsync(Guid.Empty, userID, password, Authority.Admin);
+            return this.UserService.CreateAsync(this.Shell.UserToken, userID, password, Authority.Admin);
+        }
+
+        [CommandMethod]
+        public Task DeleteAsync(string userID)
+        {
+            return this.UserService.DeleteAsync(this.Shell.UserToken, userID);
+        }
+
+        [CommandMethod]
+        public Task RenameAsync(string userName)
+        {
+            return this.UserService.RenameAsync(this.Shell.UserToken, userName);
+        }
+
+        [CommandMethod]
+        public Task AuthorityAsync(string userID, Authority authority)
+        {
+            return this.UserService.SetAuthorityAsync(this.Shell.UserToken, userID, authority);
+        }
+
+        [CommandMethod]
+        public async Task InfoAsync(string userID)
+        {
+            var (userName, authority) = await this.UserService.GetInfoAsync(this.Shell.UserToken, userID);
+            Console.WriteLine($"UseName: {userName}");
+            Console.WriteLine($"Authority: {authority}");
+        }
+
+        [CommandMethod]
+        public async Task ListAsync()
+        {
+            var items = await this.UserService.GetUsersAsync(this.Shell.UserToken);
+            foreach (var item in items)
+            {
+                Console.WriteLine(item);
+            }
+        }
+
+        [CommandMethod]
+        public Task SendMessageAsync(string userID, string message)
+        {
+            return this.UserService.SendMessageAsync(this.Shell.UserToken, userID, message);
+        }
+
+        public override bool IsEnabled => this.Shell.UserToken != Guid.Empty;
+
+        protected override bool IsMethodEnabled(CommandMethodDescriptor descriptor)
+        {
+            return this.Shell.UserToken != Guid.Empty;
         }
 
         private IUserService UserService => this.userService.Value;
+
+        private Shell Shell => this.shell.Value;
     }
 }
