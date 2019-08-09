@@ -64,6 +64,8 @@ namespace Ntreev.Crema.Services
                     Authority = authority
                 };
                 this.userByID.Add(userID, userInfo);
+                this.callback.OnCreated(userID);
+                this.OnCreated(new UserEventArgs(userID));
             });
         }
 
@@ -72,6 +74,10 @@ namespace Ntreev.Crema.Services
             return this.Dispatcher.InvokeAsync(() =>
             {
                 this.ValidateDelete(token, userID);
+
+                this.userByID.Remove(userID);
+                this.callback.OnDeleted(userID);
+                this.OnDeleted(new UserEventArgs(userID));
             });
         }
 
@@ -149,6 +155,7 @@ namespace Ntreev.Crema.Services
 
                 var user = this.userByToken[token];
                 this.callback.OnMessageReceived(user.UserID, userID, message);
+                this.OnMessageReceived(new UserMessageEventArgs(user.UserID, userID, message));
             });
         }
 
@@ -161,6 +168,7 @@ namespace Ntreev.Crema.Services
                 var user = this.userByToken[token];
                 user.UserName = userName;
                 this.callback.OnRenamed(user.UserID, userName);
+                this.OnRenamed(new UserNameEventArgs(user.UserID, userName));
             });
         }
 
@@ -169,8 +177,11 @@ namespace Ntreev.Crema.Services
             return this.Dispatcher.InvokeAsync(() =>
             {
                 this.ValidateSetAuthority(token, userID, authority);
+
                 var user = this.userByID[userID];
                 user.Authority = authority;
+                this.callback.OnAuthorityChanged(userID, authority);
+                this.OnAuthorityChanged(new UserAuthorityEventArgs(userID, authority));
             });
         }
 
@@ -184,18 +195,34 @@ namespace Ntreev.Crema.Services
 
         public Dispatcher Dispatcher { get; private set; }
 
+        public event EventHandler<UserEventArgs> Created;
+
+        public event EventHandler<UserEventArgs> Deleted;
+
         public event EventHandler<UserEventArgs> LoggedIn;
 
         public event EventHandler<UserEventArgs> LoggedOut;
 
-        public event EventHandler<UserEventArgs> Created;
+        public event EventHandler<UserMessageEventArgs> MessageReceived;
 
-        public event EventHandler<UserEventArgs> Deleted;
+        public event EventHandler<UserNameEventArgs> Renamed;
+
+        public event EventHandler<UserAuthorityEventArgs> AuthorityChanged;
 
         internal void SetCallback(IUserServiceCallback callback)
         {
             this.callback = callback;
             this.Dispatcher = new Dispatcher(this);
+        }
+
+        protected virtual void OnCreated(UserEventArgs e)
+        {
+            this.Created?.Invoke(this, e);
+        }
+
+        protected virtual void OnDeleted(UserEventArgs e)
+        {
+            this.Deleted?.Invoke(this, e);
         }
         
         protected virtual void OnLoggedIn(UserEventArgs e)
@@ -208,14 +235,19 @@ namespace Ntreev.Crema.Services
             this.LoggedOut?.Invoke(this, e);
         }
 
-        protected virtual void OnCreated(UserEventArgs e)
+        protected virtual void OnMessageReceived(UserMessageEventArgs e)
         {
-            this.Created?.Invoke(this, e);
+            this.MessageReceived?.Invoke(this, e);
         }
 
-        protected virtual void OnDeleted(UserEventArgs e)
+        protected virtual void OnRenamed(UserNameEventArgs e)
         {
-            this.Deleted?.Invoke(this, e);
+            this.Renamed?.Invoke(this, e);
+        }
+
+        protected virtual void OnAuthorityChanged(UserAuthorityEventArgs e)
+        {
+            this.AuthorityChanged?.Invoke(this, e);
         }
 
         private void ValidateUser(string userID)

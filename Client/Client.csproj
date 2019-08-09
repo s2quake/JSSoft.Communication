@@ -10,6 +10,9 @@
     <Compile Include="..\Server\Container.cs" Link="Container.cs" />
     <Compile Include="..\Server\Services\Authority.cs" Link="Services\Authority.cs" />
     <Compile Include="..\Server\Services\UserEventArgs.cs" Link="Services\UserEventArgs.cs" />
+    <Compile Include="..\Server\Services\UserMessageEventArgs.cs" Link="Services\UserMessageEventArgs.cs" />
+    <Compile Include="..\Server\Services\UserNameEventArgs.cs" Link="Services\UserNameEventArgs.cs" />
+    <Compile Include="..\Server\Services\UserAuthorityEventArgs.cs" Link="Services\UserAuthorityEventArgs.cs" />
     <Compile Include="..\Server\Services\IUserService.cs" Link="Services\IUserService.cs" />
     <Compile Include="..\Server\Services\INotifyUserService.cs" Link="Services\INotifyUserService.cs" />
     <Compile Include="..\Server\Services\IUserServiceCallback.cs" Link="Services\IUserServiceCallback.cs" />

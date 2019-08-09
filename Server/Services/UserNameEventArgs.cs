@@ -24,20 +24,14 @@ using System;
 
 namespace Ntreev.Crema.Services
 {
-    public interface INotifyUserService
+    public class UserNameEventArgs : UserEventArgs
     {
-        event EventHandler<UserEventArgs> Created;
+        public UserNameEventArgs(string userID, string userName)
+            : base(userID)
+        {
+            this.UserName = userName;
+        }
 
-        event EventHandler<UserEventArgs> Deleted;
-
-        event EventHandler<UserEventArgs> LoggedIn;
-
-        event EventHandler<UserEventArgs> LoggedOut;
-
-        event EventHandler<UserMessageEventArgs> MessageReceived;
-
-        event EventHandler<UserNameEventArgs> Renamed;
-
-        event EventHandler<UserAuthorityEventArgs> AuthorityChanged;
+        public string UserName { get; }
     }
 }

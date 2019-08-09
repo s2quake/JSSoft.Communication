@@ -27,6 +27,12 @@ namespace Ntreev.Crema.Services
     public interface IUserServiceCallback
     {
         [OperationContract]
+        void OnCreated(string userID);
+
+        [OperationContract]
+        void OnDeleted(string userID);
+
+        [OperationContract]
         void OnLoggedIn(string userID);
 
         [OperationContract]
@@ -37,5 +43,8 @@ namespace Ntreev.Crema.Services
 
         [OperationContract]
         void OnRenamed(string userID, string userName);
+
+        [OperationContract]
+        void OnAuthorityChanged(string userID, Authority authority);
     }
 }

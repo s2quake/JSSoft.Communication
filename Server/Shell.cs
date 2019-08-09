@@ -39,6 +39,11 @@ namespace Ntreev.Crema.Services
         private readonly IServiceContext serviceHost;
         private readonly CommandContext commandContext;
         private bool isDisposed;
+#if SERVER
+        private bool isServer = true;
+#else
+        private bool isServer = false;
+#endif
 
         [Import]
         private INotifyUserService userServiceNotification = null;
@@ -145,12 +150,17 @@ namespace Ntreev.Crema.Services
         {
             this.IsOpened = true;
             this.UpdatePrompt();
-            this.Title = $"Server {this.serviceHost.Host}:{this.serviceHost.Port}";
-            #if SERVER
-            this.Out.WriteLine("서버가 시작되었습니다.");
-            #else
-            this.Out.WriteLine("서버에 연결되었습니다.");
-            #endif
+            
+            if (this.isServer)
+            {
+                this.Title = $"Server {this.serviceHost.Host}:{this.serviceHost.Port}";
+                this.Out.WriteLine("서버가 시작되었습니다.");
+            }
+            else
+            {
+                this.Title = $"Client {this.serviceHost.Host}:{this.serviceHost.Port}";
+                this.Out.WriteLine("서버에 연결되었습니다.");
+            }
             this.Out.WriteLine("사용 가능한 명령을 확인려면 'help' 을(를) 입력하세요.");
             this.Out.WriteLine();
             this.Out.WriteLine("로그인을 하려면 'login admin admin' 을(를) 입력하세요.");
@@ -161,9 +171,18 @@ namespace Ntreev.Crema.Services
         {
             this.IsOpened = false;
             this.UpdatePrompt();
-            this.Title = $"Server - Closed";
-            this.Out.WriteLine("서버가 중단되었습니다.");
-            this.Out.WriteLine("서버를 시작하려면 'open' 을(를) 입력하세요.");
+            if (this.isServer)
+            {
+                this.Title = $"Server - Closed";
+                this.Out.WriteLine("서버가 중단되었습니다.");
+                this.Out.WriteLine("서버를 시작하려면 'open' 을(를) 입력하세요.");
+            }
+            else
+            {
+                this.Title = $"Client - Disconnected";
+                this.Out.WriteLine("서버와 연결이 끊어졌습니다.");
+                this.Out.WriteLine("서버에 연결하려면 'open' 을(를) 입력하세요.");
+            }
             this.Out.WriteLine();
         }
 

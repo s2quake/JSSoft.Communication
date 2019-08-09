@@ -96,15 +96,11 @@ namespace Ntreev.Crema.Services.Services
 
         public event EventHandler<UserEventArgs> Deleted;
 
-        protected virtual void OnLoggedIn(UserEventArgs e)
-        {
-            this.LoggedIn?.Invoke(this, e);
-        }
+        public event EventHandler<UserMessageEventArgs> MessageReceived;
 
-        protected virtual void OnLoggedOut(UserEventArgs e)
-        {
-            this.LoggedOut?.Invoke(this, e);
-        }
+        public event EventHandler<UserNameEventArgs> Renamed;
+
+        public event EventHandler<UserAuthorityEventArgs> AuthorityChanged;
 
         protected virtual void OnCreated(UserEventArgs e)
         {
@@ -115,8 +111,43 @@ namespace Ntreev.Crema.Services.Services
         {
             this.Deleted?.Invoke(this, e);
         }
+        
+        protected virtual void OnLoggedIn(UserEventArgs e)
+        {
+            this.LoggedIn?.Invoke(this, e);
+        }
+
+        protected virtual void OnLoggedOut(UserEventArgs e)
+        {
+            this.LoggedOut?.Invoke(this, e);
+        }
+
+        protected virtual void OnMessageReceived(UserMessageEventArgs e)
+        {
+            this.MessageReceived?.Invoke(this, e);
+        }
+
+        protected virtual void OnRenamed(UserNameEventArgs e)
+        {
+            this.Renamed?.Invoke(this, e);
+        }
+
+        protected virtual void OnAuthorityChanged(UserAuthorityEventArgs e)
+        {
+            this.AuthorityChanged?.Invoke(this, e);
+        }
 
         #region IUserServiceCallback
+
+        void IUserServiceCallback.OnCreated(string userID)
+        {
+            this.OnCreated(new UserEventArgs(userID));
+        }
+
+        void IUserServiceCallback.OnDeleted(string userID)
+        {
+            this.OnDeleted(new UserEventArgs(userID));
+        }
 
         void IUserServiceCallback.OnLoggedIn(string userID)
         {
@@ -130,12 +161,17 @@ namespace Ntreev.Crema.Services.Services
 
         void IUserServiceCallback.OnMessageReceived(string sender, string receiver, string message)
         {
-            // Console.WriteLine($"[{userID}]");
+            this.OnMessageReceived(new UserMessageEventArgs(sender, receiver, message));
         }
 
         void IUserServiceCallback.OnRenamed(string userID, string userName)
         {
-            throw new NotImplementedException();
+            this.OnRenamed(new UserNameEventArgs(userID, userName));
+        }
+
+        void IUserServiceCallback.OnAuthorityChanged(string userID, Authority authority)
+        {
+            this.OnAuthorityChanged(new UserAuthorityEventArgs(userID, authority));
         }
 
         #endregion
