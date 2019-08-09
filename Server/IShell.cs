@@ -27,8 +27,10 @@ namespace Ntreev.Crema.Services
 {
     public interface IShell : IDisposable
     {
-        Task StartAsync(Settings settings);
+        Task StartAsync();
 
         Task StopAsync();
+
+        string Title { get; set; }
     }
 }

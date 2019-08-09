@@ -74,13 +74,13 @@ namespace Ntreev.Crema.Communication.Grpc
 
         public async Task CloseAsync()
         {
-            this.Peers.Remove(this.serviceContext.Host);
+            if (this.adaptorImpl != null)
+                await this.adaptorImpl.CloseAsync(new CloseRequest() { Token = this.token });
+                this.Peers.Remove(this.serviceContext.Host);
             this.cancellation.Cancel();
             this.cancellation = null;
             this.task?.Wait();
             this.task = null;
-            if (this.adaptorImpl != null)
-                await this.adaptorImpl.CloseAsync(new CloseRequest() { Token = this.token });
             this.token = null;
             this.adaptorImpl = null;
             await this.channel.ShutdownAsync();

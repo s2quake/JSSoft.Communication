@@ -36,9 +36,24 @@ namespace Ntreev.Crema.Services
         }
 
         [CommandProperty]
+        [DefaultValue("localhost")]
+        public string Host
+        {
+            get; set;
+        }
+
+        [CommandProperty]
         public bool Verbose
         {
             get; set;
+        }
+
+        public static Settings CreateFromCommandLine()
+        {
+            var settings = new Settings();
+            var parser = new CommandLineParser(settings);
+            parser.Parse(Environment.CommandLine);
+            return settings;
         }
     }
 }

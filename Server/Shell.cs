@@ -23,9 +23,9 @@
 using System;
 using System.ComponentModel.Composition;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Ntreev.Crema.Communication;
-using Ntreev.Crema.Services;
 using Ntreev.Library.Commands;
 
 namespace Ntreev.Crema.Services
@@ -35,22 +35,26 @@ namespace Ntreev.Crema.Services
     [Export(typeof(Shell))]
     class Shell : CommandContextTerminal, IShell, IServiceProvider, IPartImportsSatisfiedNotification
     {
+        private readonly Settings settings;
         private readonly IServiceContext serviceHost;
         private readonly CommandContext commandContext;
         private bool isDisposed;
+
         [Import]
-        private INotifyUserService userServiceNotification;
+        private INotifyUserService userServiceNotification = null;
 
         [ImportingConstructor]
         public Shell(CommandContext commandContext, IServiceContext serviceHost)
            : base(commandContext)
         {
+            this.settings = Settings.CreateFromCommandLine();
             this.Prompt = "";
             this.Postfix = ">";
             this.serviceHost = serviceHost;
             this.serviceHost.Opened += ServiceHost_Opened;
             this.serviceHost.Closed += ServiceHost_Closed;
             this.commandContext = commandContext;
+            this.Title = "Server";
         }
 
         public static IShell Create()
@@ -68,6 +72,36 @@ namespace Ntreev.Crema.Services
         }
 
         public bool IsOpened { get; private set; }
+
+        public string Title
+        {
+            get => Console.Title;
+            set => Console.Title = value;
+        }
+
+        protected override void OnDrawPrompt(TextWriter writer, string prompt)
+        {
+            if (this.UserID == string.Empty)
+            {
+                base.OnDrawPrompt(writer, prompt);
+            }
+            else
+            {
+                var pattern = $"(.+@)(.+){this.Postfix}";
+                var match = Regex.Match(prompt, pattern);
+                var p1 = prompt.TrimStart();
+                var p2 = prompt.TrimEnd();
+                var prefix = prompt.Substring(p1.Length);
+                var postfix = prompt.Substring(p2.Length);
+                writer.Write(match.Groups[1].Value);
+                using (TerminalColor.SetForeground(ConsoleColor.Green))
+                {
+                    writer.Write(match.Groups[2].Value);
+                }
+                Console.ResetColor();
+                writer.Write(this.Postfix);
+            }
+        }
 
         internal void Login(string userID, Guid token)
         {
@@ -89,7 +123,7 @@ namespace Ntreev.Crema.Services
 
         internal Guid UserToken { get; private set; }
 
-        internal string UserID { get; set; } = string.Empty;
+        internal string UserID { get; private set; } = string.Empty;
 
         private TextWriter Out => this.commandContext.Out;
 
@@ -97,7 +131,7 @@ namespace Ntreev.Crema.Services
         {
             if (this.IsOpened == true)
             {
-                this.Prompt = $"Server:{this.serviceHost.Port}";
+                this.Prompt = $"{this.serviceHost.Host}:{this.serviceHost.Port}";
                 if (this.UserID != string.Empty)
                     this.Prompt += $"@{this.UserID}";
             }
@@ -111,10 +145,15 @@ namespace Ntreev.Crema.Services
         {
             this.IsOpened = true;
             this.UpdatePrompt();
+            this.Title = $"Server {this.serviceHost.Host}:{this.serviceHost.Port}";
+            #if SERVER
             this.Out.WriteLine("서버가 시작되었습니다.");
+            #else
+            this.Out.WriteLine("서버에 연결되었습니다.");
+            #endif
             this.Out.WriteLine("사용 가능한 명령을 확인려면 'help' 을(를) 입력하세요.");
             this.Out.WriteLine();
-            this.Out.WriteLine("로그인을 하려면 login admin admin 을(를) 입력하세요.");
+            this.Out.WriteLine("로그인을 하려면 'login admin admin' 을(를) 입력하세요.");
             this.Out.WriteLine();
         }
 
@@ -122,6 +161,10 @@ namespace Ntreev.Crema.Services
         {
             this.IsOpened = false;
             this.UpdatePrompt();
+            this.Title = $"Server - Closed";
+            this.Out.WriteLine("서버가 중단되었습니다.");
+            this.Out.WriteLine("서버를 시작하려면 'open' 을(를) 입력하세요.");
+            this.Out.WriteLine();
         }
 
         private void UserServiceNotification_LoggedIn(object sender, UserEventArgs e)
@@ -150,10 +193,10 @@ namespace Ntreev.Crema.Services
 
         #region IShell
 
-        async Task IShell.StartAsync(Settings settings)
+        async Task IShell.StartAsync()
         {
-            Console.Title = $"Server localhost:{settings.Port}";
-            this.serviceHost.Port = settings.Port;
+            this.serviceHost.Host = this.settings.Host;
+            this.serviceHost.Port = this.settings.Port;
             this.Token = await this.serviceHost.OpenAsync();
             base.Start();
         }
@@ -162,7 +205,10 @@ namespace Ntreev.Crema.Services
         {
             base.Cancel();
             if (this.serviceHost.IsOpened == true)
+            {
+                this.serviceHost.Closed -= ServiceHost_Closed;
                 await this.serviceHost.CloseAsync(this.Token);
+            }
         }
 
         #endregion
@@ -174,7 +220,7 @@ namespace Ntreev.Crema.Services
             this.userServiceNotification.LoggedIn += UserServiceNotification_LoggedIn;
             this.userServiceNotification.LoggedOut += UserServiceNotification_LoggedOut;
         }
-        
+
         #endregion
     }
 }

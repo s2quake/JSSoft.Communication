@@ -144,7 +144,13 @@ namespace Ntreev.Crema.Communication.Grpc
                 });
                 await responseStream.WriteAsync(reply);
             }
-            await this.Dispatcher.InvokeAsync(()=> peerDescriptor.Dispose());
+            await this.Dispatcher.InvokeAsync(()=> 
+            {
+                if (this.Peers.ContainsKey(peerDescriptor.ID) == true)
+                {
+                    peerDescriptor.Dispose();
+                }
+            });
         }
 
         public void Dispose()

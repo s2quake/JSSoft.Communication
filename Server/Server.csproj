@@ -14,7 +14,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <DefineConstants>Server</DefineConstants>
+    <DefineConstants>SERVER</DefineConstants>
   </PropertyGroup>
 
 </Project>

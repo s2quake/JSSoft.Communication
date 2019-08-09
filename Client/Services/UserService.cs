@@ -21,11 +21,8 @@
 // SOFTWARE.
 
 using System;
-using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
-using Ntreev.Crema.Communication;
-using Ntreev.Crema.Services;
 
 namespace Ntreev.Crema.Services.Services
 {
@@ -34,36 +31,31 @@ namespace Ntreev.Crema.Services.Services
     [Export(typeof(UserService))]
     class UserService : IUserService, IUserServiceCallback, INotifyUserService
     {
-        public event EventHandler<UserEventArgs> LoggedIn;
-        public event EventHandler<UserEventArgs> LoggedOut;
-        public event EventHandler<UserEventArgs> Created;
-        public event EventHandler<UserEventArgs> Deleted;
-
         private IUserService userService;
 
         public Task CreateAsync(Guid token, string userID, string password, Authority authority)
         {
-            throw new NotImplementedException();
+            return this.userService.CreateAsync(token, userID, password, authority);
         }
 
         public Task DeleteAsync(Guid token, string userID)
         {
-            throw new NotImplementedException();
+            return this.userService.DeleteAsync(token, userID);
         }
 
         public Task<(string userName, Authority authority)> GetInfoAsync(Guid token, string userID)
         {
-            throw new NotImplementedException();
+            return this.userService.GetInfoAsync(token, userID);
         }
 
         public Task<string[]> GetUsersAsync(Guid token)
         {
-            throw new NotImplementedException();
+            return this.userService.GetUsersAsync(token);
         }
 
         public Task<bool> IsOnlineAsync(Guid token, string userID)
         {
-            throw new NotImplementedException();
+            return this.userService.IsOnlineAsync(token, userID);
         }
 
         public Task<Guid> LoginAsync(string userID, string password)
@@ -78,23 +70,31 @@ namespace Ntreev.Crema.Services.Services
 
         public Task RenameAsync(Guid token, string userName)
         {
-            throw new NotImplementedException();
+            return this.userService.RenameAsync(token, userName);
         }
 
         public Task SendMessageAsync(Guid token, string userID, string message)
         {
-            throw new NotImplementedException();
+            return this.userService.SendMessageAsync(token, userID, message);
         }
 
         public Task SetAuthorityAsync(Guid token, string userID, Authority authority)
         {
-            throw new NotImplementedException();
+            return this.userService.SetAuthorityAsync(token, userID, authority);
         }
 
         public void SetUserService(IUserService userService)
         {
             this.userService = userService;
         }
+
+        public event EventHandler<UserEventArgs> LoggedIn;
+
+        public event EventHandler<UserEventArgs> LoggedOut;
+
+        public event EventHandler<UserEventArgs> Created;
+
+        public event EventHandler<UserEventArgs> Deleted;
 
         protected virtual void OnLoggedIn(UserEventArgs e)
         {
@@ -130,7 +130,6 @@ namespace Ntreev.Crema.Services.Services
 
         void IUserServiceCallback.OnMessageReceived(string sender, string receiver, string message)
         {
-            // if (receiver)
             // Console.WriteLine($"[{userID}]");
         }
 

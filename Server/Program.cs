@@ -22,7 +22,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Ntreev.Library.Commands;
 
 namespace Ntreev.Crema.Services
 {
@@ -32,12 +31,9 @@ namespace Ntreev.Crema.Services
         {
             try
             {
-                var settings = new Settings();
-                var parser = new CommandLineParser(settings);
-                parser.Parse(Environment.CommandLine);
                 using (var shell = Shell.Create())
                 {
-                    await shell.StartAsync(settings);
+                    await shell.StartAsync();
                 }
             }
             catch (Exception e)
