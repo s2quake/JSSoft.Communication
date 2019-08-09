@@ -39,7 +39,7 @@ namespace Ntreev.Crema.Communication
             this.ServiceType = serviceType;
             this.CallbackType = callbackType;
             this.Dispatcher = new Dispatcher(this);
-            this.Methods = new MethodDescriptorCollection(this);
+            this.MethodDescriptors = new MethodDescriptorCollection(this);
         }
 
         public Type ServiceType { get; }
@@ -48,7 +48,7 @@ namespace Ntreev.Crema.Communication
 
         public Dispatcher Dispatcher { get; private set; }
 
-        public MethodDescriptorCollection Methods { get; }
+        public MethodDescriptorCollection MethodDescriptors { get; }
 
         public async Task OpenAsync(ServiceToken token)
         {
@@ -106,7 +106,7 @@ namespace Ntreev.Crema.Communication
 
         #region IServiceHost
 
-        IContainer<MethodDescriptor> IServiceHost.Methods => this.Methods;
+        IContainer<MethodDescriptor> IServiceHost.MethodDescriptors => this.MethodDescriptors;
 
         #endregion
 

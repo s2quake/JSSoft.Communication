@@ -22,6 +22,7 @@
 
 using System;
 using System.ComponentModel;
+using Ntreev.Crema.Communication;
 using Ntreev.Library.Commands;
 
 namespace Ntreev.Crema.Services
@@ -29,14 +30,14 @@ namespace Ntreev.Crema.Services
     public class Settings
     {
         [CommandProperty]
-        [DefaultValue(4004)]
+        [DefaultValue(ServiceContextBase.DefaultPort)]
         public int Port
         {
             get; set;
         }
 
         [CommandProperty]
-        [DefaultValue("localhost")]
+        [DefaultValue(ServiceContextBase.DefaultHost)]
         public string Host
         {
             get; set;

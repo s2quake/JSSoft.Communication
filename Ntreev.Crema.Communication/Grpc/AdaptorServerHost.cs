@@ -103,10 +103,10 @@ namespace Ntreev.Crema.Communication.Grpc
             if (this.serviceHosts.ContainsKey(request.ServiceName) == false)
                 throw new InvalidOperationException();
             var service = this.serviceHosts[request.ServiceName];
-            if (service.Methods.ContainsKey(request.Name) == false)
+            if (service.MethodDescriptors.ContainsKey(request.Name) == false)
                 throw new InvalidOperationException();
 
-            var methodDescriptor = service.Methods[request.Name];
+            var methodDescriptor = service.MethodDescriptors[request.Name];
             var peerDescriptor = this.Peers[context.Peer];
             var instance = peerDescriptor.Services[service];
             var args = this.serializer.DeserializeMany(methodDescriptor.ParameterTypes, request.Datas.ToArray());
@@ -202,10 +202,6 @@ namespace Ntreev.Crema.Communication.Grpc
         {
             this.Dispatcher.VerifyAccess();
             var callbacks = peerDescriptor.PollReplyItems[service];
-            if (callbacks.Any() == true)
-            {
-                int qwer=0;
-            }
             return callbacks.Flush();
         }
 
@@ -219,11 +215,10 @@ namespace Ntreev.Crema.Communication.Grpc
                 Services = { Adaptor.BindService(this.adaptor) },
                 Ports = { new ServerPort(host, port, ServerCredentials.Insecure) },
             };
-            if (host == "localhost")
+            if (host == ServiceContextBase.DefaultHost)
             {
                 this.server.Ports.Add(new ServerPort(localAddress, port, ServerCredentials.Insecure));
             }
-
             this.cancellation = new CancellationTokenSource();
             this.serializer = this.serviceContext.GetService(typeof(ISerializer)) as ISerializer;
             return Task.Run(this.server.Start);

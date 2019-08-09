@@ -142,9 +142,9 @@ namespace Ntreev.Crema.Communication.Grpc
 
         private async void InvokeCallback(IServiceHost serviceHost, string name, string[] datas)
         {
-            if (serviceHost.Methods.ContainsKey(name) == false)
+            if (serviceHost.MethodDescriptors.ContainsKey(name) == false)
                 throw new InvalidOperationException();
-            var methodDescriptor = serviceHost.Methods[name];
+            var methodDescriptor = serviceHost.MethodDescriptors[name];
             var args = this.serializer.DeserializeMany(methodDescriptor.ParameterTypes, datas);
             var peer = this.Peers.First();
             var instance = peer.Callbacks[serviceHost];

@@ -33,7 +33,7 @@ namespace Ntreev.Crema.Communication
 
         Task CloseAsync(ServiceToken token);
 
-        IContainer<MethodDescriptor> Methods { get; }
+        IContainer<MethodDescriptor> MethodDescriptors { get; }
 
         object CreateInstance(object obj);
 

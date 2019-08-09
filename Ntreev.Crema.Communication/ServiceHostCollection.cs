@@ -30,9 +30,9 @@ namespace Ntreev.Crema.Communication
 {
     public class ServiceHostCollection : ContainerBase<IServiceHost>
     {
-        public ServiceHostCollection(IEnumerable<IServiceHost> services)
+        public ServiceHostCollection(IEnumerable<IServiceHost> serviceHosts)
         {
-            foreach (var item in services)
+            foreach (var item in serviceHosts)
             {
                 this.AddBase(item.Name, item);
             }

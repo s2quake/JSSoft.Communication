@@ -33,8 +33,8 @@ namespace Ntreev.Crema.Communication
 {
     public abstract class ServiceContextBase : IServiceContext, IDisposable
     {
-        private const string defaultHost = "localhost";
-        private static readonly int defaultPort = 4004;
+        public const string DefaultHost = "localhost";
+        public const int DefaultPort = 4004;
         private readonly IComponentProvider componentProvider;
         private readonly InstanceCollection serviceByServiceHost = new InstanceCollection();
         private readonly InstanceCollection callbackByServiceHost = new InstanceCollection();
@@ -43,7 +43,7 @@ namespace Ntreev.Crema.Communication
         private ISerializer serializer;
         private IAdaptorHost adaptorHost;
         private string host;
-        private int port = defaultPort;
+        private int port = DefaultPort;
         private bool isServer;
         private ServiceToken token;
 
@@ -121,7 +121,7 @@ namespace Ntreev.Crema.Communication
 
         public string Host
         {
-            get => this.host ?? defaultHost;
+            get => this.host ?? DefaultHost;
             set
             {
                 if (this.IsOpened == true)
