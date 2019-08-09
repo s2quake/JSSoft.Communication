@@ -17,6 +17,7 @@
     <Compile Include="..\Server\Services\IDataServiceCallback.cs" Link="Services\IDataServiceCallback.cs" />
 
     <Compile Include="..\Server\Commands\LoginCommand.cs" Link="Commands\LoginCommand.cs" />
+    <Compile Include="..\Server\Commands\LogoutCommand.cs" Link="Commands\LogoutCommand.cs" />
     <Compile Include="..\Server\Commands\CloseCommand.cs" Link="Commands\CloseCommand.cs" />
     <Compile Include="..\Server\Commands\ExitCommand.cs" Link="Commands\ExitCommand.cs" />
     <Compile Include="..\Server\Commands\OpenCommand.cs" Link="Commands\OpenCommand.cs" />
