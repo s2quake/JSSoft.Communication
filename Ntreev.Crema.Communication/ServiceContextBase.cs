@@ -51,7 +51,7 @@ namespace Ntreev.Crema.Communication
         {
             this.componentProvider = componentProvider;
             this.instanceBuilder = new ServiceInstanceBuilder();
-            this.ServiceHosts = new ServiceHostCollection(componentProvider.Services);
+            this.ServiceHosts = new ServiceHostCollection(this.componentProvider.Services);
             this.Dispatcher = new Dispatcher(this);
             this.isServer = IsServer(this);
         }

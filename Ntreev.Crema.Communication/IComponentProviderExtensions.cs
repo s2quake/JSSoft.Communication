@@ -43,7 +43,7 @@ namespace Ntreev.Crema.Communication
 
         public static ISerializer Getserializer(this IComponentProvider componentProvider, string serializerType)
         {
-            var type = serializerType ?? serializer.DefaultName;
+            var type = serializerType ?? JsonSerializer.DefaultName;
             return componentProvider.Serializers.First(item => item.Name == type);
         }
 

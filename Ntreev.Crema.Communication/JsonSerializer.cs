@@ -29,14 +29,14 @@ using Newtonsoft.Json;
 namespace Ntreev.Crema.Communication
 {
     [Export(typeof(ISerializer))]
-    public class serializer : ISerializer
+    public class JsonSerializer : ISerializer
     {
         public const string DefaultName = "json";
         private static readonly JsonSerializerSettings settings = new JsonSerializerSettings();
         private readonly Dictionary<Type, IDataSerializer> dataSerializerByType;
 
         [ImportingConstructor]
-        public serializer([ImportMany]IDataSerializer[] dataSerializers)
+        public JsonSerializer([ImportMany]IDataSerializer[] dataSerializers)
         {
             this.dataSerializerByType = dataSerializers.ToDictionary(item => item.Type);
         }
