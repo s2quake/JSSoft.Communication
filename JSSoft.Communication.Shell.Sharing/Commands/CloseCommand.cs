@@ -24,17 +24,23 @@ using System;
 using System.Threading.Tasks;
 using JSSoft.Communication;
 using Ntreev.Library.Commands;
+#if MEF
 using System.ComponentModel.Composition;
+#endif
 
 namespace JSSoft.Communication.Shell.Commands
 {
+#if MEF
     [Export(typeof(ICommand))]
+#endif
     class CloseCommand : CommandAsyncBase
     {
         private readonly IServiceContext serviceHost;
         private readonly Lazy<Shell> shell;
 
+#if MEF
         [ImportingConstructor]
+#endif
         public CloseCommand(IServiceContext serviceHost, Lazy<Shell> shell)
         {
             this.serviceHost = serviceHost;

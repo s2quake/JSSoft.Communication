@@ -25,17 +25,23 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using JSSoft.Communication.Shell.Services;
 using Ntreev.Library.Commands;
+#if MEF
 using System.ComponentModel.Composition;
+#endif
 
 namespace JSSoft.Communication.Shell.Commands
 {
+#if MEF
     [Export(typeof(ICommand))]
+#endif
     class LoginCommand : CommandAsyncBase
     {
         private readonly Lazy<Shell> shell = null;
         private readonly Lazy<IUserService> userService = null;
 
+#if MEF
         [ImportingConstructor]
+#endif
         public LoginCommand(Lazy<Shell> shell, Lazy<IUserService> userService)
         {
             this.shell = shell;

@@ -5,7 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)CommandContext.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Container.cs" Condition="$(DefineConstants.Contains('MEF'))" />
+    <Compile Include="$(MSBuildThisFileDirectory)Container.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IShell.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Shell.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Settings.cs" />
@@ -28,11 +28,5 @@
     <Compile Include="$(MSBuildThisFileDirectory)Commands\LogoutCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\OpenCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\UserCommand.cs" />
-
-    <Compile Include="$(MSBuildThisFileDirectory)WithoutMEF\Container.cs" Condition="!$(DefineConstants.Contains('MEF'))" />
-    <Compile Include="$(MSBuildThisFileDirectory)WithoutMEF\ExportAttribute.cs" Condition="!$(DefineConstants.Contains('MEF'))" />
-    <Compile Include="$(MSBuildThisFileDirectory)WithoutMEF\ImportManyAttribute.cs" Condition="!$(DefineConstants.Contains('MEF'))" />
-    <Compile Include="$(MSBuildThisFileDirectory)WithoutMEF\ImportingConstructorAttribute.cs" Condition="!$(DefineConstants.Contains('MEF'))" />
-    <Compile Include="$(MSBuildThisFileDirectory)WithoutMEF\IPartImportsSatisfiedNotification.cs" Condition="!$(DefineConstants.Contains('MEF'))" />
   </ItemGroup>
 </Project>

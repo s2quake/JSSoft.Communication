@@ -24,17 +24,23 @@ using System;
 using Ntreev.Library.Commands;
 using System.Threading.Tasks;
 using JSSoft.Communication.Shell.Services;
+#if MEF
 using System.ComponentModel.Composition;
+#endif
 
 namespace JSSoft.Communication.Shell.Commands
 {
+#if MEF
     [Export(typeof(ICommand))]
+#endif
     class UserCommand : CommandMethodBase
     {
         private readonly Lazy<Shell> shell = null;
         private readonly Lazy<IUserService> userService = null;
 
+#if MEF
         [ImportingConstructor]
+#endif
         public UserCommand(Lazy<Shell> shell, Lazy<IUserService> userService)
         {
             this.shell = shell;

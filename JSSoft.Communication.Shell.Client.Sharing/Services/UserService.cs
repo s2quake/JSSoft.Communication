@@ -21,14 +21,18 @@
 // SOFTWARE.
 
 using System;
-using System.ComponentModel.Composition;
 using System.Threading.Tasks;
+#if MEF
+using System.ComponentModel.Composition;
+#endif
 
 namespace JSSoft.Communication.Shell.Services
 {
+#if MEF
     [Export(typeof(IUserService))]
     [Export(typeof(INotifyUserService))]
     [Export(typeof(UserService))]
+#endif
     class UserService : IUserService, IUserServiceCallback, INotifyUserService
     {
         private IUserService userService;

@@ -23,16 +23,23 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.ComponentModel.Composition.Hosting;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+#if MEF
+using System.ComponentModel.Composition;
+using System.ComponentModel.Composition.Hosting;
+#else // MEF
+using Ntreev.Library.Commands;
+using JSSoft.Communication.Shell.Commands;
+using JSSoft.Communication.Shell.Services;
+#endif // MEF
 
 namespace JSSoft.Communication.Shell
 {
     static class Container
     {
+#if MEF
         private static CompositionContainer container;
 
         static Container()
@@ -81,5 +88,70 @@ namespace JSSoft.Communication.Shell
         {
             container.Dispose();
         }
+#else // MEF
+        private static readonly List<ICommand> commandList = new List<ICommand>();
+        private static Shell shell;
+        private static CommandContext commandContext;
+#if SERVER
+        private static ServerContext serviceContext;
+#else
+        private static ClientContext serviceContext;
+#endif
+        private static IServiceHost[] serviceHosts;
+
+        static Container()
+        {
+            var lazyIShell = new Lazy<IShell>(GetShell);
+            var lazyShell = new Lazy<Shell>(GetShell);
+            var userService = new UserService();
+            var userServiceHost = new UserServiceHost(userService);
+            var lazyUserService = new Lazy<IUserService>(() => userService);
+#if SERVER
+            var dataServiceHost = new DataServiceHost();
+            serviceHosts = new IServiceHost[] { userServiceHost, dataServiceHost };
+            serviceContext = new ServerContext(serviceHosts);
+#else
+            serviceHosts = new IServiceHost[] { userServiceHost };
+            serviceContext = new ClientContext(serviceHosts);
+#endif
+
+            commandList.Add(new CloseCommand(serviceContext, lazyShell));
+            commandList.Add(new ExitCommand(lazyIShell));
+            commandList.Add(new LoginCommand(lazyShell, lazyUserService));
+            commandList.Add(new OpenCommand(serviceContext, lazyShell));
+            commandList.Add(new UserCommand(lazyShell, lazyUserService));
+            commandContext = new CommandContext(commandList, Enumerable.Empty<ICommandProvider>());
+            shell = new Shell(commandContext, serviceContext, userService);
+        }
+
+        public static T GetService<T>() where T : class
+        {
+            if (typeof(T) == typeof(IShell))
+            {
+                return shell as T;
+            }
+            throw new NotImplementedException();
+        }
+
+        public static object GetService(Type serviceType)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void Release()
+        {
+            if (serviceContext is IDisposable s)
+            {
+                s.Dispose();
+            }
+
+            foreach (var item in serviceHosts.Reverse())
+            {
+                item.Dispose();
+            }
+        }
+
+        private static Shell GetShell() => shell;
+#endif // MEF
     }
 }

@@ -20,12 +20,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System.ComponentModel.Composition;
 using JSSoft.Communication;
+#if MEF
+using System.ComponentModel.Composition;
+#endif
 
 namespace JSSoft.Communication.Shell.Services
 {
+#if MEF
     [Export(typeof(IServiceHost))]
+#endif
     class DataServiceHost : ServerServiceHostBase<IDataService, IDataServiceCallback>
     {
         public override object CreateInstance(object obj)

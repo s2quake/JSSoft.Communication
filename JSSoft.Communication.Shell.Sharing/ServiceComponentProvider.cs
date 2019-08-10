@@ -20,9 +20,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if MEF
 using System;
-using System.ComponentModel.Composition;
 using JSSoft.Communication;
+using System.ComponentModel.Composition;
 
 namespace JSSoft.Communication.Shell
 {
@@ -40,3 +41,4 @@ namespace JSSoft.Communication.Shell
         }
     }
 }
+#endif

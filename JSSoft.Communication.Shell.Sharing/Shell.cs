@@ -21,19 +21,23 @@
 // SOFTWARE.
 
 using System;
-using System.ComponentModel.Composition;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using JSSoft.Communication.Shell.Services;
 using Ntreev.Library.Commands;
+#if MEF
+using System.ComponentModel.Composition;
+#endif
 
 namespace JSSoft.Communication.Shell
 {
+#if MEF
     [Export(typeof(IShell))]
     [Export(typeof(IServiceProvider))]
     [Export(typeof(Shell))]
-    class Shell : CommandContextTerminal, IShell, IServiceProvider, IPartImportsSatisfiedNotification
+#endif
+    class Shell : CommandContextTerminal, IShell, IServiceProvider
     {
         private readonly Settings settings;
         private readonly CommandContext commandContext;
@@ -46,7 +50,9 @@ namespace JSSoft.Communication.Shell
         private bool isServer = false;
 #endif
 
+#if MEF
         [ImportingConstructor]
+#endif
         public Shell(CommandContext commandContext, IServiceContext serviceHost, INotifyUserService userServiceNotification)
            : base(commandContext)
         {
@@ -57,6 +63,8 @@ namespace JSSoft.Communication.Shell
             this.serviceHost.Opened += ServiceHost_Opened;
             this.serviceHost.Closed += ServiceHost_Closed;
             this.userServiceNotification = userServiceNotification;
+            this.userServiceNotification.LoggedIn += UserServiceNotification_LoggedIn;
+            this.userServiceNotification.LoggedOut += UserServiceNotification_LoggedOut;
             this.commandContext = commandContext;
             this.Title = "Server";
         }
@@ -227,16 +235,6 @@ namespace JSSoft.Communication.Shell
                 this.serviceHost.Closed -= ServiceHost_Closed;
                 await this.serviceHost.CloseAsync(this.Token);
             }
-        }
-
-        #endregion
-
-        #region IPartImportsSatisfiedNotification
-
-        void IPartImportsSatisfiedNotification.OnImportsSatisfied()
-        {
-            this.userServiceNotification.LoggedIn += UserServiceNotification_LoggedIn;
-            this.userServiceNotification.LoggedOut += UserServiceNotification_LoggedOut;
         }
 
         #endregion

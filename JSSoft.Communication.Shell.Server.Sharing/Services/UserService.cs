@@ -22,16 +22,20 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading.Tasks;
 using Ntreev.Library.Threading;
+#if MEF
+using System.ComponentModel.Composition;
+#endif
 
 namespace JSSoft.Communication.Shell.Services
 {
+#if MEF
     [Export(typeof(IUserService))]
     [Export(typeof(INotifyUserService))]
     [Export(typeof(UserService))]
+#endif
     class UserService : IUserService, INotifyUserService
     {
         private readonly Dictionary<string, UserInfo> userByID = new Dictionary<string, UserInfo>();

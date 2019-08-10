@@ -22,17 +22,23 @@
 
 using System;
 using System.ComponentModel;
-using System.ComponentModel.Composition;
 using JSSoft.Communication;
+#if MEF
+using System.ComponentModel.Composition;
+#endif
 
 namespace JSSoft.Communication.Shell.Services
 {
+#if MEF
     [Export(typeof(IServiceHost))]
+#endif
     class UserServiceHost : ClientServiceHostBase<IUserService, IUserServiceCallback>
     {
         private readonly UserService userService;
 
+#if MEF
         [ImportingConstructor]
+#endif
         public UserServiceHost(UserService userService)
             : base()
         {

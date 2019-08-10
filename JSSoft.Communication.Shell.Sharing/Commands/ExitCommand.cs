@@ -24,16 +24,22 @@ using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using Ntreev.Library.Commands;
+#if MEF
 using System.ComponentModel.Composition;
+#endif
 
 namespace JSSoft.Communication.Shell.Commands
 {
+#if MEF
     [Export(typeof(ICommand))]
+#endif
     class ExitCommand : CommandAsyncBase
     {
         private readonly Lazy<IShell> shell = null;
 
+#if MEF
         [ImportingConstructor]
+#endif
         public ExitCommand(Lazy<IShell> shell)
         {
             this.shell = shell;
