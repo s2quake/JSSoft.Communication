@@ -17,6 +17,6 @@
   </PropertyGroup>
 
   <Import Project="..\JSSoft.Communication.Shell.Sharing\JSSoft.Communication.Shell.Sharing.projitems" Label="Shared" />
-  <Import Project="..\JSSoft.Communication.Shell.Services.Sharing\JSSoft.Communication.Shell.Services.Sharing.projitems" Label="Shared" />
+  <Import Project="..\JSSoft.Communication.Shell.Server.Sharing\JSSoft.Communication.Shell.Server.Sharing.projitems" Label="Shared" />
 
 </Project>

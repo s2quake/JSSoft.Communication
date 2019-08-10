@@ -23,6 +23,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NoMEF", "NoMEF", "{8B3DE4D2
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{49BBC2E5-4CE6-47EA-A427-0C3E88F22E19}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{CD2B8A1E-F105-4847-B820-8637C50670AD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -105,6 +107,18 @@ Global
 		{49BBC2E5-4CE6-47EA-A427-0C3E88F22E19}.Release|x64.Build.0 = Release|Any CPU
 		{49BBC2E5-4CE6-47EA-A427-0C3E88F22E19}.Release|x86.ActiveCfg = Release|Any CPU
 		{49BBC2E5-4CE6-47EA-A427-0C3E88F22E19}.Release|x86.Build.0 = Release|Any CPU
+		{CD2B8A1E-F105-4847-B820-8637C50670AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD2B8A1E-F105-4847-B820-8637C50670AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD2B8A1E-F105-4847-B820-8637C50670AD}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CD2B8A1E-F105-4847-B820-8637C50670AD}.Debug|x64.Build.0 = Debug|Any CPU
+		{CD2B8A1E-F105-4847-B820-8637C50670AD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CD2B8A1E-F105-4847-B820-8637C50670AD}.Debug|x86.Build.0 = Debug|Any CPU
+		{CD2B8A1E-F105-4847-B820-8637C50670AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD2B8A1E-F105-4847-B820-8637C50670AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD2B8A1E-F105-4847-B820-8637C50670AD}.Release|x64.ActiveCfg = Release|Any CPU
+		{CD2B8A1E-F105-4847-B820-8637C50670AD}.Release|x64.Build.0 = Release|Any CPU
+		{CD2B8A1E-F105-4847-B820-8637C50670AD}.Release|x86.ActiveCfg = Release|Any CPU
+		{CD2B8A1E-F105-4847-B820-8637C50670AD}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

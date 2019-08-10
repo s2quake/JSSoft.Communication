@@ -37,7 +37,11 @@ namespace JSSoft.Communication.Shell
         private static readonly List<ICommand> commandList = new List<ICommand>();
         private static Shell shell;
         private static CommandContext commandContext;
-        private static ServerContext serverContext;
+#if SERVER
+        private static ServerContext serviceContext;
+#else
+        private static ClientContext serviceContext;
+#endif
         private static IServiceHost[] serviceHosts;
 
         static Container()
@@ -47,18 +51,22 @@ namespace JSSoft.Communication.Shell
             var userService = new UserService();
             var userServiceHost = new UserServiceHost(userService);
             var lazyUserService = new Lazy<IUserService>(() => userService);
+#if SERVER
             var dataServiceHost = new DataServiceHost();
-
             serviceHosts = new IServiceHost[] { userServiceHost, dataServiceHost };
-            serverContext = new ServerContext(serviceHosts);
+            serviceContext = new ServerContext(serviceHosts);
+#else
+            serviceHosts = new IServiceHost[] { userServiceHost };
+            serviceContext = new ClientContext(serviceHosts);
+#endif
 
-            commandList.Add(new CloseCommand(serverContext, lazyShell));
+            commandList.Add(new CloseCommand(serviceContext, lazyShell));
             commandList.Add(new ExitCommand(lazyIShell));
             commandList.Add(new LoginCommand(lazyShell, lazyUserService));
-            commandList.Add(new OpenCommand(serverContext, lazyShell));
+            commandList.Add(new OpenCommand(serviceContext, lazyShell));
             commandList.Add(new UserCommand(lazyShell, lazyUserService));
             commandContext = new CommandContext(commandList, Enumerable.Empty<ICommandProvider>());
-            shell = new Shell(commandContext, serverContext, userService);
+            shell = new Shell(commandContext, serviceContext, userService);
         }
 
         public static T GetService<T>() where T : class
@@ -77,7 +85,7 @@ namespace JSSoft.Communication.Shell
 
         public static void Release()
         {
-            if (serverContext is IDisposable s)
+            if (serviceContext is IDisposable s)
             {
                 s.Dispose();
             }
