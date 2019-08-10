@@ -21,24 +21,24 @@
 // SOFTWARE.
 
 using System;
-using System.ComponentModel.Composition;
 using Ntreev.Library.Commands;
 using System.Threading.Tasks;
 using JSSoft.Communication.Shell.Services;
+using System.ComponentModel.Composition;
 
 namespace JSSoft.Communication.Shell.Commands
 {
     [Export(typeof(ICommand))]
     class UserCommand : CommandMethodBase
     {
-        [Import]
-        private Lazy<Shell> shell = null;
-        [Import]
-        private Lazy<IUserService> userService = null;
+        private readonly Lazy<Shell> shell = null;
+        private readonly Lazy<IUserService> userService = null;
 
-        public UserCommand()
+        [ImportingConstructor]
+        public UserCommand(Lazy<Shell> shell, Lazy<IUserService> userService)
         {
-
+            this.shell = shell;
+            this.userService = userService;
         }
 
         [CommandMethod]

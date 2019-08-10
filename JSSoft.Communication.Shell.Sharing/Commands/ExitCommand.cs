@@ -22,21 +22,21 @@
 
 using System;
 using System.ComponentModel;
-using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 using Ntreev.Library.Commands;
+using System.ComponentModel.Composition;
 
 namespace JSSoft.Communication.Shell.Commands
 {
     [Export(typeof(ICommand))]
     class ExitCommand : CommandAsyncBase
     {
-        [Import]
-        private Lazy<IShell> shell = null;
+        private readonly Lazy<IShell> shell = null;
 
-        public ExitCommand()
+        [ImportingConstructor]
+        public ExitCommand(Lazy<IShell> shell)
         {
-
+            this.shell = shell;
         }
 
         [CommandProperty(IsRequired = true)]

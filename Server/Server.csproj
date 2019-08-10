@@ -2,11 +2,16 @@
 
   <ItemGroup>
     <ProjectReference Include="..\JSSoft.Communication\JSSoft.Communication.csproj" />
+    <ProjectReference Include="..\sub-modules\Ntreev.Library\Ntreev.Library\Ntreev.Library.csproj" />
+    <ProjectReference Include="..\sub-modules\Ntreev.Library.Commands\Ntreev.Library.Commands\Ntreev.Library.Commands.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
+    <DefineConstants>SERVER</DefineConstants>
   </PropertyGroup>
+
+  <Import Project="..\JSSoft.Communication.Shell.Sharing\JSSoft.Communication.Shell.Sharing.projitems" Label="Shared" />
 
 </Project>

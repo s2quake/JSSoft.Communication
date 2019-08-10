@@ -1,17 +1,23 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Server
+namespace JSSoft.Communication.Shell
 {
     class Program
     {
         static async Task Main(string[] args)
         {
-            using (var serverContext = new ServerContext())
+            try
             {
-                var token = await serverContext.OpenAsync();
-                Console.ReadKey();
-                await serverContext.CloseAsync(token);
+                using (var shell = Shell.Create())
+                {
+                    await shell.StartAsync();
+                }
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine(e);
+                Environment.Exit(1);
             }
         }
     }

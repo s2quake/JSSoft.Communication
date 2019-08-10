@@ -21,10 +21,10 @@
 // SOFTWARE.
 
 using System;
-using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 using JSSoft.Communication;
 using Ntreev.Library.Commands;
+using System.ComponentModel.Composition;
 
 namespace JSSoft.Communication.Shell.Commands
 {
@@ -32,13 +32,13 @@ namespace JSSoft.Communication.Shell.Commands
     class CloseCommand : CommandAsyncBase
     {
         private readonly IServiceContext serviceHost;
-        [Import]
-        private Lazy<Shell> shell = null;
+        private readonly Lazy<Shell> shell;
 
         [ImportingConstructor]
-        public CloseCommand(IServiceContext serviceHost)
+        public CloseCommand(IServiceContext serviceHost, Lazy<Shell> shell)
         {
             this.serviceHost = serviceHost;
+            this.shell = shell;
         }
 
         public override bool IsEnabled => this.serviceHost.IsOpened;

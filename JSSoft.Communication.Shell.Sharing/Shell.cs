@@ -36,8 +36,9 @@ namespace JSSoft.Communication.Shell
     class Shell : CommandContextTerminal, IShell, IServiceProvider, IPartImportsSatisfiedNotification
     {
         private readonly Settings settings;
-        private readonly IServiceContext serviceHost;
         private readonly CommandContext commandContext;
+        private readonly IServiceContext serviceHost;
+        private readonly INotifyUserService userServiceNotification;
         private bool isDisposed;
 #if SERVER
         private bool isServer = true;
@@ -45,11 +46,8 @@ namespace JSSoft.Communication.Shell
         private bool isServer = false;
 #endif
 
-        [Import]
-        private INotifyUserService userServiceNotification = null;
-
         [ImportingConstructor]
-        public Shell(CommandContext commandContext, IServiceContext serviceHost)
+        public Shell(CommandContext commandContext, IServiceContext serviceHost, INotifyUserService userServiceNotification)
            : base(commandContext)
         {
             this.settings = Settings.CreateFromCommandLine();
@@ -58,6 +56,7 @@ namespace JSSoft.Communication.Shell
             this.serviceHost = serviceHost;
             this.serviceHost.Opened += ServiceHost_Opened;
             this.serviceHost.Closed += ServiceHost_Closed;
+            this.userServiceNotification = userServiceNotification;
             this.commandContext = commandContext;
             this.Title = "Server";
         }

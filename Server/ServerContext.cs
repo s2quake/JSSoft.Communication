@@ -2,12 +2,12 @@
 using System;
 using JSSoft.Communication;
 
-namespace Server
+namespace JSSoft.Communication.Shell
 {
     class ServerContext : ServerContextBase
     {
-        public ServerContext()
-            : base(new IServiceHost[] { })
+        public ServerContext(IServiceHost[] serviceHosts)
+            : base(serviceHosts)
         {
         }
     }

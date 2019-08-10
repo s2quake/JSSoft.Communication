@@ -22,24 +22,24 @@
 
 using System;
 using System.ComponentModel;
-using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 using JSSoft.Communication.Shell.Services;
 using Ntreev.Library.Commands;
+using System.ComponentModel.Composition;
 
 namespace JSSoft.Communication.Shell.Commands
 {
     [Export(typeof(ICommand))]
     class LogoutCommand : CommandAsyncBase
     {
-        [Import]
-        private Lazy<Shell> shell = null;
-        [Import]
-        private Lazy<IUserService> userService = null;
+        private readonly Lazy<Shell> shell = null;
+        private readonly Lazy<IUserService> userService = null;
 
-        public LogoutCommand()
+        [ImportingConstructor]
+        public LogoutCommand(Lazy<Shell> shell, Lazy<IUserService> userService)
         {
-
+            this.shell = shell;
+            this.userService = userService;
         }
 
         public override bool IsEnabled => this.Shell.UserToken != Guid.Empty;

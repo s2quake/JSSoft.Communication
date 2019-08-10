@@ -21,49 +21,20 @@
 // SOFTWARE.
 
 using System;
-using System.ComponentModel;
+using System.ComponentModel.Composition;
+using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using JSSoft.Communication.Shell.Services;
 using Ntreev.Library.Commands;
-using System.ComponentModel.Composition;
 
-namespace JSSoft.Communication.Shell.Commands
+namespace System.ComponentModel.Composition
 {
-    [Export(typeof(ICommand))]
-    class LoginCommand : CommandAsyncBase
+    class ImportingConstructor : Attribute
     {
-        private readonly Lazy<Shell> shell = null;
-        private readonly Lazy<IUserService> userService = null;
-
-        [ImportingConstructor]
-        public LoginCommand(Lazy<Shell> shell, Lazy<IUserService> userService)
+        public ImportingConstructor()
         {
-            this.shell = shell;
-            this.userService = userService;
+
         }
-
-        [CommandProperty(IsRequired = true)]
-        public string UserID
-        {
-            get; set;
-        }
-
-        [CommandProperty(IsRequired = true)]
-        public string Password
-        {
-            get; set;
-        }
-
-        public override bool IsEnabled => this.Shell.UserToken == Guid.Empty;
-
-        protected override async Task OnExecuteAsync()
-        {
-            var token = await this.UserService.LoginAsync(this.UserID, this.Password);
-            this.Shell.Login(this.UserID, token);
-        }
-
-        private IUserService UserService => this.userService.Value;
-
-        private Shell Shell => this.shell.Value;
     }
 }

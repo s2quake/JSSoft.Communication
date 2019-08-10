@@ -7,7 +7,6 @@
   <ItemGroup>
     <ProjectReference Include="..\JSSoft.Communication\JSSoft.Communication.csproj" />
     <ProjectReference Include="..\sub-modules\Ntreev.Library\Ntreev.Library\Ntreev.Library.csproj" />
-    <ProjectReference Include="..\sub-modules\Ntreev.Library\Ntreev.Library.Random\Ntreev.Library.Random.csproj" />
     <ProjectReference Include="..\sub-modules\Ntreev.Library.Commands\Ntreev.Library.Commands\Ntreev.Library.Commands.csproj" />
   </ItemGroup>
 
