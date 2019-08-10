@@ -14,7 +14,9 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <DefineConstants>SERVER</DefineConstants>
+    <DefineConstants>SERVER;MEF</DefineConstants>
   </PropertyGroup>
+
+  <Import Project="..\Ntreev.Crema.Shell.Sharing\Ntreev.Crema.Shell.Sharing.projitems" Label="Shared" />
 
 </Project>

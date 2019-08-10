@@ -1,33 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <Compile Include="..\Server\Program.cs" Link="Program.cs" />
-    <Compile Include="..\Server\IShell.cs" Link="IShell.cs" />
-    <Compile Include="..\Server\Shell.cs" Link="Shell.cs" />
-    <Compile Include="..\Server\Settings.cs" Link="Settings.cs" />
-    <Compile Include="..\Server\CommandContext.cs" Link="CommandContext.cs" />
-    <Compile Include="..\Server\ComponentProvider.cs" Link="ComponentProvider.cs" />
-    <Compile Include="..\Server\Container.cs" Link="Container.cs" />
-    <Compile Include="..\Server\Services\Authority.cs" Link="Services\Authority.cs" />
-    <Compile Include="..\Server\Services\UserEventArgs.cs" Link="Services\UserEventArgs.cs" />
-    <Compile Include="..\Server\Services\UserMessageEventArgs.cs" Link="Services\UserMessageEventArgs.cs" />
-    <Compile Include="..\Server\Services\UserNameEventArgs.cs" Link="Services\UserNameEventArgs.cs" />
-    <Compile Include="..\Server\Services\UserAuthorityEventArgs.cs" Link="Services\UserAuthorityEventArgs.cs" />
-    <Compile Include="..\Server\Services\IUserService.cs" Link="Services\IUserService.cs" />
-    <Compile Include="..\Server\Services\INotifyUserService.cs" Link="Services\INotifyUserService.cs" />
-    <Compile Include="..\Server\Services\IUserServiceCallback.cs" Link="Services\IUserServiceCallback.cs" />
-    <Compile Include="..\Server\Services\IDataService.cs" Link="Services\IDataService.cs" />
-    <Compile Include="..\Server\Services\IDataServiceCallback.cs" Link="Services\IDataServiceCallback.cs" />
-
-    <Compile Include="..\Server\Commands\LoginCommand.cs" Link="Commands\LoginCommand.cs" />
-    <Compile Include="..\Server\Commands\LogoutCommand.cs" Link="Commands\LogoutCommand.cs" />
-    <Compile Include="..\Server\Commands\CloseCommand.cs" Link="Commands\CloseCommand.cs" />
-    <Compile Include="..\Server\Commands\ExitCommand.cs" Link="Commands\ExitCommand.cs" />
-    <Compile Include="..\Server\Commands\OpenCommand.cs" Link="Commands\OpenCommand.cs" />
-    <Compile Include="..\Server\Commands\UserCommand.cs" Link="Commands\UserCommand.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="System.ComponentModel.Composition" Version="4.5.0" />
     <ProjectReference Include="..\Ntreev.Crema.Communication\Ntreev.Crema.Communication.csproj" />
     <ProjectReference Include="..\sub-modules\Ntreev.Library\Ntreev.Library\Ntreev.Library.csproj" />
@@ -37,7 +10,9 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <DefineConstants>CLIENT</DefineConstants>
+    <DefineConstants>CLIENT;MEF</DefineConstants>
   </PropertyGroup>
+
+  <Import Project="..\Ntreev.Crema.Shell.Sharing\Ntreev.Crema.Shell.Sharing.projitems" Label="Shared" />
 
 </Project>

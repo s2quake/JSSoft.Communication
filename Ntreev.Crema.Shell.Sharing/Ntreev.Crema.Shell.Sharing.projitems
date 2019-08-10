@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Ntreev.Crema.Shell</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)CommandContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Container.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IShell.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shell.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Settings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ServiceComponentProvider.cs" />
+
+    <Compile Include="$(MSBuildThisFileDirectory)Services\Authority.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\UserEventArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\UserMessageEventArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\UserNameEventArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\UserAuthorityEventArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\IUserService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\INotifyUserService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\IUserServiceCallback.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\IDataService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\IDataServiceCallback.cs" />
+
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\CloseCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\ExitCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\LoginCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\LogoutCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\OpenCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\UserCommand.cs" />
+  </ItemGroup>
+</Project>
