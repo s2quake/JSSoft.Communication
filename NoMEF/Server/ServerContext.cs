@@ -1,6 +1,6 @@
 ﻿
 using System;
-using Ntreev.Crema.Communication;
+using JSSoft.Communication;
 
 namespace Server
 {

@@ -21,10 +21,9 @@
 // SOFTWARE.
 
 using System.ComponentModel.Composition;
-using Ntreev.Crema.Communication;
-using Ntreev.Crema.Services;
+using JSSoft.Communication;
 
-namespace Ntreev.Crema.Services.Services
+namespace JSSoft.Communication.Shell.Services
 {
     [Export(typeof(IServiceHost))]
     class DataServiceHost : ServerServiceHostBase<IDataService, IDataServiceCallback>

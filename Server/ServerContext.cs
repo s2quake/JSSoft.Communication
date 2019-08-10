@@ -24,9 +24,9 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
-using Ntreev.Crema.Communication;
+using JSSoft.Communication;
 
-namespace Ntreev.Crema.Services
+namespace JSSoft.Communication.Shell
 {
     [Export(typeof(IServiceContext))]
     class ServerContext : ServerContextBase

@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ntreev.Library.Threading;
 
-namespace Ntreev.Crema.Services.Services
+namespace JSSoft.Communication.Shell.Services
 {
     class DataService : IDataService
     {

@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server", "Server\Server.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client", "Client\Client.csproj", "{0D6FD7D3-D158-41A5-9E2D-2D17149902E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Communication", "Ntreev.Crema.Communication\Ntreev.Crema.Communication.csproj", "{46F9FF22-9DEB-4D24-84C1-5FD07F2A1993}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JSSoft.Communication", "JSSoft.Communication\JSSoft.Communication.csproj", "{46F9FF22-9DEB-4D24-84C1-5FD07F2A1993}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sub-modules", "sub-modules", "{FDD91626-BAFF-44EF-B16B-4E2F1ABFB96E}"
 EndProject

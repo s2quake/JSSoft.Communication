@@ -5,7 +5,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Ntreev.Crema.Communication\Ntreev.Crema.Communication.csproj" />
+    <ProjectReference Include="..\JSSoft.Communication\JSSoft.Communication.csproj" />
     <ProjectReference Include="..\sub-modules\Ntreev.Library\Ntreev.Library\Ntreev.Library.csproj" />
     <ProjectReference Include="..\sub-modules\Ntreev.Library\Ntreev.Library.Random\Ntreev.Library.Random.csproj" />
     <ProjectReference Include="..\sub-modules\Ntreev.Library.Commands\Ntreev.Library.Commands\Ntreev.Library.Commands.csproj" />
@@ -17,6 +17,6 @@
     <DefineConstants>SERVER;MEF</DefineConstants>
   </PropertyGroup>
 
-  <Import Project="..\Ntreev.Crema.Shell.Sharing\Ntreev.Crema.Shell.Sharing.projitems" Label="Shared" />
+  <Import Project="..\JSSoft.Communication.Shell.Sharing\JSSoft.Communication.Shell.Sharing.projitems" Label="Shared" />
 
 </Project>

@@ -22,7 +22,7 @@
 
 using System;
 
-namespace Ntreev.Crema.Services
+namespace JSSoft.Communication.Shell.Services
 {
     class UserInfo
     {

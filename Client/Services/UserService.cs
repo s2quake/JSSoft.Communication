@@ -24,7 +24,7 @@ using System;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Services.Services
+namespace JSSoft.Communication.Shell.Services
 {
     [Export(typeof(IUserService))]
     [Export(typeof(INotifyUserService))]

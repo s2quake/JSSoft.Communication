@@ -23,10 +23,9 @@
 using System;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
-using Ntreev.Crema.Communication;
-using Ntreev.Crema.Services;
+using JSSoft.Communication;
 
-namespace Ntreev.Crema.Services.Services
+namespace JSSoft.Communication.Shell.Services
 {
     [Export(typeof(IServiceHost))]
     class UserServiceHost : ClientServiceHostBase<IUserService, IUserServiceCallback>

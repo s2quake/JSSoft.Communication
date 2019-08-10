@@ -23,7 +23,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Services
+namespace JSSoft.Communication.Shell
 {
     class Program
     {

@@ -27,7 +27,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Ntreev.Library.Threading;
 
-namespace Ntreev.Crema.Services
+namespace JSSoft.Communication.Shell.Services
 {
     [Export(typeof(IUserService))]
     [Export(typeof(INotifyUserService))]

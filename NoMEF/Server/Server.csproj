@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Ntreev.Crema.Communication\Ntreev.Crema.Communication.csproj" />
+    <ProjectReference Include="..\..\JSSoft.Communication\JSSoft.Communication.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
