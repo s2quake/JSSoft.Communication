@@ -27,6 +27,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using JSSoft.Communication.Shell.Commands;
+using JSSoft.Communication.Shell.Services;
 using Ntreev.Library.Commands;
 
 namespace JSSoft.Communication.Shell
@@ -43,63 +44,50 @@ namespace JSSoft.Communication.Shell
         {
             var lazyIShell = new Lazy<IShell>(GetShell);
             var lazyShell = new Lazy<Shell>(GetShell);
+            var userService = new UserService();
+            var userServiceHost = new UserServiceHost(userService);
+            var lazyUserService = new Lazy<IUserService>(() => userService);
+            var dataServiceHost = new DataServiceHost();
 
-            // serviceHosts = new IServiceHost[] { new UserSeviceHost}
+            serviceHosts = new IServiceHost[] { userServiceHost, dataServiceHost };
+            serverContext = new ServerContext(serviceHosts);
 
-            // commandList.Add(new CloseCommand());
-            // commandList.Add(new ExitCommand());
-            // commandList.Add(new LoginCommand());
-            // commandList.Add(new OpenCommand());
-            // commandList.Add(new UserCommand());
-            // commandContext = new CommandContext();
-            // shell = new Shell();
+            commandList.Add(new CloseCommand(serverContext, lazyShell));
+            commandList.Add(new ExitCommand(lazyIShell));
+            commandList.Add(new LoginCommand(lazyShell, lazyUserService));
+            commandList.Add(new OpenCommand(serverContext, lazyShell));
+            commandList.Add(new UserCommand(lazyShell, lazyUserService));
+            commandContext = new CommandContext(commandList, Enumerable.Empty<ICommandProvider>());
+            shell = new Shell(commandContext, serverContext, userService);
         }
 
-        public static T GetService<T>()
+        public static T GetService<T>() where T : class
         {
-            // if (typeof(T) == typeof(IShell))
-            // {
-            //     if (shell == null)
-            //     {
-            //         shell = new Shell();
-            //     }
-            // }
-            // return shell;
+            if (typeof(T) == typeof(IShell))
+            {
+                return shell as T;
+            }
             throw new NotImplementedException();
         }
 
         public static object GetService(Type serviceType)
         {
-            if (typeof(IEnumerable).IsAssignableFrom(serviceType) && serviceType.GenericTypeArguments.Length == 1)
-            {
-                // var itemType = serviceType.GenericTypeArguments.First();
-                // var contractName = AttributedModelServices.GetContractName(itemType);
-                // var items = container.GetExportedValues<object>(contractName);
-                // var listGenericType = typeof(List<>);
-                // var list = listGenericType.MakeGenericType(itemType);
-                // var ci = list.GetConstructor(new Type[] { typeof(int) });
-                // var instance = ci.Invoke(new object[] { items.Count(), }) as IList;
-                // foreach (var item in items)
-                // {
-                //     instance.Add(item);
-                // }
-                // return instance;
-                throw new NotImplementedException();
-            }
-            else
-            {
-                // var contractName = AttributedModelServices.GetContractName(serviceType);
-                // return container.GetExportedValue<object>(contractName);
-                throw new NotImplementedException();
-            }
+            throw new NotImplementedException();
         }
 
         public static void Release()
         {
+            if (serverContext is IDisposable s)
+            {
+                s.Dispose();
+            }
 
+            foreach (var item in serviceHosts.Reverse())
+            {
+                item.Dispose();
+            }
         }
 
         private static Shell GetShell() => shell;
-
     }
 }
