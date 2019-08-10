@@ -21,21 +21,41 @@
 // SOFTWARE.
 
 using System;
-using System.Collections.Generic;
+using System.ComponentModel;
+using System.Threading.Tasks;
+using Ntreev.Library.Commands;
+using JSSoft.Communication.ConsoleApp;
+#if MEF
 using System.ComponentModel.Composition;
-using System.Linq;
-using JSSoft.Communication;
+#endif
 
-namespace JSSoft.Communication.ConsoleApp
+namespace JSSoft.Communication.Commands
 {
-    [Export(typeof(IServiceContext))]
-    class ServerContext : ServerContextBase
+#if MEF
+    [Export(typeof(ICommand))]
+#endif
+    class ExitCommand : CommandAsyncBase
     {
+        private readonly Lazy<IShell> shell = null;
+
+#if MEF
         [ImportingConstructor]
-        public ServerContext(IComponentProvider componentProvider, [ImportMany]IServiceHost[] serviceHosts)
-            : base(componentProvider, serviceHosts)
+#endif
+        public ExitCommand(Lazy<IShell> shell)
         {
-     
+            this.shell = shell;
+        }
+
+        [CommandProperty(IsRequired = true)]
+        [DefaultValue(0)]
+        public int ExitCode
+        {
+            get; set;
+        }
+
+        protected override Task OnExecuteAsync()
+        {
+            return this.shell.Value.StopAsync();
         }
     }
 }

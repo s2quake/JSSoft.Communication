@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace JSSoft.Communication.Shell
+namespace JSSoft.Communication.ConsoleApp
 {
     class Program
     {

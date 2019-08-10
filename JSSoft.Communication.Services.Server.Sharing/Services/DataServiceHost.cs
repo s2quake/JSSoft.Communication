@@ -20,22 +20,29 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
 using JSSoft.Communication;
+#if MEF
+using System.ComponentModel.Composition;
+#endif
 
-namespace JSSoft.Communication.ConsoleApp
+namespace JSSoft.Communication.Services
 {
-    [Export(typeof(IServiceContext))]
-    class ServerContext : ServerContextBase
+#if MEF
+    [Export(typeof(IServiceHost))]
+#endif
+    class DataServiceHost : ServerServiceHostBase<IDataService, IDataServiceCallback>
     {
-        [ImportingConstructor]
-        public ServerContext(IComponentProvider componentProvider, [ImportMany]IServiceHost[] serviceHosts)
-            : base(componentProvider, serviceHosts)
+        public override object CreateInstance(object obj)
         {
-     
+            return new DataService(obj as IDataServiceCallback);
+        }
+
+        public override void DestroyInstance(object obj)
+        {
+            if (obj is DataService dataService)
+            {
+                dataService.Dispose();
+            }
         }
     }
 }

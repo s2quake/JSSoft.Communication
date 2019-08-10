@@ -21,21 +21,23 @@
 // SOFTWARE.
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
-using JSSoft.Communication;
 
-namespace JSSoft.Communication.ConsoleApp
+namespace JSSoft.Communication.Services
 {
-    [Export(typeof(IServiceContext))]
-    class ServerContext : ServerContextBase
+    public interface INotifyUserService
     {
-        [ImportingConstructor]
-        public ServerContext(IComponentProvider componentProvider, [ImportMany]IServiceHost[] serviceHosts)
-            : base(componentProvider, serviceHosts)
-        {
-     
-        }
+        event EventHandler<UserEventArgs> Created;
+
+        event EventHandler<UserEventArgs> Deleted;
+
+        event EventHandler<UserEventArgs> LoggedIn;
+
+        event EventHandler<UserEventArgs> LoggedOut;
+
+        event EventHandler<UserMessageEventArgs> MessageReceived;
+
+        event EventHandler<UserNameEventArgs> Renamed;
+
+        event EventHandler<UserAuthorityEventArgs> AuthorityChanged;
     }
 }

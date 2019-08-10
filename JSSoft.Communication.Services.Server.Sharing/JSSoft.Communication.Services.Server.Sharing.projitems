@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>JSSoft.Communication.Services.Server</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Services\DataService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\DataServiceHost.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\UserInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\UserService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\UserServiceHost.cs" />
+  </ItemGroup>
+</Project>

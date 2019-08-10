@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using JSSoft.Communication;
 
-namespace JSSoft.Communication.Shell
+namespace JSSoft.Communication.ConsoleApp
 {
     [Export(typeof(IServiceContext))]
     class ClientContext : ClientContextBase

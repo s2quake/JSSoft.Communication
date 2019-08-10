@@ -21,21 +21,39 @@
 // SOFTWARE.
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
+using System.ComponentModel;
 using JSSoft.Communication;
+#if MEF
+using System.ComponentModel.Composition;
+#endif
 
-namespace JSSoft.Communication.ConsoleApp
+namespace JSSoft.Communication.Services
 {
-    [Export(typeof(IServiceContext))]
-    class ServerContext : ServerContextBase
+#if MEF
+    [Export(typeof(IServiceHost))]
+#endif
+    class UserServiceHost : ClientServiceHostBase<IUserService, IUserServiceCallback>
     {
+        private readonly UserService userService;
+
+#if MEF
         [ImportingConstructor]
-        public ServerContext(IComponentProvider componentProvider, [ImportMany]IServiceHost[] serviceHosts)
-            : base(componentProvider, serviceHosts)
+#endif
+        public UserServiceHost(UserService userService)
+            : base()
         {
-     
+            this.userService = userService;
+        }
+
+        public override object CreateInstance(object obj)
+        {
+            this.userService.SetUserService(obj as IUserService);
+            return this.userService;
+        }
+
+        public override void DestroyInstance(object obj)
+        {
+            this.userService.SetUserService(null);
         }
     }
 }

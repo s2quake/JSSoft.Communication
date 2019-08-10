@@ -20,22 +20,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
 using JSSoft.Communication;
 
-namespace JSSoft.Communication.ConsoleApp
+namespace JSSoft.Communication.Services
 {
-    [Export(typeof(IServiceContext))]
-    class ServerContext : ServerContextBase
+    public interface IDataServiceCallback
     {
-        [ImportingConstructor]
-        public ServerContext(IComponentProvider componentProvider, [ImportMany]IServiceHost[] serviceHosts)
-            : base(componentProvider, serviceHosts)
-        {
-     
-        }
+        [OperationContract]
+        void OnLoggedIn(string userID);
+
+        [OperationContract]
+         void OnAdd(string userID, int test);
     }
 }

@@ -22,20 +22,31 @@
 
 using System;
 using System.Collections.Generic;
+using Ntreev.Library.Commands;
+#if MEF
 using System.ComponentModel.Composition;
-using System.Linq;
-using JSSoft.Communication;
+#endif
 
 namespace JSSoft.Communication.ConsoleApp
 {
-    [Export(typeof(IServiceContext))]
-    class ServerContext : ServerContextBase
+#if MEF
+    [Export(typeof(CommandContext))]
+#endif
+    class CommandContext : CommandContextBase
     {
+#if MEF
         [ImportingConstructor]
-        public ServerContext(IComponentProvider componentProvider, [ImportMany]IServiceHost[] serviceHosts)
-            : base(componentProvider, serviceHosts)
+        public CommandContext([ImportMany]IEnumerable<ICommand> commands, [ImportMany]IEnumerable<ICommandProvider> methods)
+            : base(commands, methods)
         {
-     
+
         }
+#else // MEF
+        public CommandContext(IEnumerable<ICommand> commands, IEnumerable<ICommandProvider> methods)
+            : base(commands, methods)
+        {
+
+        }
+#endif // MEF
     }
 }

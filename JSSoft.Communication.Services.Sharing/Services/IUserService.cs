@@ -21,21 +21,42 @@
 // SOFTWARE.
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
+using System.Threading.Tasks;
 using JSSoft.Communication;
 
-namespace JSSoft.Communication.ConsoleApp
+namespace JSSoft.Communication.Services
 {
-    [Export(typeof(IServiceContext))]
-    class ServerContext : ServerContextBase
+    [ServiceContract]
+    public interface IUserService
     {
-        [ImportingConstructor]
-        public ServerContext(IComponentProvider componentProvider, [ImportMany]IServiceHost[] serviceHosts)
-            : base(componentProvider, serviceHosts)
-        {
-     
-        }
+        [OperationContract]
+        Task CreateAsync(Guid token, string userID, string password, Authority authority);
+
+        [OperationContract]
+        Task DeleteAsync(Guid token, string userID);
+
+        [OperationContract]
+        Task RenameAsync(Guid token, string userName);
+
+        [OperationContract]
+        Task SetAuthorityAsync(Guid token, string userID, Authority authority);
+
+        [OperationContract]
+        Task<Guid> LoginAsync(string userID, string password);
+
+        [OperationContract]
+        Task LogoutAsync(Guid token);
+
+        [OperationContract]
+        Task<(string userName, Authority authority)> GetInfoAsync(Guid token, string userID);
+
+        [OperationContract]
+        Task<string[]> GetUsersAsync(Guid token);
+
+        [OperationContract]
+        Task<bool> IsOnlineAsync(Guid token, string userID);
+
+        [OperationContract]
+        Task SendMessageAsync(Guid token, string userID, string message);
     }
 }

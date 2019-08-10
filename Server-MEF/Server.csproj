@@ -16,7 +16,8 @@
     <DefineConstants>SERVER;MEF</DefineConstants>
   </PropertyGroup>
 
-  <Import Project="..\JSSoft.Communication.Shell.Sharing\JSSoft.Communication.Shell.Sharing.projitems" Label="Shared" />
-  <Import Project="..\JSSoft.Communication.Shell.Server.Sharing\JSSoft.Communication.Shell.Server.Sharing.projitems" Label="Shared" />
+  <Import Project="..\JSSoft.Communication.Services.Sharing\JSSoft.Communication.Services.Sharing.projitems" Label="Shared" />
+  <Import Project="..\JSSoft.Communication.ConsoleApp.Sharing\JSSoft.Communication.ConsoleApp.Sharing.projitems" Label="Shared" />
+  <Import Project="..\JSSoft.Communication.Services.Server.Sharing\JSSoft.Communication.Services.Server.Sharing.projitems" Label="Shared" />
 
 </Project>

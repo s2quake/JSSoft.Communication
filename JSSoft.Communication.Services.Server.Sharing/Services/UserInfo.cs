@@ -21,21 +21,19 @@
 // SOFTWARE.
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
-using JSSoft.Communication;
 
-namespace JSSoft.Communication.ConsoleApp
+namespace JSSoft.Communication.Services
 {
-    [Export(typeof(IServiceContext))]
-    class ServerContext : ServerContextBase
+    class UserInfo
     {
-        [ImportingConstructor]
-        public ServerContext(IComponentProvider componentProvider, [ImportMany]IServiceHost[] serviceHosts)
-            : base(componentProvider, serviceHosts)
-        {
-     
-        }
+        public string UserID { get; set; }
+
+        public string UserName { get; set; }
+
+        public string Password { get; set; }
+
+        public Authority Authority { get; set; }
+
+        public Guid Token { get; set; }
     }
 }

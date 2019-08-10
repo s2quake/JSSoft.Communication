@@ -21,21 +21,56 @@
 // SOFTWARE.
 
 using System;
-using System.Collections.Generic;
+using System.ComponentModel;
+using System.Threading.Tasks;
+using JSSoft.Communication.Services;
+using JSSoft.Communication.ConsoleApp;
+using Ntreev.Library.Commands;
+#if MEF
 using System.ComponentModel.Composition;
-using System.Linq;
-using JSSoft.Communication;
+#endif
 
-namespace JSSoft.Communication.ConsoleApp
+namespace JSSoft.Communication.Commands
 {
-    [Export(typeof(IServiceContext))]
-    class ServerContext : ServerContextBase
+#if MEF
+    [Export(typeof(ICommand))]
+#endif
+    class LoginCommand : CommandAsyncBase
     {
+        private readonly Lazy<Shell> shell = null;
+        private readonly Lazy<IUserService> userService = null;
+
+#if MEF
         [ImportingConstructor]
-        public ServerContext(IComponentProvider componentProvider, [ImportMany]IServiceHost[] serviceHosts)
-            : base(componentProvider, serviceHosts)
+#endif
+        public LoginCommand(Lazy<Shell> shell, Lazy<IUserService> userService)
         {
-     
+            this.shell = shell;
+            this.userService = userService;
         }
+
+        [CommandProperty(IsRequired = true)]
+        public string UserID
+        {
+            get; set;
+        }
+
+        [CommandProperty(IsRequired = true)]
+        public string Password
+        {
+            get; set;
+        }
+
+        public override bool IsEnabled => this.Shell.UserToken == Guid.Empty;
+
+        protected override async Task OnExecuteAsync()
+        {
+            var token = await this.UserService.LoginAsync(this.UserID, this.Password);
+            this.Shell.Login(this.UserID, token);
+        }
+
+        private IUserService UserService => this.userService.Value;
+
+        private Shell Shell => this.shell.Value;
     }
 }

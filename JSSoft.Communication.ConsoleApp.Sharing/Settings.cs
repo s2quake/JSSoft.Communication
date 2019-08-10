@@ -21,21 +21,40 @@
 // SOFTWARE.
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
+using System.ComponentModel;
 using JSSoft.Communication;
+using Ntreev.Library.Commands;
 
 namespace JSSoft.Communication.ConsoleApp
 {
-    [Export(typeof(IServiceContext))]
-    class ServerContext : ServerContextBase
+    public class Settings
     {
-        [ImportingConstructor]
-        public ServerContext(IComponentProvider componentProvider, [ImportMany]IServiceHost[] serviceHosts)
-            : base(componentProvider, serviceHosts)
+        [CommandProperty]
+        [DefaultValue(ServiceContextBase.DefaultPort)]
+        public int Port
         {
-     
+            get; set;
+        }
+
+        [CommandProperty]
+        [DefaultValue(ServiceContextBase.DefaultHost)]
+        public string Host
+        {
+            get; set;
+        }
+
+        [CommandProperty]
+        public bool Verbose
+        {
+            get; set;
+        }
+
+        public static Settings CreateFromCommandLine()
+        {
+            var settings = new Settings();
+            var parser = new CommandLineParser(settings);
+            parser.Parse(Environment.CommandLine);
+            return settings;
         }
     }
 }

@@ -21,21 +21,22 @@
 // SOFTWARE.
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
-using JSSoft.Communication;
 
-namespace JSSoft.Communication.ConsoleApp
+namespace JSSoft.Communication.Services
 {
-    [Export(typeof(IServiceContext))]
-    class ServerContext : ServerContextBase
+    public class UserMessageEventArgs : EventArgs
     {
-        [ImportingConstructor]
-        public ServerContext(IComponentProvider componentProvider, [ImportMany]IServiceHost[] serviceHosts)
-            : base(componentProvider, serviceHosts)
+        public UserMessageEventArgs(string sender, string receiver, string message)
         {
-     
+            this.Sender = sender;
+            this.Receiver = receiver;
+            this.Message = message;
         }
+
+        public string Sender { get; }
+
+        public string Receiver { get; }
+
+        public string Message { get; }
     }
 }

@@ -21,21 +21,39 @@
 // SOFTWARE.
 
 using System;
-using System.Collections.Generic;
+using System.Threading.Tasks;
+using JSSoft.Communication.ConsoleApp;
+using Ntreev.Library.Commands;
+#if MEF
 using System.ComponentModel.Composition;
-using System.Linq;
-using JSSoft.Communication;
+#endif
 
-namespace JSSoft.Communication.ConsoleApp
+namespace JSSoft.Communication.Commands
 {
-    [Export(typeof(IServiceContext))]
-    class ServerContext : ServerContextBase
+    #if MEF
+    [Export(typeof(ICommand))]
+    #endif
+    class OpenCommand : CommandAsyncBase
     {
+        private readonly IServiceContext serviceHost;
+        private readonly Lazy<Shell> shell = null;
+
+#if MEF
         [ImportingConstructor]
-        public ServerContext(IComponentProvider componentProvider, [ImportMany]IServiceHost[] serviceHosts)
-            : base(componentProvider, serviceHosts)
+        #endif
+        public OpenCommand(IServiceContext serviceHost, Lazy<Shell> shell)
         {
-     
+            this.serviceHost = serviceHost;
+            this.shell = shell;
         }
+
+        public override bool IsEnabled => this.serviceHost.IsOpened == false;
+
+        protected override async Task OnExecuteAsync()
+        {
+            this.Shell.Token = await this.serviceHost.OpenAsync();
+        }
+
+        private Shell Shell => this.shell.Value;
     }
 }

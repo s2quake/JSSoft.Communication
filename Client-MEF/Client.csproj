@@ -13,7 +13,8 @@
     <DefineConstants>CLIENT;MEF</DefineConstants>
   </PropertyGroup>
 
-  <Import Project="..\JSSoft.Communication.Shell.Sharing\JSSoft.Communication.Shell.Sharing.projitems" Label="Shared" />
-  <Import Project="..\JSSoft.Communication.Shell.Client.Sharing\JSSoft.Communication.Shell.Client.Sharing.projitems" Label="Shared" />
+  <Import Project="..\JSSoft.Communication.Services.Sharing\JSSoft.Communication.Services.Sharing.projitems" Label="Shared" />
+  <Import Project="..\JSSoft.Communication.ConsoleApp.Sharing\JSSoft.Communication.ConsoleApp.Sharing.projitems" Label="Shared" />
+  <Import Project="..\JSSoft.Communication.Services.Client.Sharing\JSSoft.Communication.Services.Client.Sharing.projitems" Label="Shared" />
 
 </Project>

@@ -20,22 +20,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if MEF
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
 using JSSoft.Communication;
+using System.ComponentModel.Composition;
 
 namespace JSSoft.Communication.ConsoleApp
 {
-    [Export(typeof(IServiceContext))]
-    class ServerContext : ServerContextBase
+    [Export(typeof(IComponentProvider))]
+    class ServiceComponentProvider : ComponentProviderBase
     {
         [ImportingConstructor]
-        public ServerContext(IComponentProvider componentProvider, [ImportMany]IServiceHost[] serviceHosts)
-            : base(componentProvider, serviceHosts)
+        public ServiceComponentProvider([ImportMany]IAdaptorHostProvider[] adaptorHostProviders,
+                                 [ImportMany]ISerializerProvider[] serializerProviders,
+                                 [ImportMany]IDataSerializer[] dataSerializers,
+                                 [ImportMany]IExceptionDescriptor[] exceptionDescriptors)
+            : base(adaptorHostProviders, serializerProviders, dataSerializers, exceptionDescriptors)
         {
-     
+
         }
     }
 }
+#endif

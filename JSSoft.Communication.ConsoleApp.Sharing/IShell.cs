@@ -21,21 +21,16 @@
 // SOFTWARE.
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
-using JSSoft.Communication;
+using System.Threading.Tasks;
 
 namespace JSSoft.Communication.ConsoleApp
 {
-    [Export(typeof(IServiceContext))]
-    class ServerContext : ServerContextBase
+    public interface IShell : IDisposable
     {
-        [ImportingConstructor]
-        public ServerContext(IComponentProvider componentProvider, [ImportMany]IServiceHost[] serviceHosts)
-            : base(componentProvider, serviceHosts)
-        {
-     
-        }
+        Task StartAsync();
+
+        Task StopAsync();
+
+        string Title { get; set; }
     }
 }

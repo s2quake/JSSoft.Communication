@@ -21,21 +21,17 @@
 // SOFTWARE.
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
+using System.Threading.Tasks;
 using JSSoft.Communication;
 
-namespace JSSoft.Communication.ConsoleApp
+namespace JSSoft.Communication.Services
 {
-    [Export(typeof(IServiceContext))]
-    class ServerContext : ServerContextBase
+    public interface IDataService
     {
-        [ImportingConstructor]
-        public ServerContext(IComponentProvider componentProvider, [ImportMany]IServiceHost[] serviceHosts)
-            : base(componentProvider, serviceHosts)
-        {
-     
-        }
+        [OperationContract]
+        Task<DateTime> CreateTypeAsync(string typeName);
+
+        [OperationContract]
+        Task<DateTime> CreateTableAsync(string tableName);
     }
 }
