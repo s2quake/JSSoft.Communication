@@ -26,8 +26,6 @@ namespace Ntreev.Crema.Communication
 {
     public interface ISerializer
     {
-        string Name { get; }
-        
         string Serialize(Type type, object data);
 
         object Deserialize(Type type, string text);

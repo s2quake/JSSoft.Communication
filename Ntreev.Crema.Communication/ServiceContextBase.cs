@@ -40,6 +40,7 @@ namespace Ntreev.Crema.Communication
         private readonly InstanceCollection callbackByServiceHost = new InstanceCollection();
         private readonly ServiceInstanceBuilder instanceBuilder;
         private IAdaptorHostProvider adpatorHostProvider;
+        private ISerializerProvider serializerProvider;
         private ISerializer serializer;
         private IAdaptorHost adaptorHost;
         private string host;
@@ -49,7 +50,7 @@ namespace Ntreev.Crema.Communication
 
         internal ServiceContextBase(IComponentProvider componentProvider)
         {
-            this.componentProvider = componentProvider;
+            this.componentProvider = componentProvider ?? new ComponentProviderInternal(new IServiceHost[] { });
             this.instanceBuilder = new ServiceInstanceBuilder();
             this.ServiceHosts = new ServiceHostCollection(this.componentProvider.Services);
             this.Dispatcher = new Dispatcher(this);
@@ -61,7 +62,8 @@ namespace Ntreev.Crema.Communication
             var token = ServiceToken.NewToken();
             await this.Dispatcher.InvokeAsync((Action)(() =>
             {
-                this.serializer = this.componentProvider.Getserializer(this.SerializerType);
+                this.serializerProvider = this.componentProvider.GetserializerProvider(this.SerializerType);
+                this.serializer = this.serializerProvider.Create(this, this.componentProvider.DataSerializers);
                 this.adpatorHostProvider = this.componentProvider.GetAdaptorHostProvider(this.AdaptorHostType);
                 this.adaptorHost = this.adpatorHostProvider.Create(this, token);
                 this.adaptorHost.Peers.CollectionChanged += Peers_CollectionChanged;
@@ -266,7 +268,7 @@ namespace Ntreev.Crema.Communication
             var baseType = GetInstanceType(this, serviceHost);
             if (this.isServer == true)
             {
-                serviceHost.DestroyInstance(service);    
+                serviceHost.DestroyInstance(service);
             }
             else
             {

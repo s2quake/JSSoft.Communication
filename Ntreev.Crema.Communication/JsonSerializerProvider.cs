@@ -21,24 +21,21 @@
 // SOFTWARE.
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
+using Newtonsoft.Json;
 
 namespace Ntreev.Crema.Communication
 {
-    [Export(typeof(IAdaptorHostProvider))]
-    class AdaptorHostProvider : IAdaptorHostProvider
+    [Export(typeof(ISerializerProvider))]
+    class JsonSerializerProvider : ISerializerProvider
     {
-        public const string DefaultName = "grpc";
+        public const string DefaultName = "json";
 
-        public IAdaptorHost Create(IServiceContext serviceContext, ServiceToken token)
+        public ISerializer Create(IServiceContext serviceHost, IDataSerializer[] dataSerializers)
         {
-            if (serviceContext is ServerContextBase)
-                return new Grpc.AdaptorServerHost(serviceContext);
-            else if (serviceContext is ClientContextBase)
-                return new Grpc.AdaptorClientHost(serviceContext);
-            throw new NotImplementedException();
+            return new JsonSerializer(dataSerializers);
         }
 
         public string Name => DefaultName;

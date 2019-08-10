@@ -33,10 +33,10 @@ namespace Ntreev.Crema.Services
         public IAdaptorHostProvider[] AdaptorHostProviders { get; private set; }
 
         [ImportMany]
-        public IServiceHost[] Services { get; private set; }
+        public ISerializerProvider[] SerializerProviders { get; private set; }
 
         [ImportMany]
-        public ISerializer[] Serializers { get; private set; }
+        public IServiceHost[] Services { get; private set; }
 
         [ImportMany]
         public IDataSerializer[] DataSerializers { get; private set; }

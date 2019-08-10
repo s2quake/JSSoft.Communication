@@ -20,15 +20,40 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace Ntreev.Crema.Communication
 {
     class ComponentProviderInternal : IComponentProvider
     {
+        public ComponentProviderInternal(IEnumerable<IServiceHost> serviceHosts)
+        {
+            this.Services = serviceHosts.ToArray();
+            this.AdaptorHostProviders = new IAdaptorHostProvider[]
+            {
+                new AdaptorHostProvider(),
+            };
+            this.SerializerProviders = new ISerializerProvider[]
+            {
+                new JsonSerializerProvider(),
+            };
+            this.DataSerializers = new IDataSerializer[]
+            {
+                new ExceptionSerializers.ArgumentExceptionSerializer(),
+                new ExceptionSerializers.ArgumentNullExceptionSerializer(),
+                new ExceptionSerializers.ExceptionSerializer(),
+                new ExceptionSerializers.NotImplementedExceptionSerializer(),
+            };
+            this.ExceptionSerializers = this.DataSerializers.OfType<IExceptionDescriptor>().ToArray();
+        }
+
         public IAdaptorHostProvider[] AdaptorHostProviders { get; }
 
         public IServiceHost[] Services { get; }
 
-        public ISerializer[] Serializers { get; }
+        public ISerializerProvider[] SerializerProviders { get; }
 
         public IDataSerializer[] DataSerializers { get; }
 

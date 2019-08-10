@@ -1,12 +1,18 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Server
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            var serverContext = new ServerContext();
+            using (var serverContext = new ServerContext())
+            {
+                var token = await serverContext.OpenAsync();
+                Console.ReadKey();
+                await serverContext.CloseAsync(token);
+            }
         }
     }
 }

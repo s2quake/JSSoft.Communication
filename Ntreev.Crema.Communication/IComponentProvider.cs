@@ -26,9 +26,9 @@ namespace Ntreev.Crema.Communication
     {
         IAdaptorHostProvider[] AdaptorHostProviders { get; }
 
-        IServiceHost[] Services { get; }
+        ISerializerProvider[] SerializerProviders { get; }
 
-        ISerializer[] Serializers { get; }
+        IServiceHost[] Services { get; }
 
         IDataSerializer[] DataSerializers { get; }
 

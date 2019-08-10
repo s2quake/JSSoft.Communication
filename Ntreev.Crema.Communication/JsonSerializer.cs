@@ -28,10 +28,8 @@ using Newtonsoft.Json;
 
 namespace Ntreev.Crema.Communication
 {
-    [Export(typeof(ISerializer))]
-    public class JsonSerializer : ISerializer
+    class JsonSerializer : ISerializer
     {
-        public const string DefaultName = "json";
         private static readonly JsonSerializerSettings settings = new JsonSerializerSettings();
         private readonly Dictionary<Type, IDataSerializer> dataSerializerByType;
 
@@ -40,8 +38,6 @@ namespace Ntreev.Crema.Communication
         {
             this.dataSerializerByType = dataSerializers.ToDictionary(item => item.Type);
         }
-
-        public string Name => DefaultName;
 
         public string Serialize(Type type, object data)
         {

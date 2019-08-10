@@ -20,27 +20,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
-
 namespace Ntreev.Crema.Communication
 {
-    [Export(typeof(IAdaptorHostProvider))]
-    class AdaptorHostProvider : IAdaptorHostProvider
+    public interface ISerializerProvider
     {
-        public const string DefaultName = "grpc";
+        ISerializer Create(IServiceContext serviceHost, IDataSerializer[] dataSerializers);
 
-        public IAdaptorHost Create(IServiceContext serviceContext, ServiceToken token)
-        {
-            if (serviceContext is ServerContextBase)
-                return new Grpc.AdaptorServerHost(serviceContext);
-            else if (serviceContext is ClientContextBase)
-                return new Grpc.AdaptorClientHost(serviceContext);
-            throw new NotImplementedException();
-        }
-
-        public string Name => DefaultName;
+        string Name { get; }
     }
 }
