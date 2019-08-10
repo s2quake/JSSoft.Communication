@@ -31,8 +31,8 @@ namespace Ntreev.Crema.Services
     class ClientContext : ClientContextBase
     {
         [ImportingConstructor]
-        public ClientContext(IComponentProvider componentProvider)
-            : base(componentProvider)
+        public ClientContext(IComponentProvider componentProvider, [ImportMany]IServiceHost[] serviceHosts)
+            : base(componentProvider, serviceHosts)
         {
      
         }

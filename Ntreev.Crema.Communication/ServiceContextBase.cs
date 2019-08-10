@@ -48,13 +48,19 @@ namespace Ntreev.Crema.Communication
         private bool isServer;
         private ServiceToken token;
 
-        internal ServiceContextBase(IComponentProvider componentProvider)
+        protected ServiceContextBase(IComponentProvider componentProvider, IServiceHost[] serviceHost)
         {
-            this.componentProvider = componentProvider ?? new ComponentProviderInternal(new IServiceHost[] { });
+            this.componentProvider = componentProvider ?? ComponentProvider.Default;
             this.instanceBuilder = new ServiceInstanceBuilder();
-            this.ServiceHosts = new ServiceHostCollection(this.componentProvider.Services);
+            this.ServiceHosts = new ServiceHostCollection(serviceHost);
             this.Dispatcher = new Dispatcher(this);
             this.isServer = IsServer(this);
+        }
+
+        protected ServiceContextBase(IServiceHost[] serviceHost)
+            : this(null, serviceHost)
+        {
+            
         }
 
         public async Task<Guid> OpenAsync()

@@ -23,12 +23,10 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using Newtonsoft.Json;
 
 namespace Ntreev.Crema.Communication
 {
-    [Export(typeof(ISerializerProvider))]
     class JsonSerializerProvider : ISerializerProvider
     {
         public const string DefaultName = "json";
@@ -39,5 +37,7 @@ namespace Ntreev.Crema.Communication
         }
 
         public string Name => DefaultName;
+
+        public static readonly JsonSerializerProvider Default = new JsonSerializerProvider();
     }
 }

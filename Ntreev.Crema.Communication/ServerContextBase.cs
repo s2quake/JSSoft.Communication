@@ -28,8 +28,14 @@ namespace Ntreev.Crema.Communication
     [ServiceContext(IsServer = true)]
     public abstract class ServerContextBase : ServiceContextBase
     {
-        protected ServerContextBase(IComponentProvider componentProvider)
-            : base(componentProvider)
+        protected ServerContextBase(IServiceHost[] serviceHosts)
+            : base(serviceHosts)
+        {
+
+        }
+
+        protected ServerContextBase(IComponentProvider componentProvider, IServiceHost[] serviceHosts)
+            : base(componentProvider, serviceHosts)
         {
 
         }

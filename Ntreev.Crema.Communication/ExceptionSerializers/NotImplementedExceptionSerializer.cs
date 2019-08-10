@@ -21,11 +21,9 @@
 // SOFTWARE.
 
 using System;
-using System.ComponentModel.Composition;
 
 namespace Ntreev.Crema.Communication.ExceptionSerializers
 {
-    [Export(typeof(IExceptionDescriptor))]
     class NotImplementedExceptionSerializer : ExceptionSerializerBase<NotImplementedException>
     {
         private static readonly NotImplementedException empty = new NotImplementedException();
@@ -37,6 +35,8 @@ namespace Ntreev.Crema.Communication.ExceptionSerializers
         }
 
         public override Type[] PropertyTypes => new Type[] { typeof(string) };
+
+        public static readonly NotImplementedExceptionSerializer Default = new NotImplementedExceptionSerializer();
 
         protected override NotImplementedException CreateInstance(object[] args)
         {

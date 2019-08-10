@@ -23,40 +23,48 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Ntreev.Crema.Communication.ExceptionSerializers;
 
 namespace Ntreev.Crema.Communication
 {
-    class ComponentProviderInternal : IComponentProvider
+    class ComponentProvider : IComponentProvider
     {
-        public ComponentProviderInternal(IEnumerable<IServiceHost> serviceHosts)
+        public ComponentProvider()
         {
-            this.Services = serviceHosts.ToArray();
             this.AdaptorHostProviders = new IAdaptorHostProvider[]
             {
-                new AdaptorHostProvider(),
+                AdaptorHostProvider.Default,
             };
             this.SerializerProviders = new ISerializerProvider[]
             {
-                new JsonSerializerProvider(),
+                JsonSerializerProvider.Default,
             };
             this.DataSerializers = new IDataSerializer[]
             {
-                new ExceptionSerializers.ArgumentExceptionSerializer(),
-                new ExceptionSerializers.ArgumentNullExceptionSerializer(),
-                new ExceptionSerializers.ExceptionSerializer(),
-                new ExceptionSerializers.NotImplementedExceptionSerializer(),
+                ArgumentExceptionSerializer.Default,
+                ArgumentNullExceptionSerializer.Default,
+                ExceptionSerializer.Default,
+                NotImplementedExceptionSerializer.Default,
             };
-            this.ExceptionSerializers = this.DataSerializers.OfType<IExceptionDescriptor>().ToArray();
+            this.ExceptionDescriptors = new IExceptionDescriptor[]
+            {
+                ArgumentExceptionSerializer.Default,
+                ArgumentNullExceptionSerializer.Default,
+                ExceptionSerializer.Default,
+                NotImplementedExceptionSerializer.Default,
+            };
         }
 
         public IAdaptorHostProvider[] AdaptorHostProviders { get; }
 
-        public IServiceHost[] Services { get; }
+        public IServiceHost[] ServiceHosts { get; }
 
         public ISerializerProvider[] SerializerProviders { get; }
 
         public IDataSerializer[] DataSerializers { get; }
 
-        public IExceptionDescriptor[] ExceptionSerializers { get; }
+        public IExceptionDescriptor[] ExceptionDescriptors { get; }
+
+        public static readonly ComponentProvider Default = new ComponentProvider();
     }
 }

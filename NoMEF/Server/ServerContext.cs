@@ -7,7 +7,7 @@ namespace Server
     class ServerContext : ServerContextBase
     {
         public ServerContext()
-            : base(null)
+            : base(new IServiceHost[] { })
         {
         }
     }

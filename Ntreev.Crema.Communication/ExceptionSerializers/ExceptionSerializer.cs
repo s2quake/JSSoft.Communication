@@ -21,11 +21,9 @@
 // SOFTWARE.
 
 using System;
-using System.ComponentModel.Composition;
 
 namespace Ntreev.Crema.Communication.ExceptionSerializers
 {
-    [Export(typeof(IExceptionDescriptor))]
     class ExceptionSerializer : ExceptionSerializerBase<Exception>
     {
         private static readonly Exception empty = new Exception();

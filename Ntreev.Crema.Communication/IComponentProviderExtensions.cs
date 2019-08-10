@@ -49,13 +49,13 @@ namespace Ntreev.Crema.Communication
 
         public static IExceptionDescriptor GetExceptionDescriptor(this IComponentProvider componentProvider, Exception e)
         {
-            var exceptionSerializer = componentProvider.ExceptionSerializers.FirstOrDefault(item => item.ExceptionType == e.GetType());
+            var exceptionSerializer = componentProvider.ExceptionDescriptors.FirstOrDefault(item => item.ExceptionType == e.GetType());
             return exceptionSerializer ?? ExceptionSerializer.Default;
         }
 
         public static IExceptionDescriptor GetExceptionDescriptor(this IComponentProvider componentProvider, int exceptionCode)
         {
-            var exceptionSerializer = componentProvider.ExceptionSerializers.FirstOrDefault(item => item.ExceptionCode == exceptionCode);
+            var exceptionSerializer = componentProvider.ExceptionDescriptors.FirstOrDefault(item => item.ExceptionCode == exceptionCode);
             return exceptionSerializer ?? ExceptionSerializer.Default;
         }
     }

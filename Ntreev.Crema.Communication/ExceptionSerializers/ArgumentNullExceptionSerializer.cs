@@ -22,12 +22,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Reflection;
 
 namespace Ntreev.Crema.Communication.ExceptionSerializers
 {
-    [Export(typeof(IExceptionDescriptor))]
     class ArgumentNullExceptionSerializer : ExceptionSerializerBase<ArgumentNullException>
     {
         private readonly Dictionary<string, string> messageByParam = new Dictionary<string, string>();
@@ -43,6 +40,8 @@ namespace Ntreev.Crema.Communication.ExceptionSerializers
             typeof(string),
             typeof(string)
         };
+
+        public static readonly ArgumentNullExceptionSerializer Default = new ArgumentNullExceptionSerializer();
 
         protected override ArgumentNullException CreateInstance(object[] args)
         {

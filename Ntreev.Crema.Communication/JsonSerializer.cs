@@ -23,7 +23,6 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using Newtonsoft.Json;
 
 namespace Ntreev.Crema.Communication
@@ -33,8 +32,7 @@ namespace Ntreev.Crema.Communication
         private static readonly JsonSerializerSettings settings = new JsonSerializerSettings();
         private readonly Dictionary<Type, IDataSerializer> dataSerializerByType;
 
-        [ImportingConstructor]
-        public JsonSerializer([ImportMany]IDataSerializer[] dataSerializers)
+        public JsonSerializer(IDataSerializer[] dataSerializers)
         {
             this.dataSerializerByType = dataSerializers.ToDictionary(item => item.Type);
         }

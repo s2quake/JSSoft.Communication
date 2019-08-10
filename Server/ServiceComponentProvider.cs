@@ -27,21 +27,16 @@ using Ntreev.Crema.Communication;
 namespace Ntreev.Crema.Services
 {
     [Export(typeof(IComponentProvider))]
-    class ComponentProvider : IComponentProvider
+    class ServiceComponentProvider : ComponentProviderBase
     {
-        [ImportMany]
-        public IAdaptorHostProvider[] AdaptorHostProviders { get; private set; }
+        [ImportingConstructor]
+        public ServiceComponentProvider([ImportMany]IAdaptorHostProvider[] adaptorHostProviders,
+                                 [ImportMany]ISerializerProvider[] serializerProviders,
+                                 [ImportMany]IDataSerializer[] dataSerializers,
+                                 [ImportMany]IExceptionDescriptor[] exceptionDescriptors)
+            : base(adaptorHostProviders, serializerProviders, dataSerializers, exceptionDescriptors)
+        {
 
-        [ImportMany]
-        public ISerializerProvider[] SerializerProviders { get; private set; }
-
-        [ImportMany]
-        public IServiceHost[] Services { get; private set; }
-
-        [ImportMany]
-        public IDataSerializer[] DataSerializers { get; private set; }
-
-        [ImportMany]
-        public IExceptionDescriptor[] ExceptionSerializers { get; private set; }
+        }
     }
 }

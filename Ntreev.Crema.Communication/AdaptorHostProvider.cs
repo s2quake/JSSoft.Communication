@@ -21,13 +21,9 @@
 // SOFTWARE.
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
 
 namespace Ntreev.Crema.Communication
 {
-    [Export(typeof(IAdaptorHostProvider))]
     class AdaptorHostProvider : IAdaptorHostProvider
     {
         public const string DefaultName = "grpc";
@@ -42,5 +38,7 @@ namespace Ntreev.Crema.Communication
         }
 
         public string Name => DefaultName;
+
+        public static readonly AdaptorHostProvider Default = new AdaptorHostProvider();
     }
 }
