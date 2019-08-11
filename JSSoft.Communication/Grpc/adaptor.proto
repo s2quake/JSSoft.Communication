@@ -2,10 +2,15 @@ syntax = "proto3";
 package JSSoft.communication.grpc;
 
 service Adaptor {
+    // 클라이언트가 서버에 연결되면 이 서비스를 호출하여 연결 되었음을 알립니다.
     rpc Open (OpenRequest) returns (OpenReply);
+    // 클라이언트 종료 직전 이 서비스가 호출되어 서버와의 연결이 끊겼음을 알립니다.
     rpc Close (CloseRequest) returns (CloseReply);
+    // 주기적으로 연결 상태를 서버에 알립니다.
     rpc Ping (PingRequest) returns (PingReply);
+    // 클라이언트가 서버의 특정 메소드를 호출할 수 있도록 해주는 기능입니다.
     rpc Invoke (InvokeRequest) returns (InvokeReply);
+    // 클라이언트가 서버에 접속하면 주기적으로 Notification이 있는지 확인후 클라이언트의 Callback 서비스의 메소드를 호출합니다.
     rpc Poll (stream PollRequest) returns (stream PollReply);
 }
 
