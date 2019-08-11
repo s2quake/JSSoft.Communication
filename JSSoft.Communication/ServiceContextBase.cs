@@ -60,7 +60,7 @@ namespace JSSoft.Communication
         protected ServiceContextBase(IServiceHost[] serviceHost)
             : this(null, serviceHost)
         {
-            
+
         }
 
         public async Task<Guid> OpenAsync()
@@ -223,8 +223,6 @@ namespace JSSoft.Communication
                     break;
             }
         }
-
-        private Dictionary<object, object> instanceByImpl;
 
         private void InitializeInstance(IServiceHost serviceHost)
         {

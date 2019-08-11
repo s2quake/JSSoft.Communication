@@ -21,8 +21,6 @@
 // SOFTWARE.
 
 using System;
-using System.Threading.Tasks;
-using Ntreev.Library.Threading;
 
 namespace JSSoft.Communication
 {

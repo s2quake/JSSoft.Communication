@@ -25,9 +25,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{CD2B8A1E-F105-4847-B820-8637C50670AD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server-Simple\Server.csproj", "{70C77F8D-2AD0-41CB-9FD7-B33B384CF82D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server-Simple", "Server-Simple\Server.csproj", "{70C77F8D-2AD0-41CB-9FD7-B33B384CF82D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client-Simple", "Client-Simple\Client-Simple.csproj", "{DA9822EF-860E-499E-9DBB-218613FEDECF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client-Simple", "Client-Simple\Client.csproj", "{DA9822EF-860E-499E-9DBB-218613FEDECF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -21,9 +21,9 @@
 // SOFTWARE.
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ntreev.Library.ObjectModel;
+using Ntreev.Library.Threading;
 
 namespace JSSoft.Communication
 {
@@ -44,6 +44,8 @@ namespace JSSoft.Communication
         Type CallbackType { get; }
 
         string Name { get; }
+
+        Dispatcher Dispatcher { get; }
 
         event EventHandler Opened;
 
