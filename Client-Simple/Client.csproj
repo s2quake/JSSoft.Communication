@@ -1,16 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <ItemGroup>
     <ProjectReference Include="..\JSSoft.Communication\JSSoft.Communication.csproj" />
   </ItemGroup>
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <DefineConstants>CLIENT</DefineConstants>
+    <Version>0.9.19223.1745</Version>
+    <AssemblyVersion>0.9</AssemblyVersion>
+    <FileVersion>0.9.19223.1745</FileVersion>
+    <Authors>s2quake</Authors>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/s2quake/grpc-sample</RepositoryUrl>
   </PropertyGroup>
-
   <Import Project="..\JSSoft.Communication.Services.Sharing\JSSoft.Communication.Services.Sharing.projitems" Label="Shared" />
   <Import Project="..\JSSoft.Communication.Services.Client.Sharing\JSSoft.Communication.Services.Client.Sharing.projitems" Label="Shared" />
-
 </Project>

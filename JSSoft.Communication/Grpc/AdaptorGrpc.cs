@@ -68,26 +68,57 @@ namespace JSSoft.Communication.Grpc {
     [grpc::BindServiceMethod(typeof(Adaptor), "BindService")]
     public abstract partial class AdaptorBase
     {
+      /// <summary>
+      /// 클라이언트가 서버에 연결되면 이 서비스를 호출하여 연결 되었음을 알립니다.
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
       public virtual global::System.Threading.Tasks.Task<global::JSSoft.Communication.Grpc.OpenReply> Open(global::JSSoft.Communication.Grpc.OpenRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
 
+      /// <summary>
+      /// 클라이언트 종료 직전 이 서비스가 호출되어 서버와의 연결이 끊겼음을 알립니다.
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
       public virtual global::System.Threading.Tasks.Task<global::JSSoft.Communication.Grpc.CloseReply> Close(global::JSSoft.Communication.Grpc.CloseRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
 
+      /// <summary>
+      /// 주기적으로 연결 상태를 서버에 알립니다.
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
       public virtual global::System.Threading.Tasks.Task<global::JSSoft.Communication.Grpc.PingReply> Ping(global::JSSoft.Communication.Grpc.PingRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
 
+      /// <summary>
+      /// 클라이언트가 서버의 특정 메소드를 호출할 수 있도록 해주는 기능입니다.
+      /// </summary>
+      /// <param name="request">The request received from the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>The response to send back to the client (wrapped by a task).</returns>
       public virtual global::System.Threading.Tasks.Task<global::JSSoft.Communication.Grpc.InvokeReply> Invoke(global::JSSoft.Communication.Grpc.InvokeRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
 
+      /// <summary>
+      /// 클라이언트가 서버에 접속하면 주기적으로 Notification이 있는지 확인후 클라이언트의 Callback 서비스의 메소드를 호출합니다.
+      /// </summary>
+      /// <param name="requestStream">Used for reading requests from the client.</param>
+      /// <param name="responseStream">Used for sending responses back to the client.</param>
+      /// <param name="context">The context of the server-side call handler being invoked.</param>
+      /// <returns>A task indicating completion of the handler.</returns>
       public virtual global::System.Threading.Tasks.Task Poll(grpc::IAsyncStreamReader<global::JSSoft.Communication.Grpc.PollRequest> requestStream, grpc::IServerStreamWriter<global::JSSoft.Communication.Grpc.PollReply> responseStream, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
@@ -118,74 +149,198 @@ namespace JSSoft.Communication.Grpc {
       {
       }
 
+      /// <summary>
+      /// 클라이언트가 서버에 연결되면 이 서비스를 호출하여 연결 되었음을 알립니다.
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
       public virtual global::JSSoft.Communication.Grpc.OpenReply Open(global::JSSoft.Communication.Grpc.OpenRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
         return Open(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
+      /// <summary>
+      /// 클라이언트가 서버에 연결되면 이 서비스를 호출하여 연결 되었음을 알립니다.
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
       public virtual global::JSSoft.Communication.Grpc.OpenReply Open(global::JSSoft.Communication.Grpc.OpenRequest request, grpc::CallOptions options)
       {
         return CallInvoker.BlockingUnaryCall(__Method_Open, null, options, request);
       }
+      /// <summary>
+      /// 클라이언트가 서버에 연결되면 이 서비스를 호출하여 연결 되었음을 알립니다.
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
       public virtual grpc::AsyncUnaryCall<global::JSSoft.Communication.Grpc.OpenReply> OpenAsync(global::JSSoft.Communication.Grpc.OpenRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
         return OpenAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
+      /// <summary>
+      /// 클라이언트가 서버에 연결되면 이 서비스를 호출하여 연결 되었음을 알립니다.
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
       public virtual grpc::AsyncUnaryCall<global::JSSoft.Communication.Grpc.OpenReply> OpenAsync(global::JSSoft.Communication.Grpc.OpenRequest request, grpc::CallOptions options)
       {
         return CallInvoker.AsyncUnaryCall(__Method_Open, null, options, request);
       }
+      /// <summary>
+      /// 클라이언트 종료 직전 이 서비스가 호출되어 서버와의 연결이 끊겼음을 알립니다.
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
       public virtual global::JSSoft.Communication.Grpc.CloseReply Close(global::JSSoft.Communication.Grpc.CloseRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
         return Close(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
+      /// <summary>
+      /// 클라이언트 종료 직전 이 서비스가 호출되어 서버와의 연결이 끊겼음을 알립니다.
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
       public virtual global::JSSoft.Communication.Grpc.CloseReply Close(global::JSSoft.Communication.Grpc.CloseRequest request, grpc::CallOptions options)
       {
         return CallInvoker.BlockingUnaryCall(__Method_Close, null, options, request);
       }
+      /// <summary>
+      /// 클라이언트 종료 직전 이 서비스가 호출되어 서버와의 연결이 끊겼음을 알립니다.
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
       public virtual grpc::AsyncUnaryCall<global::JSSoft.Communication.Grpc.CloseReply> CloseAsync(global::JSSoft.Communication.Grpc.CloseRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
         return CloseAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
+      /// <summary>
+      /// 클라이언트 종료 직전 이 서비스가 호출되어 서버와의 연결이 끊겼음을 알립니다.
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
       public virtual grpc::AsyncUnaryCall<global::JSSoft.Communication.Grpc.CloseReply> CloseAsync(global::JSSoft.Communication.Grpc.CloseRequest request, grpc::CallOptions options)
       {
         return CallInvoker.AsyncUnaryCall(__Method_Close, null, options, request);
       }
+      /// <summary>
+      /// 주기적으로 연결 상태를 서버에 알립니다.
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
       public virtual global::JSSoft.Communication.Grpc.PingReply Ping(global::JSSoft.Communication.Grpc.PingRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
         return Ping(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
+      /// <summary>
+      /// 주기적으로 연결 상태를 서버에 알립니다.
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
       public virtual global::JSSoft.Communication.Grpc.PingReply Ping(global::JSSoft.Communication.Grpc.PingRequest request, grpc::CallOptions options)
       {
         return CallInvoker.BlockingUnaryCall(__Method_Ping, null, options, request);
       }
+      /// <summary>
+      /// 주기적으로 연결 상태를 서버에 알립니다.
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
       public virtual grpc::AsyncUnaryCall<global::JSSoft.Communication.Grpc.PingReply> PingAsync(global::JSSoft.Communication.Grpc.PingRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
         return PingAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
+      /// <summary>
+      /// 주기적으로 연결 상태를 서버에 알립니다.
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
       public virtual grpc::AsyncUnaryCall<global::JSSoft.Communication.Grpc.PingReply> PingAsync(global::JSSoft.Communication.Grpc.PingRequest request, grpc::CallOptions options)
       {
         return CallInvoker.AsyncUnaryCall(__Method_Ping, null, options, request);
       }
+      /// <summary>
+      /// 클라이언트가 서버의 특정 메소드를 호출할 수 있도록 해주는 기능입니다.
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
       public virtual global::JSSoft.Communication.Grpc.InvokeReply Invoke(global::JSSoft.Communication.Grpc.InvokeRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
         return Invoke(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
+      /// <summary>
+      /// 클라이언트가 서버의 특정 메소드를 호출할 수 있도록 해주는 기능입니다.
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
       public virtual global::JSSoft.Communication.Grpc.InvokeReply Invoke(global::JSSoft.Communication.Grpc.InvokeRequest request, grpc::CallOptions options)
       {
         return CallInvoker.BlockingUnaryCall(__Method_Invoke, null, options, request);
       }
+      /// <summary>
+      /// 클라이언트가 서버의 특정 메소드를 호출할 수 있도록 해주는 기능입니다.
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
       public virtual grpc::AsyncUnaryCall<global::JSSoft.Communication.Grpc.InvokeReply> InvokeAsync(global::JSSoft.Communication.Grpc.InvokeRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
         return InvokeAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
+      /// <summary>
+      /// 클라이언트가 서버의 특정 메소드를 호출할 수 있도록 해주는 기능입니다.
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
       public virtual grpc::AsyncUnaryCall<global::JSSoft.Communication.Grpc.InvokeReply> InvokeAsync(global::JSSoft.Communication.Grpc.InvokeRequest request, grpc::CallOptions options)
       {
         return CallInvoker.AsyncUnaryCall(__Method_Invoke, null, options, request);
       }
+      /// <summary>
+      /// 클라이언트가 서버에 접속하면 주기적으로 Notification이 있는지 확인후 클라이언트의 Callback 서비스의 메소드를 호출합니다.
+      /// </summary>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
       public virtual grpc::AsyncDuplexStreamingCall<global::JSSoft.Communication.Grpc.PollRequest, global::JSSoft.Communication.Grpc.PollReply> Poll(grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
         return Poll(new grpc::CallOptions(headers, deadline, cancellationToken));
       }
+      /// <summary>
+      /// 클라이언트가 서버에 접속하면 주기적으로 Notification이 있는지 확인후 클라이언트의 Callback 서비스의 메소드를 호출합니다.
+      /// </summary>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
       public virtual grpc::AsyncDuplexStreamingCall<global::JSSoft.Communication.Grpc.PollRequest, global::JSSoft.Communication.Grpc.PollReply> Poll(grpc::CallOptions options)
       {
         return CallInvoker.AsyncDuplexStreamingCall(__Method_Poll, null, options);
