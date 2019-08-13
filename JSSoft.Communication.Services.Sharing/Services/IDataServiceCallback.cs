@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System;
 using JSSoft.Communication;
 
 namespace JSSoft.Communication.Services
@@ -27,9 +28,6 @@ namespace JSSoft.Communication.Services
     public interface IDataServiceCallback
     {
         [OperationContract]
-        void OnLoggedIn(string userID);
-
-        [OperationContract]
-         void OnAdd(string userID, int test);
+        void OnDataBaseCreated(string dataBaseName, DateTime dateTime);
     }
 }

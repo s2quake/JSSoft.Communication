@@ -118,6 +118,7 @@ namespace JSSoft.Communication.ConsoleApp
             commandList.Add(new CloseCommand(serviceContext, lazyShell));
             commandList.Add(new ExitCommand(lazyIShell));
             commandList.Add(new LoginCommand(lazyShell, lazyUserService));
+            commandList.Add(new LogoutCommand(lazyShell, lazyUserService));
             commandList.Add(new OpenCommand(serviceContext, lazyShell));
             commandList.Add(new UserCommand(lazyShell, lazyUserService));
             commandContext = new CommandContext(commandList, Enumerable.Empty<ICommandProvider>());

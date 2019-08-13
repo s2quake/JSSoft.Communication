@@ -29,8 +29,7 @@ namespace JSSoft.Communication.Services
 {
     class DataService : IDataService
     {
-        private readonly Dictionary<string, string> typeByName = new Dictionary<string, string>();
-        private readonly Dictionary<string, string> tableByName = new Dictionary<string, string>();
+        private readonly HashSet<string> dataBases = new HashSet<string>();
         private readonly IDataServiceCallback callback;
 
         public DataService(IDataServiceCallback callback)
@@ -39,24 +38,13 @@ namespace JSSoft.Communication.Services
             this.Dispatcher = new Dispatcher(this);
         }
 
-        public Task<DateTime> CreateTypeAsync(string typeName)
+        public Task<DateTime> CreateDataBaseAsync(string dataBaseName)
         {
             return this.Dispatcher.InvokeAsync(() =>
             {
-                if (this.typeByName.ContainsKey(typeName) == true)
-                    throw new ArgumentNullException(nameof(typeByName));
-                this.typeByName.Add(typeName, string.Empty);
-                return DateTime.UtcNow;
-            });
-        }
-
-        public Task<DateTime> CreateTableAsync(string tableName)
-        {
-            return this.Dispatcher.InvokeAsync(() =>
-            {
-                if (this.tableByName.ContainsKey(tableName) == true)
-                    throw new ArgumentNullException(nameof(tableName));
-                this.tableByName.Add(tableName, string.Empty);
+                if (this.dataBases.Contains(dataBaseName) == true)
+                    throw new ArgumentNullException(nameof(dataBaseName));
+                this.dataBases.Add(dataBaseName);
                 return DateTime.UtcNow;
             });
         }

@@ -65,6 +65,7 @@ namespace JSSoft.Communication.ConsoleApp
             this.userServiceNotification = userServiceNotification;
             this.userServiceNotification.LoggedIn += UserServiceNotification_LoggedIn;
             this.userServiceNotification.LoggedOut += UserServiceNotification_LoggedOut;
+            this.userServiceNotification.MessageReceived += userServiceNotification_MessageReceived;
             this.commandContext = commandContext;
             this.Title = "Server";
         }
@@ -99,6 +100,7 @@ namespace JSSoft.Communication.ConsoleApp
             }
             else
             {
+                Console.ResetColor();
                 var pattern = $"(.+@)(.+){this.Postfix}";
                 var match = Regex.Match(prompt, pattern);
                 var p1 = prompt.TrimStart();
@@ -157,7 +159,7 @@ namespace JSSoft.Communication.ConsoleApp
         {
             this.IsOpened = true;
             this.UpdatePrompt();
-            
+
             if (this.isServer)
             {
                 this.Title = $"Server {this.serviceHost.Host}:{this.serviceHost.Port}";
@@ -203,6 +205,24 @@ namespace JSSoft.Communication.ConsoleApp
         {
             this.Out.WriteLine($"User logged out: {e.UserID}");
             this.Out.WriteLine();
+        }
+
+        private void userServiceNotification_MessageReceived(object sender, UserMessageEventArgs e)
+        {
+            if (e.Sender == this.UserID)
+            {
+                using (TerminalColor.SetForeground(ConsoleColor.Magenta))
+                {
+                    this.Out.WriteLine($"'{e.Receiver}'에게 귓속말: {e.Message}");
+                }
+            }
+            else if (e.Receiver == this.UserID)
+            {
+                using (TerminalColor.SetForeground(ConsoleColor.Magenta))
+                {
+                    this.Out.WriteLine($"'{e.Receiver}'의 귓속말: {e.Message}");
+                }
+            }
         }
 
         #region IServiceProvider

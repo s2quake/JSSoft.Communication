@@ -48,9 +48,22 @@ namespace JSSoft.Communication.Services
             this.userByID.Add("admin", new UserInfo()
             {
                 UserID = "admin",
+                Password = "admin",
                 UserName = "Administrator",
                 Authority = Authority.Admin,
             });
+
+            for (var i = 0; i < 10; i++)
+            {
+                var user = new UserInfo()
+                {
+                    UserID = $"user{i}",
+                    Password = "1234",
+                    UserName = $"사용자{i}",
+                    Authority = Authority.Member,
+                };
+                this.userByID.Add(user.UserID, user);
+            }
         }
 
         public Task CreateAsync(Guid token, string userID, string password, Authority authority)
@@ -123,7 +136,7 @@ namespace JSSoft.Communication.Services
         {
             return this.Dispatcher.InvokeAsync(() =>
             {
-                this.ValidatePassword(userID);
+                this.ValidatePassword(userID, password);
 
                 var token = Guid.NewGuid();
                 var user = this.userByID[userID];
@@ -228,7 +241,7 @@ namespace JSSoft.Communication.Services
         {
             this.Deleted?.Invoke(this, e);
         }
-        
+
         protected virtual void OnLoggedIn(UserEventArgs e)
         {
             this.LoggedIn?.Invoke(this, e);
