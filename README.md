@@ -108,8 +108,19 @@ Windows 에서는 **PowerShell**을 실행합니다.
 
     
 
-# 코딩해보기
+# 간단한 예제를 작성해보면서 무엇인지 알아보기
+
+본 예제는 Visual Studio Code 를 접해보지 못한 사용자를 기준으로 작성하였습니다.
+
+## 1. Visual Studio Code 폴더 열기
+
+Visual Studio Code 를 실행후 폴더 열기로 소스 위치를 선택합니다.
+
+
+
 
 <kdb>&#8984;</kdb>
 
 Press <kbd>CMD</kbd> + <kbd>SHIFT</kbd> + <kbd>></kbd>
+
+<button class="button-save large" onclick="alret('a')">Big Fat Button</button>
