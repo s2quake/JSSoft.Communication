@@ -30,9 +30,9 @@ using System.ComponentModel.Composition;
 
 namespace JSSoft.Communication.Commands
 {
-    #if MEF
+#if MEF
     [Export(typeof(ICommand))]
-    #endif
+#endif
     class OpenCommand : CommandAsyncBase
     {
         private readonly IServiceContext serviceHost;
@@ -40,7 +40,7 @@ namespace JSSoft.Communication.Commands
 
 #if MEF
         [ImportingConstructor]
-        #endif
+#endif
         public OpenCommand(IServiceContext serviceHost, Lazy<Shell> shell)
         {
             this.serviceHost = serviceHost;

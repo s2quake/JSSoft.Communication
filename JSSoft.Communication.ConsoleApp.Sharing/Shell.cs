@@ -198,13 +198,11 @@ namespace JSSoft.Communication.ConsoleApp
         private void UserServiceNotification_LoggedIn(object sender, UserEventArgs e)
         {
             this.Out.WriteLine($"User logged in: {e.UserID}");
-            this.Out.WriteLine();
         }
 
         private void UserServiceNotification_LoggedOut(object sender, UserEventArgs e)
         {
             this.Out.WriteLine($"User logged out: {e.UserID}");
-            this.Out.WriteLine();
         }
 
         private void userServiceNotification_MessageReceived(object sender, UserMessageEventArgs e)

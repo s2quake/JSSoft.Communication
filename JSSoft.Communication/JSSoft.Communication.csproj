@@ -9,9 +9,9 @@
     <RepositoryUrl>https://github.com/s2quake/grpc-sample</RepositoryUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
-  <ItemGroup>
+  <!-- <ItemGroup>
     <Protobuf Include="Grpc\adaptor.proto" OutputDir="%(RelativePath)Grpc" CompileOutputs="false" GrpcServices="both" Access="internal" />
-  </ItemGroup>
+  </ItemGroup> -->
   <ItemGroup>
     <PackageReference Include="google.protobuf" Version="3.9.0" />
     <PackageReference Include="grpc" Version="1.22.0" />
