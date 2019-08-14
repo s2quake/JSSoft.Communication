@@ -68,6 +68,11 @@ namespace JSSoft.Communication
             return TypeDescriptor.CreateInstance(null, this.ServiceType, null, null) as T;
         }
 
+        protected virtual void DestroyService(T service)
+        {
+
+        }
+
         private protected override object CreateInstanceInternal(object obj)
         {
             return this.CreateService();
@@ -75,7 +80,7 @@ namespace JSSoft.Communication
 
         private protected override void DestroyInstanceInternal(object obj)
         {
-            
+            this.DestroyService(obj as T);
         }
     }
 }

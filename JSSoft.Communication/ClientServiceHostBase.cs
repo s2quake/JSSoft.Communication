@@ -68,6 +68,11 @@ namespace JSSoft.Communication
             
         }
 
+        protected virtual void OnServiceDestroyed()
+        {
+
+        }
+
         private protected override object CreateInstanceInternal(object obj)
         {
             this.OnServiceCreated(obj as T);
@@ -76,7 +81,7 @@ namespace JSSoft.Communication
 
         private protected override void DestroyInstanceInternal(object obj)
         {
-           
+            this.OnServiceDestroyed();
         }
     }
 }

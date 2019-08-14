@@ -40,14 +40,14 @@ namespace JSSoft.Communication.Services
             this.dataService = dataService;
         }
 
-        public override object CreateInstance(object obj)
+        protected override IDataService CreateService()
         {
-            return new DataService();
+            return this.dataService;
         }
 
-        public override void DestroyInstance(object obj)
+        protected override void DestroyService(IDataService service)
         {
-            if (obj is DataService dataService)
+            if (service is DataService dataService)
             {
                 dataService.Dispose();
             }

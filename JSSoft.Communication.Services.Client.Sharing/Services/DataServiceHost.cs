@@ -46,5 +46,10 @@ namespace JSSoft.Communication.Services
         {
             this.dataService.SetDataService(service);
         }
+
+        protected override void OnServiceDestroyed()
+        {
+            this.dataService.SetDataService(null);
+        }
     }
 }

@@ -42,13 +42,13 @@ namespace JSSoft.Communication.Services
             this.userService = userService;
         }
 
-        public override object CreateService(object callback)
+        protected override IUserServiceCallback CreateCallback(IUserService service)
         {
-            this.userService.SetUserService(obj as IUserService);
+            this.userService.SetUserService(service);
             return this.userService;
         }
 
-        public override void DestroyInstance(object obj)
+        protected override void DestroyCallback(IUserServiceCallback callback)
         {
             this.userService.SetUserService(null);
         }
