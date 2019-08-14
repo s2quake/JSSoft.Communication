@@ -106,12 +106,13 @@ namespace JSSoft.Communication.ConsoleApp
             var userService = new UserService();
             var userServiceHost = new UserServiceHost(userService);
             var lazyUserService = new Lazy<IUserService>(() => userService);
-#if SERVER
-            var dataServiceHost = new DataServiceHost();
+            var dataService = new DataService();
+            var dataServiceHost = new DataServiceHost(dataService);
+            var lazyDataService = new Lazy<IDataService>(() => dataService);
             serviceHosts = new IServiceHost[] { userServiceHost, dataServiceHost };
+#if SERVER
             serviceContext = new ServerContext(serviceHosts);
 #else
-            serviceHosts = new IServiceHost[] { userServiceHost };
             serviceContext = new ClientContext(serviceHosts);
 #endif
 
@@ -121,6 +122,7 @@ namespace JSSoft.Communication.ConsoleApp
             commandList.Add(new LogoutCommand(lazyShell, lazyUserService));
             commandList.Add(new OpenCommand(serviceContext, lazyShell));
             commandList.Add(new UserCommand(lazyShell, lazyUserService));
+            commandList.Add(new DataCommand(lazyShell, lazyDataService));
             commandContext = new CommandContext(commandList, Enumerable.Empty<ICommandProvider>());
             shell = new Shell(commandContext, serviceContext, userService);
         }

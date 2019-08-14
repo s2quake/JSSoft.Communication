@@ -254,17 +254,27 @@ namespace JSSoft.Communication
         private (object, object) CreateInstance(IServiceHost serviceHost, IPeer peer)
         {
             var baseType = GetInstanceType(this, serviceHost);
-            var typeName = $"{baseType.Name}Impl";
-            var instanceType = this.instanceBuilder.CreateType(typeName, typeof(InstanceBase), baseType);
-            var instance = TypeDescriptor.CreateInstance(null, instanceType, null, null) as InstanceBase;
-            instance.ServiceHost = serviceHost;
-            instance.AdaptorHost = adaptorHost;
-            instance.Peer = peer;
+            var instance = CreateInternal();
+            if (instance != null)
+            {
+                instance.ServiceHost = serviceHost;
+                instance.AdaptorHost = adaptorHost;
+                instance.Peer = peer;
+            }
 
             var impl = serviceHost.CreateInstance(instance);
             var service = this.isServer ? impl : instance;
             var callback = this.isServer ? instance : impl;
             return (service, callback);
+
+            InstanceBase CreateInternal()
+            {
+                if (baseType == typeof(void))
+                    return null;
+                var typeName = $"{baseType.Name}Impl";
+                var instanceType = this.instanceBuilder.CreateType(typeName, typeof(InstanceBase), baseType);
+                return TypeDescriptor.CreateInstance(null, instanceType, null, null) as InstanceBase;
+            }
         }
 
         private void DestroyInstance(IServiceHost serviceHost, object service, object callback)

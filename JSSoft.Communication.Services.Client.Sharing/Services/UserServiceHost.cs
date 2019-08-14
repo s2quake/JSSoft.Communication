@@ -42,7 +42,7 @@ namespace JSSoft.Communication.Services
             this.userService = userService;
         }
 
-        public override object CreateInstance(object obj)
+        public override object CreateService(object callback)
         {
             this.userService.SetUserService(obj as IUserService);
             return this.userService;

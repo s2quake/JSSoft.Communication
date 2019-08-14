@@ -33,9 +33,49 @@ namespace JSSoft.Communication
 
         }
 
-        public override object CreateInstance(object obj)
+        protected virtual T CreateService(U callback)
         {
-            return TypeDescriptor.CreateInstance(null, this.ServiceType, null, null);
+            return TypeDescriptor.CreateInstance(null, this.ServiceType, null, null) as T;
+        }
+
+        protected virtual void DestroyService(T service)
+        {
+
+        }
+
+        private protected override object CreateInstanceInternal(object obj)
+        {
+            return this.CreateService(obj as U);
+        }
+
+        private protected override void DestroyInstanceInternal(object obj)
+        {
+            this.DestroyService(obj as T);
+        }
+    }
+
+    [ServiceHost(IsServer = true)]
+    public abstract class ServerServiceHostBase<T> : ServiceHostBase where T : class
+    {
+        protected ServerServiceHostBase()
+            : base(typeof(T), typeof(void))
+        {
+
+        }
+
+        protected virtual T CreateService()
+        {
+            return TypeDescriptor.CreateInstance(null, this.ServiceType, null, null) as T;
+        }
+
+        private protected override object CreateInstanceInternal(object obj)
+        {
+            return this.CreateService();
+        }
+
+        private protected override void DestroyInstanceInternal(object obj)
+        {
+            
         }
     }
 }

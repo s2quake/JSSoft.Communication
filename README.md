@@ -106,3 +106,10 @@ Windows 에서는 **PowerShell**을 실행합니다.
 
     dotnet run --project Client --framework netcoreapp3.0
 
+    
+
+# 코딩해보기
+
+<kdb>&#8984;</kdb>
+
+Press <kbd>CMD</kbd> + <kbd>SHIFT</kbd> + <kbd>></kbd>

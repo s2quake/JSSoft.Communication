@@ -24,17 +24,22 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ntreev.Library.Threading;
+#if MEF
+using System.ComponentModel.Composition;
+#endif
 
 namespace JSSoft.Communication.Services
 {
+#if MEF
+    [Export(typeof(IDataService))]
+    [Export(typeof(DataService))]
+#endif    
     class DataService : IDataService
     {
         private readonly HashSet<string> dataBases = new HashSet<string>();
-        private readonly IDataServiceCallback callback;
 
-        public DataService(IDataServiceCallback callback)
+        public DataService()
         {
-            this.callback = callback;
             this.Dispatcher = new Dispatcher(this);
         }
 

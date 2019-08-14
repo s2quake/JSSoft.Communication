@@ -66,9 +66,9 @@ namespace JSSoft.Communication
             });
         }
 
-        public abstract object CreateInstance(object obj);
+        private protected abstract object CreateInstanceInternal(object obj);
 
-        public abstract void DestroyInstance(object obj);
+        private protected abstract void DestroyInstanceInternal(object obj);
 
         public string Name { get; }
 
@@ -104,6 +104,16 @@ namespace JSSoft.Communication
         }
 
         #region IServiceHost
+
+        object IServiceHost.CreateInstance(object obj)
+        {
+            return this.CreateInstanceInternal(obj);
+        }
+
+        void IServiceHost.DestroyInstance(object obj)
+        {
+            this.DestroyInstanceInternal(obj);
+        }
 
         IContainer<MethodDescriptor> IServiceHost.MethodDescriptors => this.MethodDescriptors;
 

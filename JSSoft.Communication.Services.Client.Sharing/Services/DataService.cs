@@ -20,6 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System;
+using System.Threading.Tasks;
 #if MEF
 using System.ComponentModel.Composition;
 #endif
@@ -27,30 +29,21 @@ using System.ComponentModel.Composition;
 namespace JSSoft.Communication.Services
 {
 #if MEF
-    [Export(typeof(IServiceHost))]
+    [Export(typeof(IDataService))]
+    [Export(typeof(DataService))]
 #endif
-    class DataServiceHost : ServerServiceHostBase<IDataService>
+    class DataService : IDataService
     {
-        private DataService dataService;
-#if MEF
-        [ImportingConstructor]
-#endif        
-        public DataServiceHost(DataService dataService)
+        private IDataService dataService;
+
+        public Task<DateTime> CreateDataBaseAsync(string dataBaseName)
+        {
+            return this.dataService.CreateDataBaseAsync(dataBaseName);
+        }
+
+        public void SetDataService(IDataService dataService)
         {
             this.dataService = dataService;
-        }
-
-        public override object CreateInstance(object obj)
-        {
-            return new DataService();
-        }
-
-        public override void DestroyInstance(object obj)
-        {
-            if (obj is DataService dataService)
-            {
-                dataService.Dispose();
-            }
         }
     }
 }

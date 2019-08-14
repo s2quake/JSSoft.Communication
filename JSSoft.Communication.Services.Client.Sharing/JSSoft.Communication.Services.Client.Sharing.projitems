@@ -6,5 +6,7 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Services\UserService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\UserServiceHost.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\DataService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\DataServiceHost.cs" />
   </ItemGroup>
 </Project>

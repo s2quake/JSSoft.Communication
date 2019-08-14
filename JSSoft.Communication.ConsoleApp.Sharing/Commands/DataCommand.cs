@@ -20,37 +20,49 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System;
+using Ntreev.Library.Commands;
+using System.Threading.Tasks;
+using JSSoft.Communication.Services;
+using JSSoft.Communication.ConsoleApp;
 #if MEF
 using System.ComponentModel.Composition;
 #endif
 
-namespace JSSoft.Communication.Services
+namespace JSSoft.Communication.Commands
 {
 #if MEF
-    [Export(typeof(IServiceHost))]
+    [Export(typeof(ICommand))]
 #endif
-    class DataServiceHost : ServerServiceHostBase<IDataService>
+    class DataCommand : CommandMethodBase
     {
-        private DataService dataService;
+        private readonly Lazy<Shell> shell = null;
+        private readonly Lazy<IDataService> dataService = null;
+
 #if MEF
         [ImportingConstructor]
-#endif        
-        public DataServiceHost(DataService dataService)
+#endif
+        public DataCommand(Lazy<Shell> shell, Lazy<IDataService> dataService)
         {
+            this.shell = shell;
             this.dataService = dataService;
         }
 
-        public override object CreateInstance(object obj)
+        [CommandMethod]
+        public Task CreateAsync(string dataBaseName)
         {
-            return new DataService();
+            return this.DataService.CreateDataBaseAsync(dataBaseName);
         }
 
-        public override void DestroyInstance(object obj)
+        public override bool IsEnabled => this.Shell.UserToken != Guid.Empty;
+
+        protected override bool IsMethodEnabled(CommandMethodDescriptor descriptor)
         {
-            if (obj is DataService dataService)
-            {
-                dataService.Dispose();
-            }
+            return this.Shell.UserToken != Guid.Empty;
         }
+
+        private IDataService DataService => this.dataService.Value;
+
+        private Shell Shell => this.shell.Value;
     }
 }

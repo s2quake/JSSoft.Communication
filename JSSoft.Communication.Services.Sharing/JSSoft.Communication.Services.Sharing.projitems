@@ -13,6 +13,5 @@
     <Compile Include="$(MSBuildThisFileDirectory)Services\INotifyUserService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\IUserServiceCallback.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\IDataService.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Services\IDataServiceCallback.cs" />
   </ItemGroup>
 </Project>

@@ -20,14 +20,31 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System;
-using JSSoft.Communication;
+#if MEF
+using System.ComponentModel.Composition;
+#endif
 
 namespace JSSoft.Communication.Services
 {
-    public interface IDataServiceCallback
+#if MEF
+    [Export(typeof(IServiceHost))]
+#endif
+    class DataServiceHost : ClientServiceHostBase<IDataService>
     {
-        [OperationContract]
-        void OnDataBaseCreated(string dataBaseName, DateTime dateTime);
+        private readonly DataService dataService;
+
+#if MEF
+        [ImportingConstructor]
+#endif
+        public DataServiceHost(DataService dataService)
+            : base()
+        {
+            this.dataService = dataService;
+        }
+
+        protected override void OnServiceCreated(IDataService service)
+        {
+            this.dataService.SetDataService(service);
+        }
     }
 }
