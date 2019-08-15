@@ -116,7 +116,17 @@ Windows 에서는 **PowerShell**을 실행합니다.
 
 Visual Studio Code 를 실행후 폴더 열기로 소스 위치를 선택합니다.
 
+| macOS       | Windows     |
+| ----------- | ----------- |
+| <kdb>⌘</kdb> + <kbd>O</kbd> | <kbd>Ctrl</kbd> + <kbd>K</kbd>  <kbd>Ctrl</kbd> + <kbd>O</kbd>       |
 
+
+
+
+
+ee
+ ------------------------------------------------------------------|
+| <kdb>⌘</kdb> + <kbd>O</kbd> | <kbd>Ctrl</kbd> + <kbd>K</kbd>, <kbd>O</kbd> |
 
 
 <kdb>&#8984;</kdb>
@@ -124,3 +134,13 @@ Visual Studio Code 를 실행후 폴더 열기로 소스 위치를 선택합니�
 Press <kbd>CMD</kbd> + <kbd>SHIFT</kbd> + <kbd>></kbd>
 
 <button class="button-save large" onclick="alret('a')">Big Fat Button</button>
+
+```{r setup, echo=FALSE}
+show_text <- FALSE
+```
+
+```{r conditional_block, echo=FALSE, results='asis', eval=show_text}
+cat("## Hey look, a heading!
+
+lorem ipsum dolor emet...")
+```
