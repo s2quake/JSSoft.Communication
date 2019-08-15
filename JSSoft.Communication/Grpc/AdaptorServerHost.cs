@@ -99,7 +99,7 @@ namespace JSSoft.Communication.Grpc
                 throw new InvalidOperationException();
             var service = this.serviceHosts[request.ServiceName];
             if (service.MethodDescriptors.ContainsKey(request.Name) == false)
-                throw new InvalidOperationException();
+                throw new InvalidOperationException($"method '{request.Name}' does not exists.");
 
             var methodDescriptor = service.MethodDescriptors[request.Name];
             var peerDescriptor = this.Peers[context.Peer];

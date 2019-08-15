@@ -147,19 +147,26 @@ Visual Studio Code 를 실행후 폴더 열기로 소스 위치를 선택합니�
 
 ```csharp
 using System.Threading.Tasks;
+using JSSoft.Communication;
 
 namespace Services
 {
-    interface IMyService
+    public interface IMyService
     {
+        [OperationContract]
         string Login(string userID);
 
+        [OperationContract]
         Task<(string product, string version)> GetVersionAsync();
     }
 }
 ```
 
 아주 간단한 Login 메소드와 복잡해보이고 웬지 코딩 숙련도가 높아질것 같은 비동기 메소드 GetVersionAsync 를 정의하였습니다.
+
+> 만약 인터페이스를 `internal` 으로 사용하고자 한다면 코드 상단에 다음 구문을 추가 해야 합니다.
+
+    [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("JSSoft.Communication.Runtime")]
 
 ## 4. 나만의 서비스 구현하기
 
@@ -205,7 +212,7 @@ namespace Server_Test
 
 IServiceHost 은(는) 직접 구현하기 힘들기 때문에 구현된 기본 클래스인 `ServerServiceHostBase` 을(를) 상속받아 정의합니다.
 
-> Server-Test 경로내에 `MyServiceHost.cs` 파일을 만들고 아래와 같이 내용을 구현합니다.
+> Server-Test 경로내에 `MyServiceHost.cs` 파일을 만들고 다음과 같이 작성합니다.
 
 ```csharp
 using System;
@@ -233,7 +240,7 @@ namespace Server_Test
 
 이제 준비된 서비스를 사용하여 서버를 실행해봅니다.
 
-> Server-Test 경로내에 `ServerContext.cs` 파일을 만들고 아래와 같이 내용을 구현합니다.
+> Server-Test 경로내에 `ServerContext.cs` 파일을 만들고 다음과 같이 작성합니다.
 
 ```csharp
 using JSSoft.Communication;
@@ -289,7 +296,7 @@ namespace Server_Test
 
 ## 8. 클라이언트 구현하기
 
-> 
+> Client-Test 경로내에 MyServiceHost.cs 파일을 만들고 내용을 다음과 같이 작성합니다.
 
 ```csharp
 using System;
@@ -300,12 +307,18 @@ namespace Client_Test
 {
     class MyServiceHost : ClientServiceHostBase<IMyService>
     {
+        public IMyService Service { get; private set; }
 
+        protected override void OnServiceCreated(IMyService service)
+        {
+            this.Service = service;
+        }
     }
 }
 ```
 
-> Server-Test 경로내에 Program.cs 내용을 다음과 같이 작성합니다.
+> Client-Test 경로내에 ClientContext.cs 파일을 만들고 내용을 다음과 같이 작성합니다.
+
 ```csharp
 using JSSoft.Communication;
 
@@ -313,8 +326,8 @@ namespace Client_Test
 {
     class ClientContext : ClientContextBase
     {
-        public ClientContext()
-            : base(new MyServiceHost())
+        public ClientContext(params IServiceHost[] serviceHosts)
+            : base(serviceHosts)
         {
 
         }
@@ -326,7 +339,6 @@ namespace Client_Test
 ```csharp
 using System;
 using System.Threading.Tasks;
-using JSSoft.Communication;
 
 namespace Client_Test
 {
@@ -334,11 +346,18 @@ namespace Client_Test
     {
         static async Task Main(string[] args)
         {
-            var serviceContext = new ClientContext();
+            var serviceHost = new MyServiceHost();
+            var serviceContext = new ClientContext(serviceHost);
 
             var token = await serviceContext.OpenAsync();
+            var service = serviceHost.Service;
 
-            Console.WriteLine("서버에 연결되었습니다.");
+            var id = service.Login("admin");
+            var (product, version) = await service.GetVersionAsync();
+            Console.WriteLine($"logged in: {id}");
+            Console.WriteLine($"product: {product}");
+            Console.WriteLine($"version: {version}");
+
             Console.WriteLine("종료하려면 아무 키나 누르세요.");
             Console.ReadKey();
 
@@ -347,3 +366,17 @@ namespace Client_Test
     }
 }
 ```
+
+## 9. 빌드 및 실행하기
+
+새로운 terminal이나 PowerShell 실행후 소스 경로에서 아래의 명령을 실행하여 빌드합니다.
+
+    dotnet build --framework netcoreapp3.0
+
+빌드가 완료된 후에 아래의 명령을 실행하여 서버를 실행합니다.
+
+    dotnet run --project Server-Test
+
+다시 새로운 terminal이나 PowerShell 실행후 소스 경로에서 아래의 명령을 실행하여 클라이언트를 실행합니다.
+
+    dotnet run --projet Client-Test
