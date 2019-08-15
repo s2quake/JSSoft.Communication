@@ -39,6 +39,7 @@ namespace JSSoft.Communication.ConsoleApp
             catch (Exception e)
             {
                 Console.Error.WriteLine(e);
+                Console.ReadKey();
                 Environment.Exit(1);
             }
         }

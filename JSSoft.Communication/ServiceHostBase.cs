@@ -34,10 +34,11 @@ namespace JSSoft.Communication
 
         internal ServiceHostBase(Type serviceType, Type callbackType)
         {
+            this.ServiceType = serviceType ?? throw new ArgumentNullException(nameof(serviceType));
+            this.CallbackType = callbackType ?? throw new ArgumentNullException(nameof(callbackType));
             this.Name = serviceType.Name;
-            this.ServiceType = serviceType;
-            this.CallbackType = callbackType;
             this.MethodDescriptors = new MethodDescriptorCollection(this);
+            this.OnValidate();
         }
 
         public Type ServiceType { get; }
@@ -68,10 +69,6 @@ namespace JSSoft.Communication
             this.Dispatcher = null;
         }
 
-        private protected abstract object CreateInstanceInternal(object obj);
-
-        private protected abstract void DestroyInstanceInternal(object obj);
-
         public string Name { get; }
 
         public event EventHandler Opened;
@@ -87,6 +84,26 @@ namespace JSSoft.Communication
         {
             this.Closed?.Invoke(this, e);
         }
+
+        protected virtual void OnValidate()
+        {
+            if (this.ServiceType.IsInterface == false)
+                throw new InvalidOperationException("service type must be interface.");
+            if (this.ServiceType.IsPublic == false && this.ServiceType.IsVisible == false)
+                throw new InvalidOperationException($"'{this.ServiceType.Name}' must be public or internal.");
+
+            if (this.CallbackType != typeof(void))
+            {
+                if (this.CallbackType.IsInterface == false)
+                    throw new InvalidOperationException("callback type must be interface.");
+                if (this.CallbackType.IsPublic == false && this.CallbackType.IsVisible == false)
+                    throw new InvalidOperationException($"'{this.ServiceType.Name}' type must be public or internal.");
+            }
+        }
+
+        private protected abstract object CreateInstanceInternal(object obj);
+
+        private protected abstract void DestroyInstanceInternal(object obj);
 
         internal static bool IsServer(ServiceHostBase serviceHost)
         {

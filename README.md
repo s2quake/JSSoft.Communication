@@ -148,7 +148,7 @@ Visual Studio Code 를 실행후 폴더 열기로 소스 위치를 선택합니�
 ```csharp
 using System.Threading.Tasks;
 
-namespace Server_Test
+namespace Services
 {
     interface IMyService
     {
@@ -170,6 +170,7 @@ namespace Server_Test
 ```csharp
 using System;
 using System.Threading.Tasks;
+using Services;
 
 namespace Server_Test
 {
@@ -209,6 +210,7 @@ IServiceHost 은(는) 직접 구현하기 힘들기 때문에 구현된 기본 �
 ```csharp
 using System;
 using JSSoft.Communication;
+using Services;
 
 namespace Server_Test
 {
@@ -254,7 +256,7 @@ namespace Server_Test
 ```csharp
 using System;
 using System.Threading.Tasks;
-using JSSoft.Communication.Services;
+using JSSoft.Communication;
 
 namespace Server_Test
 {
@@ -262,9 +264,7 @@ namespace Server_Test
     {
         static async Task Main(string[] args)
         {
-            var service = new MyService();
-            var serviceHost = new MyServiceHost();
-            var serviceContext = new ServerContext(serviceHost);
+            var serviceContext = new ServerContext();
 
             var token = await serviceContext.OpenAsync();
 
@@ -289,9 +289,12 @@ namespace Server_Test
 
 ## 8. 클라이언트 구현하기
 
+> 
+
 ```csharp
 using System;
 using JSSoft.Communication;
+using Services;
 
 namespace Client_Test
 {
@@ -323,7 +326,7 @@ namespace Client_Test
 ```csharp
 using System;
 using System.Threading.Tasks;
-using JSSoft.Communication.Services;
+using JSSoft.Communication;
 
 namespace Client_Test
 {
@@ -331,13 +334,11 @@ namespace Client_Test
     {
         static async Task Main(string[] args)
         {
-            var service = new MyService();
-            var serviceHost = new MyServiceHost();
-            var serviceContext = new ClientContext(serviceHost);
+            var serviceContext = new ClientContext();
 
             var token = await serviceContext.OpenAsync();
 
-            Console.WriteLine("서버가 시작되었습니다.");
+            Console.WriteLine("서버에 연결되었습니다.");
             Console.WriteLine("종료하려면 아무 키나 누르세요.");
             Console.ReadKey();
 
