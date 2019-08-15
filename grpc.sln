@@ -3,31 +3,33 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29025.244
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server-MEF", "Server-MEF\Server.csproj", "{E7713170-CD96-4B4F-AC64-9AD964F7A762}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server", "Server-MEF\Server.csproj", "{E7713170-CD96-4B4F-AC64-9AD964F7A762}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client-MEF", "Client-MEF\Client.csproj", "{0D6FD7D3-D158-41A5-9E2D-2D17149902E8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client", "Client-MEF\Client.csproj", "{0D6FD7D3-D158-41A5-9E2D-2D17149902E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JSSoft.Communication", "JSSoft.Communication\JSSoft.Communication.csproj", "{46F9FF22-9DEB-4D24-84C1-5FD07F2A1993}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Communication", "JSSoft.Communication\JSSoft.Communication.csproj", "{46F9FF22-9DEB-4D24-84C1-5FD07F2A1993}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sub-modules", "sub-modules", "{FDD91626-BAFF-44EF-B16B-4E2F1ABFB96E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Ntreev.Library", "Ntreev.Library", "{DE89FD3F-CDE8-4202-BB34-AB85D5B36C4A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Library", "sub-modules\Ntreev.Library\Ntreev.Library\Ntreev.Library.csproj", "{9E4D4930-3035-4B7F-B610-342165ECAD29}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Library", "sub-modules\Ntreev.Library\Ntreev.Library\Ntreev.Library.csproj", "{9E4D4930-3035-4B7F-B610-342165ECAD29}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Ntreev.Library.Commands", "Ntreev.Library.Commands", "{867E648D-4CFE-4F8A-A1F9-48299790E279}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Library.Commands", "sub-modules\Ntreev.Library.Commands\Ntreev.Library.Commands\Ntreev.Library.Commands.csproj", "{69DCC655-CE13-4BEA-AD09-36C43C3933CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Library.Commands", "sub-modules\Ntreev.Library.Commands\Ntreev.Library.Commands\Ntreev.Library.Commands.csproj", "{69DCC655-CE13-4BEA-AD09-36C43C3933CD}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NoMEF", "NoMEF", "{8B3DE4D2-DD95-4C99-878D-5FF15EFF1128}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MEF", "MEF", "{8B3DE4D2-DD95-4C99-878D-5FF15EFF1128}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{49BBC2E5-4CE6-47EA-A427-0C3E88F22E19}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server", "Server\Server.csproj", "{49BBC2E5-4CE6-47EA-A427-0C3E88F22E19}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{CD2B8A1E-F105-4847-B820-8637C50670AD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client", "Client\Client.csproj", "{CD2B8A1E-F105-4847-B820-8637C50670AD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server-Simple", "Server-Simple\Server.csproj", "{70C77F8D-2AD0-41CB-9FD7-B33B384CF82D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server", "Server-Simple\Server.csproj", "{70C77F8D-2AD0-41CB-9FD7-B33B384CF82D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client-Simple", "Client-Simple\Client.csproj", "{DA9822EF-860E-499E-9DBB-218613FEDECF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client", "Client-Simple\Client.csproj", "{DA9822EF-860E-499E-9DBB-218613FEDECF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Simple", "Simple", "{F4E7CE1D-053E-4FEE-8C36-CB8750280E9F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -151,14 +153,17 @@ Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {31A49F4B-E896-49EF-989A-CF426E43F01B}
-	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{E7713170-CD96-4B4F-AC64-9AD964F7A762} = {8B3DE4D2-DD95-4C99-878D-5FF15EFF1128}
+		{0D6FD7D3-D158-41A5-9E2D-2D17149902E8} = {8B3DE4D2-DD95-4C99-878D-5FF15EFF1128}
 		{DE89FD3F-CDE8-4202-BB34-AB85D5B36C4A} = {FDD91626-BAFF-44EF-B16B-4E2F1ABFB96E}
 		{9E4D4930-3035-4B7F-B610-342165ECAD29} = {DE89FD3F-CDE8-4202-BB34-AB85D5B36C4A}
 		{867E648D-4CFE-4F8A-A1F9-48299790E279} = {FDD91626-BAFF-44EF-B16B-4E2F1ABFB96E}
 		{69DCC655-CE13-4BEA-AD09-36C43C3933CD} = {867E648D-4CFE-4F8A-A1F9-48299790E279}
-		{49BBC2E5-4CE6-47EA-A427-0C3E88F22E19} = {8B3DE4D2-DD95-4C99-878D-5FF15EFF1128}
+		{70C77F8D-2AD0-41CB-9FD7-B33B384CF82D} = {F4E7CE1D-053E-4FEE-8C36-CB8750280E9F}
+		{DA9822EF-860E-499E-9DBB-218613FEDECF} = {F4E7CE1D-053E-4FEE-8C36-CB8750280E9F}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {31A49F4B-E896-49EF-989A-CF426E43F01B}
 	EndGlobalSection
 EndGlobal
