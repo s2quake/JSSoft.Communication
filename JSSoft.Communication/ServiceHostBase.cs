@@ -89,16 +89,30 @@ namespace JSSoft.Communication
         {
             if (this.ServiceType.IsInterface == false)
                 throw new InvalidOperationException("service type must be interface.");
-            if (this.ServiceType.IsPublic == false && this.ServiceType.IsVisible == false)
+            if (this.ServiceType.IsNested == true)
+                throw new InvalidOperationException("service type can not be nested type.");
+            if (IsPublicType(this.ServiceType) == false && IsInternalType(this.ServiceType) == false)
                 throw new InvalidOperationException($"'{this.ServiceType.Name}' must be public or internal.");
 
             if (this.CallbackType != typeof(void))
             {
                 if (this.CallbackType.IsInterface == false)
                     throw new InvalidOperationException("callback type must be interface.");
-                if (this.CallbackType.IsPublic == false && this.CallbackType.IsVisible == false)
+                if (this.CallbackType.IsNested == true)
+                throw new InvalidOperationException("callback type can not be nested type.");
+                if (IsPublicType(this.CallbackType) == false && IsInternalType(this.CallbackType) == false)
                     throw new InvalidOperationException($"'{this.ServiceType.Name}' type must be public or internal.");
             }
+        }
+
+        private static bool IsPublicType(Type type)
+        {
+            return type.IsVisible == true && type.IsPublic == true && type.IsNotPublic == false;
+        }
+
+        private static bool IsInternalType(Type t)
+        {
+            return t.IsVisible == false && t.IsPublic == false && t.IsNotPublic == true;
         }
 
         private protected abstract object CreateInstanceInternal(object obj);
