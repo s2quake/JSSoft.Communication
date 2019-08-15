@@ -12,8 +12,8 @@ https://github.com/s2quake/Crema 프로젝트에서 WCF 대체할 목적으로 �
 
 # 빌드
 
-    git clone https://github.com/s2quake/grpc-sample.git --recursive
-    cd grpc-sample
+    git clone https://github.com/s2quake/JSSoft.Communication.git --recursive
+    cd JSSoft.Communication
     dotnet restore
     dotnet build --framework netcoreapp3.0
 
@@ -84,13 +84,13 @@ macOS 또는 linux 운영체제에서는 **terminal**을
 
 Windows 에서는 **PowerShell**을 실행합니다.
 
-    git clone https://github.com/s2quake/grpc-sample.git --recursive
+    git clone https://github.com/s2quake/JSSoft.Communication.git --recursive
 
 > 해당 소스는 서브모듈을 포함하고 있기 때문에 --recursive 스위치를 사용합니다.
 
 ## 3. 소스 경로로 이동
 
-    cd grpc-sample
+    cd JSSoft.Communication
 
 ## 4. 소스 빌드
 
