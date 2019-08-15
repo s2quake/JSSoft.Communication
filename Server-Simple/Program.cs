@@ -31,16 +31,16 @@ namespace JSSoft.Communication.ConsoleApp
         static async Task Main(string[] args)
         {
             var userService = new UserService();
-            using (var userServiceHost = new UserServiceHost(userService))
-            using (var serviceContext = new ServerContext(new IServiceHost[] { userServiceHost }))
-            {
-                var token = await serviceContext.OpenAsync();
+            var userServiceHost = new UserServiceHost(userService);
+            var serviceContext = new ServerContext(userServiceHost);
 
-                Console.WriteLine("종료하려면 아무 키나 누르세요.");
-                Console.ReadKey();
+            var token = await serviceContext.OpenAsync();
 
-                await serviceContext.CloseAsync(token);
-            }
+            Console.WriteLine("서버가 시작되었습니다.");
+            Console.WriteLine("종료하려면 아무 키나 누르세요.");
+            Console.ReadKey();
+
+            await serviceContext.CloseAsync(token);
         }
     }
 }

@@ -25,13 +25,13 @@ namespace JSSoft.Communication
     [ServiceContext(IsServer = true)]
     public abstract class ServerContextBase : ServiceContextBase
     {
-        protected ServerContextBase(IServiceHost[] serviceHosts)
+        protected ServerContextBase(params IServiceHost[] serviceHosts)
             : base(serviceHosts)
         {
 
         }
 
-        protected ServerContextBase(IComponentProvider componentProvider, IServiceHost[] serviceHosts)
+        protected ServerContextBase(IComponentProvider componentProvider, params IServiceHost[] serviceHosts)
             : base(componentProvider, serviceHosts)
         {
 

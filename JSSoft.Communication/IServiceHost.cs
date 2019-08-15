@@ -27,7 +27,7 @@ using Ntreev.Library.Threading;
 
 namespace JSSoft.Communication
 {
-    public interface IServiceHost : IDisposable
+    public interface IServiceHost
     {
         Task OpenAsync(ServiceToken token);
 

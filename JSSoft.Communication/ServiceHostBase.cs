@@ -28,7 +28,7 @@ using Ntreev.Library.Threading;
 
 namespace JSSoft.Communication
 {
-    public abstract class ServiceHostBase : IServiceHost, IDisposable
+    public abstract class ServiceHostBase : IServiceHost
     {
         private ServiceToken token;
 
@@ -37,7 +37,6 @@ namespace JSSoft.Communication
             this.Name = serviceType.Name;
             this.ServiceType = serviceType;
             this.CallbackType = callbackType;
-            this.Dispatcher = new Dispatcher(this);
             this.MethodDescriptors = new MethodDescriptorCollection(this);
         }
 
@@ -52,6 +51,7 @@ namespace JSSoft.Communication
         public async Task OpenAsync(ServiceToken token)
         {
             this.token = token;
+            this.Dispatcher = new Dispatcher(this);
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.OnOpened(EventArgs.Empty);
@@ -64,6 +64,8 @@ namespace JSSoft.Communication
             {
                 this.OnClosed(EventArgs.Empty);
             });
+            this.Dispatcher.Dispose();
+            this.Dispatcher = null;
         }
 
         private protected abstract object CreateInstanceInternal(object obj);
@@ -84,14 +86,6 @@ namespace JSSoft.Communication
         protected virtual void OnClosed(EventArgs e)
         {
             this.Closed?.Invoke(this, e);
-        }
-
-        internal void Dispose()
-        {
-            if (this.Dispatcher == null)
-                throw new ObjectDisposedException($"{this.GetType()}");
-            this.Dispatcher.Dispose();
-            this.Dispatcher = null;
         }
 
         internal static bool IsServer(ServiceHostBase serviceHost)
@@ -116,12 +110,6 @@ namespace JSSoft.Communication
         }
 
         IContainer<MethodDescriptor> IServiceHost.MethodDescriptors => this.MethodDescriptors;
-
-        #endregion
-
-        #region IDisposable
-
-        void IDisposable.Dispose() => this.Dispose();
 
         #endregion
     }

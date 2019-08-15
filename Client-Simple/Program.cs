@@ -31,8 +31,8 @@ namespace JSSoft.Communication.ConsoleApp
         static async Task Main(string[] args)
         {
             var userService = new UserService();
-            using (var userServiceHost = new UserServiceHost(userService))
-            using (var serviceContext = new ClientContext(new IServiceHost[] { userServiceHost }))
+            var userServiceHost = new UserServiceHost(userService);
+            var serviceContext = new ClientContext(userServiceHost);
             {
                 var token = await serviceContext.OpenAsync();
                 var userToken = await userService.LoginAsync("admin", "admin");

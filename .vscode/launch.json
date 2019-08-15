@@ -23,7 +23,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build all",
-            "program": "${workspaceFolder}/Server-MEF/bin/Debug/netcoreapp3.0/Server.dll",
+            "program": "${workspaceFolder}/Server-Simple/bin/Debug/netcoreapp3.0/Server.dll",
             "args": [
                 "--verbose"
             ],

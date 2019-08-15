@@ -24,7 +24,7 @@ namespace JSSoft.Communication.ConsoleApp
 {
     class ServerContext : ServerContextBase
     {
-        public ServerContext(IServiceHost[] serviceHosts)
+        public ServerContext(params IServiceHost[] serviceHosts)
             : base(serviceHosts)
         {
         }

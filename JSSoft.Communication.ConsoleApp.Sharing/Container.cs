@@ -143,15 +143,7 @@ namespace JSSoft.Communication.ConsoleApp
 
         public static void Release()
         {
-            if (serviceContext is IDisposable s)
-            {
-                s.Dispose();
-            }
-
-            foreach (var item in serviceHosts.Reverse())
-            {
-                item.Dispose();
-            }
+            
         }
 
         private static Shell GetShell() => shell;

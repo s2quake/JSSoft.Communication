@@ -108,8 +108,241 @@ Windows 에서는 **PowerShell**을 실행합니다.
 
     
 
-# 코딩해보기
+# 간단한 예제를 작성해보면서 무엇인지 알아보기
 
-<kdb>&#8984;</kdb>
+## 1. Visual Studio Code 폴더 열기
 
-Press <kbd>CMD</kbd> + <kbd>SHIFT</kbd> + <kbd>></kbd>
+Visual Studio Code 를 실행후 폴더 열기로 소스 위치를 선택합니다.
+
+| 폴더 열기 | macOS       | Windows     |
+| ------- | ----------- | ----------- |
+| 단축키   | <kdb>&#8984;</kdb> + <kbd>O</kbd> | <kbd>Ctrl</kbd> + <kbd>K</kbd>  <kbd>Ctrl</kbd> + <kbd>O</kbd>       |
+
+
+## 2. 서버 프로젝트 만들기
+
+상단의 보기 메뉴에서 터미널을 선택하여 터미널 창을 띄웁니다.
+
+| 터미널 | macOS       | Windows     |
+| ------- | ----------- | ----------- |
+| 단축키   | <kdb>⌃</kdb> + <kbd>~</kbd> | <kbd>Ctrl</kbd> + <kbd>~</kbd> |
+
+> 아래 명령을 실행하여 프로젝트를 생성하고 필요한 설정을 수행합니다.
+
+    mkdir Server-Test
+    dotnet new console -o Server-Test
+    dotnet sln add Server-Test
+    dotnet add Server-Test reference JSSoft.Communication
+
+* Server-Test 경로를 생성합니다.
+* Server-Test 경로에 콘솔 프로젝트를 생성합니다.
+* Server-Test 프로젝트를 솔루션에 추가합니다.
+* Server-Test 프로젝트에 JSSoft.Communication 프로젝트를 추가합니다.
+
+## 3. 나만의 서비스 정의하기
+
+서버를 구축하기 전에 클라이언트에서 사용할 간단한 서비스를 제작해봅니다.
+
+> Server-Test 경로내에 `IMyService.cs` 파일을 만들고 아래와 같은 인터페이스를 정의합니다.
+
+```csharp
+using System.Threading.Tasks;
+
+namespace Server_Test
+{
+    interface IMyService
+    {
+        string Login(string userID);
+
+        Task<(string product, string version)> GetVersionAsync();
+    }
+}
+```
+
+아주 간단한 Login 메소드와 복잡해보이고 웬지 코딩 숙련도가 높아질것 같은 비동기 메소드 GetVersionAsync 를 정의하였습니다.
+
+## 4. 나만의 서비스 구현하기
+
+이제 인터페이스를 정의했으니 실제 작업을 구현해봅니다.
+
+> Server-Test 경로내에 `MyService.cs` 파일을 만들고 아래와 같이 작업을 구현합니다.
+
+```csharp
+using System;
+using System.Threading.Tasks;
+
+namespace Server_Test
+{
+    class MyService : IMyService
+    {
+        public string Login(string userID)
+        {
+            Console.WriteLine($"logged in: '{userID}'");
+            return $"{Guid.NewGuid()}";
+        }
+
+        public Task<(string product, string version)> GetVersionAsync()
+        {
+            return Task.Run(() =>
+            {
+                return ("MyServer", "1.0.0.0");
+            });
+        }
+    }
+}
+```
+
+## 5. 나만의 서비스 준비하기
+
+이제 구현된 서비스를 서버에 사용할 준비를 해야 합니다.
+
+서버에는 다수의 서비스를 사용할 수 있기 때문에 이를 관리하기 위하여
+
+`IServiceHost` 라는 인터페이스를 구현해야 합니다.
+
+`IServiceHost` 은(는) 서비스의 주인 역할을 하며 서버에서 잘 사용할 수 있게 여러 제반 사항을 만들어줍니다.
+
+IServiceHost 은(는) 직접 구현하기 힘들기 때문에 구현된 기본 클래스인 `ServerServiceHostBase` 을(를) 상속받아 정의합니다.
+
+> Server-Test 경로내에 `MyServiceHost.cs` 파일을 만들고 아래와 같이 내용을 구현합니다.
+
+```csharp
+using System;
+using JSSoft.Communication;
+
+namespace Server_Test
+{
+    class MyServiceHost : ServerServiceHostBase<IMyService>
+    {
+        protected override IMyService CreateService()
+        {
+            return new MyService();
+        }
+
+        protected override void DestroyService(IMyService service)
+        {
+
+        }
+    }
+}
+```
+
+## 6. 서버 실행하기
+
+이제 준비된 서비스를 사용하여 서버를 실행해봅니다.
+
+> Server-Test 경로내에 `ServerContext.cs` 파일을 만들고 아래와 같이 내용을 구현합니다.
+
+```csharp
+using JSSoft.Communication;
+
+namespace Server_Test
+{
+    class ServerContext : ServerContextBase
+    {
+        public ServerContext()
+            : base(new MyServiceHost())
+        {
+
+        }
+    }
+}
+```
+
+> Server-Test 경로내에 Program.cs 내용을 다음과 같이 작성합니다.
+
+```csharp
+using System;
+using System.Threading.Tasks;
+using JSSoft.Communication.Services;
+
+namespace Server_Test
+{
+    class Program
+    {
+        static async Task Main(string[] args)
+        {
+            var service = new MyService();
+            var serviceHost = new MyServiceHost();
+            var serviceContext = new ServerContext(serviceHost);
+
+            var token = await serviceContext.OpenAsync();
+
+            Console.WriteLine("서버가 시작되었습니다.");
+            Console.WriteLine("종료하려면 아무 키나 누르세요.");
+            Console.ReadKey();
+
+            await serviceContext.CloseAsync(token);
+        }
+    }
+}
+```
+
+## 7. 클라이언트 프로젝트 만들기
+
+서버 프로젝트를 생성할때와 마찬가지로 터미널 창을 열고 아래 명령을 실행합니다.
+
+    mkdir Client-Test
+    dotnet new console -o Client-Test
+    dotnet sln add Client-Test
+    dotnet add Client-Test reference JSSoft.Communication
+
+## 8. 클라이언트 구현하기
+
+```csharp
+using System;
+using JSSoft.Communication;
+
+namespace Client_Test
+{
+    class MyServiceHost : ClientServiceHostBase<IMyService>
+    {
+
+    }
+}
+```
+
+> Server-Test 경로내에 Program.cs 내용을 다음과 같이 작성합니다.
+```csharp
+using JSSoft.Communication;
+
+namespace Client_Test
+{
+    class ClientContext : ClientContextBase
+    {
+        public ClientContext()
+            : base(new MyServiceHost())
+        {
+
+        }
+    }
+}
+```
+
+> Client-Test 경로내에 Program.cs 내용을 다음과 같이 작성합니다.
+```csharp
+using System;
+using System.Threading.Tasks;
+using JSSoft.Communication.Services;
+
+namespace Client_Test
+{
+    class Program
+    {
+        static async Task Main(string[] args)
+        {
+            var service = new MyService();
+            var serviceHost = new MyServiceHost();
+            var serviceContext = new ClientContext(serviceHost);
+
+            var token = await serviceContext.OpenAsync();
+
+            Console.WriteLine("서버가 시작되었습니다.");
+            Console.WriteLine("종료하려면 아무 키나 누르세요.");
+            Console.ReadKey();
+
+            await serviceContext.CloseAsync(token);
+        }
+    }
+}
+```

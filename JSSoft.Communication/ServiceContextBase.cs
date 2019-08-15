@@ -31,7 +31,7 @@ using Ntreev.Library.Threading;
 
 namespace JSSoft.Communication
 {
-    public abstract class ServiceContextBase : IServiceContext, IDisposable
+    public abstract class ServiceContextBase : IServiceContext
     {
         public const string DefaultHost = "localhost";
         public const int DefaultPort = 4004;
@@ -53,7 +53,6 @@ namespace JSSoft.Communication
             this.componentProvider = componentProvider ?? ComponentProvider.Default;
             this.instanceBuilder = new ServiceInstanceBuilder();
             this.ServiceHosts = new ServiceHostCollection(serviceHost);
-            this.Dispatcher = new Dispatcher(this);
             this.isServer = IsServer(this);
         }
 
@@ -66,6 +65,7 @@ namespace JSSoft.Communication
         public async Task<Guid> OpenAsync()
         {
             var token = ServiceToken.NewToken();
+            this.Dispatcher = new Dispatcher(this);
             await this.Dispatcher.InvokeAsync((Action)(() =>
             {
                 this.serializerProvider = this.componentProvider.GetserializerProvider(this.SerializerType);
@@ -109,6 +109,8 @@ namespace JSSoft.Communication
                 this.IsOpened = false;
                 this.OnClosed(EventArgs.Empty);
             });
+            this.Dispatcher.Dispose();
+            this.Dispatcher = null;
             this.token = ServiceToken.Empty;
         }
 
@@ -165,12 +167,6 @@ namespace JSSoft.Communication
         protected virtual void OnClosed(EventArgs e)
         {
             this.Closed?.Invoke(this, e);
-        }
-
-        internal void Dispose()
-        {
-            this.Dispatcher.Dispose();
-            this.Dispatcher = null;
         }
 
         internal static bool IsServer(ServiceContextBase serviceContext)
@@ -312,12 +308,6 @@ namespace JSSoft.Communication
         #region IServiecHost
 
         IContainer<IServiceHost> IServiceContext.ServiceHosts => this.ServiceHosts;
-
-        #endregion
-
-        #region IDisposable
-
-        void IDisposable.Dispose() => this.Dispose();
 
         #endregion
     }
