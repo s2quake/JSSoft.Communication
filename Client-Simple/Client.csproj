@@ -4,6 +4,7 @@
   </ItemGroup>
   <PropertyGroup>
     <OutputType>Exe</OutputType>
+    <TargetFrameworks Condition="'$(MSBuildRuntimeType)'=='Mono'">net45</TargetFrameworks>
     <TargetFrameworks Condition="'$(MSBuildRuntimeType)'=='Full'">net45</TargetFrameworks>
     <TargetFrameworks Condition="'$(MSBuildRuntimeType)'=='Core' And '$(NETCoreAppMaximumVersion)'=='3.0'">netcoreapp3.0</TargetFrameworks>
     <DefineConstants>CLIENT</DefineConstants>
