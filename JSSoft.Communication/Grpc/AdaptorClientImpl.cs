@@ -62,7 +62,7 @@ namespace JSSoft.Communication.Grpc
 
         public async Task CloseAsync()
         {
-            await this.timer.DisposeAsync();
+            this.timer.Dispose();
             var value = await base.CloseAsync(new CloseRequest() { Token = this.Token.ToString() });
             this.timer = null;
         }
