@@ -44,7 +44,7 @@ namespace JSSoft.Communication.Grpc
         private Server server;
         private AdaptorServerImpl adaptor;
         private ISerializer serializer;
-        
+
         static AdaptorServerHost()
         {
             localAddress = Dns.GetHostEntry(Dns.GetHostName()).AddressList.First(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork).ToString();
@@ -55,6 +55,7 @@ namespace JSSoft.Communication.Grpc
             this.serviceContext = serviceContext;
             this.serviceHosts = serviceContext.ServiceHosts;
             this.logger = GrpcEnvironment.Logger;
+            this.Peers = new PeerCollection(this);
         }
 
         internal async Task<OpenReply> Open(OpenRequest request, ServerCallContext context)
@@ -63,10 +64,10 @@ namespace JSSoft.Communication.Grpc
             {
                 var serviceNames = request.ServiceNames;
                 var serviceHosts = serviceNames.Select(item => this.serviceHosts[item]).ToArray();
-                var peer = context.Peer;
-                var peerDescriptor = new PeerDescriptor(peer, serviceHosts);
-                this.Peers.Add(peerDescriptor);
-                return peerDescriptor.Token;
+                var peerID = context.Peer;
+                var peer = new Peer(peerID, serviceHosts);
+                this.Peers.Add(peer);
+                return peer.Token;
             });
             this.logger.Debug($"Connected: {context.Peer}");
             return new OpenReply() { Token = $"{token}" };
@@ -76,8 +77,8 @@ namespace JSSoft.Communication.Grpc
         {
             await this.Dispatcher.InvokeAsync(() =>
             {
-                var peerDescriptor = this.Peers[context.Peer];
-                peerDescriptor.Dispose();
+                var peer = this.Peers[context.Peer];
+                peer.Dispose();
             });
             this.logger.Debug($"Disconnected: {context.Peer}");
             return new CloseReply();
@@ -87,9 +88,9 @@ namespace JSSoft.Communication.Grpc
         {
             return this.Dispatcher.InvokeAsync(() =>
             {
-                var peerDescriptor = this.Peers[context.Peer];
-                peerDescriptor.Ping = DateTime.UtcNow;
-                return new PingReply() { Time = peerDescriptor.Ping.Ticks };
+                var peer = this.Peers[context.Peer];
+                peer.Ping();
+                return new PingReply() { Time = peer.PingTime.Ticks };
             });
         }
 
@@ -102,8 +103,8 @@ namespace JSSoft.Communication.Grpc
                 throw new InvalidOperationException($"method '{request.Name}' does not exists.");
 
             var methodDescriptor = service.MethodDescriptors[request.Name];
-            var peerDescriptor = this.Peers[context.Peer];
-            var instance = peerDescriptor.Services[service];
+            var peer = this.Peers[context.Peer];
+            var instance = peer.Services[service];
             var args = this.serializer.DeserializeMany(methodDescriptor.ParameterTypes, request.Datas.ToArray());
             var (code, valueType, value) = await methodDescriptor.InvokeAsync(this.serviceContext, instance, args);
             var reply = new InvokeReply()
@@ -117,15 +118,19 @@ namespace JSSoft.Communication.Grpc
         internal async Task Poll(IAsyncStreamReader<PollRequest> requestStream, IServerStreamWriter<PollReply> responseStream, ServerCallContext context)
         {
             var cancellationToken = this.cancellation.Token;
-            var peer = context.Peer;
-            var peerDescriptor = await this.Dispatcher.InvokeAsync(() => this.Peers[peer]);
+            var peerID = context.Peer;
+            var peer = await this.Dispatcher.InvokeAsync(() => this.Peers[peerID]);
             while (await requestStream.MoveNext())
             {
                 var request = requestStream.Current;
-                var services = peerDescriptor.ServiceHosts;
+                var services = peer.ServiceHosts;
                 if (this.cancellation.IsCancellationRequested == true)
                 {
                     await responseStream.WriteAsync(new PollReply() { Code = -1 });
+                    break;
+                }
+                if (peer.Cancellation.IsCancellationRequested == true)
+                {
                     break;
                 }
                 var reply = new PollReply();
@@ -133,17 +138,17 @@ namespace JSSoft.Communication.Grpc
                 {
                     foreach (var item in services)
                     {
-                        var items = this.Poll(peerDescriptor, item);
+                        var items = this.Poll(peer, item);
                         reply.Items.AddRange(items);
                     }
                 });
                 await responseStream.WriteAsync(reply);
             }
-            await this.Dispatcher.InvokeAsync(()=> 
+            await this.Dispatcher.InvokeAsync(() =>
             {
-                if (this.Peers.ContainsKey(peerDescriptor.ID) == true)
+                if (this.Peers.ContainsKey(peer.ID) == true)
                 {
-                    peerDescriptor.Dispose();
+                    peer.Dispose();
                 }
             });
         }
@@ -153,7 +158,7 @@ namespace JSSoft.Communication.Grpc
 
         }
 
-        public PeerCollection Peers { get; } = new PeerCollection();
+        public PeerCollection Peers { get; }
 
         public Dispatcher Dispatcher => this.serviceContext.Dispatcher;
 
@@ -176,8 +181,8 @@ namespace JSSoft.Communication.Grpc
             var datas = this.serializer.SerializeMany(types, args);
             return this.Dispatcher.InvokeAsync(() =>
             {
-                var peerDescriptor = instance.Peer as PeerDescriptor;
-                var peers = peerDescriptor == null ? this.Peers : EnumerableUtility.One(peerDescriptor);
+                var peer = instance.Peer as Peer;
+                var peers = peer == null ? this.Peers : EnumerableUtility.One(peer);
                 var service = instance.ServiceHost;
                 foreach (var item in peers)
                 {
@@ -193,10 +198,10 @@ namespace JSSoft.Communication.Grpc
             });
         }
 
-        private PollReplyItem[] Poll(PeerDescriptor peerDescriptor, IServiceHost service)
+        private PollReplyItem[] Poll(Peer peer, IServiceHost service)
         {
             this.Dispatcher.VerifyAccess();
-            var callbacks = peerDescriptor.PollReplyItems[service];
+            var callbacks = peer.PollReplyItems[service];
             return callbacks.Flush();
         }
 
@@ -221,14 +226,14 @@ namespace JSSoft.Communication.Grpc
 
         async Task IAdaptorHost.CloseAsync()
         {
-            this.adaptor = null;
             this.cancellation.Cancel();
             while (this.Peers.Any())
             {
                 await Task.Delay(1);
             }
-            this.serializer = null;
             await this.server.ShutdownAsync();
+            this.adaptor = null;
+            this.serializer = null;
             this.server = null;
         }
 

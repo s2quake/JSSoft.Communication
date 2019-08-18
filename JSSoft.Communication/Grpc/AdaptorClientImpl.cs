@@ -21,7 +21,9 @@
 // SOFTWARE.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -29,17 +31,66 @@ using System.Threading.Tasks;
 using Grpc.Core;
 using Grpc.Core.Utils;
 using Newtonsoft.Json;
+using Ntreev.Library.ObjectModel;
 
 namespace JSSoft.Communication.Grpc
 {
-    class AdaptorClientImpl : Adaptor.AdaptorClient
+    class AdaptorClientImpl : Adaptor.AdaptorClient, IPeer
     {
+        private static readonly TimeSpan timeout = new TimeSpan(0, 0, 10);
         private readonly Channel channel;
+        private readonly Dictionary<IServiceHost, object> callbacks = new Dictionary<IServiceHost, object>();
+        private Timer timer;
 
-        public AdaptorClientImpl(Channel channel)
+        public AdaptorClientImpl(Channel channel, string id, IServiceHost[] serviceHosts)
             : base(channel)
         {
             this.channel = channel;
+            this.ID = id;
+            this.ServiceHosts = serviceHosts;
         }
+
+        public async Task OpenAsync()
+        {
+            var serviceNames = this.ServiceHosts.Select(item => item.Name).ToArray();
+            var request = new OpenRequest() { Time = DateTime.UtcNow.Ticks };
+            request.ServiceNames.AddRange(serviceNames);
+            var reply = await base.OpenAsync(request);
+            this.Token = Guid.Parse(reply.Token);
+            this.timer = new Timer(Timer_TimerCallback, null, timeout.Milliseconds, timeout.Milliseconds);
+        }
+
+        public async Task CloseAsync()
+        {
+            await this.timer.DisposeAsync();
+            var value = await base.CloseAsync(new CloseRequest() { Token = this.Token.ToString() });
+            this.timer = null;
+        }
+
+        public string ID { get; }
+
+        public Guid Token { get; private set; }
+
+        public IServiceHost[] ServiceHosts { get; }
+
+        public IReadOnlyDictionary<IServiceHost, object> Callbacks => this.callbacks;
+
+        private async void Timer_TimerCallback(object state)
+        {
+            var request = new PingRequest()
+            {
+                Token = this.Token.ToString()
+            };
+            await this.PingAsync(request);
+        }
+
+        #region IPeer
+
+        void IPeer.AddInstance(IServiceHost serviceHost, object service, object callback)
+        {
+            this.callbacks.Add(serviceHost, callback);
+        }
+
+        #endregion
     }
 }
