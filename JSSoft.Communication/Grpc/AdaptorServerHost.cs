@@ -153,11 +153,6 @@ namespace JSSoft.Communication.Grpc
             });
         }
 
-        public void Dispose()
-        {
-
-        }
-
         public PeerCollection Peers { get; }
 
         public Dispatcher Dispatcher => this.serviceContext.Dispatcher;

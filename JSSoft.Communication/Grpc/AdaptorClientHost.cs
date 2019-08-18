@@ -39,7 +39,6 @@ namespace JSSoft.Communication.Grpc
         private Task task;
         private Channel channel;
         private AdaptorClientImpl adaptorImpl;
-        private ServiceInstanceBuilder instanceBuilder = new ServiceInstanceBuilder();
         private ISerializer serializer;
         private PeerCollectionSurrogate peers;
 

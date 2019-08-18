@@ -33,7 +33,7 @@ namespace JSSoft.Communication.Grpc
 {
     class PeerCollection : ContainerBase<Peer>
     {
-        private static readonly TimeSpan timeout = new TimeSpan(0, 0, 5);
+        private static readonly TimeSpan timeout = new TimeSpan(0, 0, 30);
         private readonly AdaptorServerHost adaptorHost;
         private Timer timer;
 
@@ -41,11 +41,6 @@ namespace JSSoft.Communication.Grpc
         {
             this.adaptorHost = adaptorHost;
             this.CollectionChanged += PeerCollection_CollectionChanged;
-        }
-
-        public PeerCollection()
-        {
-            
         }
 
         public void Add(Peer item)
@@ -71,7 +66,8 @@ namespace JSSoft.Communication.Grpc
                     {
                         if (this.timer == null)
                         {
-                            this.timer = new Timer(Timer_TimerCallback, null, (int)timeout.TotalMilliseconds, (int)timeout.TotalMilliseconds);
+                            var milliseconds = (int)timeout.TotalMilliseconds;
+                            this.timer = new Timer(Timer_TimerCallback, null, milliseconds, milliseconds);
                         }
                     }
                     break;
