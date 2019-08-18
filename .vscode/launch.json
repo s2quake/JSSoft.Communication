@@ -12,7 +12,7 @@
             "program": "${workspaceFolder}/Client-MEF/bin/Debug/netcoreapp3.0/Client.dll",
             "args": [
                 "--host",
-                "192.168.0.2"
+                "localhost"
             ],
             "cwd": "${workspaceFolder}/Client",
             "stopAtEntry": false,

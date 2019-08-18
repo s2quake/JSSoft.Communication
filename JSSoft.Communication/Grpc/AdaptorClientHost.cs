@@ -37,53 +37,42 @@ namespace JSSoft.Communication.Grpc
         private AsyncDuplexStreamingCall<PollRequest, PollReply> call;
         private CancellationTokenSource cancellation;
         private Task task;
-        private string token;
         private Channel channel;
         private AdaptorClientImpl adaptorImpl;
-        private ServiceInstanceBuilder instanceBuilder = new ServiceInstanceBuilder();
         private ISerializer serializer;
+        private PeerCollectionSurrogate peers;
 
         public AdaptorClientHost(IServiceContext serviceContext)
         {
             this.serviceContext = serviceContext;
             this.serviceHosts = serviceContext.ServiceHosts;
+            this.peers = new PeerCollectionSurrogate();
         }
 
-        public Task OpenAsync(string host, int port)
+        public async Task OpenAsync(string host, int port)
         {
-            var peerDescriptor = new PeerDescriptor(host, this.serviceHosts.ToArray());
             this.channel = new Channel($"{host}:{port}", ChannelCredentials.Insecure);
-            this.adaptorImpl = new AdaptorClientImpl(this.channel);
-
-            var request = new OpenRequest() { Time = DateTime.UtcNow.Ticks };
-            request.ServiceNames.AddRange(this.serviceHosts.Keys);
-            var reply = this.adaptorImpl.Open(request);
-            this.token = reply.Token;
-
+            this.adaptorImpl = new AdaptorClientImpl(this.channel, host, this.serviceHosts.ToArray());
+            await this.adaptorImpl.OpenAsync();
+            this.peers.Set(this.adaptorImpl);
             this.cancellation = new CancellationTokenSource();
             this.serializer = this.serviceContext.GetService(typeof(ISerializer)) as ISerializer;
             this.task = this.PollAsync(this.cancellation.Token);
-
-            this.Peers.Add(peerDescriptor);
-            return Task.Delay(1);
         }
 
         public async Task CloseAsync()
         {
+            this.peers.Unset();
             if (this.adaptorImpl != null)
-                await this.adaptorImpl.CloseAsync(new CloseRequest() { Token = this.token });
-                this.Peers.Remove(this.serviceContext.Host);
+                await this.adaptorImpl.CloseAsync();
             this.cancellation.Cancel();
             this.cancellation = null;
             this.task?.Wait();
             this.task = null;
-            this.token = null;
             this.adaptorImpl = null;
             await this.channel.ShutdownAsync();
             this.channel = null;
         }
-
-        public PeerCollection Peers { get; } = new PeerCollection();
 
         public event EventHandler<DisconnectionReasonEventArgs> Disconnected;
 
@@ -142,8 +131,7 @@ namespace JSSoft.Communication.Grpc
                 throw new InvalidOperationException();
             var methodDescriptor = serviceHost.MethodDescriptors[name];
             var args = this.serializer.DeserializeMany(methodDescriptor.ParameterTypes, datas);
-            var peer = this.Peers.First();
-            var instance = peer.Callbacks[serviceHost];
+            var instance = this.adaptorImpl.Callbacks[serviceHost];
             await methodDescriptor.InvokeAsync(this.serviceContext, instance, args);
         }
 
@@ -235,7 +223,7 @@ namespace JSSoft.Communication.Grpc
             return (T)this.serializer.Deserialize(typeof(T), reply.Data);
         }
 
-        IContainer<IPeer> IAdaptorHost.Peers => this.Peers;
+        IContainer<IPeer> IAdaptorHost.Peers => this.peers;
 
         #endregion
     }

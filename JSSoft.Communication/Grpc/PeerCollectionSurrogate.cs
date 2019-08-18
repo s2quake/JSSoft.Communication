@@ -20,39 +20,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System;
-using System.Collections.Generic;
+using Ntreev.Library.ObjectModel;
 
 namespace JSSoft.Communication.Grpc
 {
-    class PeerProperties
+    class PeerCollectionSurrogate : ContainerBase<IPeer>
     {
-        private readonly Dictionary<string, object> properties = new Dictionary<string, object>();
+        private IPeer peer;
 
-        public void Add(string peer, string key, object value)
+        public void Set(IPeer peer)
         {
-            this.properties.Add(GetKey(peer, key), value);
+            this.peer = peer;
+            base.AddBase(this.peer.ID, this.peer);
         }
 
-        public void Contains(string peer, string key)
+        public void Unset()
         {
-            this.properties.ContainsKey(GetKey(peer, key));
-        }
-
-        public void Remove(string peer, string key)
-        {
-            this.properties.Remove(GetKey(peer, key));
-        }
-
-        public object this[string peer, string key]
-        {
-            get => this.properties[GetKey(peer, key)];
-            set => this.properties[GetKey(peer, key)] = value;
-        }
-
-        private static string GetKey(string peer, string key)
-        {
-            return $"{peer}.{key}";
+            base.RemoveBase(this.peer.ID);
+            this.peer = null;
         }
     }
 }
