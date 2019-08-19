@@ -3,6 +3,8 @@
     <TargetFramework Condition="'$(MSBuildRuntimeType)'=='Mono'">net45</TargetFramework>
     <TargetFramework Condition="'$(MSBuildRuntimeType)'=='Full'">net45</TargetFramework>
     <TargetFramework Condition="'$(MSBuildRuntimeType)'=='Core' And '$(NETCoreAppMaximumVersion)'=='3.0'">netcoreapp3.0</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup>
     <Version>0.9.19223.1745</Version>
     <AssemblyVersion>0.9</AssemblyVersion>
     <FileVersion>0.9.19223.1745</FileVersion>

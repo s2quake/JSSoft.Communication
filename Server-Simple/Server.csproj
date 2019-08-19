@@ -1,12 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <ItemGroup>
-    <ProjectReference Include="..\JSSoft.Communication\JSSoft.Communication.csproj" />
-  </ItemGroup>
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
     <TargetFramework Condition="'$(MSBuildRuntimeType)'=='Mono'">net45</TargetFramework>
     <TargetFramework Condition="'$(MSBuildRuntimeType)'=='Full'">net45</TargetFramework>
     <TargetFramework Condition="'$(MSBuildRuntimeType)'=='Core' And '$(NETCoreAppMaximumVersion)'=='3.0'">netcoreapp3.0</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
     <DefineConstants>SERVER</DefineConstants>
     <Version>0.9.19223.1745</Version>
     <AssemblyVersion>0.9</AssemblyVersion>
@@ -15,6 +14,9 @@
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/s2quake/grpc-sample</RepositoryUrl>
   </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\JSSoft.Communication\JSSoft.Communication.csproj" />
+  </ItemGroup>
   <Import Project="..\JSSoft.Communication.Services.Sharing\JSSoft.Communication.Services.Sharing.projitems" Label="Shared" />
   <Import Project="..\JSSoft.Communication.Services.Server.Sharing\JSSoft.Communication.Services.Server.Sharing.projitems" Label="Shared" />
 </Project>
