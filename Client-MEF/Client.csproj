@@ -7,10 +7,7 @@
   </ItemGroup>
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-<<<<<<< HEAD
     <TargetFramework Condition="'$(MSBuildRuntimeType)'=='Mono'">net45</TargetFramework>
-=======
->>>>>>> c473c1ee0993c4a4edb15253a96160980759e3aa
     <TargetFramework Condition="'$(MSBuildRuntimeType)'=='Full'">net45</TargetFramework>
     <TargetFramework Condition="'$(MSBuildRuntimeType)'=='Core' And '$(NETCoreAppMaximumVersion)'=='3.0'">netcoreapp3.0</TargetFramework>
     <DefineConstants>CLIENT;MEF</DefineConstants>
