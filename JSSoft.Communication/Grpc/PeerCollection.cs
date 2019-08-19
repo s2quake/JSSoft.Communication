@@ -21,15 +21,29 @@
 // SOFTWARE.
 
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Threading;
 using Ntreev.Library.ObjectModel;
+using Ntreev.Library.Threading;
 
 namespace JSSoft.Communication.Grpc
 {
-    class PeerCollection : ContainerBase<PeerDescriptor>
+    class PeerCollection : ContainerBase<Peer>
     {
-        public void Add(PeerDescriptor item)
+        private static readonly TimeSpan timeout = new TimeSpan(0, 0, 30);
+        private readonly AdaptorServerHost adaptorHost;
+        private Timer timer;
+
+        public PeerCollection(AdaptorServerHost adaptorHost)
+        {
+            this.adaptorHost = adaptorHost;
+            this.CollectionChanged += PeerCollection_CollectionChanged;
+        }
+
+        public void Add(Peer item)
         {
             base.AddBase(item.ID, item);
             item.Disposed += Item_Disposed;
@@ -42,10 +56,62 @@ namespace JSSoft.Communication.Grpc
             base.RemoveBase(peer);
         }
 
+        public Dispatcher Dispatcher => this.adaptorHost?.Dispatcher;
+
+        private void PeerCollection_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    {
+                        if (this.timer == null)
+                        {
+                            var milliseconds = (int)timeout.TotalMilliseconds;
+                            this.timer = new Timer(Timer_TimerCallback, null, milliseconds, milliseconds);
+                        }
+                    }
+                    break;
+                case NotifyCollectionChangedAction.Remove:
+                    {
+                        if (this.Any() == false)
+                        {
+                            this.timer.Dispose();
+                            this.timer = null;
+                        }
+                    }
+                    break;
+                case NotifyCollectionChangedAction.Reset:
+                    {
+                        if (this.timer != null)
+                        {
+                            this.timer.Dispose();
+                            this.timer = null;
+                        }
+                    }
+                    break;
+            }
+        }
+
         private void Item_Disposed(object sender, EventArgs e)
         {
-            if (sender is PeerDescriptor item)
+            if (sender is Peer item)
                 base.RemoveBase(item.ID);
+        }
+
+        private void Timer_TimerCallback(object state)
+        {
+            this.Dispatcher.InvokeAsync(() =>
+            {
+                var dateTime = DateTime.UtcNow;
+                var query = from item in this
+                            where dateTime - item.PingTime > timeout
+                            select item;
+                var items = query.ToArray();
+                foreach (var item in items)
+                {
+                    item.Abort();
+                }
+            });
         }
     }
 }

@@ -46,7 +46,7 @@ namespace JSSoft.Communication
 
         internal IPeer Peer { get; set; }
 
-         [InstanceMethod(InvokeMethod)]
+        [InstanceMethod(InvokeMethod)]
         protected void Invoke(string name, Type[] types, object[] args)
         {
             this.AdaptorHost.Invoke(this, name, types, args);

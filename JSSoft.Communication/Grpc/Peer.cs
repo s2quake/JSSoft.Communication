@@ -24,19 +24,30 @@ using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace JSSoft.Communication.Grpc
 {
-    sealed class PeerDescriptor : IPeer
+    sealed class Peer : IPeer
     {
-        public PeerDescriptor(string id, IServiceHost[] serviceHosts)
+        private CancellationTokenSource cancellation = new CancellationTokenSource();
+
+        public Peer(string id, IServiceHost[] serviceHosts)
         {
             this.ID = id;
             this.ServiceHosts = serviceHosts;
+            this.Ping();
         }
 
         public void Dispose()
         {
+            this.Callbacks.DisposeAll();
+            this.Disposed?.Invoke(this, EventArgs.Empty);
+        }
+
+        public void Abort()
+        {
+            this.cancellation.Cancel();
             this.Callbacks.DisposeAll();
             this.Disposed?.Invoke(this, EventArgs.Empty);
         }
@@ -48,13 +59,18 @@ namespace JSSoft.Communication.Grpc
             this.PollReplyItems.Add(serviceHost, new PollReplyItemCollection(serviceHost));
         }
 
+        public void Ping()
+        {
+            this.PingTime = DateTime.UtcNow;
+        }
+
         public string ID { get; }
 
         public IServiceHost[] ServiceHosts { get; }
 
         public Guid Token { get; set; } = Guid.NewGuid();
 
-        public DateTime Ping { get; set; }
+        public DateTime PingTime { get; set; }
 
         public Dictionary<IServiceHost, object> Services { get; } = new Dictionary<IServiceHost, object>();
 
@@ -63,6 +79,8 @@ namespace JSSoft.Communication.Grpc
         public Dictionary<IServiceHost, PollReplyItemCollection> PollReplyItems { get; } = new Dictionary<IServiceHost, PollReplyItemCollection>();
 
         public Dictionary<string, object> Properties { get; } = new Dictionary<string, object>();
+
+        public CancellationToken Cancellation => this.cancellation.Token;
 
         public event EventHandler Disposed;
     }
