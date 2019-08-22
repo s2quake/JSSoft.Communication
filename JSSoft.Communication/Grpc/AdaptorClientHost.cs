@@ -34,7 +34,6 @@ namespace JSSoft.Communication.Grpc
     {
         private readonly IServiceContext serviceContext;
         private readonly IContainer<IServiceHost> serviceHosts;
-        private AsyncDuplexStreamingCall<PollRequest, PollReply> call;
         private CancellationTokenSource cancellation;
         private Task task;
         private Channel channel;
@@ -57,7 +56,12 @@ namespace JSSoft.Communication.Grpc
             this.peers.Set(this.adaptorImpl);
             this.cancellation = new CancellationTokenSource();
             this.serializer = this.serviceContext.GetService(typeof(ISerializer)) as ISerializer;
-            this.task = this.PollAsync(this.cancellation.Token);
+            this.task = Task.Run(() => 
+            {
+                var eventSet = new ManualResetEvent(false);
+                this.PollAsync(this.cancellation.Token, eventSet);
+                eventSet.WaitOne();
+            });
         }
 
         public async Task CloseAsync()
@@ -81,19 +85,19 @@ namespace JSSoft.Communication.Grpc
             this.Disconnected?.Invoke(this, e);
         }
 
-        private async Task PollAsync(CancellationToken cancellationToken)
+        private async void PollAsync(CancellationToken cancellationToken, ManualResetEvent eventSet)
         {
             var exitCode = 0;
             try
             {
-                using (this.call = this.adaptorImpl.Poll())
+                using (var call = this.adaptorImpl.Poll())
                 {
                     while (!cancellationToken.IsCancellationRequested)
                     {
                         var request = new PollRequest();
-                        await this.call.RequestStream.WriteAsync(request);
-                        await this.call.ResponseStream.MoveNext();
-                        var reply = this.call.ResponseStream.Current;
+                        await call.RequestStream.WriteAsync(request);
+                        await call.ResponseStream.MoveNext();
+                        var reply = call.ResponseStream.Current;
                         if (reply.Code != 0)
                         {
                             exitCode = reply.Code;
@@ -107,10 +111,10 @@ namespace JSSoft.Communication.Grpc
                         reply.Items.Clear();
                         await Task.Delay(1);
                     }
-                    await this.call.RequestStream.CompleteAsync();
-                    await this.call.ResponseStream.MoveNext();
+                    await call.RequestStream.CompleteAsync();
+                    await call.ResponseStream.MoveNext();
                 }
-                this.call = null;
+                //call = null;
             }
             catch (Exception e)
             {
@@ -123,6 +127,7 @@ namespace JSSoft.Communication.Grpc
                 this.adaptorImpl = null;
                 this.OnDisconnected(new DisconnectionReasonEventArgs(exitCode));
             }
+            eventSet.Set();
         }
 
         private async void InvokeCallback(IServiceHost serviceHost, string name, string[] datas)
