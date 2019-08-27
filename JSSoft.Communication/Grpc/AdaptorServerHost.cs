@@ -90,6 +90,7 @@ namespace JSSoft.Communication.Grpc
             {
                 var peer = this.Peers[context.Peer];
                 peer.Ping();
+                Console.WriteLine($"ping: {context.Peer} {DateTime.Now}");
                 return new PingReply() { Time = peer.PingTime.Ticks };
             });
         }

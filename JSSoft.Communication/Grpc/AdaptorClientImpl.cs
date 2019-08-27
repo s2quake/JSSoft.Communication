@@ -21,17 +21,12 @@
 // SOFTWARE.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
-using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using Grpc.Core;
-using Grpc.Core.Utils;
-using Newtonsoft.Json;
-using Ntreev.Library.ObjectModel;
+using Timer = System.Timers.Timer;
 
 namespace JSSoft.Communication.Grpc
 {
@@ -57,14 +52,16 @@ namespace JSSoft.Communication.Grpc
             request.ServiceNames.AddRange(serviceNames);
             var reply = await base.OpenAsync(request);
             this.Token = Guid.Parse(reply.Token);
-            this.timer = new Timer(Timer_TimerCallback, null, timeout.Milliseconds, timeout.Milliseconds);
+            this.timer = new Timer(timeout.TotalMilliseconds);
+            this.timer.Elapsed += Timer_Elapsed;
+            this.timer.Start();
         }
-
+    
         public async Task CloseAsync()
         {
             this.timer.Dispose();
-            var value = await base.CloseAsync(new CloseRequest() { Token = this.Token.ToString() });
             this.timer = null;
+            var value = await base.CloseAsync(new CloseRequest() { Token = this.Token.ToString() });
         }
 
         public string ID { get; }
@@ -75,7 +72,7 @@ namespace JSSoft.Communication.Grpc
 
         public IReadOnlyDictionary<IServiceHost, object> Callbacks => this.callbacks;
 
-        private async void Timer_TimerCallback(object state)
+        private async void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             var request = new PingRequest()
             {

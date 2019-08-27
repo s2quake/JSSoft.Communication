@@ -66,7 +66,7 @@ namespace JSSoft.Communication
         {
             var token = ServiceToken.NewToken();
             this.Dispatcher = new Dispatcher(this);
-            await this.Dispatcher.InvokeAsync((Action)(() =>
+            await this.Dispatcher.InvokeAsync(() =>
             {
                 this.serializerProvider = this.componentProvider.GetserializerProvider(this.SerializerType);
                 this.serializer = this.serializerProvider.Create(this, this.componentProvider.DataSerializers);
@@ -74,7 +74,7 @@ namespace JSSoft.Communication
                 this.adaptorHost = this.adpatorHostProvider.Create(this, token);
                 this.adaptorHost.Peers.CollectionChanged += Peers_CollectionChanged;
                 this.adaptorHost.Disconnected += AdaptorHost_Disconnected;
-            }));
+            });
             foreach (var item in this.ServiceHosts)
             {
                 this.InitializeInstance(item);

@@ -30,6 +30,10 @@ namespace JSSoft.Communication
 
         public IAdaptorHost Create(IServiceContext serviceContext, ServiceToken token)
         {
+            Environment.SetEnvironmentVariable("GRPC_VERBOSITY", "DEBUG");
+            Environment.SetEnvironmentVariable("GRPC_TRACE", "all");
+            global::Grpc.Core.GrpcEnvironment.SetLogger(new global::Grpc.Core.Logging.ConsoleLogger());
+
             if (serviceContext is ServerContextBase)
                 return new Grpc.AdaptorServerHost(serviceContext);
             else if (serviceContext is ClientContextBase)

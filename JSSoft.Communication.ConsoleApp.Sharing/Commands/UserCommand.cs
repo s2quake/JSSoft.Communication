@@ -76,8 +76,8 @@ namespace JSSoft.Communication.Commands
         public async Task InfoAsync(string userID)
         {
             var (userName, authority) = await this.UserService.GetInfoAsync(this.Shell.UserToken, userID);
-            Console.WriteLine($"UseName: {userName}");
-            Console.WriteLine($"Authority: {authority}");
+            this.Out.WriteLine($"UseName: {userName}");
+            this.Out.WriteLine($"Authority: {authority}");
         }
 
         [CommandMethod]
@@ -86,7 +86,7 @@ namespace JSSoft.Communication.Commands
             var items = await this.UserService.GetUsersAsync(this.Shell.UserToken);
             foreach (var item in items)
             {
-                Console.WriteLine(item);
+                this.Out.WriteLine(item);
             }
         }
 
