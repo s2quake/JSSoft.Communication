@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <TargetFramework Condition="'$(MSBuildRuntimeType)'=='Core' And '$(NETCoreAppMaximumVersion)'=='3.0'">netcoreapp3.0</TargetFramework>
     <TargetFramework Condition="'$(MSBuildRuntimeType)'=='Mono'">net45</TargetFramework>
     <TargetFramework Condition="'$(MSBuildRuntimeType)'=='Full'">net45</TargetFramework>
-    <TargetFramework Condition="'$(MSBuildRuntimeType)'=='Core' And '$(NETCoreAppMaximumVersion)'=='3.0'">netcoreapp3.0</TargetFramework>
   </PropertyGroup>
   <PropertyGroup>
     <Version>0.9.19223.1745</Version>
@@ -13,9 +13,12 @@
     <RepositoryUrl>https://github.com/s2quake/grpc-sample</RepositoryUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
-  <!-- <ItemGroup>
+  <ItemGroup>
     <Protobuf Include="Grpc\adaptor.proto" OutputDir="%(RelativePath)Grpc" CompileOutputs="false" GrpcServices="both" Access="internal" />
-  </ItemGroup> -->
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)'=='net45'">
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="google.protobuf" Version="3.9.0" />
     <PackageReference Include="grpc" Version="2.23.0" />
@@ -25,6 +28,5 @@
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <ProjectReference Include="..\sub-modules\Ntreev.Library\Ntreev.Library\Ntreev.Library.csproj" />
-    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
 </Project>

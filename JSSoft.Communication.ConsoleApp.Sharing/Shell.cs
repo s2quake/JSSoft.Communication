@@ -44,6 +44,12 @@ namespace JSSoft.Communication.ConsoleApp
         private readonly IServiceContext serviceHost;
         private readonly INotifyUserService userServiceNotification;
         private bool isDisposed;
+
+        static Shell()
+        {
+            JSSoft.Communication.Logging.LogUtility.Logger = JSSoft.Communication.Logging.ConsoleLogger.Default;
+        }
+
 #if SERVER
         private bool isServer = true;
 #else
@@ -123,7 +129,6 @@ namespace JSSoft.Communication.ConsoleApp
             this.UserToken = token;
             this.UpdatePrompt();
             this.Out.WriteLine("사용자 관련 명령을 수행하려면 'help user' 을(를) 입력하세요.");
-            this.Out.WriteLine();
         }
 
         internal void Logout()
@@ -171,9 +176,7 @@ namespace JSSoft.Communication.ConsoleApp
                 this.Out.WriteLine("서버에 연결되었습니다.");
             }
             this.Out.WriteLine("사용 가능한 명령을 확인려면 'help' 을(를) 입력하세요.");
-            this.Out.WriteLine();
             this.Out.WriteLine("로그인을 하려면 'login admin admin' 을(를) 입력하세요.");
-            this.Out.WriteLine();
         }
 
         private void ServiceHost_Closed(object sender, EventArgs e)

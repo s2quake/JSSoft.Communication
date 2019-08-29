@@ -26,6 +26,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Reflection;
 using System.Threading.Tasks;
+using JSSoft.Communication.Logging;
 using Ntreev.Library.ObjectModel;
 using Ntreev.Library.Threading;
 
@@ -70,8 +71,10 @@ namespace JSSoft.Communication
             {
                 this.serializerProvider = this.componentProvider.GetserializerProvider(this.SerializerType);
                 this.serializer = this.serializerProvider.Create(this, this.componentProvider.DataSerializers);
+                LogUtility.Debug($"{this.serializerProvider.Name} Serializer created.");
                 this.adpatorHostProvider = this.componentProvider.GetAdaptorHostProvider(this.AdaptorHostType);
                 this.adaptorHost = this.adpatorHostProvider.Create(this, token);
+                LogUtility.Debug($"{this.adpatorHostProvider.Name} Adaptor created.");
                 this.adaptorHost.Peers.CollectionChanged += Peers_CollectionChanged;
                 this.adaptorHost.Disconnected += AdaptorHost_Disconnected;
             });
@@ -79,11 +82,14 @@ namespace JSSoft.Communication
             {
                 this.InitializeInstance(item);
                 await item.OpenAsync(token);
+                LogUtility.Debug($"{item.Name} Service opened.");
             }
             await this.adaptorHost.OpenAsync(this.Host, this.Port);
+            LogUtility.Debug($"{this.adpatorHostProvider.Name} Adaptor opened.");
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.IsOpened = true;
+                LogUtility.Debug($"Service Context opened.");
                 this.OnOpened(EventArgs.Empty);
             });
             this.token = token;
@@ -95,10 +101,12 @@ namespace JSSoft.Communication
             if (token == Guid.Empty || this.token.Guid != token)
                 throw new ArgumentException($"invalid token: {token}", nameof(token));
             await this.adaptorHost.CloseAsync();
+            LogUtility.Debug($"{this.adpatorHostProvider.Name} Adaptor closed.");
             foreach (var item in this.ServiceHosts)
             {
                 await item.CloseAsync(this.token);
                 this.ReleaseInstance(item);
+                LogUtility.Debug($"{item.Name} Service closed.");
             }
             await this.Dispatcher.InvokeAsync(() =>
             {
@@ -108,6 +116,7 @@ namespace JSSoft.Communication
                 this.serializer = null;
                 this.IsOpened = false;
                 this.OnClosed(EventArgs.Empty);
+                LogUtility.Debug($"Service Context closed.");
             });
             this.Dispatcher.Dispose();
             this.Dispatcher = null;

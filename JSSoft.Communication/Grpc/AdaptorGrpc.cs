@@ -131,7 +131,7 @@ namespace JSSoft.Communication.Grpc {
     {
       /// <summary>Creates a new client for Adaptor</summary>
       /// <param name="channel">The channel to use to make remote calls.</param>
-      public AdaptorClient(grpc::Channel channel) : base(channel)
+      public AdaptorClient(grpc::ChannelBase channel) : base(channel)
       {
       }
       /// <summary>Creates a new client for Adaptor that uses a custom <c>CallInvoker</c>.</summary>

@@ -22,27 +22,18 @@
 
 using System;
 
-namespace JSSoft.Communication
+namespace JSSoft.Communication.Logging
 {
-    class AdaptorHostProvider : IAdaptorHostProvider
+    public interface ILogger
     {
-        public const string DefaultName = "grpc";
+        void Debug(object message);
 
-        public IAdaptorHost Create(IServiceContext serviceContext, ServiceToken token)
-        {
-            // Environment.SetEnvironmentVariable("GRPC_VERBOSITY", "DEBUG");
-            // Environment.SetEnvironmentVariable("GRPC_TRACE", "all");
-            // global::Grpc.Core.GrpcEnvironment.SetLogger(new global::Grpc.Core.Logging.ConsoleLogger());
+        void Info(object message);
 
-            if (serviceContext is ServerContextBase)
-                return new Grpc.AdaptorServerHost(serviceContext);
-            else if (serviceContext is ClientContextBase)
-                return new Grpc.AdaptorClientHost(serviceContext);
-            throw new NotImplementedException();
-        }
+        void Error(object message);
 
-        public string Name => DefaultName;
+        void Warn(object message);
 
-        public static readonly AdaptorHostProvider Default = new AdaptorHostProvider();
+        void Fatal(object message);
     }
 }

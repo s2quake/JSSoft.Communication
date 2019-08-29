@@ -45,6 +45,7 @@ namespace JSSoft.Communication
                 this.IsAsync = true;
             }
             this.Name = GenerateName(methodInfo);
+            this.ShortName = methodInfo.Name;
         }
 
         public async Task<(int, Type, object)> InvokeAsync(IServiceProvider serviceProvider, object instance, object[] args)
@@ -73,6 +74,8 @@ namespace JSSoft.Communication
         }
         
         public string Name { get; }
+
+        public string ShortName { get; }
 
         public Type[] ParameterTypes { get; }
 

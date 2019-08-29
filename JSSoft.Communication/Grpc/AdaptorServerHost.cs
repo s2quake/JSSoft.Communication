@@ -28,6 +28,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Grpc.Core.Logging;
+using JSSoft.Communication.Logging;
 using Ntreev.Library.Linq;
 using Ntreev.Library.ObjectModel;
 using Ntreev.Library.Threading;
@@ -39,7 +40,6 @@ namespace JSSoft.Communication.Grpc
         private static readonly string localAddress;
         private readonly IServiceContext serviceContext;
         private readonly IContainer<IServiceHost> serviceHosts;
-        private ILogger logger;
         private CancellationTokenSource cancellation;
         private Server server;
         private AdaptorServerImpl adaptor;
@@ -54,7 +54,6 @@ namespace JSSoft.Communication.Grpc
         {
             this.serviceContext = serviceContext;
             this.serviceHosts = serviceContext.ServiceHosts;
-            this.logger = GrpcEnvironment.Logger;
             this.Peers = new PeerCollection(this);
         }
 
@@ -69,7 +68,7 @@ namespace JSSoft.Communication.Grpc
                 this.Peers.Add(peer);
                 return peer.Token;
             });
-            this.logger.Debug($"Connected: {context.Peer}");
+            LogUtility.Debug($"{context.Peer} Connected");
             return new OpenReply() { Token = $"{token}" };
         }
 
@@ -80,7 +79,7 @@ namespace JSSoft.Communication.Grpc
                 var peer = this.Peers[context.Peer];
                 peer.Dispose();
             });
-            this.logger.Debug($"Disconnected: {context.Peer}");
+            LogUtility.Debug($"{context.Peer} Disconnected");
             return new CloseReply();
         }
 
@@ -90,7 +89,7 @@ namespace JSSoft.Communication.Grpc
             {
                 var peer = this.Peers[context.Peer];
                 peer.Ping();
-                Console.WriteLine($"ping: {context.Peer} {DateTime.Now}");
+                LogUtility.Debug($"{context.Peer} Ping: {DateTime.Now}");
                 return new PingReply() { Time = peer.PingTime.Ticks };
             });
         }
@@ -113,6 +112,7 @@ namespace JSSoft.Communication.Grpc
                 Code = code,
                 Data = this.serializer.Serialize(valueType, value)
             };
+            LogUtility.Debug($"{context.Peer} Invoke: {request.ServiceName}.{methodDescriptor.ShortName}");
             return reply;
         }
 

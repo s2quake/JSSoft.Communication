@@ -22,27 +22,43 @@
 
 using System;
 
-namespace JSSoft.Communication
+namespace JSSoft.Communication.Logging
 {
-    class AdaptorHostProvider : IAdaptorHostProvider
+    public static class ILoggerExtensions
     {
-        public const string DefaultName = "grpc";
-
-        public IAdaptorHost Create(IServiceContext serviceContext, ServiceToken token)
+        public static void Debug(this ILogger logger, string format, params object[] args)
         {
-            // Environment.SetEnvironmentVariable("GRPC_VERBOSITY", "DEBUG");
-            // Environment.SetEnvironmentVariable("GRPC_TRACE", "all");
-            // global::Grpc.Core.GrpcEnvironment.SetLogger(new global::Grpc.Core.Logging.ConsoleLogger());
-
-            if (serviceContext is ServerContextBase)
-                return new Grpc.AdaptorServerHost(serviceContext);
-            else if (serviceContext is ClientContextBase)
-                return new Grpc.AdaptorClientHost(serviceContext);
-            throw new NotImplementedException();
+            logger.Debug(string.Format(format, args));
         }
 
-        public string Name => DefaultName;
+        public static void Info(this ILogger logger, string format, params object[] args)
+        {
+            logger.Info(string.Format(format, args));
+        }
 
-        public static readonly AdaptorHostProvider Default = new AdaptorHostProvider();
+        public static void Error(this ILogger logger, string format, params object[] args)
+        {
+            logger.Error(string.Format(format, args));
+        }
+
+        public static void Error(this ILogger logger, Exception e)
+        {
+            logger.Error(e);
+        }
+
+        public static void Warn(this ILogger logger, string format, params object[] args)
+        {
+            logger.Warn(string.Format(format, args));
+        }
+
+        public static void Fatal(this ILogger logger, string format, params object[] args)
+        {
+            logger.Fatal(string.Format(format, args));
+        }
+
+        public static void Fatal(this ILogger logger, Exception e)
+        {
+            logger.Fatal(e);
+        }
     }
 }
