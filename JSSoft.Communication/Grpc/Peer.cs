@@ -25,6 +25,7 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using JSSoft.Communication.Logging;
 
 namespace JSSoft.Communication.Grpc
 {
@@ -49,6 +50,7 @@ namespace JSSoft.Communication.Grpc
         {
             this.cancellation.Cancel();
             this.Callbacks.DisposeAll();
+            LogUtility.Debug($"{this.ID} Aboreted.");
             this.Disposed?.Invoke(this, EventArgs.Empty);
         }
 
