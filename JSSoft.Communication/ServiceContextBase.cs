@@ -65,62 +65,33 @@ namespace JSSoft.Communication
 
         public async Task<Guid> OpenAsync()
         {
-            var token = ServiceToken.NewToken();
-            this.Dispatcher = new Dispatcher(this);
-            await this.Dispatcher.InvokeAsync(() =>
+            try
             {
-                this.serializerProvider = this.componentProvider.GetserializerProvider(this.SerializerType);
-                this.serializer = this.serializerProvider.Create(this, this.componentProvider.DataSerializers);
-                LogUtility.Debug($"{this.serializerProvider.Name} Serializer created.");
-                this.adpatorHostProvider = this.componentProvider.GetAdaptorHostProvider(this.AdaptorHostType);
-                this.adaptorHost = this.adpatorHostProvider.Create(this, token);
-                LogUtility.Debug($"{this.adpatorHostProvider.Name} Adaptor created.");
-                this.adaptorHost.Peers.CollectionChanged += Peers_CollectionChanged;
-                this.adaptorHost.Disconnected += AdaptorHost_Disconnected;
-            });
-            foreach (var item in this.ServiceHosts)
-            {
-                this.InitializeInstance(item);
-                await item.OpenAsync(token);
-                LogUtility.Debug($"{item.Name} Service opened.");
+                return await this.OpenInternalAsync();
             }
-            await this.adaptorHost.OpenAsync(this.Host, this.Port);
-            LogUtility.Debug($"{this.adpatorHostProvider.Name} Adaptor opened.");
-            await this.Dispatcher.InvokeAsync(() =>
+            catch
             {
-                this.IsOpened = true;
-                LogUtility.Debug($"Service Context opened.");
-                this.OnOpened(EventArgs.Empty);
-            });
-            this.token = token;
-            return this.token.Guid;
+                this.serializerProvider = null;
+                this.serializer = null;
+                this.adpatorHostProvider = null;
+                this.adaptorHost = null;
+                this.serviceByServiceHost.Clear();
+                this.callbackByServiceHost.Clear();
+                await this.Dispatcher.DisposeAsync();
+                throw;
+            }
         }
 
         public async Task CloseAsync(Guid token)
         {
-            if (token == Guid.Empty || this.token.Guid != token)
-                throw new ArgumentException($"invalid token: {token}", nameof(token));
-            await this.adaptorHost.CloseAsync();
-            LogUtility.Debug($"{this.adpatorHostProvider.Name} Adaptor closed.");
-            foreach (var item in this.ServiceHosts)
+            try
             {
-                await item.CloseAsync(this.token);
-                this.ReleaseInstance(item);
-                LogUtility.Debug($"{item.Name} Service closed.");
+                await this.CloseInternalAsync(token);
             }
-            await this.Dispatcher.InvokeAsync(() =>
+            catch
             {
-                this.adaptorHost.Disconnected -= AdaptorHost_Disconnected;
-                this.adaptorHost.Peers.CollectionChanged -= Peers_CollectionChanged;
-                this.adaptorHost = null;
-                this.serializer = null;
-                this.IsOpened = false;
-                this.OnClosed(EventArgs.Empty);
-                LogUtility.Debug($"Service Context closed.");
-            });
-            this.Dispatcher.Dispose();
-            this.Dispatcher = null;
-            this.token = ServiceToken.Empty;
+                throw;
+            }
         }
 
         public object GetService(Type serviceType)
@@ -207,6 +178,66 @@ namespace JSSoft.Communication
                 return attribute.PerPeer;
             }
             return false;
+        }
+
+        private async Task<Guid> OpenInternalAsync()
+        {
+            var token = ServiceToken.NewToken();
+            this.Dispatcher = new Dispatcher(this);
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.serializerProvider = this.componentProvider.GetserializerProvider(this.SerializerType);
+                this.serializer = this.serializerProvider.Create(this, this.componentProvider.DataSerializers);
+                LogUtility.Debug($"{this.serializerProvider.Name} Serializer created.");
+                this.adpatorHostProvider = this.componentProvider.GetAdaptorHostProvider(this.AdaptorHostType);
+                this.adaptorHost = this.adpatorHostProvider.Create(this, token);
+                LogUtility.Debug($"{this.adpatorHostProvider.Name} Adaptor created.");
+                this.adaptorHost.Peers.CollectionChanged += Peers_CollectionChanged;
+                this.adaptorHost.Disconnected += AdaptorHost_Disconnected;
+            });
+            foreach (var item in this.ServiceHosts)
+            {
+                this.InitializeInstance(item);
+                await item.OpenAsync(token);
+                LogUtility.Debug($"{item.Name} Service opened.");
+            }
+            await this.adaptorHost.OpenAsync(this.Host, this.Port);
+            LogUtility.Debug($"{this.adpatorHostProvider.Name} Adaptor opened.");
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.IsOpened = true;
+                LogUtility.Debug($"Service Context opened.");
+                this.OnOpened(EventArgs.Empty);
+            });
+            this.token = token;
+            return this.token.Guid;
+        }
+
+        private async Task CloseInternalAsync(Guid token)
+        {
+            if (token == Guid.Empty || this.token.Guid != token)
+                throw new ArgumentException($"invalid token: {token}", nameof(token));
+            await this.adaptorHost.CloseAsync();
+            LogUtility.Debug($"{this.adpatorHostProvider.Name} Adaptor closed.");
+            foreach (var item in this.ServiceHosts)
+            {
+                await item.CloseAsync(this.token);
+                this.ReleaseInstance(item);
+                LogUtility.Debug($"{item.Name} Service closed.");
+            }
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.adaptorHost.Disconnected -= AdaptorHost_Disconnected;
+                this.adaptorHost.Peers.CollectionChanged -= Peers_CollectionChanged;
+                this.adaptorHost = null;
+                this.serializer = null;
+                this.IsOpened = false;
+                this.OnClosed(EventArgs.Empty);
+                LogUtility.Debug($"Service Context closed.");
+            });
+            this.Dispatcher.Dispose();
+            this.Dispatcher = null;
+            this.token = ServiceToken.Empty;
         }
 
         private async void AdaptorHost_Disconnected(object sender, DisconnectionReasonEventArgs e)

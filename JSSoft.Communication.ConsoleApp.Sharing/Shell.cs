@@ -71,7 +71,7 @@ namespace JSSoft.Communication.ConsoleApp
             this.userServiceNotification = userServiceNotification;
             this.userServiceNotification.LoggedIn += UserServiceNotification_LoggedIn;
             this.userServiceNotification.LoggedOut += UserServiceNotification_LoggedOut;
-            this.userServiceNotification.MessageReceived += userServiceNotification_MessageReceived;
+            this.userServiceNotification.MessageReceived += UserServiceNotification_MessageReceived;
             this.commandContext = commandContext;
             this.Title = "Server";
         }
@@ -208,7 +208,7 @@ namespace JSSoft.Communication.ConsoleApp
             this.Out.WriteLine($"User logged out: {e.UserID}");
         }
 
-        private void userServiceNotification_MessageReceived(object sender, UserMessageEventArgs e)
+        private void UserServiceNotification_MessageReceived(object sender, UserMessageEventArgs e)
         {
             if (e.Sender == this.UserID)
             {
