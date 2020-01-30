@@ -1,8 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework Condition="'$(MSBuildRuntimeType)'=='Core' And '$(NETCoreAppMaximumVersion)'=='3.0'">netcoreapp3.0</TargetFramework>
-    <TargetFramework Condition="'$(MSBuildRuntimeType)'=='Mono'">net45</TargetFramework>
-    <TargetFramework Condition="'$(MSBuildRuntimeType)'=='Full'">net45</TargetFramework>
+    <TargetFrameworks>netcoreapp3.0;net45</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup>
     <Version>0.9.19223.1745</Version>
@@ -13,9 +11,9 @@
     <RepositoryUrl>https://github.com/s2quake/grpc-sample</RepositoryUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
-  <ItemGroup>
+  <!-- <ItemGroup>
     <Protobuf Include="Grpc\adaptor.proto" OutputDir="%(RelativePath)Grpc" CompileOutputs="false" GrpcServices="both" Access="internal" />
-  </ItemGroup>
+  </ItemGroup> -->
   <ItemGroup Condition="'$(TargetFramework)'=='net45'">
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
