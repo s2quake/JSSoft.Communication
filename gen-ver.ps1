@@ -5,18 +5,21 @@ $fileVersion = "$majorVersion.$minorVersion" + "." + (Get-Date -Format yy) + (Ge
 
 Get-ChildItem -Path $PSScriptRoot -Include "*.csproj" -Depth 1 -Name | ForEach-Object {
     [xml]$doc = Get-Content $_
-    if ($doc.Project.Sdk -eq "Microsoft.NET.Sdk") {
-        if ($doc.Project.PropertyGroup.Version) {
-            $doc.Project.PropertyGroup.Version = $fileVersion
-        }
-        if ($doc.Project.PropertyGroup.FileVersion) {
-            $doc.Project.PropertyGroup.FileVersion = $fileVersion
-        }
-        if ($doc.Project.PropertyGroup.AssemblyVersion) {
-            $doc.Project.PropertyGroup.AssemblyVersion = $version
+    if (($doc.Project.Sdk -eq "Microsoft.NET.Sdk") -or ($doc.Project.Sdk -eq "Microsoft.NET.Sdk.WindowsDesktop")) {
+        foreach ($obj in $doc.Project.PropertyGroup) {        
+            if ($obj.Version) {
+                $obj.Version = $fileVersion
+            }
+            if ($obj.FileVersion) {
+                $obj.FileVersion = $fileVersion
+            }
+            if ($obj.AssemblyVersion) {
+                $obj.AssemblyVersion = $version
+            }
         }
         $doc.Save($_)
     }
 }
 
+Set-Content version.txt $fileVersion -NoNewline
 Write-Host $fileVersion

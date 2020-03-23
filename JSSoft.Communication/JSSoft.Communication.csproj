@@ -1,11 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.0;net45</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup>
-    <Version>0.9.19223.1745</Version>
+    <Version>0.9.2084.0802</Version>
     <AssemblyVersion>0.9</AssemblyVersion>
-    <FileVersion>0.9.19223.1745</FileVersion>
+    <FileVersion>0.9.2084.0802</FileVersion>
     <Authors>s2quake</Authors>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/s2quake/grpc-sample</RepositoryUrl>
