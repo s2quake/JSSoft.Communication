@@ -32,6 +32,24 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Simple", "Simple", "{F4E7CE1D-053E-4FEE-8C36-CB8750280E9F}"
 EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		JSSoft.Communication.ConsoleApp.Sharing\JSSoft.Communication.ConsoleApp.Sharing.projitems*{0d6fd7d3-d158-41a5-9e2d-2d17149902e8}*SharedItemsImports = 5
+		JSSoft.Communication.Services.Client.Sharing\JSSoft.Communication.Services.Client.Sharing.projitems*{0d6fd7d3-d158-41a5-9e2d-2d17149902e8}*SharedItemsImports = 5
+		JSSoft.Communication.Services.Sharing\JSSoft.Communication.Services.Sharing.projitems*{0d6fd7d3-d158-41a5-9e2d-2d17149902e8}*SharedItemsImports = 5
+		JSSoft.Communication.ConsoleApp.Sharing\JSSoft.Communication.ConsoleApp.Sharing.projitems*{49bbc2e5-4ce6-47ea-a427-0c3e88f22e19}*SharedItemsImports = 5
+		JSSoft.Communication.Services.Server.Sharing\JSSoft.Communication.Services.Server.Sharing.projitems*{49bbc2e5-4ce6-47ea-a427-0c3e88f22e19}*SharedItemsImports = 5
+		JSSoft.Communication.Services.Sharing\JSSoft.Communication.Services.Sharing.projitems*{49bbc2e5-4ce6-47ea-a427-0c3e88f22e19}*SharedItemsImports = 5
+		JSSoft.Communication.Services.Server.Sharing\JSSoft.Communication.Services.Server.Sharing.projitems*{70c77f8d-2ad0-41cb-9fd7-b33b384cf82d}*SharedItemsImports = 5
+		JSSoft.Communication.Services.Sharing\JSSoft.Communication.Services.Sharing.projitems*{70c77f8d-2ad0-41cb-9fd7-b33b384cf82d}*SharedItemsImports = 5
+		JSSoft.Communication.ConsoleApp.Sharing\JSSoft.Communication.ConsoleApp.Sharing.projitems*{cd2b8a1e-f105-4847-b820-8637c50670ad}*SharedItemsImports = 5
+		JSSoft.Communication.Services.Client.Sharing\JSSoft.Communication.Services.Client.Sharing.projitems*{cd2b8a1e-f105-4847-b820-8637c50670ad}*SharedItemsImports = 5
+		JSSoft.Communication.Services.Sharing\JSSoft.Communication.Services.Sharing.projitems*{cd2b8a1e-f105-4847-b820-8637c50670ad}*SharedItemsImports = 5
+		JSSoft.Communication.Services.Client.Sharing\JSSoft.Communication.Services.Client.Sharing.projitems*{da9822ef-860e-499e-9dbb-218613fedecf}*SharedItemsImports = 5
+		JSSoft.Communication.Services.Sharing\JSSoft.Communication.Services.Sharing.projitems*{da9822ef-860e-499e-9dbb-218613fedecf}*SharedItemsImports = 5
+		JSSoft.Communication.ConsoleApp.Sharing\JSSoft.Communication.ConsoleApp.Sharing.projitems*{e7713170-cd96-4b4f-ac64-9ad964f7a762}*SharedItemsImports = 5
+		JSSoft.Communication.Services.Server.Sharing\JSSoft.Communication.Services.Server.Sharing.projitems*{e7713170-cd96-4b4f-ac64-9ad964f7a762}*SharedItemsImports = 5
+		JSSoft.Communication.Services.Sharing\JSSoft.Communication.Services.Sharing.projitems*{e7713170-cd96-4b4f-ac64-9ad964f7a762}*SharedItemsImports = 5
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
