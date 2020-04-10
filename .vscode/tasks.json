@@ -10,7 +10,7 @@
             "group": "build",
             "args": [
                 "build", 
-                "Client",
+                "Client-MEF",
                 "--framework",
                 "netcoreapp3.0",
                 "--configuration",
@@ -28,7 +28,7 @@
             "group": "build",
             "args": [
                 "build", 
-                "Server",
+                "Server-MEF",
                 "--framework",
                 "netcoreapp3.0",
                 "--configuration",

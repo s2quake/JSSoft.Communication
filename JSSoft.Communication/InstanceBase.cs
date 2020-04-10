@@ -33,7 +33,7 @@ namespace JSSoft.Communication
         public const string InvokeAsyncMethod = "InvokeAsync";
         public const string InvokeGenericAsyncMethod = "InvokeGenericAsync";
 
-        internal InstanceBase()
+        public InstanceBase()
         {
 
         }
@@ -52,10 +52,20 @@ namespace JSSoft.Communication
             this.AdaptorHost.Invoke(this, name, types, args);
         }
 
+        protected void Invoke(string name, (Type[] types, object[] args) info)
+        {
+            this.AdaptorHost.Invoke(this, name, info.types, info.args);
+        }
+
         [InstanceMethod(InvokeGenericMethod)]
         protected T Invoke<T>(string name, Type[] types, object[] args)
         {
             return this.AdaptorHost.Invoke<T>(this, name, types, args);
+        }
+
+        protected T Invoke<T>(string name, (Type[] types, object[] args) info)
+        {
+            return this.AdaptorHost.Invoke<T>(this, name, info.types, info.args);
         }
 
         [InstanceMethod(InvokeAsyncMethod)]
@@ -64,10 +74,40 @@ namespace JSSoft.Communication
             return this.AdaptorHost.InvokeAsync(this, name, types, args);
         }
 
+        protected Task InvokeAsync(string name, (Type[] types, object[] args) info)
+        {
+            return this.AdaptorHost.InvokeAsync(this, name, info.types, info.args);
+        }
+
         [InstanceMethod(InvokeGenericAsyncMethod)]
         protected Task<T> InvokeAsync<T>(string name, Type[] types, object[] args)
         {
             return this.AdaptorHost.InvokeAsync<T>(this, name, types, args);
+        }
+
+        protected Task<T> InvokeAsync<T>(string name, (Type[] types, object[] args) info)
+        {
+            return this.AdaptorHost.InvokeAsync<T>(this, name, info.types, info.args);
+        }
+
+        protected static (Type[], object[]) Info<P>(P arg)
+        {
+            return (new Type[] { typeof(P) }, new object[] { arg });
+        }
+
+        protected static (Type[], object[]) Info<P1, P2>(P1 arg1, P2 arg2)
+        {
+            return (new Type[] { typeof(P1), typeof(P2) }, new object[] { arg1, arg2 });
+        }
+
+        protected static (Type[], object[]) Info<P1, P2, P3>(P1 arg1, P2 arg2, P3 arg3)
+        {
+            return (new Type[] { typeof(P1), typeof(P2), typeof(P3) }, new object[] { arg1, arg2, arg3 });
+        }
+
+        protected static (Type[], object[]) Info<P1, P2, P3, P4>(P1 arg1, P2 arg2, P3 arg3, P4 arg4)
+        {
+            return (new Type[] { typeof(P1), typeof(P2), typeof(P3), typeof(P4) }, new object[] { arg1, arg2, arg3, arg4 });
         }
     }
 }

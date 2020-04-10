@@ -52,9 +52,9 @@ namespace JSSoft.Communication
         protected ServiceContextBase(IComponentProvider componentProvider, IServiceHost[] serviceHost)
         {
             this.componentProvider = componentProvider ?? ComponentProvider.Default;
-            this.instanceBuilder = new ServiceInstanceBuilder();
             this.ServiceHosts = new ServiceHostCollection(serviceHost);
             this.isServer = IsServer(this);
+            this.instanceBuilder = ServiceInstanceBuilder.Create();
         }
 
         protected ServiceContextBase(IServiceHost[] serviceHost)
@@ -138,6 +138,17 @@ namespace JSSoft.Communication
         public event EventHandler Opened;
 
         public event EventHandler Closed;
+
+        protected virtual InstanceBase CreateInstance(Type type)
+        {
+            if (this.instanceBuilder == null)
+                throw new InvalidOperationException($"cannot create instance of {type}");
+            if (type == typeof(void))
+                return null;
+            var typeName = $"{type.Name}Impl";
+            var instanceType = this.instanceBuilder.CreateType(typeName, typeof(InstanceBase), type);
+            return TypeDescriptor.CreateInstance(null, instanceType, null, null) as InstanceBase;
+        }
 
         protected virtual void OnOpened(EventArgs e)
         {
@@ -289,8 +300,9 @@ namespace JSSoft.Communication
 
         private (object, object) CreateInstance(IServiceHost serviceHost, IPeer peer)
         {
+            var adaptorHost = this.adaptorHost;
             var baseType = GetInstanceType(this, serviceHost);
-            var instance = CreateInternal();
+            var instance = this.CreateInstance(baseType);
             if (instance != null)
             {
                 instance.ServiceHost = serviceHost;
@@ -302,15 +314,6 @@ namespace JSSoft.Communication
             var service = this.isServer ? impl : instance;
             var callback = this.isServer ? instance : impl;
             return (service, callback);
-
-            InstanceBase CreateInternal()
-            {
-                if (baseType == typeof(void))
-                    return null;
-                var typeName = $"{baseType.Name}Impl";
-                var instanceType = this.instanceBuilder.CreateType(typeName, typeof(InstanceBase), baseType);
-                return TypeDescriptor.CreateInstance(null, instanceType, null, null) as InstanceBase;
-            }
         }
 
         private void DestroyInstance(IServiceHost serviceHost, object service, object callback)
