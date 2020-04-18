@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
@@ -47,7 +48,7 @@ namespace JSSoft.Communication.Grpc
 
         static AdaptorServerHost()
         {
-            localAddress = Dns.GetHostEntry(Dns.GetHostName()).AddressList.First(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork).ToString();
+            localAddress = Dns.GetHostEntry(Dns.GetHostName()).AddressList.First(item => $"{item}" != "127.0.0.1" && item.AddressFamily == AddressFamily.InterNetwork).ToString();
         }
 
         public AdaptorServerHost(IServiceContext serviceContext)

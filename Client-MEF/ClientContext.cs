@@ -20,7 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System;
 using System.ComponentModel.Composition;
+using System.Reflection;
+using System.Threading.Tasks;
+using JSSoft.Communication.Services;
 
 namespace JSSoft.Communication.ConsoleApp
 {
@@ -31,7 +35,68 @@ namespace JSSoft.Communication.ConsoleApp
         public ClientContext(IComponentProvider componentProvider, [ImportMany]IServiceHost[] serviceHosts)
             : base(componentProvider, serviceHosts)
         {
-     
+
+        }
+
+        protected override InstanceBase CreateInstance(Type type)
+        {
+            if (type == typeof(IUserService))
+                return new UserServiceInstance();
+            return base.CreateInstance(type);
         }
     }
+
+    class UserServiceInstance : InstanceBase, IUserService
+    {
+        public Task CreateAsync(Guid token, string userID, string password, Authority authority)
+        {
+            return this.InvokeAsync(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token, userID, password, authority));
+        }
+
+        public Task DeleteAsync(Guid token, string userID)
+        {
+            return this.InvokeAsync(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token, userID));
+        }
+
+        public Task<(string userName, Authority authority)> GetInfoAsync(Guid token, string userID)
+        {
+            return this.InvokeAsync<(string, Authority)>(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token, userID));
+        }
+
+        public Task<string[]> GetUsersAsync(Guid token)
+        {
+            return this.InvokeAsync<string[]>(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token));
+        }
+
+        public Task<bool> IsOnlineAsync(Guid token, string userID)
+        {
+            return this.InvokeAsync<bool>(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token, userID));
+        }
+
+        public Task<Guid> LoginAsync(string userID, string password)
+        {
+            return this.InvokeAsync<Guid>(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), userID, password));
+        }
+
+        public Task LogoutAsync(Guid token)
+        {
+            return this.InvokeAsync<Guid>(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token));
+        }
+
+        public Task RenameAsync(Guid token, string userName)
+        {
+            return this.InvokeAsync<Guid>(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token, userName));
+        }
+
+        public Task SendMessageAsync(Guid token, string userID, string message)
+        {
+            return this.InvokeAsync<Guid>(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token, userID, message));
+        }
+
+        public Task SetAuthorityAsync(Guid token, string userID, Authority authority)
+        {
+            return this.InvokeAsync<Guid>(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token, userID, authority));
+        }
+    }
+
 }

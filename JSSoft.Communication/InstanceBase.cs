@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 using System;
+using System.Reflection;
 using System.Threading.Tasks;
 
 // https://sharplab.io/#v2:C4LglgNgPgAgTARgLACgYAYAEMEBYDcqG2CArISqgHYCGAtgKYDOADjQMYOYBywATgwYA3AHQBhAXRriA9nToBXKmHY1gYGVVQBvVJn3Y4mAJJUmwGlU4AhGkwZ6DulAdfYAzNlwmqQmQGsGAAocLFpGABpMABUATxYGAG0AXUxgeOYomQAjACsGdmAUzBo+AHMmAEpHN0xnWv0ASGAACz4ZAHdMKgYu7hlgYzoWCAZGKmAGABMAUQAPThZ1TSDKigbMAF9UGrcYT2ifP0CAHmiAPhCEMPoGKLiE4vSEpiy8gqLU0orqlwb6hrNNqdbq9HgDIYjMYMCbTeaLZZUVbrBrbSh/Wr7bAANiOAQYAEEmLErFcbpFMGw+PQmJgcvlCsVvlVdq4AbUge0uj0+hDhqNxpNZgsGEsNEi1qyDGipfosTBsWdznjAkSSewlWTurcolSaXT3oyvuUWRi3Oy3JyQTzwYN+dDYcKEeLkbKtrs0a5dvAfOZLDY7AxIRBMCBfRYrAxbPZdhbXPLvKZjsFQiVyggomAJmmynBfhs4wZGkJSmkMrSALygro4EQPJKpbRlhIyABmZMqUWeDDbQSzwEqWxRG30Jb4Ocr1YNDM+dRzGZzRk2w8t2UDIiT+KC4R77c3gU7zcyE8lZtcnoabqx/ZVDAA4jCGHwVFrvgub98827C7Ux0fJzatb1sUTbdr2ADK/BZmUh5ge2/aDsubquH+zKYFWNr0h8IHzlEn5Dm6jQwAA7Jga72Buvj4ic/aXDuvb7vej7PuwsHlnhJqnhsF61FengKreaqkqmb6Ztmn5RNkMgyCG3zuPm/yEX+3YAWCQEZDhcFBJBz5UDBXYZL2CEGS27ZSTJiErhsqEmuhU5YUac6iYuHFlJ4SFnkWJFkeujFCew263AxVGqsSVhsS8rlVFZ0punxOI0RMyqMQ+PQsf5r7pmJwCLgptQ/pgxalipdmAQgdYaY2R4QVBekRbufYTJZyEGDZFSlWCDmzk2zn4R5GxEaR5EMJRyb+YlwB0UFe4hUxaUqP59WvCeMX6Dx7ooGiQA
@@ -52,9 +53,9 @@ namespace JSSoft.Communication
             this.AdaptorHost.Invoke(this, name, types, args);
         }
 
-        protected void Invoke(string name, (Type[] types, object[] args) info)
+        protected void Invoke((string name, Type[] types, object[] args) info)
         {
-            this.AdaptorHost.Invoke(this, name, info.types, info.args);
+            this.AdaptorHost.Invoke(this, info.name, info.types, info.args);
         }
 
         [InstanceMethod(InvokeGenericMethod)]
@@ -63,9 +64,9 @@ namespace JSSoft.Communication
             return this.AdaptorHost.Invoke<T>(this, name, types, args);
         }
 
-        protected T Invoke<T>(string name, (Type[] types, object[] args) info)
+        protected T Invoke<T>((string name, Type[] types, object[] args) info)
         {
-            return this.AdaptorHost.Invoke<T>(this, name, info.types, info.args);
+            return this.AdaptorHost.Invoke<T>(this, info.name, info.types, info.args);
         }
 
         [InstanceMethod(InvokeAsyncMethod)]
@@ -74,9 +75,9 @@ namespace JSSoft.Communication
             return this.AdaptorHost.InvokeAsync(this, name, types, args);
         }
 
-        protected Task InvokeAsync(string name, (Type[] types, object[] args) info)
+        protected Task InvokeAsync((string name, Type[] types, object[] args) info)
         {
-            return this.AdaptorHost.InvokeAsync(this, name, info.types, info.args);
+            return this.AdaptorHost.InvokeAsync(this, info.name, info.types, info.args);
         }
 
         [InstanceMethod(InvokeGenericAsyncMethod)]
@@ -85,29 +86,29 @@ namespace JSSoft.Communication
             return this.AdaptorHost.InvokeAsync<T>(this, name, types, args);
         }
 
-        protected Task<T> InvokeAsync<T>(string name, (Type[] types, object[] args) info)
+        protected Task<T> InvokeAsync<T>((string name, Type[] types, object[] args) info)
         {
-            return this.AdaptorHost.InvokeAsync<T>(this, name, info.types, info.args);
+            return this.AdaptorHost.InvokeAsync<T>(this, info.name, info.types, info.args);
         }
 
-        protected static (Type[], object[]) Info<P>(P arg)
+        protected static (string, Type[], object[]) Info<P>(MethodInfo methodInfo, Type serviceType, P arg)
         {
-            return (new Type[] { typeof(P) }, new object[] { arg });
+            return (MethodDescriptor.GenerateName(methodInfo, serviceType), new Type[] { typeof(P) }, new object[] { arg });
         }
 
-        protected static (Type[], object[]) Info<P1, P2>(P1 arg1, P2 arg2)
+        protected static (string, Type[], object[]) Info<P1, P2>(MethodInfo methodInfo, Type serviceType, P1 arg1, P2 arg2)
         {
-            return (new Type[] { typeof(P1), typeof(P2) }, new object[] { arg1, arg2 });
+            return (MethodDescriptor.GenerateName(methodInfo, serviceType), new Type[] { typeof(P1), typeof(P2) }, new object[] { arg1, arg2 });
         }
 
-        protected static (Type[], object[]) Info<P1, P2, P3>(P1 arg1, P2 arg2, P3 arg3)
+        protected static (string, Type[], object[]) Info<P1, P2, P3>(MethodInfo methodInfo, Type serviceType, P1 arg1, P2 arg2, P3 arg3)
         {
-            return (new Type[] { typeof(P1), typeof(P2), typeof(P3) }, new object[] { arg1, arg2, arg3 });
+            return (MethodDescriptor.GenerateName(methodInfo, serviceType), new Type[] { typeof(P1), typeof(P2), typeof(P3) }, new object[] { arg1, arg2, arg3 });
         }
 
-        protected static (Type[], object[]) Info<P1, P2, P3, P4>(P1 arg1, P2 arg2, P3 arg3, P4 arg4)
+        protected static (string, Type[], object[]) Info<P1, P2, P3, P4>(MethodInfo methodInfo, Type serviceType, P1 arg1, P2 arg2, P3 arg3, P4 arg4)
         {
-            return (new Type[] { typeof(P1), typeof(P2), typeof(P3), typeof(P4) }, new object[] { arg1, arg2, arg3, arg4 });
+            return (MethodDescriptor.GenerateName(methodInfo, serviceType), new Type[] { typeof(P1), typeof(P2), typeof(P3), typeof(P4) }, new object[] { arg1, arg2, arg3, arg4 });
         }
     }
 }
