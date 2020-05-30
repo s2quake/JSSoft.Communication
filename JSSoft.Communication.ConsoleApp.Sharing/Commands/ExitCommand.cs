@@ -53,7 +53,7 @@ namespace JSSoft.Communication.Commands
             get; set;
         }
 
-        protected override Task OnExecuteAsync()
+        protected override Task OnExecuteAsync(object source)
         {
             return this.shell.Value.StopAsync();
         }
