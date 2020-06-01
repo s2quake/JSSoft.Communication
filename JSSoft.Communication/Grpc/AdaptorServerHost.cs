@@ -60,37 +60,40 @@ namespace JSSoft.Communication.Grpc
 
         internal async Task<OpenReply> Open(OpenRequest request, ServerCallContext context)
         {
-            var token = await this.Dispatcher.InvokeAsync(() =>
+            var token = Guid.NewGuid();
+            await this.Dispatcher.InvokeAsync(() =>
             {
                 var serviceNames = request.ServiceNames;
                 var serviceHosts = serviceNames.Select(item => this.serviceHosts[item]).ToArray();
                 var peerID = context.Peer;
-                var peer = new Peer(peerID, serviceHosts);
+                var peer = new Peer($"{token}", serviceHosts) { Token = token };
                 this.Peers.Add(peer);
                 return peer.Token;
             });
-            LogUtility.Debug($"{context.Peer} Connected");
+            LogUtility.Debug($"{context.Peer}({token}) Connected");
             return new OpenReply() { Token = $"{token}" };
         }
 
         internal async Task<CloseReply> Close(CloseRequest request, ServerCallContext context)
         {
+            var token = request.Token;
             await this.Dispatcher.InvokeAsync(() =>
             {
-                var peer = this.Peers[context.Peer];
+                var peer = this.Peers[token];
                 peer.Dispose();
             });
-            LogUtility.Debug($"{context.Peer} Disconnected");
+            LogUtility.Debug($"{context.Peer}({token}) Disconnected");
             return new CloseReply();
         }
 
         internal Task<PingReply> Ping(PingRequest request, ServerCallContext context)
         {
+            var token = request.Token;
             return this.Dispatcher.InvokeAsync(() =>
             {
-                var peer = this.Peers[context.Peer];
+                var peer = this.Peers[token];
                 peer.Ping();
-                LogUtility.Debug($"{context.Peer} Ping: {DateTime.Now}");
+                LogUtility.Debug($"{context.Peer}({token}) Ping: {DateTime.Now}");
                 return new PingReply() { Time = peer.PingTime.Ticks };
             });
         }
@@ -103,8 +106,9 @@ namespace JSSoft.Communication.Grpc
             if (service.MethodDescriptors.ContainsKey(request.Name) == false)
                 throw new InvalidOperationException($"method '{request.Name}' does not exists.");
 
+            var token = request.Token;
             var methodDescriptor = service.MethodDescriptors[request.Name];
-            var peer = this.Peers[context.Peer];
+            var peer = this.Peers[token];
             var instance = peer.Services[service];
             var args = this.serializer.DeserializeMany(methodDescriptor.ParameterTypes, request.Datas.ToArray());
             var (code, valueType, value) = await methodDescriptor.InvokeAsync(this.serviceContext, instance, args);
@@ -121,9 +125,14 @@ namespace JSSoft.Communication.Grpc
         {
             var cancellationToken = this.cancellation.Token;
             var peerID = context.Peer;
-            var peer = await this.Dispatcher.InvokeAsync(() => this.Peers[peerID]);
+            var peer = null as Peer;
             while (await requestStream.MoveNext())
             {
+                if (peer == null)
+                {
+                    var token = requestStream.Current.Token;
+                    peer = await this.Dispatcher.InvokeAsync(() => this.Peers[token]);
+                }
                 var request = requestStream.Current;
                 var services = peer.ServiceHosts;
                 if (this.cancellation.IsCancellationRequested == true)

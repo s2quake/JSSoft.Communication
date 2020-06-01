@@ -80,22 +80,22 @@ namespace JSSoft.Communication.ConsoleApp
 
         public Task LogoutAsync(Guid token)
         {
-            return this.InvokeAsync<Guid>(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token));
+            return this.InvokeAsync(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token));
         }
 
         public Task RenameAsync(Guid token, string userName)
         {
-            return this.InvokeAsync<Guid>(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token, userName));
+            return this.InvokeAsync(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token, userName));
         }
 
         public Task SendMessageAsync(Guid token, string userID, string message)
         {
-            return this.InvokeAsync<Guid>(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token, userID, message));
+            return this.InvokeAsync(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token, userID, message));
         }
 
         public Task SetAuthorityAsync(Guid token, string userID, Authority authority)
         {
-            return this.InvokeAsync<Guid>(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token, userID, authority));
+            return this.InvokeAsync(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token, userID, authority));
         }
     }
 

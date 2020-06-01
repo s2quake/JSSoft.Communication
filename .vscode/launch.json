@@ -28,7 +28,7 @@
                 "--verbose"
             ],
             "cwd": "${workspaceFolder}/Server",
-            "console": "integratedTerminal",
+            "console": "externalTerminal",
             "stopAtEntry": false
         },
         {
