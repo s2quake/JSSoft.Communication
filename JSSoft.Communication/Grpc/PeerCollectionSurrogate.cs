@@ -36,8 +36,11 @@ namespace JSSoft.Communication.Grpc
 
         public void Unset()
         {
-            base.RemoveBase(this.peer.ID);
-            this.peer = null;
+            if (this.peer != null)
+            {
+                base.RemoveBase(this.peer.ID);
+                this.peer = null;
+            }
         }
     }
 }
