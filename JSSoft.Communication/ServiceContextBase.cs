@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using JSSoft.Communication.Logging;
 using Ntreev.Library.ObjectModel;
@@ -194,8 +195,9 @@ namespace JSSoft.Communication
         private async Task<Guid> OpenInternalAsync()
         {
             var token = ServiceToken.NewToken();
+            var eventSet = new ManualResetEvent(false);
             this.Dispatcher = new Dispatcher(this);
-            await this.Dispatcher.InvokeAsync(() =>
+            await this.Dispatcher.InvokeAsync(async () =>
             {
                 this.serializerProvider = this.componentProvider.GetserializerProvider(this.SerializerType);
                 this.serializer = this.serializerProvider.Create(this, this.componentProvider.DataSerializers);
@@ -205,22 +207,21 @@ namespace JSSoft.Communication
                 LogUtility.Debug($"{this.adpatorHostProvider.Name} Adaptor created.");
                 this.adaptorHost.Peers.CollectionChanged += Peers_CollectionChanged;
                 this.adaptorHost.Disconnected += AdaptorHost_Disconnected;
-            });
-            foreach (var item in this.ServiceHosts)
-            {
-                this.InitializeInstance(item);
-                await item.OpenAsync(token);
-                LogUtility.Debug($"{item.Name} Service opened.");
-            }
-            await this.adaptorHost.OpenAsync(this.Host, this.Port);
-            LogUtility.Debug($"{this.adpatorHostProvider.Name} Adaptor opened.");
-            await this.Dispatcher.InvokeAsync(() =>
-            {
+                foreach (var item in this.ServiceHosts)
+                {
+                    this.InitializeInstance(item);
+                    await item.OpenAsync(token);
+                    LogUtility.Debug($"{item.Name} Service opened.");
+                }
+                await this.adaptorHost.OpenAsync(this.Host, this.Port);
+                LogUtility.Debug($"{this.adpatorHostProvider.Name} Adaptor opened.");
                 this.IsOpened = true;
                 LogUtility.Debug($"Service Context opened.");
+                this.token = token;
                 this.OnOpened(EventArgs.Empty);
+                eventSet.Set();
             });
-            this.token = token;
+            await Task.Run(() => eventSet.WaitOne());
             return this.token.Guid;
         }
 
@@ -228,27 +229,31 @@ namespace JSSoft.Communication
         {
             if (token == Guid.Empty || this.token.Guid != token)
                 throw new ArgumentException($"invalid token: {token}", nameof(token));
-            await this.adaptorHost.CloseAsync();
-            LogUtility.Debug($"{this.adpatorHostProvider.Name} Adaptor closed.");
-            foreach (var item in this.ServiceHosts)
+
+            var eventSet = new ManualResetEvent(false);
+            await this.Dispatcher.InvokeAsync(async () =>
             {
-                await item.CloseAsync(this.token);
-                this.ReleaseInstance(item);
-                LogUtility.Debug($"{item.Name} Service closed.");
-            }
-            await this.Dispatcher.InvokeAsync(() =>
-            {
+                await this.adaptorHost.CloseAsync();
+                LogUtility.Debug($"{this.adpatorHostProvider.Name} Adaptor closed.");
+                foreach (var item in this.ServiceHosts)
+                {
+                    await item.CloseAsync(this.token);
+                    this.ReleaseInstance(item);
+                    LogUtility.Debug($"{item.Name} Service closed.");
+                }
                 this.adaptorHost.Disconnected -= AdaptorHost_Disconnected;
                 this.adaptorHost.Peers.CollectionChanged -= Peers_CollectionChanged;
                 this.adaptorHost = null;
                 this.serializer = null;
                 this.IsOpened = false;
+                this.Dispatcher.Dispose();
+                this.Dispatcher = null;
                 this.OnClosed(EventArgs.Empty);
                 LogUtility.Debug($"Service Context closed.");
+                this.token = ServiceToken.Empty;
+                eventSet.Set();
             });
-            this.Dispatcher.Dispose();
-            this.Dispatcher = null;
-            this.token = ServiceToken.Empty;
+            await Task.Run(() => eventSet.WaitOne());
         }
 
         private async void AdaptorHost_Disconnected(object sender, DisconnectionReasonEventArgs e)

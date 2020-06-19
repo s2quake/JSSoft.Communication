@@ -213,21 +213,24 @@ namespace JSSoft.Communication.Grpc
 
         #region IAdaptorHost
 
-        Task IAdaptorHost.OpenAsync(string host, int port)
+        async Task IAdaptorHost.OpenAsync(string host, int port)
         {
-            this.adaptor = new AdaptorServerImpl(this);
-            this.server = new Server()
+            await this.Dispatcher.InvokeAsync(() =>
             {
-                Services = { Adaptor.BindService(this.adaptor) },
-                Ports = { new ServerPort(host, port, ServerCredentials.Insecure) },
-            };
-            if (host == ServiceContextBase.DefaultHost)
-            {
-                this.server.Ports.Add(new ServerPort(localAddress, port, ServerCredentials.Insecure));
-            }
-            this.cancellation = new CancellationTokenSource();
-            this.serializer = this.serviceContext.GetService(typeof(ISerializer)) as ISerializer;
-            return Task.Run(this.server.Start);
+                this.adaptor = new AdaptorServerImpl(this);
+                this.server = new Server()
+                {
+                    Services = { Adaptor.BindService(this.adaptor) },
+                    Ports = { new ServerPort(host, port, ServerCredentials.Insecure) },
+                };
+                if (host == ServiceContextBase.DefaultHost)
+                {
+                    this.server.Ports.Add(new ServerPort(localAddress, port, ServerCredentials.Insecure));
+                }
+                this.cancellation = new CancellationTokenSource();
+                this.serializer = this.serviceContext.GetService(typeof(ISerializer)) as ISerializer;
+            });
+            await Task.Run(this.server.Start);
         }
 
         async Task IAdaptorHost.CloseAsync()
