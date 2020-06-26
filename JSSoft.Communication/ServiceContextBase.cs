@@ -49,6 +49,7 @@ namespace JSSoft.Communication
         private int port = DefaultPort;
         private bool isServer;
         private ServiceToken token;
+        private ServiceState serviceState;
 
         protected ServiceContextBase(IComponentProvider componentProvider, IServiceHost[] serviceHost)
         {
@@ -66,31 +67,85 @@ namespace JSSoft.Communication
 
         public async Task<Guid> OpenAsync()
         {
+            if (this.serviceState != ServiceState.None)
+                throw new InvalidOperationException();
+            this.serviceState = ServiceState.Opening;
+            this.Dispatcher = await Dispatcher.CreateAsync(this);
             try
             {
-                return await this.OpenInternalAsync();
+                var token = ServiceToken.NewToken();
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.serializerProvider = this.componentProvider.GetserializerProvider(this.SerializerType);
+                    this.serializer = this.serializerProvider.Create(this, this.componentProvider.DataSerializers);
+                    this.Debug($"{this.serializerProvider.Name} Serializer created.");
+                    this.adpatorHostProvider = this.componentProvider.GetAdaptorHostProvider(this.AdaptorHostType);
+                    this.adaptorHost = this.adpatorHostProvider.Create(this, token);
+                    this.Debug($"{this.adpatorHostProvider.Name} Adaptor created.");
+                    this.adaptorHost.Peers.CollectionChanged += Peers_CollectionChanged;
+                    this.adaptorHost.Disconnected += AdaptorHost_Disconnected;
+                });
+                await this.adaptorHost.OpenAsync(this.Host, this.Port);
+                await this.DebugAsync($"{this.adpatorHostProvider.Name} Adaptor opened.");
+                foreach (var item in this.ServiceHosts)
+                {
+                    await this.Dispatcher.InvokeAsync(() => this.InitializeInstance(item));
+                    await item.OpenAsync(token);
+                    await this.DebugAsync($"{item.Name} Service opened.");
+                }
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.Debug($"Service Context opened.");
+                    this.token = token;
+                    this.serviceState = ServiceState.Open;
+                    this.OnOpened(EventArgs.Empty);
+                });
+                return this.token.Guid;
             }
             catch
             {
-                this.serializerProvider = null;
-                this.serializer = null;
-                this.adpatorHostProvider = null;
-                this.adaptorHost = null;
-                this.serviceByServiceHost.Clear();
-                this.callbackByServiceHost.Clear();
-                await this.Dispatcher.DisposeAsync();
+                this.serviceState = ServiceState.None;
+                await this.AbortAsync();
                 throw;
             }
         }
 
         public async Task CloseAsync(Guid token)
         {
+            if (token == Guid.Empty || this.token.Guid != token)
+                throw new ArgumentException($"invalid token: {token}", nameof(token));
+            if (this.serviceState != ServiceState.Open)
+                throw new InvalidOperationException();
             try
             {
-                await this.CloseInternalAsync(token);
+                await this.adaptorHost.CloseAsync();
+                await this.DebugAsync($"{this.adpatorHostProvider.Name} Adaptor closed.");
+                foreach (var item in this.ServiceHosts)
+                {
+                    await item.CloseAsync(this.token);
+                    await this.Dispatcher.InvokeAsync(() =>
+                    {
+                        this.ReleaseInstance(item);
+                        this.Debug($"{item.Name} Service closed.");
+                    });
+                }
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.adaptorHost.Disconnected -= AdaptorHost_Disconnected;
+                    this.adaptorHost.Peers.CollectionChanged -= Peers_CollectionChanged;
+                    this.adaptorHost = null;
+                    this.serializer = null;
+                    this.Dispatcher.Dispose();
+                    this.Dispatcher = null;
+                    this.token = ServiceToken.Empty;
+                    this.serviceState = ServiceState.None;
+                    this.OnClosed(EventArgs.Empty);
+                    this.Debug($"Service Context closed.");
+                });
             }
             catch
             {
+                await this.AbortAsync();
                 throw;
             }
         }
@@ -110,13 +165,15 @@ namespace JSSoft.Communication
 
         public ServiceHostCollection ServiceHosts { get; }
 
+        public ServiceState ServiceState => this.serviceState;
+
         public string Host
         {
             get => this.host ?? DefaultHost;
             set
             {
-                if (this.IsOpened == true)
-                    throw new InvalidOperationException("cannot set host when service is open.");
+                if (this.serviceState != ServiceState.None)
+                    throw new InvalidOperationException($"cannot set host. service state is '{this.serviceState}'.");
                 this.host = value;
             }
         }
@@ -126,13 +183,11 @@ namespace JSSoft.Communication
             get => this.port;
             set
             {
-                if (this.IsOpened == true)
-                    throw new InvalidOperationException("cannot set port when service is open.");
+                if (this.serviceState != ServiceState.None)
+                    throw new InvalidOperationException($"cannot set port. service state is '{this.serviceState}'.");
                 this.port = value;
             }
         }
-
-        public bool IsOpened { get; private set; }
 
         public Dispatcher Dispatcher { get; private set; }
 
@@ -192,68 +247,30 @@ namespace JSSoft.Communication
             return false;
         }
 
-        private async Task<Guid> OpenInternalAsync()
+        private async Task AbortAsync()
         {
-            var token = ServiceToken.NewToken();
-            var eventSet = new ManualResetEvent(false);
-            this.Dispatcher = new Dispatcher(this);
-            await this.Dispatcher.InvokeAsync(async () =>
+            await Task.Run(() =>
             {
-                this.serializerProvider = this.componentProvider.GetserializerProvider(this.SerializerType);
-                this.serializer = this.serializerProvider.Create(this, this.componentProvider.DataSerializers);
-                LogUtility.Debug($"{this.serializerProvider.Name} Serializer created.");
-                this.adpatorHostProvider = this.componentProvider.GetAdaptorHostProvider(this.AdaptorHostType);
-                this.adaptorHost = this.adpatorHostProvider.Create(this, token);
-                LogUtility.Debug($"{this.adpatorHostProvider.Name} Adaptor created.");
-                this.adaptorHost.Peers.CollectionChanged += Peers_CollectionChanged;
-                this.adaptorHost.Disconnected += AdaptorHost_Disconnected;
-                foreach (var item in this.ServiceHosts)
-                {
-                    this.InitializeInstance(item);
-                    await item.OpenAsync(token);
-                    LogUtility.Debug($"{item.Name} Service opened.");
-                }
-                await this.adaptorHost.OpenAsync(this.Host, this.Port);
-                LogUtility.Debug($"{this.adpatorHostProvider.Name} Adaptor opened.");
-                this.IsOpened = true;
-                LogUtility.Debug($"Service Context opened.");
-                this.token = token;
-                this.OnOpened(EventArgs.Empty);
-                eventSet.Set();
+                this.serializerProvider = null;
+                this.serializer = null;
+                this.adpatorHostProvider = null;
+                this.adaptorHost = null;
+                this.serviceByServiceHost.Clear();
+                this.callbackByServiceHost.Clear();
+                this.serviceState = ServiceState.None;
+                this.Dispatcher?.Dispose();
+                this.Dispatcher = null;
             });
-            await Task.Run(() => eventSet.WaitOne());
-            return this.token.Guid;
         }
 
-        private async Task CloseInternalAsync(Guid token)
+        private void Debug(string message)
         {
-            if (token == Guid.Empty || this.token.Guid != token)
-                throw new ArgumentException($"invalid token: {token}", nameof(token));
+            LogUtility.Debug(message);
+        }
 
-            var eventSet = new ManualResetEvent(false);
-            await this.Dispatcher.InvokeAsync(async () =>
-            {
-                await this.adaptorHost.CloseAsync();
-                LogUtility.Debug($"{this.adpatorHostProvider.Name} Adaptor closed.");
-                foreach (var item in this.ServiceHosts)
-                {
-                    await item.CloseAsync(this.token);
-                    this.ReleaseInstance(item);
-                    LogUtility.Debug($"{item.Name} Service closed.");
-                }
-                this.adaptorHost.Disconnected -= AdaptorHost_Disconnected;
-                this.adaptorHost.Peers.CollectionChanged -= Peers_CollectionChanged;
-                this.adaptorHost = null;
-                this.serializer = null;
-                this.IsOpened = false;
-                this.Dispatcher.Dispose();
-                this.Dispatcher = null;
-                this.OnClosed(EventArgs.Empty);
-                LogUtility.Debug($"Service Context closed.");
-                this.token = ServiceToken.Empty;
-                eventSet.Set();
-            });
-            await Task.Run(() => eventSet.WaitOne());
+        private Task DebugAsync(string message)
+        {
+            return this.Dispatcher.InvokeAsync(() => this.Debug(message));
         }
 
         private async void AdaptorHost_Disconnected(object sender, DisconnectionReasonEventArgs e)

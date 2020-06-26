@@ -21,39 +21,28 @@
 // SOFTWARE.
 
 using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
-using JSSoft.Communication.ConsoleApp;
-using Ntreev.Library.Commands;
-#if MEF
-using System.ComponentModel.Composition;
-#endif
+using JSSoft.Communication.Logging;
+using Ntreev.Library.ObjectModel;
+using Ntreev.Library.Threading;
 
-namespace JSSoft.Communication.Commands
+namespace JSSoft.Communication
 {
-#if MEF
-    [Export(typeof(ICommand))]
-#endif
-    class CloseCommand : CommandAsyncBase
+    public enum ServiceState
     {
-        private readonly IServiceContext serviceHost;
-        private readonly Lazy<Shell> shell;
+        None,
 
-#if MEF
-        [ImportingConstructor]
-#endif
-        public CloseCommand(IServiceContext serviceHost, Lazy<Shell> shell)
-        {
-            this.serviceHost = serviceHost;
-            this.shell = shell;
-        }
+        Opening,
 
-        public override bool IsEnabled => this.serviceHost.ServiceState == ServiceState.Open;
+        Open,
 
-        protected override Task OnExecuteAsync(object source)
-        {
-            return this.serviceHost.CloseAsync(this.Shell.Token);
-        }
+        Closing,
 
-        private Shell Shell => this.shell.Value;
+        Closed = None,
     }
 }

@@ -38,7 +38,7 @@ namespace JSSoft.Communication.Grpc
 {
     class AdaptorServerHost : IAdaptorHost
     {
-        private static readonly string localAddress;
+        private static readonly string localAddress = "127.0.0.1";
         private readonly IServiceContext serviceContext;
         private readonly IContainer<IServiceHost> serviceHosts;
         private CancellationTokenSource cancellation;
@@ -48,7 +48,10 @@ namespace JSSoft.Communication.Grpc
 
         static AdaptorServerHost()
         {
-            localAddress = Dns.GetHostEntry(Dns.GetHostName()).AddressList.First(item => $"{item}" != "127.0.0.1" && item.AddressFamily == AddressFamily.InterNetwork).ToString();
+            var addressList = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
+            var address = addressList.FirstOrDefault(item => $"{item}" != "127.0.0.1" && item.AddressFamily == AddressFamily.InterNetwork);
+            if (address != null)
+                localAddress = $"{address}";
         }
 
         public AdaptorServerHost(IServiceContext serviceContext)

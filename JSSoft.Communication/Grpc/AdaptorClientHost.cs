@@ -50,24 +50,36 @@ namespace JSSoft.Communication.Grpc
 
         public async Task OpenAsync(string host, int port)
         {
-            await Task.Run(() =>
+            try
             {
-                this.channel = new Channel($"{host}:{port}", ChannelCredentials.Insecure);
-                this.adaptorImpl = new AdaptorClientImpl(this.channel, host, this.serviceHosts.ToArray());
-            });
-            await this.adaptorImpl.OpenAsync();
-            await Task.Run(() =>
+                await Task.Run(() =>
+                {
+                    this.channel = new Channel($"{host}:{port}", ChannelCredentials.Insecure);
+                    this.adaptorImpl = new AdaptorClientImpl(this.channel, host, this.serviceHosts.ToArray());
+                });
+                await this.adaptorImpl.OpenAsync();
+                await Task.Run(() =>
+                {
+                    this.peers.Set(this.adaptorImpl);
+                    this.cancellation = new CancellationTokenSource();
+                    this.serializer = this.serviceContext.GetService(typeof(ISerializer)) as ISerializer;
+                });
+                this.task = Task.Run(() =>
+                {
+                    var eventSet = new ManualResetEvent(false);
+                    this.PollAsync(this.cancellation.Token, eventSet);
+                    eventSet.WaitOne();
+                });
+            }
+            catch
             {
-                this.peers.Set(this.adaptorImpl);
-                this.cancellation = new CancellationTokenSource();
-                this.serializer = this.serviceContext.GetService(typeof(ISerializer)) as ISerializer;
-            });
-            this.task = Task.Run(() =>
-            {
-                var eventSet = new ManualResetEvent(false);
-                this.PollAsync(this.cancellation.Token, eventSet);
-                eventSet.WaitOne();
-            });
+                if (this.channel != null)
+                {
+                    await this.channel.ShutdownAsync();
+                    this.channel = null;
+                }
+                throw;
+            }
         }
 
         public async Task CloseAsync()
