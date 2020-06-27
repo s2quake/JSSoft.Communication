@@ -49,7 +49,7 @@ namespace JSSoft.Communication.Commands
 
         public override bool IsEnabled => this.serviceHost.ServiceState == ServiceState.None;
 
-        protected override async Task OnExecuteAsync(object source)
+        protected override async Task OnExecuteAsync()
         {
             this.Shell.Token = await this.serviceHost.OpenAsync();
         }
