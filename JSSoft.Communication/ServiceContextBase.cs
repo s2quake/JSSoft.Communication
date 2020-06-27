@@ -73,9 +73,9 @@ namespace JSSoft.Communication
             this.Dispatcher = await Dispatcher.CreateAsync(this);
             try
             {
-                var token = ServiceToken.NewToken();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
+                    this.token = ServiceToken.NewToken();
                     this.serializerProvider = this.componentProvider.GetserializerProvider(this.SerializerType);
                     this.serializer = this.serializerProvider.Create(this, this.componentProvider.DataSerializers);
                     this.Debug($"{this.serializerProvider.Name} Serializer created.");
@@ -85,18 +85,17 @@ namespace JSSoft.Communication
                     this.adaptorHost.Peers.CollectionChanged += Peers_CollectionChanged;
                     this.adaptorHost.Disconnected += AdaptorHost_Disconnected;
                 });
-                await this.adaptorHost.OpenAsync(this.Host, this.Port);
-                await this.DebugAsync($"{this.adpatorHostProvider.Name} Adaptor opened.");
                 foreach (var item in this.ServiceHosts)
                 {
                     await this.Dispatcher.InvokeAsync(() => this.InitializeInstance(item));
                     await item.OpenAsync(token);
                     await this.DebugAsync($"{item.Name} Service opened.");
                 }
+                await this.adaptorHost.OpenAsync(this.Host, this.Port);
+                await this.DebugAsync($"{this.adpatorHostProvider.Name} Adaptor opened.");
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.Debug($"Service Context opened.");
-                    this.token = token;
                     this.serviceState = ServiceState.Open;
                     this.OnOpened(EventArgs.Empty);
                 });
@@ -249,8 +248,13 @@ namespace JSSoft.Communication
 
         private async Task AbortAsync()
         {
+            foreach (var item in this.ServiceHosts)
+            {
+                await item.CloseAsync(this.token);
+            }
             await Task.Run(() =>
             {
+                this.token = null;
                 this.serializerProvider = null;
                 this.serializer = null;
                 this.adpatorHostProvider = null;

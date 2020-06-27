@@ -61,10 +61,13 @@ namespace JSSoft.Communication
 
         public async Task CloseAsync(ServiceToken token)
         {
+            if (this.token != token)
+                throw new InvalidOperationException();
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.OnClosed(EventArgs.Empty);
             });
+            this.token = null;
             this.Dispatcher.Dispose();
             this.Dispatcher = null;
         }
@@ -99,7 +102,7 @@ namespace JSSoft.Communication
                 if (this.CallbackType.IsInterface == false)
                     throw new InvalidOperationException("callback type must be interface.");
                 if (this.CallbackType.IsNested == true)
-                throw new InvalidOperationException("callback type can not be nested type.");
+                    throw new InvalidOperationException("callback type can not be nested type.");
                 if (IsPublicType(this.CallbackType) == false && IsInternalType(this.CallbackType) == false)
                     throw new InvalidOperationException($"'{this.ServiceType.Name}' type must be public or internal.");
             }
