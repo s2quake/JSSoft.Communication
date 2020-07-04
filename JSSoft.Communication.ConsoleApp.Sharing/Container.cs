@@ -123,7 +123,7 @@ namespace JSSoft.Communication.ConsoleApp
             commandList.Add(new OpenCommand(serviceContext, lazyShell));
             commandList.Add(new UserCommand(lazyShell, lazyUserService));
             commandList.Add(new DataCommand(lazyShell, lazyDataService));
-            commandContext = new CommandContext(commandList, Enumerable.Empty<ICommandProvider>());
+            commandContext = new CommandContext(commandList);
             shell = new Shell(commandContext, serviceContext, userService);
         }
 

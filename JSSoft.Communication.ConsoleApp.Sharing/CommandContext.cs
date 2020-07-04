@@ -35,14 +35,14 @@ namespace JSSoft.Communication.ConsoleApp
     {
 #if MEF
         [ImportingConstructor]
-        public CommandContext([ImportMany]IEnumerable<ICommand> commands, [ImportMany]IEnumerable<ICommandProvider> methods)
-            : base(commands, methods)
+        public CommandContext([ImportMany]IEnumerable<ICommand> commands)
+            : base(commands)
         {
 
         }
 #else // MEF
-        public CommandContext(IEnumerable<ICommand> commands, IEnumerable<ICommandProvider> methods)
-            : base(commands, methods)
+        public CommandContext(IEnumerable<ICommand> commands)
+            : base(commands)
         {
 
         }
