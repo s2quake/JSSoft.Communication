@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
@@ -37,7 +38,7 @@ namespace JSSoft.Communication.Grpc
 {
     class AdaptorServerHost : IAdaptorHost
     {
-        private static readonly string localAddress;
+        private static readonly string localAddress = "127.0.0.1";
         private readonly IServiceContext serviceContext;
         private readonly IContainer<IServiceHost> serviceHosts;
         private CancellationTokenSource cancellation;
@@ -47,7 +48,10 @@ namespace JSSoft.Communication.Grpc
 
         static AdaptorServerHost()
         {
-            localAddress = Dns.GetHostEntry(Dns.GetHostName()).AddressList.First(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork).ToString();
+            var addressList = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
+            var address = addressList.FirstOrDefault(item => $"{item}" != "127.0.0.1" && item.AddressFamily == AddressFamily.InterNetwork);
+            if (address != null)
+                localAddress = $"{address}";
         }
 
         public AdaptorServerHost(IServiceContext serviceContext)
@@ -59,37 +63,40 @@ namespace JSSoft.Communication.Grpc
 
         internal async Task<OpenReply> Open(OpenRequest request, ServerCallContext context)
         {
-            var token = await this.Dispatcher.InvokeAsync(() =>
+            var token = Guid.NewGuid();
+            await this.Dispatcher.InvokeAsync(() =>
             {
                 var serviceNames = request.ServiceNames;
                 var serviceHosts = serviceNames.Select(item => this.serviceHosts[item]).ToArray();
                 var peerID = context.Peer;
-                var peer = new Peer(peerID, serviceHosts);
+                var peer = new Peer($"{token}", serviceHosts) { Token = token };
                 this.Peers.Add(peer);
                 return peer.Token;
             });
-            LogUtility.Debug($"{context.Peer} Connected");
+            LogUtility.Debug($"{context.Peer}({token}) Connected");
             return new OpenReply() { Token = $"{token}" };
         }
 
         internal async Task<CloseReply> Close(CloseRequest request, ServerCallContext context)
         {
+            var token = request.Token;
             await this.Dispatcher.InvokeAsync(() =>
             {
-                var peer = this.Peers[context.Peer];
+                var peer = this.Peers[token];
                 peer.Dispose();
             });
-            LogUtility.Debug($"{context.Peer} Disconnected");
+            LogUtility.Debug($"{context.Peer}({token}) Disconnected");
             return new CloseReply();
         }
 
         internal Task<PingReply> Ping(PingRequest request, ServerCallContext context)
         {
+            var token = request.Token;
             return this.Dispatcher.InvokeAsync(() =>
             {
-                var peer = this.Peers[context.Peer];
+                var peer = this.Peers[token];
                 peer.Ping();
-                LogUtility.Debug($"{context.Peer} Ping: {DateTime.Now}");
+                LogUtility.Debug($"{context.Peer}({token}) Ping: {DateTime.Now}");
                 return new PingReply() { Time = peer.PingTime.Ticks };
             });
         }
@@ -102,8 +109,9 @@ namespace JSSoft.Communication.Grpc
             if (service.MethodDescriptors.ContainsKey(request.Name) == false)
                 throw new InvalidOperationException($"method '{request.Name}' does not exists.");
 
+            var token = request.Token;
             var methodDescriptor = service.MethodDescriptors[request.Name];
-            var peer = this.Peers[context.Peer];
+            var peer = this.Peers[token];
             var instance = peer.Services[service];
             var args = this.serializer.DeserializeMany(methodDescriptor.ParameterTypes, request.Datas.ToArray());
             var (code, valueType, value) = await methodDescriptor.InvokeAsync(this.serviceContext, instance, args);
@@ -120,9 +128,14 @@ namespace JSSoft.Communication.Grpc
         {
             var cancellationToken = this.cancellation.Token;
             var peerID = context.Peer;
-            var peer = await this.Dispatcher.InvokeAsync(() => this.Peers[peerID]);
+            var peer = null as Peer;
             while (await requestStream.MoveNext())
             {
+                if (peer == null)
+                {
+                    var token = requestStream.Current.Token;
+                    peer = await this.Dispatcher.InvokeAsync(() => this.Peers[token]);
+                }
                 var request = requestStream.Current;
                 var services = peer.ServiceHosts;
                 if (this.cancellation.IsCancellationRequested == true)
@@ -203,21 +216,24 @@ namespace JSSoft.Communication.Grpc
 
         #region IAdaptorHost
 
-        Task IAdaptorHost.OpenAsync(string host, int port)
+        async Task IAdaptorHost.OpenAsync(string host, int port)
         {
-            this.adaptor = new AdaptorServerImpl(this);
-            this.server = new Server()
+            await this.Dispatcher.InvokeAsync(() =>
             {
-                Services = { Adaptor.BindService(this.adaptor) },
-                Ports = { new ServerPort(host, port, ServerCredentials.Insecure) },
-            };
-            if (host == ServiceContextBase.DefaultHost)
-            {
-                this.server.Ports.Add(new ServerPort(localAddress, port, ServerCredentials.Insecure));
-            }
-            this.cancellation = new CancellationTokenSource();
-            this.serializer = this.serviceContext.GetService(typeof(ISerializer)) as ISerializer;
-            return Task.Run(this.server.Start);
+                this.adaptor = new AdaptorServerImpl(this);
+                this.server = new Server()
+                {
+                    Services = { Adaptor.BindService(this.adaptor) },
+                    Ports = { new ServerPort(host, port, ServerCredentials.Insecure) },
+                };
+                if (host == ServiceContextBase.DefaultHost)
+                {
+                    this.server.Ports.Add(new ServerPort(localAddress, port, ServerCredentials.Insecure));
+                }
+                this.cancellation = new CancellationTokenSource();
+                this.serializer = this.serviceContext.GetService(typeof(ISerializer)) as ISerializer;
+            });
+            await Task.Run(this.server.Start);
         }
 
         async Task IAdaptorHost.CloseAsync()

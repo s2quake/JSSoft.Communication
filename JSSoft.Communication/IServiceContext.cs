@@ -36,12 +36,12 @@ namespace JSSoft.Communication
         IContainer<IServiceHost> ServiceHosts { get; }
 
         string Host { get; set; }
-        
+
         int Port { get; set; }
 
-        bool IsOpened { get; }
-
         Dispatcher Dispatcher { get; }
+
+        ServiceState ServiceState { get; }
 
         event EventHandler Opened;
 

@@ -20,27 +20,29 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
+using JSSoft.Communication.Logging;
 using Ntreev.Library.ObjectModel;
+using Ntreev.Library.Threading;
 
-namespace JSSoft.Communication.Grpc
+namespace JSSoft.Communication
 {
-    class PeerCollectionSurrogate : ContainerBase<IPeer>
+    public enum ServiceState
     {
-        private IPeer peer;
+        None,
 
-        public void Set(IPeer peer)
-        {
-            this.peer = peer;
-            base.AddBase(this.peer.ID, this.peer);
-        }
+        Opening,
 
-        public void Unset()
-        {
-            if (this.peer != null)
-            {
-                base.RemoveBase(this.peer.ID);
-                this.peer = null;
-            }
-        }
+        Open,
+
+        Closing,
+
+        Closed = None,
     }
 }

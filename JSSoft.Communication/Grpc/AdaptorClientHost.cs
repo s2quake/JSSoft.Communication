@@ -50,31 +50,53 @@ namespace JSSoft.Communication.Grpc
 
         public async Task OpenAsync(string host, int port)
         {
-            this.channel = new Channel($"{host}:{port}", ChannelCredentials.Insecure);
-            this.adaptorImpl = new AdaptorClientImpl(this.channel, host, this.serviceHosts.ToArray());
-            await this.adaptorImpl.OpenAsync();
-            this.peers.Set(this.adaptorImpl);
-            this.cancellation = new CancellationTokenSource();
-            this.serializer = this.serviceContext.GetService(typeof(ISerializer)) as ISerializer;
-            this.task = Task.Run(() => 
+            try
             {
-                var eventSet = new ManualResetEvent(false);
-                this.PollAsync(this.cancellation.Token, eventSet);
-                eventSet.WaitOne();
-            });
+                await Task.Run(() =>
+                {
+                    this.channel = new Channel($"{host}:{port}", ChannelCredentials.Insecure);
+                    this.adaptorImpl = new AdaptorClientImpl(this.channel, host, this.serviceHosts.ToArray());
+                });
+                await this.adaptorImpl.OpenAsync();
+                await Task.Run(() =>
+                {
+                    this.peers.Set(this.adaptorImpl);
+                    this.cancellation = new CancellationTokenSource();
+                    this.serializer = this.serviceContext.GetService(typeof(ISerializer)) as ISerializer;
+                });
+                this.task = Task.Run(() =>
+                {
+                    var eventSet = new ManualResetEvent(false);
+                    this.PollAsync(this.cancellation.Token, eventSet);
+                    eventSet.WaitOne();
+                });
+            }
+            catch
+            {
+                if (this.channel != null)
+                {
+                    await this.channel.ShutdownAsync();
+                    this.channel = null;
+                }
+                throw;
+            }
         }
 
         public async Task CloseAsync()
         {
-            this.peers.Unset();
+            await Task.Run(() => this.peers.Unset());
             if (this.adaptorImpl != null)
                 await this.adaptorImpl.CloseAsync();
-            this.cancellation.Cancel();
-            this.cancellation = null;
-            this.task?.Wait();
-            this.task = null;
-            this.adaptorImpl = null;
-            await this.channel.ShutdownAsync();
+            await Task.Run(() =>
+            {
+                this.cancellation?.Cancel();
+                this.cancellation = null;
+                this.task?.Wait();
+                this.task = null;
+                this.adaptorImpl = null;
+            });
+            if (this.channel != null)
+                await this.channel.ShutdownAsync();
             this.channel = null;
         }
 
@@ -94,7 +116,10 @@ namespace JSSoft.Communication.Grpc
                 {
                     while (!cancellationToken.IsCancellationRequested)
                     {
-                        var request = new PollRequest();
+                        var request = new PollRequest()
+                        {
+                            Token = $"{this.adaptorImpl.Token}"
+                        };
                         await call.RequestStream.WriteAsync(request);
                         await call.ResponseStream.MoveNext();
                         var reply = call.ResponseStream.Current;
@@ -164,11 +189,13 @@ namespace JSSoft.Communication.Grpc
 
         void IAdaptorHost.Invoke(InstanceBase instance, string name, Type[] types, object[] args)
         {
+            var token = $"{this.adaptorImpl.Token}";
             var datas = this.serializer.SerializeMany(types, args);
             var request = new InvokeRequest()
             {
                 ServiceName = instance.ServiceName,
                 Name = name,
+                Token = token
             };
             request.Datas.AddRange(datas);
             var reply = this.adaptorImpl.Invoke(request);
@@ -180,11 +207,13 @@ namespace JSSoft.Communication.Grpc
 
         T IAdaptorHost.Invoke<T>(InstanceBase instance, string name, Type[] types, object[] args)
         {
+            var token = $"{this.adaptorImpl.Token}";
             var datas = this.serializer.SerializeMany(types, args);
             var request = new InvokeRequest()
             {
                 ServiceName = instance.ServiceName,
                 Name = name,
+                Token = token
             };
             request.Datas.AddRange(datas);
             var reply = this.adaptorImpl.Invoke(request);
@@ -197,11 +226,13 @@ namespace JSSoft.Communication.Grpc
 
         async Task IAdaptorHost.InvokeAsync(InstanceBase instance, string name, Type[] types, object[] args)
         {
+            var token = $"{this.adaptorImpl.Token}";
             var datas = this.serializer.SerializeMany(types, args);
             var request = new InvokeRequest()
             {
                 ServiceName = instance.ServiceName,
                 Name = name,
+                Token = token
             };
             request.Datas.AddRange(datas);
             var reply = await this.adaptorImpl.InvokeAsync(request);
@@ -213,11 +244,13 @@ namespace JSSoft.Communication.Grpc
 
         async Task<T> IAdaptorHost.InvokeAsync<T>(InstanceBase instance, string name, Type[] types, object[] args)
         {
+            var token = $"{this.adaptorImpl.Token}";
             var datas = this.serializer.SerializeMany(types, args);
             var request = new InvokeRequest()
             {
                 ServiceName = instance.ServiceName,
                 Name = name,
+                Token = token
             };
             request.Datas.AddRange(datas);
             var reply = await this.adaptorImpl.InvokeAsync(request);

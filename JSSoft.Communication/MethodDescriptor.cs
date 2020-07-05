@@ -86,8 +86,19 @@ namespace JSSoft.Communication
         internal static string GenerateName(MethodInfo methodInfo)
         {
             var parameterTypes = methodInfo.GetParameters().Select(item => item.ParameterType).ToArray();
+            return GenerateName(methodInfo.ReturnType, methodInfo.ReflectedType, methodInfo.Name, parameterTypes);
+        }
+
+        internal static string GenerateName(MethodInfo methodInfo, Type serviceType)
+        {
+            var parameterTypes = methodInfo.GetParameters().Select(item => item.ParameterType).ToArray();
+            return GenerateName(methodInfo.ReturnType, serviceType, methodInfo.Name, parameterTypes);
+        }
+
+        internal static string GenerateName(Type returnType, Type reflectedType, string methodName, params Type[] parameterTypes)
+        {
             var parameterTypeNames = string.Join<Type>(", ", parameterTypes);
-            return $"{methodInfo.ReturnType} {methodInfo.ReflectedType}.{methodInfo.Name}({parameterTypeNames})";
+            return $"{returnType} {reflectedType}.{methodName}({parameterTypeNames})";
         }
 
         internal MethodInfo MethodInfo { get; }

@@ -47,7 +47,7 @@ namespace JSSoft.Communication.Commands
             this.shell = shell;
         }
 
-        public override bool IsEnabled => this.serviceHost.IsOpened;
+        public override bool IsEnabled => this.serviceHost.ServiceState == ServiceState.Open;
 
         protected override Task OnExecuteAsync()
         {

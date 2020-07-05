@@ -47,20 +47,30 @@ namespace JSSoft.Communication.Grpc
 
         public async Task OpenAsync()
         {
-            var serviceNames = this.ServiceHosts.Select(item => item.Name).ToArray();
-            var request = new OpenRequest() { Time = DateTime.UtcNow.Ticks };
-            request.ServiceNames.AddRange(serviceNames);
+            var request = await Task.Run(() =>
+            {
+                var serviceNames = this.ServiceHosts.Select(item => item.Name).ToArray();
+                var req = new OpenRequest() { Time = DateTime.UtcNow.Ticks };
+                req.ServiceNames.AddRange(serviceNames);
+                return req;
+            });
             var reply = await base.OpenAsync(request);
-            this.Token = Guid.Parse(reply.Token);
-            this.timer = new Timer(timeout.TotalMilliseconds);
-            this.timer.Elapsed += Timer_Elapsed;
-            this.timer.Start();
+            await Task.Run(() =>
+            {
+                this.Token = Guid.Parse(reply.Token);
+                this.timer = new Timer(timeout.TotalMilliseconds);
+                this.timer.Elapsed += Timer_Elapsed;
+                this.timer.Start();
+            });
         }
-    
+
         public async Task CloseAsync()
         {
-            this.timer.Dispose();
-            this.timer = null;
+            await Task.Run(() =>
+            {
+                this.timer.Dispose();
+                this.timer = null;
+            });
             var value = await base.CloseAsync(new CloseRequest() { Token = this.Token.ToString() });
         }
 

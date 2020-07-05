@@ -251,7 +251,7 @@ namespace JSSoft.Communication.ConsoleApp
         async Task IShell.StopAsync()
         {
             base.Cancel();
-            if (this.serviceHost.IsOpened == true)
+            if (this.serviceHost.ServiceState == ServiceState.Open)
             {
                 this.serviceHost.Closed -= ServiceHost_Closed;
                 await this.serviceHost.CloseAsync(this.Token);

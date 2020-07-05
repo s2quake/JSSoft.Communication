@@ -42,8 +42,20 @@ namespace JSSoft.Communication
         internal ServiceInstanceBuilder()
         {
             this.AssemblyName = new AssemblyName(ns);
-            this.assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(this.AssemblyName, AssemblyBuilderAccess.Run);
+            this.assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(this.AssemblyName, AssemblyBuilderAccess.RunAndCollect);
             this.moduleBuilder = assemblyBuilder.DefineDynamicModule(this.AssemblyName.Name);
+        }
+
+        internal static ServiceInstanceBuilder Create()
+        {
+            try
+            {
+                return new ServiceInstanceBuilder();
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public Type CreateType(string name, Type baseType, Type interfaceType)
