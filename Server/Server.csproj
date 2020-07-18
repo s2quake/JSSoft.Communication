@@ -5,9 +5,9 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <DefineConstants>SERVER</DefineConstants>
-    <Version>0.9.20179.1041</Version>
+    <Version>0.9.20200.2038</Version>
     <AssemblyVersion>0.9</AssemblyVersion>
-    <FileVersion>0.9.20179.1041</FileVersion>
+    <FileVersion>0.9.20200.2038</FileVersion>
     <Authors>s2quake</Authors>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/s2quake/grpc-sample</RepositoryUrl>
