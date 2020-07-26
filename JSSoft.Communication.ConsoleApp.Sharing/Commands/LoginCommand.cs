@@ -49,13 +49,13 @@ namespace JSSoft.Communication.Commands
             this.userService = userService;
         }
 
-        [CommandProperty(IsRequired = true)]
+        [CommandPropertyRequired]
         public string UserID
         {
             get; set;
         }
 
-        [CommandProperty(IsRequired = true)]
+        [CommandPropertyRequired]
         public string Password
         {
             get; set;
