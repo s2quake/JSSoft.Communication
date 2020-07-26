@@ -20,8 +20,8 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\JSSoft.Communication\JSSoft.Communication.csproj" />
-    <ProjectReference Include="..\sub-modules\Ntreev.Library\Ntreev.Library\Ntreev.Library.csproj" />
-    <ProjectReference Include="..\sub-modules\Ntreev.Library.Commands\Ntreev.Library.Commands\Ntreev.Library.Commands.csproj" />
+    <ProjectReference Include="..\..\Ntreev.Library\Ntreev.Library\Ntreev.Library.csproj" />
+    <ProjectReference Include="..\..\Ntreev.Library.Commands\Ntreev.Library.Commands\Ntreev.Library.Commands.csproj" />
   </ItemGroup>
   <Import Project="..\JSSoft.Communication.Services.Sharing\JSSoft.Communication.Services.Sharing.projitems" Label="Shared" />
   <Import Project="..\JSSoft.Communication.ConsoleApp.Sharing\JSSoft.Communication.ConsoleApp.Sharing.projitems" Label="Shared" />
