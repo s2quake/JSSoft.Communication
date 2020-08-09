@@ -46,8 +46,7 @@ namespace JSSoft.Communication.ExceptionSerializers
         protected override ArgumentNullException CreateInstance(object[] args)
         {
             var paramName = args[0] as string;
-            var message = args[1] as string;
-            if (paramName != null && message != null)
+            if (paramName != null && args[1] is string message)
                 new ArgumentNullException(paramName, message);
             else if (paramName != null)
                 return new ArgumentNullException(paramName);
@@ -62,7 +61,7 @@ namespace JSSoft.Communication.ExceptionSerializers
                 var exception = new ArgumentNullException(paramName);
                 this.messageByParam.Add(paramName, exception.Message);
             }
-            var message = e.Message == this.messageByParam[paramName] ? null : e.Message;;
+            var message = e.Message == this.messageByParam[paramName] ? null : e.Message; ;
             return new object[] { paramName, message };
         }
     }

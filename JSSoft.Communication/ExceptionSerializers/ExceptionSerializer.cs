@@ -40,8 +40,7 @@ namespace JSSoft.Communication.ExceptionSerializers
 
         protected override Exception CreateInstance(object[] args)
         {
-            var message = args[0] as string;
-            if (message == null)
+            if (!(args[0] is string message))
                 return new Exception();
             return new Exception(message);
         }
@@ -49,7 +48,7 @@ namespace JSSoft.Communication.ExceptionSerializers
         protected override object[] SelectProperties(Exception e)
         {
             if (e.Message == empty.Message)
-                return new object[] { null};
+                return new object[] { null };
             return new object[] { e.Message };
         }
     }

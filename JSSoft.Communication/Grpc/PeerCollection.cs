@@ -20,14 +20,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System;
-using System.Linq;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Threading;
 using Ntreev.Library.ObjectModel;
 using Ntreev.Library.Threading;
+using System;
+using System.Collections.Specialized;
+using System.Linq;
+using System.Threading;
 
 namespace JSSoft.Communication.Grpc
 {

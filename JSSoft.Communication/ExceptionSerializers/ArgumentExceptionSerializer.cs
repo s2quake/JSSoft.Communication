@@ -62,7 +62,7 @@ namespace JSSoft.Communication.ExceptionSerializers
                 var exception = new ArgumentException(paramName);
                 this.messageByParam.Add(paramName, exception.Message);
             }
-            var message = e.Message == this.messageByParam[paramName] ? null : e.Message;;
+            var message = e.Message == this.messageByParam[paramName] ? null : e.Message; ;
             return new object[] { paramName, message };
         }
     }

@@ -20,18 +20,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using JSSoft.Communication.Logging;
 using System;
-using System.Linq;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
-using JSSoft.Communication.Logging;
 
 namespace JSSoft.Communication.Grpc
 {
     sealed class Peer : IPeer
     {
-        private CancellationTokenSource cancellation = new CancellationTokenSource();
+        private readonly CancellationTokenSource cancellation = new CancellationTokenSource();
 
         public Peer(string id, IServiceHost[] serviceHosts)
         {
@@ -58,7 +56,7 @@ namespace JSSoft.Communication.Grpc
         {
             this.Services.Add(serviceHost, service);
             this.Callbacks.Add(serviceHost, callback);
-            this.PollReplyItems.Add(serviceHost, new PollReplyItemCollection(serviceHost));
+            this.PollReplyItems.Add(serviceHost, new PollReplyItemCollection());
         }
 
         public void Ping()

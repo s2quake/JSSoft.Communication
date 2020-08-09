@@ -65,7 +65,7 @@ namespace JSSoft.Communication
 
         protected virtual void OnServiceCreated(T service)
         {
-            
+
         }
 
         protected virtual void OnServiceDestroyed()

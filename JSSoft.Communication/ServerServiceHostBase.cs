@@ -44,7 +44,7 @@ namespace JSSoft.Communication
         }
 
         private protected override object CreateInstanceInternal(object obj)
-        { 
+        {
             return this.CreateService(obj as U);
         }
 

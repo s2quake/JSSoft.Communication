@@ -27,7 +27,7 @@ namespace JSSoft.Communication
     public interface IDataSerializer
     {
         Type Type { get; }
-        
+
         string Serialize(ISerializer serializer, object data);
 
         object Deserialize(ISerializer serializer, string text);

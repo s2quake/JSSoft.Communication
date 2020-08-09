@@ -20,16 +20,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 using JSSoft.Communication.Logging;
 using Ntreev.Library.ObjectModel;
 using Ntreev.Library.Threading;
+using System;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace JSSoft.Communication
 {
@@ -41,15 +39,14 @@ namespace JSSoft.Communication
         private readonly InstanceCollection serviceByServiceHost = new InstanceCollection();
         private readonly InstanceCollection callbackByServiceHost = new InstanceCollection();
         private readonly ServiceInstanceBuilder instanceBuilder;
+        private readonly bool isServer;
         private IAdaptorHostProvider adpatorHostProvider;
         private ISerializerProvider serializerProvider;
         private ISerializer serializer;
         private IAdaptorHost adaptorHost;
         private string host;
         private int port = DefaultPort;
-        private bool isServer;
         private ServiceToken token;
-        private ServiceState serviceState;
 
         protected ServiceContextBase(IComponentProvider componentProvider, IServiceHost[] serviceHost)
         {
@@ -67,9 +64,9 @@ namespace JSSoft.Communication
 
         public async Task<Guid> OpenAsync()
         {
-            if (this.serviceState != ServiceState.None)
+            if (this.ServiceState != ServiceState.None)
                 throw new InvalidOperationException();
-            this.serviceState = ServiceState.Opening;
+            this.ServiceState = ServiceState.Opening;
             this.Dispatcher = await Dispatcher.CreateAsync(this);
             try
             {
@@ -96,14 +93,14 @@ namespace JSSoft.Communication
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.Debug($"Service Context opened.");
-                    this.serviceState = ServiceState.Open;
+                    this.ServiceState = ServiceState.Open;
                     this.OnOpened(EventArgs.Empty);
                 });
                 return this.token.Guid;
             }
             catch
             {
-                this.serviceState = ServiceState.None;
+                this.ServiceState = ServiceState.None;
                 await this.AbortAsync();
                 throw;
             }
@@ -113,7 +110,7 @@ namespace JSSoft.Communication
         {
             if (token == Guid.Empty || this.token.Guid != token)
                 throw new ArgumentException($"invalid token: {token}", nameof(token));
-            if (this.serviceState != ServiceState.Open)
+            if (this.ServiceState != ServiceState.Open)
                 throw new InvalidOperationException();
             try
             {
@@ -137,7 +134,7 @@ namespace JSSoft.Communication
                     this.Dispatcher.Dispose();
                     this.Dispatcher = null;
                     this.token = ServiceToken.Empty;
-                    this.serviceState = ServiceState.None;
+                    this.ServiceState = ServiceState.None;
                     this.OnClosed(EventArgs.Empty);
                     this.Debug($"Service Context closed.");
                 });
@@ -164,15 +161,15 @@ namespace JSSoft.Communication
 
         public ServiceHostCollection ServiceHosts { get; }
 
-        public ServiceState ServiceState => this.serviceState;
+        public ServiceState ServiceState { get; private set; }
 
         public string Host
         {
             get => this.host ?? DefaultHost;
             set
             {
-                if (this.serviceState != ServiceState.None)
-                    throw new InvalidOperationException($"cannot set host. service state is '{this.serviceState}'.");
+                if (this.ServiceState != ServiceState.None)
+                    throw new InvalidOperationException($"cannot set host. service state is '{this.ServiceState}'.");
                 this.host = value;
             }
         }
@@ -182,8 +179,8 @@ namespace JSSoft.Communication
             get => this.port;
             set
             {
-                if (this.serviceState != ServiceState.None)
-                    throw new InvalidOperationException($"cannot set port. service state is '{this.serviceState}'.");
+                if (this.ServiceState != ServiceState.None)
+                    throw new InvalidOperationException($"cannot set port. service state is '{this.ServiceState}'.");
                 this.port = value;
             }
         }
@@ -261,7 +258,7 @@ namespace JSSoft.Communication
                 this.adaptorHost = null;
                 this.serviceByServiceHost.Clear();
                 this.callbackByServiceHost.Clear();
-                this.serviceState = ServiceState.None;
+                this.ServiceState = ServiceState.None;
                 this.Dispatcher?.Dispose();
                 this.Dispatcher = null;
             });
@@ -344,7 +341,6 @@ namespace JSSoft.Communication
 
         private void DestroyInstance(IServiceHost serviceHost, object service, object callback)
         {
-            var baseType = GetInstanceType(this, serviceHost);
             if (this.isServer == true)
             {
                 serviceHost.DestroyInstance(service);
@@ -355,7 +351,7 @@ namespace JSSoft.Communication
             }
         }
 
-        private void CreateInstance(IAdaptorHost adaptorHost, IPeer peer)
+        private void CreateInstance(IAdaptorHost _, IPeer peer)
         {
             foreach (var item in peer.ServiceHosts)
             {

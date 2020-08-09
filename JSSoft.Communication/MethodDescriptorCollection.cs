@@ -20,8 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System.Reflection;
 using Ntreev.Library.ObjectModel;
+using System.Reflection;
 
 namespace JSSoft.Communication
 {
@@ -34,9 +34,8 @@ namespace JSSoft.Communication
             var methods = instanceType.GetMethods();
             foreach (var item in methods)
             {
-                if (item.GetCustomAttribute(typeof(OperationContractAttribute)) is OperationContractAttribute attr)
+                if (item.GetCustomAttribute(typeof(OperationContractAttribute)) is OperationContractAttribute)
                 {
-                    var methodName = attr.Name ?? item.Name;
                     var methodDescriptor = new MethodDescriptor(item);
                     this.AddBase(methodDescriptor.Name, methodDescriptor);
                 }
