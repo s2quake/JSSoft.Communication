@@ -20,10 +20,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System;
-using System.Threading.Tasks;
 using Ntreev.Library.ObjectModel;
 using Ntreev.Library.Threading;
+using System;
+using System.Threading.Tasks;
 
 namespace JSSoft.Communication
 {

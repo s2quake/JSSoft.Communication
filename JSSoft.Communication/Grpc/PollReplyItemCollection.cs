@@ -20,7 +20,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -29,11 +28,9 @@ namespace JSSoft.Communication.Grpc
     class PollReplyItemCollection : IEnumerable<PollReplyItem>, IReadOnlyList<PollReplyItem>
     {
         private readonly List<PollReplyItem> itemList = new List<PollReplyItem>();
-        private readonly IServiceHost service;
 
-        public PollReplyItemCollection(IServiceHost service)
+        public PollReplyItemCollection()
         {
-            this.service = service;
         }
 
         public void Add(PollReplyItem item)
@@ -51,10 +48,7 @@ namespace JSSoft.Communication.Grpc
             return this.itemList.IndexOf(item);
         }
 
-        public PollReplyItem this[int index]
-        {
-            get => this.itemList[index];
-        }
+        public PollReplyItem this[int index] => this.itemList[index];
 
         public bool Contains(PollReplyItem item)
         {

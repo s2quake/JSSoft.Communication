@@ -27,14 +27,12 @@ namespace JSSoft.Communication.ConsoleApp
 {
     class Program
     {
-        static async Task Main(string[] args)
+        static async Task Main(string[] _)
         {
             try
             {
-                using (var shell = Shell.Create())
-                {
-                    await shell.StartAsync();
-                }
+                using var shell = Shell.Create();
+                await shell.StartAsync();
             }
             catch (Exception e)
             {

@@ -21,8 +21,8 @@
 // SOFTWARE.
 
 using System;
-using System.Reflection;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace JSSoft.Communication
@@ -50,8 +50,7 @@ namespace JSSoft.Communication
 
         public async Task<(int, Type, object)> InvokeAsync(IServiceProvider serviceProvider, object instance, object[] args)
         {
-            var componentProvider = serviceProvider.GetService(typeof(IComponentProvider)) as IComponentProvider;
-            if (componentProvider == null)
+            if (!(serviceProvider.GetService(typeof(IComponentProvider)) is IComponentProvider componentProvider))
             {
                 throw new InvalidOperationException("can not get interface of IComponentProvider at serviceProvider");
             }
@@ -72,7 +71,7 @@ namespace JSSoft.Communication
                 return (exceptionSerializer.ExceptionCode, e.GetType(), e);
             }
         }
-        
+
         public string Name { get; }
 
         public string ShortName { get; }

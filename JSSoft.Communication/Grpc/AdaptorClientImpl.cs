@@ -20,12 +20,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using Grpc.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
-using Grpc.Core;
 using Timer = System.Timers.Timer;
 
 namespace JSSoft.Communication.Grpc
@@ -33,14 +33,12 @@ namespace JSSoft.Communication.Grpc
     class AdaptorClientImpl : Adaptor.AdaptorClient, IPeer
     {
         private static readonly TimeSpan timeout = new TimeSpan(0, 0, 10);
-        private readonly Channel channel;
         private readonly Dictionary<IServiceHost, object> callbacks = new Dictionary<IServiceHost, object>();
         private Timer timer;
 
         public AdaptorClientImpl(Channel channel, string id, IServiceHost[] serviceHosts)
             : base(channel)
         {
-            this.channel = channel;
             this.ID = id;
             this.ServiceHosts = serviceHosts;
         }

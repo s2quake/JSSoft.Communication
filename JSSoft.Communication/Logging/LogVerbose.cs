@@ -38,7 +38,7 @@ namespace JSSoft.Communication.Logging
         Warn = 8,
 
         Fatal = 16,
-        
+
         All = Debug | Info | Error | Warn | Fatal,
     }
 }

@@ -20,11 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using JSSoft.Communication.Services;
 using System;
 using System.ComponentModel.Composition;
 using System.Reflection;
 using System.Threading.Tasks;
-using JSSoft.Communication.Services;
 
 namespace JSSoft.Communication.ConsoleApp
 {
@@ -32,7 +32,7 @@ namespace JSSoft.Communication.ConsoleApp
     class ClientContext : ClientContextBase
     {
         [ImportingConstructor]
-        public ClientContext(IComponentProvider componentProvider, [ImportMany]IServiceHost[] serviceHosts)
+        public ClientContext(IComponentProvider componentProvider, [ImportMany] IServiceHost[] serviceHosts)
             : base(componentProvider, serviceHosts)
         {
 

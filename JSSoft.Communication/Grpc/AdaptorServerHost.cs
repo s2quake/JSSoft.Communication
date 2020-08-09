@@ -20,19 +20,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using Grpc.Core;
+using JSSoft.Communication.Logging;
+using Ntreev.Library.Linq;
+using Ntreev.Library.ObjectModel;
+using Ntreev.Library.Threading;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using Grpc.Core;
-using Grpc.Core.Logging;
-using JSSoft.Communication.Logging;
-using Ntreev.Library.Linq;
-using Ntreev.Library.ObjectModel;
-using Ntreev.Library.Threading;
 
 namespace JSSoft.Communication.Grpc
 {
@@ -178,20 +176,12 @@ namespace JSSoft.Communication.Grpc
             this.Disconnected?.Invoke(this, e);
         }
 
-        private void ValidateToken(string token)
-        {
-            this.Dispatcher.VerifyAccess();
-            if (token == null)
-                throw new ArgumentNullException(nameof(token));
-        }
-
         private Task AddCallback(InstanceBase instance, string name, Type[] types, object[] args)
         {
             var datas = this.serializer.SerializeMany(types, args);
             return this.Dispatcher.InvokeAsync(() =>
             {
-                var peer = instance.Peer as Peer;
-                var peers = peer == null ? this.Peers : EnumerableUtility.One(peer);
+                var peers = !(instance.Peer is Peer peer) ? this.Peers : EnumerableUtility.One(peer);
                 var service = instance.ServiceHost;
                 foreach (var item in peers)
                 {

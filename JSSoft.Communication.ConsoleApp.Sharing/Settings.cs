@@ -20,10 +20,48 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+
+/* Server' 프로젝트에서 병합되지 않은 변경 내용
+이전:
 using System;
 using System.ComponentModel;
 using JSSoft.Communication;
 using Ntreev.Library.Commands;
+이후:
+using JSSoft.Communication;
+using Ntreev.Library.Commands;
+using System;
+using System.ComponentModel;
+*/
+
+/* Server' 프로젝트에서 병합되지 않은 변경 내용
+이전:
+using System;
+using System.ComponentModel;
+using JSSoft.Communication;
+using Ntreev.Library.Commands;
+이후:
+using JSSoft.Communication;
+using Ntreev.Library.Commands;
+using System;
+using System.ComponentModel;
+*/
+
+/* Client' 프로젝트에서 병합되지 않은 변경 내용
+이전:
+using System;
+using System.ComponentModel;
+using JSSoft.Communication;
+using Ntreev.Library.Commands;
+이후:
+using JSSoft.Communication;
+using Ntreev.Library.Commands;
+using System;
+using System.ComponentModel;
+*/
+using Ntreev.Library.Commands;
+using System;
+using System.ComponentModel;
 
 namespace JSSoft.Communication.ConsoleApp
 {

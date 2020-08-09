@@ -31,7 +31,7 @@ namespace JSSoft.Communication.Services
 #endif
     class DataServiceHost : ServerServiceHostBase<IDataService>
     {
-        private DataService dataService;
+        private readonly DataService dataService;
 #if MEF
         [ImportingConstructor]
 #endif        

@@ -115,7 +115,7 @@ namespace JSSoft.Communication.Services
         {
             this.Deleted?.Invoke(this, e);
         }
-        
+
         protected virtual void OnLoggedIn(UserEventArgs e)
         {
             this.LoggedIn?.Invoke(this, e);

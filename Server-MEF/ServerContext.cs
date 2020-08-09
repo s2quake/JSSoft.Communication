@@ -28,10 +28,10 @@ namespace JSSoft.Communication.ConsoleApp
     class ServerContext : ServerContextBase
     {
         [ImportingConstructor]
-        public ServerContext(IComponentProvider componentProvider, [ImportMany]IServiceHost[] serviceHosts)
+        public ServerContext(IComponentProvider componentProvider, [ImportMany] IServiceHost[] serviceHosts)
             : base(componentProvider, serviceHosts)
         {
-     
+
         }
     }
 }

@@ -40,7 +40,7 @@ namespace JSSoft.Communication.ConsoleApp
     static class Container
     {
 #if MEF
-        private static CompositionContainer container;
+        private static readonly CompositionContainer container;
 
         static Container()
         {
@@ -90,14 +90,14 @@ namespace JSSoft.Communication.ConsoleApp
         }
 #else // MEF
         private static readonly List<ICommand> commandList = new List<ICommand>();
-        private static Shell shell;
-        private static CommandContext commandContext;
+        private static readonly Shell shell;
+        private static readonly CommandContext commandContext;
 #if SERVER
-        private static ServerContext serviceContext;
+        private static readonly ServerContext serviceContext;
 #else
-        private static ClientContext serviceContext;
+        private static readonly ClientContext serviceContext;
 #endif
-        private static IServiceHost[] serviceHosts;
+        private static readonly IServiceHost[] serviceHosts;
 
         static Container()
         {
@@ -143,10 +143,13 @@ namespace JSSoft.Communication.ConsoleApp
 
         public static void Release()
         {
-            
+
         }
 
-        private static Shell GetShell() => shell;
+        private static Shell GetShell()
+        {
+            return shell;
+        }
 #endif // MEF
     }
 }

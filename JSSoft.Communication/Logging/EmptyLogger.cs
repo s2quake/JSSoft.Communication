@@ -20,8 +20,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System;
-
 namespace JSSoft.Communication.Logging
 {
     public class EmptyLogger : ILogger
@@ -48,7 +46,7 @@ namespace JSSoft.Communication.Logging
 
         public void Fatal(object message)
         {
-            
+
         }
 
         public static readonly EmptyLogger Default = new EmptyLogger();

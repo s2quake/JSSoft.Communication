@@ -36,8 +36,8 @@ namespace JSSoft.Communication
     {
         private const string ns = "JSSoft.Communication.Runtime";
         private readonly Dictionary<string, Type> typeByName = new Dictionary<string, Type>();
-        private AssemblyBuilder assemblyBuilder;
-        private ModuleBuilder moduleBuilder;
+        private readonly AssemblyBuilder assemblyBuilder;
+        private readonly ModuleBuilder moduleBuilder;
 
         internal ServiceInstanceBuilder()
         {

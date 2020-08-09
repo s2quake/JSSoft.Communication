@@ -20,9 +20,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using JSSoft.Communication.ExceptionSerializers;
 using System;
 using System.Linq;
-using JSSoft.Communication.ExceptionSerializers;
 
 namespace JSSoft.Communication
 {

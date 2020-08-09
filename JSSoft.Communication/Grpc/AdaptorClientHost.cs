@@ -20,13 +20,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using Grpc.Core;
+using Ntreev.Library.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Grpc.Core;
-using Ntreev.Library.ObjectModel;
 
 namespace JSSoft.Communication.Grpc
 {
@@ -34,12 +34,12 @@ namespace JSSoft.Communication.Grpc
     {
         private readonly IServiceContext serviceContext;
         private readonly IContainer<IServiceHost> serviceHosts;
+        private readonly PeerCollectionSurrogate peers;
         private CancellationTokenSource cancellation;
         private Task task;
         private Channel channel;
         private AdaptorClientImpl adaptorImpl;
         private ISerializer serializer;
-        private PeerCollectionSurrogate peers;
 
         public AdaptorClientHost(IServiceContext serviceContext)
         {
@@ -112,34 +112,31 @@ namespace JSSoft.Communication.Grpc
             var exitCode = 0;
             try
             {
-                using (var call = this.adaptorImpl.Poll())
+                using var call = this.adaptorImpl.Poll();
+                while (!cancellationToken.IsCancellationRequested)
                 {
-                    while (!cancellationToken.IsCancellationRequested)
+                    var request = new PollRequest()
                     {
-                        var request = new PollRequest()
-                        {
-                            Token = $"{this.adaptorImpl.Token}"
-                        };
-                        await call.RequestStream.WriteAsync(request);
-                        await call.ResponseStream.MoveNext();
-                        var reply = call.ResponseStream.Current;
-                        if (reply.Code != 0)
-                        {
-                            exitCode = reply.Code;
-                            break;
-                        }
-                        foreach (var item in reply.Items)
-                        {
-                            var service = this.serviceHosts[item.ServiceName];
-                            this.InvokeCallback(service, reply.Items);
-                        }
-                        reply.Items.Clear();
-                        await Task.Delay(1);
-                    }
-                    await call.RequestStream.CompleteAsync();
+                        Token = $"{this.adaptorImpl.Token}"
+                    };
+                    await call.RequestStream.WriteAsync(request);
                     await call.ResponseStream.MoveNext();
+                    var reply = call.ResponseStream.Current;
+                    if (reply.Code != 0)
+                    {
+                        exitCode = reply.Code;
+                        break;
+                    }
+                    foreach (var item in reply.Items)
+                    {
+                        var service = this.serviceHosts[item.ServiceName];
+                        this.InvokeCallback(service, reply.Items);
+                    }
+                    reply.Items.Clear();
+                    await Task.Delay(1);
                 }
-                //call = null;
+                await call.RequestStream.CompleteAsync();
+                await call.ResponseStream.MoveNext();
             }
             catch (Exception e)
             {
@@ -175,8 +172,7 @@ namespace JSSoft.Communication.Grpc
 
         private void ThrowException(int code, string data)
         {
-            var componentProvider = this.serviceContext.GetService(typeof(IComponentProvider)) as IComponentProvider;
-            if (componentProvider == null)
+            if (!(this.serviceContext.GetService(typeof(IComponentProvider)) is IComponentProvider componentProvider))
             {
                 throw new InvalidOperationException("can not get interface of IComponentProvider at serviceProvider");
             }

@@ -20,15 +20,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using JSSoft.Communication.Services;
 using System;
 using System.Threading.Tasks;
-using JSSoft.Communication.Services;
 
 namespace JSSoft.Communication.ConsoleApp
 {
     class Program
     {
-        static async Task Main(string[] args)
+        static async Task Main(string[] _)
         {
             var userService = new UserService();
             var userServiceHost = new UserServiceHost(userService);

@@ -20,16 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 using Grpc.Core;
-using Grpc.Core.Logging;
-using Newtonsoft.Json;
-using Ntreev.Library.Threading;
+using System.Threading.Tasks;
 
 namespace JSSoft.Communication.Grpc
 {
@@ -56,7 +48,7 @@ namespace JSSoft.Communication.Grpc
         {
             return this.adaptorHost.Ping(request, context);
         }
-       
+
         public override Task<InvokeReply> Invoke(InvokeRequest request, ServerCallContext context)
         {
             return this.adaptorHost.Invoke(request, context);
