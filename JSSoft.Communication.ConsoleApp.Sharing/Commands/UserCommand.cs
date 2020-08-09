@@ -20,11 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System;
-using Ntreev.Library.Commands;
-using System.Threading.Tasks;
-using JSSoft.Communication.Services;
 using JSSoft.Communication.ConsoleApp;
+using JSSoft.Communication.Services;
+using Ntreev.Library.Commands;
+using System;
+using System.Threading.Tasks;
 #if MEF
 using System.ComponentModel.Composition;
 #endif
@@ -51,7 +51,7 @@ namespace JSSoft.Communication.Commands
         [CommandMethod]
         public Task CreateAsync(string userID, string password, Authority authority = Authority.Member)
         {
-            return this.UserService.CreateAsync(this.Shell.UserToken, userID, password, Authority.Admin);
+            return this.UserService.CreateAsync(this.Shell.UserToken, userID, password, authority);
         }
 
         [CommandMethod]

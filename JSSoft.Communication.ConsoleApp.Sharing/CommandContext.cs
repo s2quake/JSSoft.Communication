@@ -20,8 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System.Collections.Generic;
 using Ntreev.Library.Commands;
+using System.Collections.Generic;
 #if MEF
 using System.ComponentModel.Composition;
 #endif
@@ -35,7 +35,7 @@ namespace JSSoft.Communication.ConsoleApp
     {
 #if MEF
         [ImportingConstructor]
-        public CommandContext([ImportMany]IEnumerable<ICommand> commands)
+        public CommandContext([ImportMany] IEnumerable<ICommand> commands)
             : base(commands)
         {
 

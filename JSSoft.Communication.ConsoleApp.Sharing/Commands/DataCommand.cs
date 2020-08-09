@@ -20,11 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System;
-using Ntreev.Library.Commands;
-using System.Threading.Tasks;
-using JSSoft.Communication.Services;
 using JSSoft.Communication.ConsoleApp;
+using JSSoft.Communication.Services;
+using Ntreev.Library.Commands;
+using System;
+using System.Threading.Tasks;
 #if MEF
 using System.ComponentModel.Composition;
 #endif

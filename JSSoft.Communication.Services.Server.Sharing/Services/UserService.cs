@@ -20,11 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using Ntreev.Library.Threading;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Ntreev.Library.Threading;
 #if MEF
 using System.ComponentModel.Composition;
 #endif
@@ -70,7 +70,7 @@ namespace JSSoft.Communication.Services
         {
             return this.Dispatcher.InvokeAsync(() =>
             {
-                this.ValidateCreate(token, userID, password, authority);
+                this.ValidateCreate(token, userID, password);
 
                 var user = this.userByToken[token];
                 var userInfo = new UserInfo()
@@ -193,7 +193,7 @@ namespace JSSoft.Communication.Services
         {
             return this.Dispatcher.InvokeAsync(() =>
             {
-                this.ValidateSetAuthority(token, userID, authority);
+                this.ValidateSetAuthority(token, userID);
 
                 var user = this.userByID[userID];
                 user.Authority = authority;
@@ -314,7 +314,7 @@ namespace JSSoft.Communication.Services
                 throw new InvalidOperationException("wrong userID or password.");
         }
 
-        private void ValidateCreate(Guid token, string userID, string password, Authority authority)
+        private void ValidateCreate(Guid token, string userID, string password)
         {
             this.Dispatcher.VerifyAccess();
             this.ValidateUser(token);
@@ -357,7 +357,7 @@ namespace JSSoft.Communication.Services
                 throw new InvalidOperationException("permission denied.");
         }
 
-        private void ValidateSetAuthority(Guid token, string userID, Authority authority)
+        private void ValidateSetAuthority(Guid token, string userID)
         {
             this.Dispatcher.VerifyAccess();
             this.ValidateUser(token);

@@ -20,10 +20,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using Ntreev.Library.Threading;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Ntreev.Library.Threading;
 #if MEF
 using System.ComponentModel.Composition;
 #endif

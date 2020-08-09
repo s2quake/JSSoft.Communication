@@ -20,9 +20,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using JSSoft.Communication;
 using System;
 using System.Threading.Tasks;
-using JSSoft.Communication;
 
 namespace JSSoft.Communication.Services
 {

@@ -20,8 +20,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using JSSoft.Communication;
-
 namespace JSSoft.Communication.Services
 {
     public interface IUserServiceCallback

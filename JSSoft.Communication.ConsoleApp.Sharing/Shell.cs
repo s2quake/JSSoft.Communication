@@ -20,12 +20,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using JSSoft.Communication.Services;
+using Ntreev.Library.Commands;
 using System;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using JSSoft.Communication.Services;
-using Ntreev.Library.Commands;
 #if MEF
 using System.ComponentModel.Composition;
 #endif
@@ -51,9 +51,9 @@ namespace JSSoft.Communication.ConsoleApp
         }
 
 #if SERVER
-        private bool isServer = true;
+        private readonly bool isServer = true;
 #else
-        private bool isServer = false;
+        private readonly bool isServer = false;
 #endif
 
 #if MEF
@@ -109,10 +109,6 @@ namespace JSSoft.Communication.ConsoleApp
                 Console.ResetColor();
                 var pattern = $"(.+@)(.+){this.Postfix}";
                 var match = Regex.Match(prompt, pattern);
-                var p1 = prompt.TrimStart();
-                var p2 = prompt.TrimEnd();
-                var prefix = prompt.Substring(p1.Length);
-                var postfix = prompt.Substring(p2.Length);
                 writer.Write(match.Groups[1].Value);
                 using (TerminalColor.SetForeground(ConsoleColor.Green))
                 {

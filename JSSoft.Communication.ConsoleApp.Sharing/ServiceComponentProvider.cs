@@ -21,8 +21,8 @@
 // SOFTWARE.
 
 #if MEF
-using System;
 using JSSoft.Communication;
+using System;
 using System.ComponentModel.Composition;
 
 namespace JSSoft.Communication.ConsoleApp
@@ -31,10 +31,10 @@ namespace JSSoft.Communication.ConsoleApp
     class ServiceComponentProvider : ComponentProviderBase
     {
         [ImportingConstructor]
-        public ServiceComponentProvider([ImportMany]IAdaptorHostProvider[] adaptorHostProviders,
-                                 [ImportMany]ISerializerProvider[] serializerProviders,
-                                 [ImportMany]IDataSerializer[] dataSerializers,
-                                 [ImportMany]IExceptionDescriptor[] exceptionDescriptors)
+        public ServiceComponentProvider([ImportMany] IAdaptorHostProvider[] adaptorHostProviders,
+                                 [ImportMany] ISerializerProvider[] serializerProviders,
+                                 [ImportMany] IDataSerializer[] dataSerializers,
+                                 [ImportMany] IExceptionDescriptor[] exceptionDescriptors)
             : base(adaptorHostProviders, serializerProviders, dataSerializers, exceptionDescriptors)
         {
 

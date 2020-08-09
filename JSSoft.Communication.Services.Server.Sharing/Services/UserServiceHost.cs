@@ -31,7 +31,7 @@ namespace JSSoft.Communication.Services
 #endif
     class UserServiceHost : ServerServiceHostBase<IUserService, IUserServiceCallback>
     {
-        private UserService userService;
+        private readonly UserService userService;
 
 #if MEF
         [ImportingConstructor]
