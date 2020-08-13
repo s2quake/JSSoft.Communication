@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../Ntreev.Library"
+		},
+		{
+			"path": "../Ntreev.Library.Commands"
+		}
+	],
+	"settings": {}
+}
