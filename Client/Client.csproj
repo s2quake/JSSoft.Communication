@@ -1,17 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="../netfx.props" />
+  <Import Project="..\base.props" />
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net45</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <DefineConstants>CLIENT</DefineConstants>
-    <Version>0.9.20200.2038</Version>
-    <AssemblyVersion>0.9</AssemblyVersion>
-    <FileVersion>0.9.20200.2038</FileVersion>
-    <Authors>s2quake</Authors>
-    <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/s2quake/grpc-sample</RepositoryUrl>
-    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\JSSoft.Communication\JSSoft.Communication.csproj" />
