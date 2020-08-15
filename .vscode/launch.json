@@ -9,7 +9,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build client",
-            "program": "${workspaceFolder}/Client-MEF/bin/Debug/netcoreapp3.0/Client.dll",
+            "program": "${workspaceFolder}/bin/Debug/netcoreapp3.1/Client-MEF/client.dll",
             "args": [
                 "--host",
                 "localhost"
@@ -23,7 +23,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build all",
-            "program": "${workspaceFolder}/Server-MEF/bin/Debug/netcoreapp3.0/Server.dll",
+            "program": "${workspaceFolder}/bin/Debug/netcoreapp3.1/Server-MEF/Server.dll",
             "args": [
                 "--verbose"
             ],

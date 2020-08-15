@@ -4,6 +4,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <DefineConstants>SERVER</DefineConstants>
+    <AssemblyName>server</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\JSSoft.Communication\JSSoft.Communication.csproj" />

@@ -12,7 +12,7 @@
                 "build", 
                 "Client-MEF",
                 "--framework",
-                "netcoreapp3.0",
+                "netcoreapp3.1",
                 "--configuration",
                 "Debug"
             ],
@@ -30,7 +30,7 @@
                 "build", 
                 "Server-MEF",
                 "--framework",
-                "netcoreapp3.0",
+                "netcoreapp3.1",
                 "--configuration",
                 "Debug"
             ],
@@ -47,7 +47,7 @@
             "args": [
                 "build",
                 "--framework",
-                "netcoreapp3.0",
+                "netcoreapp3.1",
                 "--configuration",
                 "Debug"
             ],

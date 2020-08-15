@@ -3,7 +3,8 @@
   <Import Project="..\base.props" />
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <DefineConstants>SERVER;MEF</DefineConstants>
+    <DefineConstants>CLIENT;MEF</DefineConstants>
+    <AssemblyName>client</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.ComponentModel.Composition" Version="4.7.0" />
@@ -15,5 +16,5 @@
   </ItemGroup>
   <Import Project="..\JSSoft.Communication.Services.Sharing\JSSoft.Communication.Services.Sharing.projitems" Label="Shared" />
   <Import Project="..\JSSoft.Communication.ConsoleApp.Sharing\JSSoft.Communication.ConsoleApp.Sharing.projitems" Label="Shared" />
-  <Import Project="..\JSSoft.Communication.Services.Server.Sharing\JSSoft.Communication.Services.Server.Sharing.projitems" Label="Shared" />
+  <Import Project="..\JSSoft.Communication.Services.Client.Sharing\JSSoft.Communication.Services.Client.Sharing.projitems" Label="Shared" />
 </Project>

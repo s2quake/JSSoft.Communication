@@ -4,6 +4,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <DefineConstants>CLIENT</DefineConstants>
+    <AssemblyName>client</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\JSSoft.Communication\JSSoft.Communication.csproj" />
