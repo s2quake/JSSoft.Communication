@@ -3,9 +3,9 @@
   <Import Project="netfx.props" />
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.1;net45</TargetFrameworks>
-    <Version>1.0.20227.2025</Version>
+    <Version>1.0.0-$(TargetFramework)-unversioned</Version>
     <AssemblyVersion>1.0</AssemblyVersion>
-    <FileVersion>1.0.20227.2025</FileVersion>
+    <FileVersion>1.0.0</FileVersion>
     <Authors>s2quake</Authors>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/s2quake/grpc-sample</RepositoryUrl>
