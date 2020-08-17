@@ -5,17 +5,9 @@
     "tasks": [
         {
             "label": "build client",
-            "command": "dotnet",
+            "command": "dotnet build Client-MEF --framework netcoreapp3.1",
             "type": "shell",
             "group": "build",
-            "args": [
-                "build", 
-                "Client-MEF",
-                "--framework",
-                "netcoreapp3.1",
-                "--configuration",
-                "Debug"
-            ],
             "presentation": {
                 "reveal": "always"
             },
@@ -23,17 +15,9 @@
         },
         {
             "label": "build server",
-            "command": "dotnet",
+            "command": "dotnet build Server-MEF --framework netcoreapp3.1",
             "type": "shell",
             "group": "build",
-            "args": [
-                "build", 
-                "Server-MEF",
-                "--framework",
-                "netcoreapp3.1",
-                "--configuration",
-                "Debug"
-            ],
             "presentation": {
                 "reveal": "always"
             },
@@ -41,16 +25,9 @@
         },
         {
             "label": "build all",
-            "command": "dotnet",
+            "command": "dotnet build --framework netcoreapp3.1",
             "type": "shell",
             "group": "build",
-            "args": [
-                "build",
-                "--framework",
-                "netcoreapp3.1",
-                "--configuration",
-                "Debug"
-            ],
             "presentation": {
                 "reveal": "always"
             },

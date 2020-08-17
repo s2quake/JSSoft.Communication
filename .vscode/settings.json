@@ -1,8 +1,8 @@
 {
     "files.exclude": {
+        ".vs": true,
         "**/bin": true,
-        "**/obj": true,
-        "**/sub-modules": false
+        "**/obj": true
     },
     "editor.codeLens": false
 }
