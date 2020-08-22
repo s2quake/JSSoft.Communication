@@ -93,6 +93,8 @@ namespace JSSoft.Communication.Grpc
             return this.Dispatcher.InvokeAsync(() =>
             {
                 var peer = this.Peers[token];
+                if (peer == null)
+                    throw new InvalidOperationException($"invalid token: '{token}'");
                 peer.Ping();
                 LogUtility.Debug($"{context.Peer}({token}) Ping: {DateTime.Now}");
                 return new PingReply() { Time = peer.PingTime.Ticks };
@@ -185,14 +187,17 @@ namespace JSSoft.Communication.Grpc
                 var service = instance.ServiceHost;
                 foreach (var item in peers)
                 {
-                    var callbacks = item.PollReplyItems[service];
-                    var pollItem = new PollReplyItem()
+                    if (item.PollReplyItems.ContainsKey(service) == true)
                     {
-                        Name = name,
-                        ServiceName = instance.ServiceName
-                    };
-                    pollItem.Datas.AddRange(datas);
-                    callbacks.Add(pollItem);
+                        var callbacks = item.PollReplyItems[service];
+                        var pollItem = new PollReplyItem()
+                        {
+                            Name = name,
+                            ServiceName = instance.ServiceName
+                        };
+                        pollItem.Datas.AddRange(datas);
+                        callbacks.Add(pollItem);
+                    }
                 }
             });
         }

@@ -127,11 +127,7 @@ namespace JSSoft.Communication.Grpc
                         exitCode = reply.Code;
                         break;
                     }
-                    foreach (var item in reply.Items)
-                    {
-                        var service = this.serviceHosts[item.ServiceName];
-                        this.InvokeCallback(service, reply.Items);
-                    }
+                    this.InvokeCallback(reply.Items);
                     reply.Items.Clear();
                     await Task.Delay(1);
                 }
@@ -162,10 +158,11 @@ namespace JSSoft.Communication.Grpc
             await methodDescriptor.InvokeAsync(this.serviceContext, instance, args);
         }
 
-        private void InvokeCallback(IServiceHost service, IEnumerable<PollReplyItem> pollItems)
+        private void InvokeCallback(IEnumerable<PollReplyItem> pollItems)
         {
             foreach (var item in pollItems)
             {
+                var service = this.serviceHosts[item.ServiceName];
                 this.InvokeCallback(service, item.Name, item.Datas.ToArray());
             }
         }
