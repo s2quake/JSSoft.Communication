@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\base.props" />
+  <Import Project="..\netfx.props" />
   <!-- <ItemGroup>
     <Protobuf Include="Grpc\adaptor.proto" OutputDir="%(RelativePath)Grpc" CompileOutputs="false" GrpcServices="both" Access="internal" />
   </ItemGroup> -->

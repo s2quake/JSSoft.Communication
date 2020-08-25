@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp3.1;net45</TargetFrameworks>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
+    <Authors>s2quake</Authors>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/s2quake/JSSoft.Communication</RepositoryUrl>
+    <LangVersion>latest</LangVersion>
+    <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+    <BaseOutputPath>$(MSBuildThisFileDirectory)\bin\$(MSBuildProjectName)</BaseOutputPath>
+    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)\obj\nuget\$(MSBuildProjectName)</BaseIntermediateOutputPath>
+    <OutputPath>$(MSBuildThisFileDirectory)\bin\$(Configuration)\$(TargetFramework)\$(MSBuildProjectName)</OutputPath>
+    <IntermediateOutputPath>$(MSBuildThisFileDirectory)\obj\$(Configuration)\$(TargetFramework)\$(MSBuildProjectName)</IntermediateOutputPath>
+  </PropertyGroup>
+</Project>
