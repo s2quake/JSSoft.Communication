@@ -9,10 +9,12 @@
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/s2quake/JSSoft.Communication</RepositoryUrl>
     <LangVersion>latest</LangVersion>
-    <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
-    <BaseOutputPath>$(MSBuildThisFileDirectory)bin\$(MSBuildProjectName)</BaseOutputPath>
-    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
-    <OutputPath>$(MSBuildThisFileDirectory)bin\$(Configuration)\$(TargetFramework)\$(MSBuildProjectName)</OutputPath>
-    <IntermediateOutputPath>$(MSBuildThisFileDirectory)obj\$(Configuration)\$(TargetFramework)\$(MSBuildProjectName)</IntermediateOutputPath>
+    <RootPath Condition="'$(SolutionDir)' != ''">$(SolutionDir)</RootPath>
+    <RootPath Condition="'$(SolutionDir)' == ''">$(MSBuildThisFileDirectory)..\</RootPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <BaseOutputPath>$(RootPath)bin\$(MSBuildProjectName)</BaseOutputPath>
+    <BaseIntermediateOutputPath>$(RootPath)obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
+    <OutputPath>$(RootPath)bin\$(Configuration)\$(TargetFramework)\$(MSBuildProjectName)</OutputPath>
+    <IntermediateOutputPath>$(RootPath)obj\$(Configuration)\$(TargetFramework)\$(MSBuildProjectName)</IntermediateOutputPath>
   </PropertyGroup>
 </Project>
