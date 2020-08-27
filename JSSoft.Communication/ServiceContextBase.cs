@@ -21,8 +21,8 @@
 // SOFTWARE.
 
 using JSSoft.Communication.Logging;
-using Ntreev.Library.ObjectModel;
-using Ntreev.Library.Threading;
+using JSSoft.Library.ObjectModel;
+using JSSoft.Library.Threading;
 using System;
 using System.Collections.Specialized;
 using System.ComponentModel;

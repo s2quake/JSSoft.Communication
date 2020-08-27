@@ -21,9 +21,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client", "Client-Simple\Cli
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Simple", "Simple", "{F4E7CE1D-053E-4FEE-8C36-CB8750280E9F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Library", "..\Ntreev.Library\Ntreev.Library\Ntreev.Library.csproj", "{0BC47439-89C7-4F86-B5F5-BC9430B3174F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JSSoft.Library", "..\JSSoft.Library\JSSoft.Library\JSSoft.Library.csproj", "{0BC47439-89C7-4F86-B5F5-BC9430B3174F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Library.Commands", "..\Ntreev.Library.Commands\Ntreev.Library.Commands\Ntreev.Library.Commands.csproj", "{AA8621C5-5D8E-4255-A49D-F47C9AF69163}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JSSoft.Library.Commands", "..\JSSoft.Library.Commands\JSSoft.Library.Commands\JSSoft.Library.Commands.csproj", "{AA8621C5-5D8E-4255-A49D-F47C9AF69163}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution

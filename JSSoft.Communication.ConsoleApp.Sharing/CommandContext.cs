@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using Ntreev.Library.Commands;
+using JSSoft.Library.Commands;
 using System.Collections.Generic;
 #if MEF
 using System.ComponentModel.Composition;

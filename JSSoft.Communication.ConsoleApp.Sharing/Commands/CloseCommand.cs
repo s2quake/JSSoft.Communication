@@ -21,7 +21,7 @@
 // SOFTWARE.
 
 using JSSoft.Communication.ConsoleApp;
-using Ntreev.Library.Commands;
+using JSSoft.Library.Commands;
 using System;
 using System.Threading.Tasks;
 #if MEF

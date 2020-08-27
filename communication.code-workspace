@@ -4,10 +4,10 @@
 			"path": "."
 		},
 		{
-			"path": "../Ntreev.Library"
+			"path": "../JSSoft.Library"
 		},
 		{
-			"path": "../Ntreev.Library.Commands"
+			"path": "../JSSoft.Library.Commands"
 		}
 	],
 	"settings": {}

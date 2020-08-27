@@ -21,45 +21,45 @@
 // SOFTWARE.
 
 
-/* Server' ÇÁ·ÎÁ§Æ®¿¡¼­ º´ÇÕµÇÁö ¾ÊÀº º¯°æ ³»¿ë
-ÀÌÀü:
+/* Server' ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Õµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½ï¿½:
 using System;
 using System.ComponentModel;
 using JSSoft.Communication;
-using Ntreev.Library.Commands;
-ÀÌÈÄ:
+using JSSoft.Library.Commands;
+ï¿½ï¿½ï¿½ï¿½:
 using JSSoft.Communication;
-using Ntreev.Library.Commands;
-using System;
-using System.ComponentModel;
-*/
-
-/* Server' ÇÁ·ÎÁ§Æ®¿¡¼­ º´ÇÕµÇÁö ¾ÊÀº º¯°æ ³»¿ë
-ÀÌÀü:
-using System;
-using System.ComponentModel;
-using JSSoft.Communication;
-using Ntreev.Library.Commands;
-ÀÌÈÄ:
-using JSSoft.Communication;
-using Ntreev.Library.Commands;
+using JSSoft.Library.Commands;
 using System;
 using System.ComponentModel;
 */
 
-/* Client' ÇÁ·ÎÁ§Æ®¿¡¼­ º´ÇÕµÇÁö ¾ÊÀº º¯°æ ³»¿ë
-ÀÌÀü:
+/* Server' ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Õµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½ï¿½:
 using System;
 using System.ComponentModel;
 using JSSoft.Communication;
-using Ntreev.Library.Commands;
-ÀÌÈÄ:
+using JSSoft.Library.Commands;
+ï¿½ï¿½ï¿½ï¿½:
 using JSSoft.Communication;
-using Ntreev.Library.Commands;
+using JSSoft.Library.Commands;
 using System;
 using System.ComponentModel;
 */
-using Ntreev.Library.Commands;
+
+/* Client' ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Õµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½ï¿½:
+using System;
+using System.ComponentModel;
+using JSSoft.Communication;
+using JSSoft.Library.Commands;
+ï¿½ï¿½ï¿½ï¿½:
+using JSSoft.Communication;
+using JSSoft.Library.Commands;
+using System;
+using System.ComponentModel;
+*/
+using JSSoft.Library.Commands;
 using System;
 using System.ComponentModel;
 

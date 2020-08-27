@@ -21,7 +21,7 @@
 // SOFTWARE.
 
 using Grpc.Core;
-using Ntreev.Library.ObjectModel;
+using JSSoft.Library.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;

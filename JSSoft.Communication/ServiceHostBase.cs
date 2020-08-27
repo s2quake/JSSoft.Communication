@@ -20,8 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using Ntreev.Library.ObjectModel;
-using Ntreev.Library.Threading;
+using JSSoft.Library.ObjectModel;
+using JSSoft.Library.Threading;
 using System;
 using System.Reflection;
 using System.Threading.Tasks;

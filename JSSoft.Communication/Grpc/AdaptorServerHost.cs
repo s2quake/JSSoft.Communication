@@ -22,9 +22,9 @@
 
 using Grpc.Core;
 using JSSoft.Communication.Logging;
-using Ntreev.Library.Linq;
-using Ntreev.Library.ObjectModel;
-using Ntreev.Library.Threading;
+using JSSoft.Library.Linq;
+using JSSoft.Library.ObjectModel;
+using JSSoft.Library.Threading;
 using System;
 using System.Linq;
 using System.Net;

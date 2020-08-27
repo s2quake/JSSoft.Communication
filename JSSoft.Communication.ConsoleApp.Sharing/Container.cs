@@ -30,7 +30,7 @@ using System.Reflection;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 #else // MEF
-using Ntreev.Library.Commands;
+using JSSoft.Library.Commands;
 using JSSoft.Communication.Commands;
 using JSSoft.Communication.Services;
 #endif // MEF

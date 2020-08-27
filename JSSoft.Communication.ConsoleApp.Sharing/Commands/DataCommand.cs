@@ -22,7 +22,7 @@
 
 using JSSoft.Communication.ConsoleApp;
 using JSSoft.Communication.Services;
-using Ntreev.Library.Commands;
+using JSSoft.Library.Commands;
 using System;
 using System.Threading.Tasks;
 #if MEF

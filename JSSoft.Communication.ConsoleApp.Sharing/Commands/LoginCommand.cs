@@ -24,7 +24,7 @@ using JSSoft.Communication.ConsoleApp;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using System;
-using Ntreev.Library.Commands;
+using JSSoft.Library.Commands;
 using JSSoft.Communication.Services;
 #if MEF
 using System.ComponentModel.Composition;
