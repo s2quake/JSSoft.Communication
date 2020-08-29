@@ -28,8 +28,6 @@ using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-[assembly: InternalsVisibleTo("JSSoft.Communication.Runtime")]
-
 namespace JSSoft.Communication
 {
     sealed class ServiceInstanceBuilder
