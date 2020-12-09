@@ -26,6 +26,7 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using JSSoft.Library.Commands;
 using JSSoft.Communication.Services;
+using System.Threading;
 #if MEF
 using System.ComponentModel.Composition;
 #endif
@@ -51,7 +52,7 @@ namespace JSSoft.Communication.Commands
 
         public override bool IsEnabled => this.Shell.UserToken != Guid.Empty;
 
-        protected override async Task OnExecuteAsync()
+        protected override async Task OnExecuteAsync(CancellationToken cancellationToken)
         {
             await this.UserService.LogoutAsync(this.Shell.UserToken);
             this.Shell.Logout();

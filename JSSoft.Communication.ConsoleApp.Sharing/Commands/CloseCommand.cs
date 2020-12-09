@@ -24,6 +24,7 @@ using JSSoft.Communication.ConsoleApp;
 using JSSoft.Library.Commands;
 using System;
 using System.Threading.Tasks;
+using System.Threading;
 #if MEF
 using System.ComponentModel.Composition;
 #endif
@@ -49,7 +50,7 @@ namespace JSSoft.Communication.Commands
 
         public override bool IsEnabled => this.serviceHost.ServiceState == ServiceState.Open;
 
-        protected override Task OnExecuteAsync()
+        protected override Task OnExecuteAsync(CancellationToken cancellationToken)
         {
             return this.serviceHost.CloseAsync(this.Shell.Token);
         }

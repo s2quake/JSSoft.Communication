@@ -25,6 +25,7 @@ using JSSoft.Library.Commands;
 using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using System.Threading;
 #if MEF
 using System.ComponentModel.Composition;
 #endif
@@ -53,7 +54,7 @@ namespace JSSoft.Communication.Commands
             get; set;
         }
 
-        protected override Task OnExecuteAsync()
+        protected override Task OnExecuteAsync(CancellationToken cancellationToken)
         {
             return this.shell.Value.StopAsync();
         }
