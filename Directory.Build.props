@@ -5,14 +5,14 @@
     <Version>1.0.0</Version>
     <AssemblyVersion>1.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>
-	<RepositoryType>git</RepositoryType>
-	<RepositoryUrl>https://github.com/s2quake/JSSoft.Communication</RepositoryUrl>
-	<LicenseUrl>https://github.com/s2quake/JSSoft.Communication/blob/master/LICENSE.md</LicenseUrl>
-	<Copyright>Copyright (c) 2019 Jeesu Choi</Copyright>
-	<Description>grpc-based communication library for crema project</Description>
-	<Authors>s2quake</Authors>
-	<PackageProjectUrl>https://github.com/s2quake/JSSoft.Communication</PackageProjectUrl>
-	<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+	  <RepositoryType>git</RepositoryType>
+	  <RepositoryUrl>https://github.com/s2quake/JSSoft.Communication</RepositoryUrl>
+	  <LicenseUrl>https://github.com/s2quake/JSSoft.Communication/blob/master/LICENSE.md</LicenseUrl>
+	  <Copyright>Copyright (c) 2019 Jeesu Choi</Copyright>
+	  <Description>grpc-based communication library for crema project</Description>
+	  <Authors>s2quake</Authors>
+	  <PackageProjectUrl>https://github.com/s2quake/JSSoft.Communication</PackageProjectUrl>
+	  <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <LangVersion>latest</LangVersion>
     <RootPath Condition="'$(SolutionDir)' != ''">$(SolutionDir)</RootPath>
     <RootPath Condition="'$(SolutionDir)' == ''">$(MSBuildThisFileDirectory)..\</RootPath>
@@ -21,9 +21,9 @@
     <BaseIntermediateOutputPath>$(RootPath)obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
     <OutputPath>$(RootPath)bin\$(Configuration)\$(TargetFramework)\$(MSBuildProjectName)</OutputPath>
     <IntermediateOutputPath>$(RootPath)obj\$(Configuration)\$(TargetFramework)\$(MSBuildProjectName)</IntermediateOutputPath>
-	<DelaySign>true</DelaySign>
-	<AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)JSSoft.Communication.snk</AssemblyOriginatorKeyFile>
-	<SignAssembly>true</SignAssembly>
-	<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+	  <DelaySign>true</DelaySign>
+	  <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)JSSoft.Communication.snk</AssemblyOriginatorKeyFile>
+	  <SignAssembly>true</SignAssembly>
+	  <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
 </Project>
