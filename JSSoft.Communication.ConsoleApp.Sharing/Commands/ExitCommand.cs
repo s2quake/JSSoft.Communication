@@ -47,8 +47,7 @@ namespace JSSoft.Communication.Commands
             this.shell = shell;
         }
 
-        [CommandPropertyRequired]
-        [DefaultValue(0)]
+        [CommandPropertyRequired(DefaultValue = 0)]
         public int ExitCode
         {
             get; set;

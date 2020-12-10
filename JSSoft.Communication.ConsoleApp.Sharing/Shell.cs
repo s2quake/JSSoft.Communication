@@ -241,7 +241,7 @@ namespace JSSoft.Communication.ConsoleApp
             this.serviceHost.Host = this.settings.Host;
             this.serviceHost.Port = this.settings.Port;
             this.Token = await this.serviceHost.OpenAsync();
-            base.Start();
+            await base.StartAsync();
         }
 
         async Task IShell.StopAsync()

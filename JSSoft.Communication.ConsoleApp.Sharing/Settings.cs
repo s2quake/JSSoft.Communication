@@ -20,45 +20,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-
-/* Server' ������Ʈ���� ���յ��� ���� ���� ����
-����:
-using System;
-using System.ComponentModel;
-using JSSoft.Communication;
-using JSSoft.Library.Commands;
-����:
-using JSSoft.Communication;
-using JSSoft.Library.Commands;
-using System;
-using System.ComponentModel;
-*/
-
-/* Server' ������Ʈ���� ���յ��� ���� ���� ����
-����:
-using System;
-using System.ComponentModel;
-using JSSoft.Communication;
-using JSSoft.Library.Commands;
-����:
-using JSSoft.Communication;
-using JSSoft.Library.Commands;
-using System;
-using System.ComponentModel;
-*/
-
-/* Client' ������Ʈ���� ���յ��� ���� ���� ����
-����:
-using System;
-using System.ComponentModel;
-using JSSoft.Communication;
-using JSSoft.Library.Commands;
-����:
-using JSSoft.Communication;
-using JSSoft.Library.Commands;
-using System;
-using System.ComponentModel;
-*/
 using JSSoft.Library.Commands;
 using System;
 using System.ComponentModel;
@@ -67,21 +28,19 @@ namespace JSSoft.Communication.ConsoleApp
 {
     public class Settings
     {
-        [CommandProperty]
-        [DefaultValue(ServiceContextBase.DefaultPort)]
+        [CommandProperty(InitValue = ServiceContextBase.DefaultPort)]
         public int Port
         {
             get; set;
         }
 
-        [CommandProperty]
-        [DefaultValue(ServiceContextBase.DefaultHost)]
+        [CommandProperty(InitValue = ServiceContextBase.DefaultHost)]
         public string Host
         {
             get; set;
         }
 
-        [CommandProperty]
+        [CommandPropertySwitch]
         public bool Verbose
         {
             get; set;
