@@ -23,6 +23,7 @@
     <BaseIntermediateOutputPath>$(RootPath)obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
     <OutputPath>$(RootPath)bin\$(ConfigurationType)\$(TargetFramework)\$(MSBuildProjectName)</OutputPath>
     <IntermediateOutputPath>$(RootPath)obj\$(ConfigurationType)\$(TargetFramework)\$(MSBuildProjectName)</IntermediateOutputPath>
+    <ExePath>$(RootPath)exe\$(ConfigurationType)\$(TargetFramework)\</ExePath>
 	  <DelaySign>true</DelaySign>
 	  <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)JSSoft.Communication.snk</AssemblyOriginatorKeyFile>
 	  <SignAssembly Condition="'$(Configuration)' == 'Release'">true</SignAssembly>
