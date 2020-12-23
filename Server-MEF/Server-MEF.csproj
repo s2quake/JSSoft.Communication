@@ -5,7 +5,7 @@
     <OutputType>Exe</OutputType>
     <DefineConstants>SERVER;MEF</DefineConstants>
     <AssemblyName>server</AssemblyName>
-    <OutputPath>$(ExePath)server</OutputPath>
+    <PublishName>communication\server</PublishName>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.ComponentModel.Composition" Version="4.7.0" />

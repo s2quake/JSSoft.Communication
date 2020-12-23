@@ -5,7 +5,7 @@
     <OutputType>Exe</OutputType>
     <DefineConstants>CLIENT;MEF</DefineConstants>
     <AssemblyName>client</AssemblyName>
-    <OutputPath>$(ExePath)client</OutputPath>
+    <PublishName>communication\client</PublishName>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.ComponentModel.Composition" Version="4.7.0" />
