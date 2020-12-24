@@ -1,6 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup Condition="'$(PublishName)' != '' and ($(PublishGroup) == 'communication' or $(PublishGroup) == '')">
-    <PublishDir>$(RootPath)publish\$(Configuration)\$(TargetFramework)\$(PublishName)</PublishDir>
+  <PropertyGroup>
+    <DesiredPublishDir>$(OutputPath)publish</DesiredPublishDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(PublishName)' != '' and ($(PublishGroup) == 'communication' or $(PublishGroup) == '')">
+    <DesiredPublishDir Condition="'$(PublishDir)' == '$(OutputPath)publish\'">$(RootPath)publish\$(Configuration)\$(TargetFramework)\</DesiredPublishDir>
+  </PropertyGroup>
+  <Target Name="AfterBuild">
+    <PropertyGroup Condition="'$(PublishName)' != ''">
+      <PublishDir>$([System.IO.Path]::Combine($(DesiredPublishDir),$(PublishName)))</PublishDir>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(PublishName)' == ''">
+      <PublishDir>$(DesiredPublishDir)</PublishDir>
+    </PropertyGroup>
+    <Message Text="CommandsPublishGroup: $(PublishGroup)" Importance="High" />
+    <Message Text="CommandsDesiredPublishDir: $(DesiredPublishDir)" Importance="High" />
+  </Target>
 </Project>
