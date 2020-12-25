@@ -17,6 +17,12 @@ if (!(Test-Path $OutputPath)) {
     New-Item $OutputPath -ItemType Directory
 }
 $OutputPath = Resolve-Path $OutputPath
+if ($KeyPath) {
+    $KeyPath = Resolve-Path $KeyPath
+}
+if ($LogPath) {
+    $LogPath = Resolve-Path $LogPath
+}
 $location = Get-Location
 $buildFile = "./.vscode/build.ps1"
 try {
