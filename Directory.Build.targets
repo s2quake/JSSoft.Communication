@@ -25,8 +25,9 @@ SOFTWARE. -->
     <DesiredPublishDir>$(OutputPath)publish\</DesiredPublishDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(PublishName)' != '' and ($(PublishGroup) == 'communication' or $(PublishGroup) == '')">
-    <DesiredPublishDir Condition="'$(PublishDir)' == '$(DesiredPublishDir)'">$(RootPath)publish\$(Configuration)\$(TargetFramework)\</DesiredPublishDir>
-    <DesiredPublishDir Condition="'$(PublishDir)' != '$(DesiredPublishDir)'">$(PublishDir)</DesiredPublishDir>
+    <DesiredPublishDirTemp Condition="'$(PublishDir)' == '$(DesiredPublishDir)'">$(RootPath)publish\$(Configuration)\$(TargetFramework)\</DesiredPublishDirTemp>
+    <DesiredPublishDirTemp Condition="'$(PublishDir)' != '$(DesiredPublishDir)'">$(PublishDir)</DesiredPublishDirTemp>
+    <DesiredPublishDir>$(DesiredPublishDirTemp)</DesiredPublishDir>
   </PropertyGroup>
   <Target Name="AfterBuild">
     <PropertyGroup Condition="'$(PublishName)' != ''">
