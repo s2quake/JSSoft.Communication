@@ -37,7 +37,7 @@ SOFTWARE. -->
 	  <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <LangVersion>latest</LangVersion>
     <RootPath Condition="'$(SolutionDir)' != ''">$(SolutionDir)</RootPath>
-    <RootPath Condition="'$(SolutionDir)' == ''">$(MSBuildStartupDirectory)\</RootPath>
+    <RootPath Condition="'$(SolutionDir)' == ''">$(MSBuildThisFileDirectory)\</RootPath>
     <ConfigurationType Condition="'$(Configuration)' == ''">Debug</ConfigurationType>
     <ConfigurationType Condition="'$(Configuration)' != ''">$(Configuration)</ConfigurationType>
 	  <DelaySign>true</DelaySign>
