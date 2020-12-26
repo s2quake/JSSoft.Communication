@@ -1,5 +1,5 @@
 param(
-    [string]$OutputPath = "bin",
+    [string]$OutputPath = "",
     [string]$Framework = "netcoreapp3.1",
     [string]$KeyPath = "",
     [string]$LogPath = "",
