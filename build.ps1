@@ -13,22 +13,10 @@ $propPaths = (
     "./Directory.Build.props"
 )
 
-if (!(Test-Path $OutputPath)) {
-    New-Item $OutputPath -ItemType Directory
-}
-$OutputPath = Resolve-Path $OutputPath
-if ($KeyPath) {
-    $KeyPath = Resolve-Path $KeyPath
-}
-if ($LogPath) {
-    $LogPath = Resolve-Path $LogPath
-}
-$location = Get-Location
-$buildFile = "./.vscode/build.ps1"
 try {
-    Set-Location $PSScriptRoot
-    $propPaths = $propPaths | ForEach-Object { Resolve-Path $_ }
-    $solutionPath = Resolve-Path $solutionPath
+    $buildFile = "./build-temp.ps1"
+    $solutionPath = Join-Path $PSScriptRoot $solutionPath -Resolve
+    $propPaths = $propPaths | ForEach-Object { Join-Path $PSScriptRoot $_ -Resolve }
     Invoke-WebRequest -Uri "https://raw.githubusercontent.com/s2quake/build/master/build.ps1" -OutFile $buildFile
     $buildFile = Resolve-Path $buildFile
     & $buildFile $solutionPath $propPaths -Publish -KeyPath $KeyPath -Sign -OutputPath $OutputPath -Framework $Framework -LogPath $LogPath -Force:$Force
