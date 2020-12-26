@@ -23,5 +23,4 @@ try {
 }
 finally {
     Remove-Item $buildFile
-    Set-Location $location
 }
