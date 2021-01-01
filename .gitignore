@@ -20,11 +20,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-.vs/
-.vscode/
 bin/
 publish/
 obj/
 logs/
+packages/
 .DS_Store
-**/launchSettings.json
+.vs/
+.vscode/
+*.user
+*.suo
+launchSettings.json
+build-temp.ps1
