@@ -5,37 +5,31 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": ".NET Core Launch (client)",
+            "name": "launch-communication-client",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build client",
-            "program": "${workspaceFolder}/bin/Debug/netcoreapp3.1/Client-MEF/client.dll",
+            "program": "${workspaceFolder}/Client-MEF/bin/Debug/netcoreapp3.1/client.dll",
             "args": [
                 "--host",
                 "localhost"
             ],
-            "cwd": "${workspaceFolder}/Client",
+            "cwd": "${workspaceFolder}/Client-MEF/bin/Debug/netcoreapp3.1",
             "stopAtEntry": false,
             "console": "externalTerminal"
         },
         {
-            "name": ".NET Core Launch (server)",
+            "name": "launch-communication-server",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build all",
-            "program": "${workspaceFolder}/bin/Debug/netcoreapp3.1/Server-MEF/Server.dll",
+            "program": "${workspaceFolder}/Server-MEF/bin/Debug/netcoreapp3.1/server.dll",
             "args": [
                 "--verbose"
             ],
-            "cwd": "${workspaceFolder}/Server",
+            "cwd": "${workspaceFolder}/Server-MEF/bin/Debug/netcoreapp3.1",
             "console": "externalTerminal",
             "stopAtEntry": false
-        },
-        {
-            "name": ".NET Core Attach",
-            "type": "coreclr",
-            "request": "attach",
-            "processId": "${command:pickProcess}"
         }
     ]
 }
