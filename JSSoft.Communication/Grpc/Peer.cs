@@ -59,6 +59,15 @@ namespace JSSoft.Communication.Grpc
             this.PollReplyItems.Add(serviceHost, new PollReplyItemCollection());
         }
 
+        public (object service, object callback) RemoveInstance(IServiceHost serviceHost)
+        {
+            var value = (this.Services[serviceHost], this.Callbacks[serviceHost]);
+            this.PollReplyItems.Remove(serviceHost);
+            this.Services.Remove(serviceHost);
+            this.Callbacks.Remove(serviceHost);
+            return value;
+        }
+
         public void Ping()
         {
             this.PingTime = DateTime.UtcNow;

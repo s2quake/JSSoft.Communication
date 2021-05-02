@@ -287,7 +287,15 @@ namespace JSSoft.Communication
                     {
                         foreach (IPeer item in e.NewItems)
                         {
-                            this.CreateInstance(this.adaptorHost, item);
+                            this.CreateInstance(item);
+                        }
+                    }
+                    break;
+                case NotifyCollectionChangedAction.Remove:
+                    {
+                        foreach (IPeer item in e.OldItems)
+                        {
+                            this.DestroyInstance(item);
                         }
                     }
                     break;
@@ -318,7 +326,8 @@ namespace JSSoft.Communication
                 callback = this.callbackByServiceHost[serviceHost];
                 this.callbackByServiceHost.Remove(serviceHost);
             }
-            this.DestroyInstance(serviceHost, service, callback);
+            if (service != null)
+                this.DestroyInstance(serviceHost, service, callback);
         }
 
         private (object, object) CreateInstance(IServiceHost serviceHost, IPeer peer)
@@ -351,7 +360,7 @@ namespace JSSoft.Communication
             }
         }
 
-        private void CreateInstance(IAdaptorHost _, IPeer peer)
+        private void CreateInstance(IPeer peer)
         {
             foreach (var item in peer.ServiceHosts)
             {
@@ -366,6 +375,25 @@ namespace JSSoft.Communication
                     var service = this.serviceByServiceHost[item];
                     var callback = this.callbackByServiceHost[item];
                     peer.AddInstance(item, service, callback);
+                }
+            }
+        }
+
+        private void DestroyInstance(IPeer peer)
+        {
+            foreach (var item in peer.ServiceHosts)
+            {
+                var isPerPeer = IsPerPeer(this, item);
+                if (isPerPeer == true)
+                {
+                    var (service, callback) = peer.RemoveInstance(item);
+                    this.DestroyInstance(item, service, callback);
+                }
+                else
+                {
+                    var service = this.serviceByServiceHost[item];
+                    var callback = this.callbackByServiceHost[item];
+                    peer.RemoveInstance(item);
                 }
             }
         }

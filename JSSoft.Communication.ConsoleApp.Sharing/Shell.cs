@@ -39,6 +39,7 @@ namespace JSSoft.Communication.ConsoleApp
 #endif
     class Shell : CommandContextTerminal, IShell, IServiceProvider
     {
+        private static readonly string postfix = Terminal.IsWin32NT == true ? ">" : "$ ";
         private readonly Settings settings;
         private readonly CommandContext commandContext;
         private readonly IServiceContext serviceHost;
@@ -63,8 +64,7 @@ namespace JSSoft.Communication.ConsoleApp
            : base(commandContext)
         {
             this.settings = Settings.CreateFromCommandLine();
-            this.Prompt = "";
-            this.Postfix = ">";
+            this.Prompt = postfix;
             this.serviceHost = serviceHost;
             this.serviceHost.Opened += ServiceHost_Opened;
             this.serviceHost.Closed += ServiceHost_Closed;
@@ -98,24 +98,22 @@ namespace JSSoft.Communication.ConsoleApp
             set => Console.Title = value;
         }
 
-        protected override void OnDrawPrompt(TextWriter writer, string prompt)
+        protected override string FormatPrompt(string prompt)
         {
             if (this.UserID == string.Empty)
             {
-                base.OnDrawPrompt(writer, prompt);
+                return prompt;
             }
             else
             {
-                Console.ResetColor();
-                var pattern = $"(.+@)(.+){this.Postfix}";
+                var tb = new TerminalStringBuilder();
+                var pattern = $"(.+@)(.+){postfix}";
                 var match = Regex.Match(prompt, pattern);
-                writer.Write(match.Groups[1].Value);
-                using (TerminalColor.SetForeground(ConsoleColor.Green))
-                {
-                    writer.Write(match.Groups[2].Value);
-                }
-                Console.ResetColor();
-                writer.Write(this.Postfix);
+                tb.Append(match.Groups[1].Value);
+                tb.Foreground = TerminalColor.BrightGreen;
+                tb.Append(match.Groups[2].Value);
+                tb.Foreground = null;
+                return tb.ToString();
             }
         }
 
@@ -208,17 +206,13 @@ namespace JSSoft.Communication.ConsoleApp
         {
             if (e.Sender == this.UserID)
             {
-                using (TerminalColor.SetForeground(ConsoleColor.Magenta))
-                {
-                    this.Out.WriteLine($"'{e.Receiver}'에게 귓속말: {e.Message}");
-                }
+                var text = TerminalStrings.Foreground($"'{e.Receiver}'에게 귓속말: {e.Message}", TerminalColor.BrightMagenta);
+                this.Out.WriteLine(text);
             }
             else if (e.Receiver == this.UserID)
             {
-                using (TerminalColor.SetForeground(ConsoleColor.Magenta))
-                {
-                    this.Out.WriteLine($"'{e.Receiver}'의 귓속말: {e.Message}");
-                }
+                var text = TerminalStrings.Foreground($"'{e.Receiver}'의 귓속말: {e.Message}", TerminalColor.BrightMagenta);
+                this.Out.WriteLine(text);
             }
         }
 

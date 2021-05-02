@@ -96,6 +96,13 @@ namespace JSSoft.Communication.Grpc
             this.callbacks.Add(serviceHost, callback);
         }
 
+        (object service, object callback) IPeer.RemoveInstance(IServiceHost serviceHost)
+        {
+            var value = this.callbacks[serviceHost];
+            this.callbacks.Remove(serviceHost);
+            return (null, value);
+        }
+
         #endregion
     }
 }

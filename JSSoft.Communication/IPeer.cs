@@ -29,5 +29,7 @@ namespace JSSoft.Communication
         IServiceHost[] ServiceHosts { get; }
 
         void AddInstance(IServiceHost serviceHost, object service, object callback);
+
+        (object service, object callback) RemoveInstance(IServiceHost serviceHost);
     }
 }
