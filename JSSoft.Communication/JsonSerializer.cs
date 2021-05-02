@@ -39,11 +39,17 @@ namespace JSSoft.Communication
 
         public string Serialize(Type type, object data)
         {
-            if (this.dataSerializerByType.ContainsKey(type) == true)
+            var currentType = type;
+            while (currentType != null)
             {
-                var dataSerializer = this.dataSerializerByType[type];
-                return dataSerializer.Serialize(this, data);
+                if (this.dataSerializerByType.ContainsKey(currentType) == true)
+                {
+                    var dataSerializer = this.dataSerializerByType[currentType];
+                    return dataSerializer.Serialize(this, data);
+                }
+                currentType = currentType.BaseType;
             }
+
             return JsonConvert.SerializeObject(data, type, settings);
         }
 
