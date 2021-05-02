@@ -152,8 +152,9 @@ namespace JSSoft.Communication.ConsoleApp
 
         public static void Release()
         {
-            foreach (var item in instanceList.Reverse<object>())
+            for (var i = instanceList.Count - 1; i >= 0; i--)
             {
+                var item = instanceList[i];
                 if (item is IDisposable disposable)
                 {
                     disposable.Dispose();

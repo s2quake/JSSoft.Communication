@@ -45,14 +45,14 @@ namespace JSSoft.Communication.Services
 
         protected override async Task<IUserServiceCallback> CreateCallbackAsync(IUserService service)
         {
-            await Task.CompletedTask;
+            await Task.Delay(1);
             this.userService.SetUserService(service);
             return this.userService;
         }
 
         protected override async Task DestroyCallbackAsync(IUserServiceCallback callback)
         {
-            await Task.CompletedTask;
+            await Task.Delay(1);
             this.userService.SetUserService(null);
         }
     }

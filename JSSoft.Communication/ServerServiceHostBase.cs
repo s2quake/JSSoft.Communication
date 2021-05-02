@@ -41,7 +41,7 @@ namespace JSSoft.Communication
 
         protected virtual Task DestroyServiceAsync(T service)
         {
-            return Task.CompletedTask;
+            return Task.Delay(1);
         }
 
         private protected override async Task<object> CreateInstanceInternalAsync(object obj)
@@ -71,7 +71,7 @@ namespace JSSoft.Communication
 
         protected virtual Task DestroyServiceAsync(T service)
         {
-            return Task.CompletedTask;
+            return Task.Delay(1);
         }
 
         private protected override async Task<object> CreateInstanceInternalAsync(object obj)

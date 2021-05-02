@@ -54,7 +54,7 @@ namespace JSSoft.Communication.Services
 
         protected override async Task DestroyServiceAsync(IDataService service)
         {
-            await Task.CompletedTask;
+            await Task.Delay(1);
         }
     }
 }

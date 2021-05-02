@@ -45,7 +45,7 @@ namespace JSSoft.Communication.Services
 
         protected override async Task<IUserService> CreateServiceAsync(IUserServiceCallback callback)
         {
-            await Task.CompletedTask;
+            await Task.Delay(1);
             this.userService.SetCallback(callback);
             return this.userService;
         }

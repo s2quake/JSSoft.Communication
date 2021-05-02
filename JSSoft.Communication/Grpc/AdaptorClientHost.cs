@@ -83,8 +83,6 @@ namespace JSSoft.Communication.Grpc
         public async Task CloseAsync()
         {
             await this.serviceContext.RemovePeekAsync(this.adaptorImpl);
-            if (this.adaptorImpl != null)
-                await this.adaptorImpl.CloseAsync();
             await Task.Run(() =>
             {
                 this.cancellation?.Cancel();
@@ -93,6 +91,8 @@ namespace JSSoft.Communication.Grpc
                 this.task = null;
                 this.adaptorImpl = null;
             });
+            if (this.adaptorImpl != null)
+                await this.adaptorImpl.CloseAsync();
             if (this.channel != null)
                 await this.channel.ShutdownAsync();
             this.channel = null;
