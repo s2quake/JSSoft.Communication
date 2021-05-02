@@ -92,6 +92,7 @@ namespace JSSoft.Communication.ConsoleApp
         private static readonly List<ICommand> commandList = new List<ICommand>();
         private static readonly Shell shell;
         private static readonly CommandContext commandContext;
+        private static readonly List<object> instanceList = new List<object>();
 #if SERVER
         private static readonly ServerContext serviceContext;
 #else
@@ -109,11 +110,19 @@ namespace JSSoft.Communication.ConsoleApp
             var dataService = new DataService();
             var dataServiceHost = new DataServiceHost(dataService);
             var lazyDataService = new Lazy<IDataService>(() => dataService);
+
+            instanceList.Add(userService);
+            instanceList.Add(dataService);
+            instanceList.Add(userServiceHost);
+            instanceList.Add(dataServiceHost);
+
             serviceHosts = new IServiceHost[] { userServiceHost, dataServiceHost };
 #if SERVER
             serviceContext = new ServerContext(serviceHosts);
+            instanceList.Add(serviceHosts);
 #else
             serviceContext = new ClientContext(serviceHosts);
+            instanceList.Add(serviceHosts);
 #endif
 
             commandList.Add(new CloseCommand(serviceContext, lazyShell));
@@ -143,7 +152,13 @@ namespace JSSoft.Communication.ConsoleApp
 
         public static void Release()
         {
-
+            foreach (var item in instanceList.Reverse<object>())
+            {
+                if (item is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                }
+            }
         }
 
         private static Shell GetShell()

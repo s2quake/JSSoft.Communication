@@ -20,6 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System;
+using System.Threading.Tasks;
 #if MEF
 using System.ComponentModel.Composition;
 #endif
@@ -41,15 +43,19 @@ namespace JSSoft.Communication.Services
             this.userService = userService;
         }
 
-        protected override IUserService CreateService(IUserServiceCallback callback)
+        protected override async Task<IUserService> CreateServiceAsync(IUserServiceCallback callback)
         {
+            await Task.CompletedTask;
             this.userService.SetCallback(callback);
             return this.userService;
         }
 
-        protected override void DestroyService(IUserService service)
+        protected override async Task DestroyServiceAsync(IUserService service)
         {
-            userService.Dispose();
+            if (service is UserService userService)
+            {
+                await userService.DisposeAsync();
+            }
         }
     }
 }

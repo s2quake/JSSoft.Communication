@@ -37,7 +37,7 @@ namespace JSSoft.Communication.Grpc
     class AdaptorServerHost : IAdaptorHost
     {
         private static readonly string localAddress = "127.0.0.1";
-        private readonly IServiceContext serviceContext;
+        private readonly ServerContextBase serviceContext;
         private readonly IContainer<IServiceHost> serviceHosts;
         private CancellationTokenSource cancellation;
         private Server server;
@@ -52,7 +52,7 @@ namespace JSSoft.Communication.Grpc
                 localAddress = $"{address}";
         }
 
-        public AdaptorServerHost(IServiceContext serviceContext)
+        public AdaptorServerHost(ServerContextBase serviceContext)
         {
             this.serviceContext = serviceContext;
             this.serviceHosts = serviceContext.ServiceHosts;
@@ -62,15 +62,15 @@ namespace JSSoft.Communication.Grpc
         internal async Task<OpenReply> Open(OpenRequest request, ServerCallContext context)
         {
             var token = Guid.NewGuid();
+            var serviceNames = request.ServiceNames;
+            var serviceHosts = serviceNames.Select(item => this.serviceHosts[item]).ToArray();
+            var peerID = context.Peer;
+            var peer = new Peer($"{token}", serviceHosts) { Token = token };
             await this.Dispatcher.InvokeAsync(() =>
             {
-                var serviceNames = request.ServiceNames;
-                var serviceHosts = serviceNames.Select(item => this.serviceHosts[item]).ToArray();
-                var peerID = context.Peer;
-                var peer = new Peer($"{token}", serviceHosts) { Token = token };
                 this.Peers.Add(peer);
-                return peer.Token;
             });
+            await this.serviceContext.AddPeerAsync(peer);
             LogUtility.Debug($"{context.Peer}({token}) Connected");
             return new OpenReply() { Token = $"{token}" };
         }
@@ -78,11 +78,9 @@ namespace JSSoft.Communication.Grpc
         internal async Task<CloseReply> Close(CloseRequest request, ServerCallContext context)
         {
             var token = request.Token;
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                var peer = this.Peers[token];
-                peer.Dispose();
-            });
+            var peer = await this.Dispatcher.InvokeAsync(() =>this.Peers[token]);
+            await this.serviceContext.RemovePeekAsync(peer);
+            await this.Dispatcher.InvokeAsync(peer.Dispose);
             LogUtility.Debug($"{context.Peer}({token}) Disconnected");
             return new CloseReply();
         }
@@ -263,8 +261,6 @@ namespace JSSoft.Communication.Grpc
         {
             throw new NotImplementedException();
         }
-
-        IContainer<IPeer> IAdaptorHost.Peers => this.Peers;
 
         #endregion
     }

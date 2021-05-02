@@ -16,7 +16,8 @@
             ],
             "cwd": "${workspaceFolder}/Client-MEF/bin/Debug/netcoreapp3.1",
             "stopAtEntry": false,
-            "console": "externalTerminal"
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
         },
         {
             "name": "launch-communication-server",
@@ -28,8 +29,9 @@
                 "--verbose"
             ],
             "cwd": "${workspaceFolder}/Server-MEF/bin/Debug/netcoreapp3.1",
-            "console": "externalTerminal",
-            "stopAtEntry": false
+            "stopAtEntry": false,
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
         }
     ]
 }

@@ -40,7 +40,7 @@ namespace JSSoft.Communication
 
         Task<T> InvokeAsync<T>(InstanceBase instance, string name, Type[] types, object[] args);
 
-        IContainer<IPeer> Peers { get; }
+        // IContainer<IPeer> Peers { get; }
 
         event EventHandler<DisconnectionReasonEventArgs> Disconnected;
     }

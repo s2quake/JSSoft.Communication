@@ -20,27 +20,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using JSSoft.Library.ObjectModel;
+// using JSSoft.Library.ObjectModel;
 
-namespace JSSoft.Communication.Grpc
-{
-    class PeerCollectionSurrogate : ContainerBase<IPeer>
-    {
-        private IPeer peer;
+// namespace JSSoft.Communication.Grpc
+// {
+//     class PeerCollectionSurrogate : ContainerBase<IPeer>
+//     {
+//         private IPeer peer;
 
-        public void Set(IPeer peer)
-        {
-            this.peer = peer;
-            base.AddBase(this.peer.ID, this.peer);
-        }
+//         public void Set(IPeer peer)
+//         {
+//             this.peer = peer;
+//             base.AddBase(this.peer.ID, this.peer);
+//         }
 
-        public void Unset()
-        {
-            if (this.peer != null)
-            {
-                base.RemoveBase(this.peer.ID);
-                this.peer = null;
-            }
-        }
-    }
-}
+//         public void Unset()
+//         {
+//             if (this.peer != null)
+//             {
+//                 base.RemoveBase(this.peer.ID);
+//                 this.peer = null;
+//             }
+//         }
+//     }
+// }

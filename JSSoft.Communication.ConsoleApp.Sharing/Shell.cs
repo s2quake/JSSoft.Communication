@@ -25,6 +25,7 @@ using JSSoft.Library.Commands;
 using System;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 #if MEF
 using System.ComponentModel.Composition;
@@ -45,6 +46,7 @@ namespace JSSoft.Communication.ConsoleApp
         private readonly IServiceContext serviceHost;
         private readonly INotifyUserService userServiceNotification;
         private bool isDisposed;
+        private CancellationTokenSource cancellation;
 
         static Shell()
         {
@@ -142,16 +144,19 @@ namespace JSSoft.Communication.ConsoleApp
 
         private void UpdatePrompt()
         {
-            if (this.IsOpened == true)
+            var prompt = string.Empty;
+            var isOpened = this.IsOpened;
+            var host = this.serviceHost.Host;
+            var port = this.serviceHost.Port;
+            var userID = this.UserID;
+
+            if (isOpened == true)
             {
-                this.Prompt = $"{this.serviceHost.Host}:{this.serviceHost.Port}";
-                if (this.UserID != string.Empty)
-                    this.Prompt += $"@{this.UserID}";
+                prompt = $"{host}:{port}";
+                if (userID != string.Empty)
+                    prompt += $"@{userID}";
             }
-            else
-            {
-                this.Prompt = string.Empty;
-            }
+            this.Prompt = prompt + postfix;
         }
 
         private void ServiceHost_Opened(object sender, EventArgs e)
@@ -189,7 +194,6 @@ namespace JSSoft.Communication.ConsoleApp
                 this.Out.WriteLine("서버와 연결이 끊어졌습니다.");
                 this.Out.WriteLine("서버에 연결하려면 'open' 을(를) 입력하세요.");
             }
-            this.Out.WriteLine();
         }
 
         private void UserServiceNotification_LoggedIn(object sender, UserEventArgs e)
@@ -232,15 +236,16 @@ namespace JSSoft.Communication.ConsoleApp
 
         async Task IShell.StartAsync()
         {
+            this.cancellation = new CancellationTokenSource();
             this.serviceHost.Host = this.settings.Host;
             this.serviceHost.Port = this.settings.Port;
             this.Token = await this.serviceHost.OpenAsync();
-            await base.StartAsync();
+            await base.StartAsync(this.cancellation.Token);
         }
 
         async Task IShell.StopAsync()
         {
-            base.Cancel();
+            this.cancellation.Cancel();
             if (this.serviceHost.ServiceState == ServiceState.Open)
             {
                 this.serviceHost.Closed -= ServiceHost_Closed;

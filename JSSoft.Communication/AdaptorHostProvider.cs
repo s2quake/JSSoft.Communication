@@ -34,10 +34,10 @@ namespace JSSoft.Communication
             // Environment.SetEnvironmentVariable("GRPC_TRACE", "all");
             // global::Grpc.Core.GrpcEnvironment.SetLogger(new global::Grpc.Core.Logging.ConsoleLogger());
 
-            if (serviceContext is ServerContextBase)
-                return new Grpc.AdaptorServerHost(serviceContext);
-            else if (serviceContext is ClientContextBase)
-                return new Grpc.AdaptorClientHost(serviceContext);
+            if (serviceContext is ServerContextBase serverContextBase)
+                return new Grpc.AdaptorServerHost(serverContextBase);
+            else if (serviceContext is ClientContextBase clientContextBase)
+                return new Grpc.AdaptorClientHost(clientContextBase);
             throw new NotImplementedException();
         }
 

@@ -23,6 +23,7 @@
 #if MEF
 using System.ComponentModel.Composition;
 #endif
+using System.Threading.Tasks;
 
 namespace JSSoft.Communication.Services
 {
@@ -42,14 +43,16 @@ namespace JSSoft.Communication.Services
             this.userService = userService;
         }
 
-        protected override IUserServiceCallback CreateCallback(IUserService service)
+        protected override async Task<IUserServiceCallback> CreateCallbackAsync(IUserService service)
         {
+            await Task.CompletedTask;
             this.userService.SetUserService(service);
             return this.userService;
         }
 
-        protected override void DestroyCallback(IUserServiceCallback callback)
+        protected override async Task DestroyCallbackAsync(IUserServiceCallback callback)
         {
+            await Task.CompletedTask;
             this.userService.SetUserService(null);
         }
     }

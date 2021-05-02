@@ -35,9 +35,9 @@ namespace JSSoft.Communication
 
         IContainer<MethodDescriptor> MethodDescriptors { get; }
 
-        object CreateInstance(object obj);
+        Task<object> CreateInstanceAsync(object obj);
 
-        void DestroyInstance(object obj);
+        Task DestroyInstanceAsync(object obj);
 
         Type ServiceType { get; }
 

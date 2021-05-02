@@ -32,20 +32,18 @@ namespace JSSoft.Communication.Grpc
 {
     class AdaptorClientHost : IAdaptorHost
     {
-        private readonly IServiceContext serviceContext;
+        private readonly ClientContextBase serviceContext;
         private readonly IContainer<IServiceHost> serviceHosts;
-        private readonly PeerCollectionSurrogate peers;
         private CancellationTokenSource cancellation;
         private Task task;
         private Channel channel;
         private AdaptorClientImpl adaptorImpl;
         private ISerializer serializer;
 
-        public AdaptorClientHost(IServiceContext serviceContext)
+        public AdaptorClientHost(ClientContextBase serviceContext)
         {
             this.serviceContext = serviceContext;
             this.serviceHosts = serviceContext.ServiceHosts;
-            this.peers = new PeerCollectionSurrogate();
         }
 
         public async Task OpenAsync(string host, int port)
@@ -60,7 +58,7 @@ namespace JSSoft.Communication.Grpc
                 await this.adaptorImpl.OpenAsync();
                 await Task.Run(() =>
                 {
-                    this.peers.Set(this.adaptorImpl);
+                    this.serviceContext.AddPeerAsync(this.adaptorImpl);
                     this.cancellation = new CancellationTokenSource();
                     this.serializer = this.serviceContext.GetService(typeof(ISerializer)) as ISerializer;
                 });
@@ -84,7 +82,7 @@ namespace JSSoft.Communication.Grpc
 
         public async Task CloseAsync()
         {
-            await Task.Run(() => this.peers.Unset());
+            await this.serviceContext.RemovePeekAsync(this.adaptorImpl);
             if (this.adaptorImpl != null)
                 await this.adaptorImpl.CloseAsync();
             await Task.Run(() =>
@@ -253,8 +251,6 @@ namespace JSSoft.Communication.Grpc
             }
             return (T)this.serializer.Deserialize(typeof(T), reply.Data);
         }
-
-        IContainer<IPeer> IAdaptorHost.Peers => this.peers;
 
         #endregion
     }

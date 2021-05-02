@@ -20,6 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System.Threading.Tasks;
+
 namespace JSSoft.Communication
 {
     [ServiceContext(IsServer = true)]
@@ -36,5 +38,9 @@ namespace JSSoft.Communication
         {
 
         }
+
+        internal Task AddPeerAsync(IPeer peer) => this.CreateInstanceAsync(peer);
+
+        internal Task RemovePeekAsync(IPeer peer) => this.DestroyInstanceAsync(peer);
     }
 }

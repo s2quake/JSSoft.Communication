@@ -20,6 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System;
+using System.Threading.Tasks;
 #if MEF
 using System.ComponentModel.Composition;
 #endif
@@ -29,7 +31,7 @@ namespace JSSoft.Communication.Services
 #if MEF
     [Export(typeof(IServiceHost))]
 #endif
-    class DataServiceHost : ServerServiceHostBase<IDataService>
+    class DataServiceHost : ServerServiceHostBase<IDataService>, IDisposable
     {
         private readonly DataService dataService;
 #if MEF
@@ -40,17 +42,19 @@ namespace JSSoft.Communication.Services
             this.dataService = dataService;
         }
 
-        protected override IDataService CreateService()
+        public void Dispose()
         {
-            return this.dataService;
+            this.dataService.Dispose();
         }
 
-        protected override void DestroyService(IDataService service)
+        protected override Task<IDataService> CreateServiceAsync()
         {
-            if (service is DataService dataService)
-            {
-                dataService.Dispose();
-            }
+            return Task.Run<IDataService>(() => this.dataService);
+        }
+
+        protected override async Task DestroyServiceAsync(IDataService service)
+        {
+            await Task.CompletedTask;
         }
     }
 }

@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace JSSoft.Communication
 {
@@ -33,24 +34,24 @@ namespace JSSoft.Communication
 
         }
 
-        protected virtual T CreateService(U callback)
+        protected virtual Task<T> CreateServiceAsync(U callback)
         {
-            return TypeDescriptor.CreateInstance(null, this.ServiceType, null, null) as T;
+            return Task.Run(() => TypeDescriptor.CreateInstance(null, this.ServiceType, null, null) as T);
         }
 
-        protected virtual void DestroyService(T service)
+        protected virtual Task DestroyServiceAsync(T service)
         {
-
+            return Task.CompletedTask;
         }
 
-        private protected override object CreateInstanceInternal(object obj)
+        private protected override async Task<object> CreateInstanceInternalAsync(object obj)
         {
-            return this.CreateService(obj as U);
+            return await this.CreateServiceAsync(obj as U);
         }
 
-        private protected override void DestroyInstanceInternal(object obj)
+        private protected override Task DestroyInstanceInternalAsync(object obj)
         {
-            this.DestroyService(obj as T);
+            return this.DestroyServiceAsync(obj as T);
         }
     }
 
@@ -63,24 +64,24 @@ namespace JSSoft.Communication
 
         }
 
-        protected virtual T CreateService()
+        protected virtual Task<T> CreateServiceAsync()
         {
-            return TypeDescriptor.CreateInstance(null, this.ServiceType, null, null) as T;
+            return Task.Run(() => TypeDescriptor.CreateInstance(null, this.ServiceType, null, null) as T);
         }
 
-        protected virtual void DestroyService(T service)
+        protected virtual Task DestroyServiceAsync(T service)
         {
-
+            return Task.CompletedTask;
         }
 
-        private protected override object CreateInstanceInternal(object obj)
+        private protected override async Task<object> CreateInstanceInternalAsync(object obj)
         {
-            return this.CreateService();
+            return await this.CreateServiceAsync();
         }
 
-        private protected override void DestroyInstanceInternal(object obj)
+        private protected override async Task DestroyInstanceInternalAsync(object obj)
         {
-            this.DestroyService(obj as T);
+            await this.DestroyServiceAsync(obj as T);
         }
     }
 }

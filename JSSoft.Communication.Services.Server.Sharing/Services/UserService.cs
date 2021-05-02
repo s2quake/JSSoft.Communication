@@ -202,11 +202,11 @@ namespace JSSoft.Communication.Services
             });
         }
 
-        public void Dispose()
+        public async Task DisposeAsync()
         {
             if (this.Dispatcher == null)
                 throw new ObjectDisposedException(nameof(UserService));
-            this.Dispatcher.Dispose();
+            await this.Dispatcher.DisposeAsync();
             this.Dispatcher = null;
         }
 

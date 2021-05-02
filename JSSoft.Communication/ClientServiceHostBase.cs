@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace JSSoft.Communication
 {
@@ -33,24 +34,24 @@ namespace JSSoft.Communication
 
         }
 
-        protected virtual U CreateCallback(T service)
+        protected virtual Task<U> CreateCallbackAsync(T service)
         {
-            return TypeDescriptor.CreateInstance(null, this.CallbackType, null, null) as U;
+            return Task.Run(() => TypeDescriptor.CreateInstance(null, this.CallbackType, null, null) as U);
         }
 
-        protected virtual void DestroyCallback(U callback)
+        protected virtual Task DestroyCallbackAsync(U callback)
         {
-
+            return Task.CompletedTask;
         }
 
-        private protected override object CreateInstanceInternal(object obj)
+        private protected override async Task<object> CreateInstanceInternalAsync(object obj)
         {
-            return this.CreateCallback(obj as T);
+            return await this.CreateCallbackAsync(obj as T);
         }
 
-        private protected override void DestroyInstanceInternal(object obj)
+        private protected override Task DestroyInstanceInternalAsync(object obj)
         {
-            this.DestroyCallback(obj as U);
+            return this.DestroyCallbackAsync(obj as U);
         }
     }
 
@@ -73,15 +74,16 @@ namespace JSSoft.Communication
 
         }
 
-        private protected override object CreateInstanceInternal(object obj)
+        private protected override Task<object> CreateInstanceInternalAsync(object obj)
         {
             this.OnServiceCreated(obj as T);
-            return null;
+            return Task.Run(() => null as object);
         }
 
-        private protected override void DestroyInstanceInternal(object obj)
+        private protected override Task DestroyInstanceInternalAsync(object obj)
         {
             this.OnServiceDestroyed();
+            return Task.CompletedTask;
         }
     }
 }
