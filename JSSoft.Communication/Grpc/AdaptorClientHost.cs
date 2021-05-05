@@ -80,7 +80,7 @@ namespace JSSoft.Communication.Grpc
             }
         }
 
-        public async Task CloseAsync()
+        public async Task CloseAsync(int closeCode)
         {
             await Task.Run(() =>
             {
@@ -99,16 +99,16 @@ namespace JSSoft.Communication.Grpc
             this.channel = null;
         }
 
-        public event EventHandler<DisconnectionReasonEventArgs> Disconnected;
+        public event EventHandler<CloseEventArgs> Disconnected;
 
-        protected virtual void OnDisconnected(DisconnectionReasonEventArgs e)
+        protected virtual void OnDisconnected(CloseEventArgs e)
         {
             this.Disconnected?.Invoke(this, e);
         }
 
         private async void PollAsync(CancellationToken cancellationToken, ManualResetEvent eventSet)
         {
-            var exitCode = 0;
+            var closeCode = int.MinValue;
             try
             {
                 using var call = this.adaptorImpl.Poll();
@@ -121,9 +121,9 @@ namespace JSSoft.Communication.Grpc
                     await call.RequestStream.WriteAsync(request);
                     await call.ResponseStream.MoveNext();
                     var reply = call.ResponseStream.Current;
-                    if (reply.Code != 0)
+                    if (reply.Code != int.MinValue)
                     {
-                        exitCode = reply.Code;
+                        closeCode = reply.Code;
                         break;
                     }
                     this.InvokeCallback(reply.Items);
@@ -135,15 +135,15 @@ namespace JSSoft.Communication.Grpc
             }
             catch (Exception e)
             {
-                exitCode = 1;
+                closeCode = -1;
                 GrpcEnvironment.Logger.Error(e, e.Message);
             }
-            if (exitCode != 0)
+            if (closeCode != int.MinValue)
             {
                 this.task = null;
                 await this.adaptorImpl.AbortAsync();
                 this.adaptorImpl = null;
-                this.OnDisconnected(new DisconnectionReasonEventArgs(exitCode));
+                this.OnDisconnected(new CloseEventArgs(closeCode));
             }
             eventSet.Set();
         }

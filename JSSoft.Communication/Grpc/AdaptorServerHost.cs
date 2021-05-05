@@ -41,6 +41,7 @@ namespace JSSoft.Communication.Grpc
         private static readonly string localAddress = "127.0.0.1";
         private readonly ServerContextBase serviceContext;
         private readonly IContainer<IServiceHost> serviceHosts;
+        private int closeCode;
         private CancellationTokenSource cancellation;
         private Server server;
         private AdaptorServerImpl adaptor;
@@ -137,14 +138,14 @@ namespace JSSoft.Communication.Grpc
                 var services = peer.ServiceHosts;
                 if (this.cancellation.IsCancellationRequested == true)
                 {
-                    await responseStream.WriteAsync(new PollReply() { Code = -1 });
+                    await responseStream.WriteAsync(new PollReply() { Code = this.closeCode });
                     break;
                 }
                 if (peer.Cancellation.IsCancellationRequested == true)
                 {
                     break;
                 }
-                var reply = new PollReply();
+                var reply = new PollReply() { Code = int.MinValue };
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     foreach (var item in services)
@@ -166,9 +167,9 @@ namespace JSSoft.Communication.Grpc
 
         public Dispatcher Dispatcher => this.serviceContext.Dispatcher;
 
-        public event EventHandler<DisconnectionReasonEventArgs> Disconnected;
+        public event EventHandler<CloseEventArgs> Disconnected;
 
-        protected virtual void OnDisconnected(DisconnectionReasonEventArgs e)
+        protected virtual void OnDisconnected(CloseEventArgs e)
         {
             this.Disconnected?.Invoke(this, e);
         }
@@ -276,8 +277,9 @@ namespace JSSoft.Communication.Grpc
             await Task.Run(this.server.Start);
         }
 
-        async Task IAdaptorHost.CloseAsync()
+        async Task IAdaptorHost.CloseAsync(int closeCode)
         {
+            this.closeCode = closeCode;
             this.cancellation.Cancel();
             while (await this.Dispatcher.InvokeAsync(this.Peers.Any))
             {

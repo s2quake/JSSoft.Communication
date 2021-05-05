@@ -30,7 +30,7 @@ namespace JSSoft.Communication
     {
         Task OpenAsync(string host, int port);
 
-        Task CloseAsync();
+        Task CloseAsync(int closeCode);
 
         void Invoke(InstanceBase instance, string name, Type[] types, object[] args);
 
@@ -40,8 +40,6 @@ namespace JSSoft.Communication
 
         Task<T> InvokeAsync<T>(InstanceBase instance, string name, Type[] types, object[] args);
 
-        // IContainer<IPeer> Peers { get; }
-
-        event EventHandler<DisconnectionReasonEventArgs> Disconnected;
+        event EventHandler<CloseEventArgs> Disconnected;
     }
 }

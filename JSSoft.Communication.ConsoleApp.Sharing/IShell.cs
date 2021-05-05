@@ -29,7 +29,7 @@ namespace JSSoft.Communication.ConsoleApp
     {
         Task StartAsync();
 
-        Task StopAsync();
+        Task StopAsync(int exitCode);
 
         string Title { get; set; }
     }

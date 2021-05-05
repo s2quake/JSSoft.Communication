@@ -25,6 +25,7 @@ using JSSoft.Library.ObjectModel;
 using JSSoft.Library.Threading;
 using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -104,17 +105,19 @@ namespace JSSoft.Communication
             }
         }
 
-        public async Task CloseAsync(Guid token)
+        public async Task CloseAsync(Guid token, int closeCode)
         {
             if (token == Guid.Empty || this.token.Guid != token)
                 throw new ArgumentException($"invalid token: {token}", nameof(token));
             if (this.ServiceState != ServiceState.Open)
                 throw new InvalidOperationException();
+            if (closeCode == int.MinValue)
+                throw new ArgumentException($"invalid close code: '{closeCode}'", nameof(closeCode));
             try
             {
-                await this.adaptorHost.CloseAsync();
+                await this.adaptorHost.CloseAsync(closeCode);
                 await this.DebugAsync($"{this.adpatorHostProvider.Name} Adaptor closed.");
-                foreach (var item in this.ServiceHosts)
+                foreach (var item in this.ServiceHosts.Reverse())
                 {
                     await item.CloseAsync(this.token);
                     await this.ReleaseInstanceAsync(item);
@@ -132,7 +135,7 @@ namespace JSSoft.Communication
                     this.Dispatcher = null;
                     this.token = ServiceToken.Empty;
                     this.ServiceState = ServiceState.None;
-                    this.OnClosed(EventArgs.Empty);
+                    this.OnClosed(new CloseEventArgs(closeCode));
                     this.Debug($"Service Context closed.");
                 });
             }
@@ -186,7 +189,7 @@ namespace JSSoft.Communication
 
         public event EventHandler Opened;
 
-        public event EventHandler Closed;
+        public event EventHandler<CloseEventArgs> Closed;
 
         protected virtual InstanceBase CreateInstance(Type type)
         {
@@ -204,7 +207,7 @@ namespace JSSoft.Communication
             this.Opened?.Invoke(this, e);
         }
 
-        protected virtual void OnClosed(EventArgs e)
+        protected virtual void OnClosed(CloseEventArgs e)
         {
             this.Closed?.Invoke(this, e);
         }
@@ -271,9 +274,9 @@ namespace JSSoft.Communication
             return this.Dispatcher.InvokeAsync(() => this.Debug(message));
         }
 
-        private async void AdaptorHost_Disconnected(object sender, DisconnectionReasonEventArgs e)
+        private async void AdaptorHost_Disconnected(object sender, CloseEventArgs e)
         {
-            await this.CloseAsync(this.token.Guid);
+            await this.CloseAsync(this.token.Guid, e.CloseCode);
         }
 
         private async Task InitializeInstanceAsync(IServiceHost serviceHost)
@@ -362,7 +365,7 @@ namespace JSSoft.Communication
 
         internal async Task DestroyInstanceAsync(IPeer peer)
         {
-            foreach (var item in peer.ServiceHosts)
+            foreach (var item in peer.ServiceHosts.Reverse())
             {
                 var isPerPeer = IsPerPeer(this, item);
                 if (isPerPeer == true)

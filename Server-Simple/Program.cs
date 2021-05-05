@@ -40,7 +40,7 @@ namespace JSSoft.Communication.ConsoleApp
             Console.WriteLine("종료하려면 아무 키나 누르세요.");
             Console.ReadKey();
 
-            await serviceContext.CloseAsync(token);
+            await serviceContext.CloseAsync(token, 0);
         }
     }
 }

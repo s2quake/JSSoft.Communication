@@ -251,13 +251,13 @@ namespace JSSoft.Communication.ConsoleApp
             await base.StartAsync(this.cancellation.Token);
         }
 
-        async Task IShell.StopAsync()
+        async Task IShell.StopAsync(int exitCode)
         {
             this.cancellation.Cancel();
             if (this.serviceHost.ServiceState == ServiceState.Open)
             {
                 this.serviceHost.Closed -= ServiceHost_Closed;
-                await this.serviceHost.CloseAsync(this.Token);
+                await this.serviceHost.CloseAsync(this.Token, exitCode);
             }
         }
 

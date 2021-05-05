@@ -52,7 +52,7 @@ namespace JSSoft.Communication.Commands
 
         protected override Task OnExecuteAsync(CancellationToken cancellationToken)
         {
-            return this.serviceHost.CloseAsync(this.Shell.Token);
+            return this.serviceHost.CloseAsync(this.Shell.Token, 0);
         }
 
         private Shell Shell => this.shell.Value;

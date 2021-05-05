@@ -31,7 +31,7 @@ namespace JSSoft.Communication
     {
         Task<Guid> OpenAsync();
 
-        Task CloseAsync(Guid token);
+        Task CloseAsync(Guid token, int closeCode);
 
         IContainer<IServiceHost> ServiceHosts { get; }
 
@@ -45,6 +45,6 @@ namespace JSSoft.Communication
 
         event EventHandler Opened;
 
-        event EventHandler Closed;
+        event EventHandler<CloseEventArgs> Closed;
     }
 }

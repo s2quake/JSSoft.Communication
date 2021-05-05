@@ -42,7 +42,7 @@ namespace JSSoft.Communication.ConsoleApp
                 Console.ReadKey();
 
                 await userService.LogoutAsync(userToken);
-                await serviceContext.CloseAsync(token);
+                await serviceContext.CloseAsync(token, 0);
             }
         }
     }

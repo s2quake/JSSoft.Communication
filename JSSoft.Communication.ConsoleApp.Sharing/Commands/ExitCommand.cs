@@ -55,7 +55,7 @@ namespace JSSoft.Communication.Commands
 
         protected override Task OnExecuteAsync(CancellationToken cancellationToken)
         {
-            return this.shell.Value.StopAsync();
+            return this.shell.Value.StopAsync(this.ExitCode);
         }
     }
 }

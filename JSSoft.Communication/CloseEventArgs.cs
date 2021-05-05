@@ -20,12 +20,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System;
+
 namespace JSSoft.Communication
 {
-    public enum DisconnectionReason
+    public class CloseEventArgs : EventArgs
     {
-        None,
+        public CloseEventArgs(int closeCode)
+        {
+            this.CloseCode = closeCode;
+        }
 
-        Aborted,
+        public int CloseCode { get; }
     }
 }
