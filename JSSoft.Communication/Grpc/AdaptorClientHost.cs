@@ -82,17 +82,18 @@ namespace JSSoft.Communication.Grpc
 
         public async Task CloseAsync()
         {
-            await this.serviceContext.RemovePeekAsync(this.adaptorImpl);
             await Task.Run(() =>
             {
                 this.cancellation?.Cancel();
                 this.cancellation = null;
                 this.task?.Wait();
                 this.task = null;
-                this.adaptorImpl = null;
             });
             if (this.adaptorImpl != null)
+                await this.serviceContext.RemovePeekAsync(this.adaptorImpl);
+            if (this.adaptorImpl != null)
                 await this.adaptorImpl.CloseAsync();
+            this.adaptorImpl = null;
             if (this.channel != null)
                 await this.channel.ShutdownAsync();
             this.channel = null;
@@ -140,6 +141,7 @@ namespace JSSoft.Communication.Grpc
             if (exitCode != 0)
             {
                 this.task = null;
+                await this.adaptorImpl.AbortAsync();
                 this.adaptorImpl = null;
                 this.OnDisconnected(new DisconnectionReasonEventArgs(exitCode));
             }

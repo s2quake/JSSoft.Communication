@@ -32,7 +32,7 @@ namespace JSSoft.Communication.Grpc
 {
     class AdaptorClientImpl : Adaptor.AdaptorClient, IPeer
     {
-        private static readonly TimeSpan timeout = new TimeSpan(0, 0, 10);
+        private static readonly TimeSpan timeout = new TimeSpan(0, 0, 15);
         private readonly Dictionary<IServiceHost, object> callbacks = new Dictionary<IServiceHost, object>();
         private Timer timer;
 
@@ -69,7 +69,16 @@ namespace JSSoft.Communication.Grpc
                 this.timer.Dispose();
                 this.timer = null;
             });
-            var value = await base.CloseAsync(new CloseRequest() { Token = this.Token.ToString() });
+            await base.CloseAsync(new CloseRequest() { Token = this.Token.ToString() });
+        }
+
+        public async Task AbortAsync()
+        {
+            await Task.Run(() =>
+            {
+                this.timer.Dispose();
+                this.timer = null;
+            });
         }
 
         public string ID { get; }
@@ -86,7 +95,14 @@ namespace JSSoft.Communication.Grpc
             {
                 Token = this.Token.ToString()
             };
-            await this.PingAsync(request);
+            try
+            {
+                await this.PingAsync(request);
+            }
+            catch
+            {
+
+            }
         }
 
         #region IPeer

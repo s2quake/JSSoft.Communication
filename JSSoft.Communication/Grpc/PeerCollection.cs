@@ -26,90 +26,37 @@ using System;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace JSSoft.Communication.Grpc
 {
     class PeerCollection : ContainerBase<Peer>
     {
-        private static readonly TimeSpan timeout = new TimeSpan(0, 0, 30);
-        private readonly AdaptorServerHost adaptorHost;
-        private Timer timer;
+        private readonly ServerContextBase serviceContext;
 
-        public PeerCollection(AdaptorServerHost adaptorHost)
+        public PeerCollection(ServerContextBase serviceContext)
         {
-            this.adaptorHost = adaptorHost;
-            this.CollectionChanged += PeerCollection_CollectionChanged;
+            this.serviceContext = serviceContext;
         }
 
-        public void Add(Peer item)
+        public async Task AddAsync(Peer item)
         {
-            base.AddBase(item.ID, item);
-            item.Disposed += Item_Disposed;
+            await this.serviceContext.AddPeerAsync(item);
+            await this.Dispatcher.InvokeAsync(() => base.AddBase(item.ID, item));
         }
 
-        public void Remove(string peer)
+        public async Task<Peer> RemoveAsync(string id)
         {
-            var item = base[peer];
-            item.Disposed -= Item_Disposed;
-            base.RemoveBase(peer);
-        }
-
-        public Dispatcher Dispatcher => this.adaptorHost?.Dispatcher;
-
-        private void PeerCollection_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            switch (e.Action)
+            var peer = await this.Dispatcher.InvokeAsync(() =>
             {
-                case NotifyCollectionChangedAction.Add:
-                    {
-                        if (this.timer == null)
-                        {
-                            var milliseconds = (int)timeout.TotalMilliseconds;
-                            this.timer = new Timer(Timer_TimerCallback, null, milliseconds, milliseconds);
-                        }
-                    }
-                    break;
-                case NotifyCollectionChangedAction.Remove:
-                    {
-                        if (this.Any() == false)
-                        {
-                            this.timer.Dispose();
-                            this.timer = null;
-                        }
-                    }
-                    break;
-                case NotifyCollectionChangedAction.Reset:
-                    {
-                        if (this.timer != null)
-                        {
-                            this.timer.Dispose();
-                            this.timer = null;
-                        }
-                    }
-                    break;
-            }
-        }
-
-        private void Item_Disposed(object sender, EventArgs e)
-        {
-            if (sender is Peer item)
-                base.RemoveBase(item.ID);
-        }
-
-        private void Timer_TimerCallback(object state)
-        {
-            this.Dispatcher.InvokeAsync(() =>
-            {
-                var dateTime = DateTime.UtcNow;
-                var query = from item in this
-                            where dateTime - item.PingTime > timeout
-                            select item;
-                var items = query.ToArray();
-                foreach (var item in items)
-                {
-                    item.Abort();
-                }
+                var item = base[id];
+                base.RemoveBase(id);
+                return item;
             });
+            await this.serviceContext.RemovePeekAsync(peer);
+            return peer;
         }
+
+        public Dispatcher Dispatcher => this.serviceContext?.Dispatcher;
     }
 }

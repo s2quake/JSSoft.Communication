@@ -24,9 +24,9 @@ SOFTWARE. -->
   <Import Condition="'$(SolutionDir)' != '' and '$(SolutionDir)' != '$(MSBuildThisFileDirectory)' and $([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../')) != ''" Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.1;net45</TargetFrameworks>
-    <Version>1.0.0</Version>
-    <AssemblyVersion>1.0</AssemblyVersion>
-    <FileVersion>1.0.0</FileVersion>
+    <Version>2.0.0</Version>
+    <AssemblyVersion>2.0</AssemblyVersion>
+    <FileVersion>2.0.0</FileVersion>
 	  <RepositoryType>git</RepositoryType>
 	  <RepositoryUrl>https://github.com/s2quake/JSSoft.Communication</RepositoryUrl>
 	  <LicenseUrl>https://github.com/s2quake/JSSoft.Communication/blob/master/LICENSE.md</LicenseUrl>

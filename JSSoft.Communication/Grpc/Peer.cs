@@ -41,15 +41,12 @@ namespace JSSoft.Communication.Grpc
         public void Dispose()
         {
             this.Callbacks.DisposeAll();
-            this.Disposed?.Invoke(this, EventArgs.Empty);
         }
 
         public void Abort()
         {
             this.cancellation.Cancel();
-            this.Callbacks.DisposeAll();
             LogUtility.Debug($"{this.ID} Aboreted.");
-            this.Disposed?.Invoke(this, EventArgs.Empty);
         }
 
         public void AddInstance(IServiceHost serviceHost, object service, object callback)
@@ -90,7 +87,5 @@ namespace JSSoft.Communication.Grpc
         public Dictionary<string, object> Properties { get; } = new Dictionary<string, object>();
 
         public CancellationToken Cancellation => this.cancellation.Token;
-
-        public event EventHandler Disposed;
     }
 }

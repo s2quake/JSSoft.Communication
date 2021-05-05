@@ -26,6 +26,7 @@ using JSSoft.Library.Linq;
 using JSSoft.Library.ObjectModel;
 using JSSoft.Library.Threading;
 using System;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -36,6 +37,7 @@ namespace JSSoft.Communication.Grpc
 {
     class AdaptorServerHost : IAdaptorHost
     {
+        private static readonly TimeSpan timeout = new TimeSpan(0, 0, 30);
         private static readonly string localAddress = "127.0.0.1";
         private readonly ServerContextBase serviceContext;
         private readonly IContainer<IServiceHost> serviceHosts;
@@ -43,6 +45,7 @@ namespace JSSoft.Communication.Grpc
         private Server server;
         private AdaptorServerImpl adaptor;
         private ISerializer serializer;
+        private Timer timer;
 
         static AdaptorServerHost()
         {
@@ -56,7 +59,8 @@ namespace JSSoft.Communication.Grpc
         {
             this.serviceContext = serviceContext;
             this.serviceHosts = serviceContext.ServiceHosts;
-            this.Peers = new PeerCollection(this);
+            this.Peers = new PeerCollection(serviceContext);
+            this.Peers.CollectionChanged += PeerCollection_CollectionChanged;
         }
 
         internal async Task<OpenReply> Open(OpenRequest request, ServerCallContext context)
@@ -66,26 +70,21 @@ namespace JSSoft.Communication.Grpc
             var serviceHosts = serviceNames.Select(item => this.serviceHosts[item]).ToArray();
             var peerID = context.Peer;
             var peer = new Peer($"{token}", serviceHosts) { Token = token };
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                this.Peers.Add(peer);
-            });
-            await this.serviceContext.AddPeerAsync(peer);
+            await this.Peers.AddAsync(peer);
             LogUtility.Debug($"{context.Peer}({token}) Connected");
             return new OpenReply() { Token = $"{token}" };
         }
 
-        internal async Task<CloseReply> Close(CloseRequest request, ServerCallContext context)
+        public async Task<CloseReply> Close(CloseRequest request, ServerCallContext context)
         {
             var token = request.Token;
-            var peer = await this.Dispatcher.InvokeAsync(() =>this.Peers[token]);
-            await this.serviceContext.RemovePeekAsync(peer);
-            await this.Dispatcher.InvokeAsync(peer.Dispose);
+            var peer = await this.Peers.RemoveAsync(token);
+            peer.Dispose();
             LogUtility.Debug($"{context.Peer}({token}) Disconnected");
             return new CloseReply();
         }
 
-        internal Task<PingReply> Ping(PingRequest request, ServerCallContext context)
+        public Task<PingReply> Ping(PingRequest request, ServerCallContext context)
         {
             var token = request.Token;
             return this.Dispatcher.InvokeAsync(() =>
@@ -99,7 +98,7 @@ namespace JSSoft.Communication.Grpc
             });
         }
 
-        internal async Task<InvokeReply> Invoke(InvokeRequest request, ServerCallContext context)
+        public async Task<InvokeReply> Invoke(InvokeRequest request, ServerCallContext context)
         {
             if (this.serviceHosts.ContainsKey(request.ServiceName) == false)
                 throw new InvalidOperationException();
@@ -122,7 +121,7 @@ namespace JSSoft.Communication.Grpc
             return reply;
         }
 
-        internal async Task Poll(IAsyncStreamReader<PollRequest> requestStream, IServerStreamWriter<PollReply> responseStream, ServerCallContext context)
+        public async Task Poll(IAsyncStreamReader<PollRequest> requestStream, IServerStreamWriter<PollReply> responseStream, ServerCallContext context)
         {
             var cancellationToken = this.cancellation.Token;
             var peerID = context.Peer;
@@ -156,13 +155,11 @@ namespace JSSoft.Communication.Grpc
                 });
                 await responseStream.WriteAsync(reply);
             }
-            await this.Dispatcher.InvokeAsync(() =>
+            if (this.cancellation.IsCancellationRequested == true || peer.Cancellation.IsCancellationRequested == true)
             {
-                if (this.Peers.ContainsKey(peer.ID) == true)
-                {
-                    peer.Dispose();
-                }
-            });
+                await this.Peers.RemoveAsync(peer.ID);
+                peer.Dispose();
+            }
         }
 
         public PeerCollection Peers { get; }
@@ -207,6 +204,56 @@ namespace JSSoft.Communication.Grpc
             return callbacks.Flush();
         }
 
+        private void PeerCollection_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    {
+                        if (this.timer == null)
+                        {
+                            var milliseconds = (int)timeout.TotalMilliseconds;
+                            this.timer = new Timer(Timer_TimerCallback, null, milliseconds, milliseconds);
+                        }
+                    }
+                    break;
+                case NotifyCollectionChangedAction.Remove:
+                    {
+                        if (this.Peers.Any() == false)
+                        {
+                            this.timer.Dispose();
+                            this.timer = null;
+                        }
+                    }
+                    break;
+                case NotifyCollectionChangedAction.Reset:
+                    {
+                        if (this.timer != null)
+                        {
+                            this.timer.Dispose();
+                            this.timer = null;
+                        }
+                    }
+                    break;
+            }
+        }
+
+        private void Timer_TimerCallback(object state)
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                var dateTime = DateTime.UtcNow;
+                var query = from item in this.Peers
+                            where dateTime - item.PingTime > timeout
+                            select item;
+                var items = query.ToArray();
+                foreach (var item in items)
+                {
+                    item.Abort();
+                }
+            });
+        }
+
         #region IAdaptorHost
 
         async Task IAdaptorHost.OpenAsync(string host, int port)
@@ -232,7 +279,7 @@ namespace JSSoft.Communication.Grpc
         async Task IAdaptorHost.CloseAsync()
         {
             this.cancellation.Cancel();
-            while (this.Peers.Any())
+            while (await this.Dispatcher.InvokeAsync(this.Peers.Any))
             {
                 await Task.Delay(1);
             }

@@ -24,7 +24,6 @@ using JSSoft.Communication.Logging;
 using JSSoft.Library.ObjectModel;
 using JSSoft.Library.Threading;
 using System;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -79,7 +78,6 @@ namespace JSSoft.Communication
                     this.adpatorHostProvider = this.componentProvider.GetAdaptorHostProvider(this.AdaptorHostType);
                     this.adaptorHost = this.adpatorHostProvider.Create(this, token);
                     this.Debug($"{this.adpatorHostProvider.Name} Adaptor created.");
-                    // this.adaptorHost.Peers.CollectionChanged += Peers_CollectionChanged;
                     this.adaptorHost.Disconnected += AdaptorHost_Disconnected;
                 });
                 foreach (var item in this.ServiceHosts)
@@ -128,7 +126,6 @@ namespace JSSoft.Communication
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.adaptorHost.Disconnected -= AdaptorHost_Disconnected;
-                    // this.adaptorHost.Peers.CollectionChanged -= Peers_CollectionChanged;
                     this.adaptorHost = null;
                     this.serializer = null;
                     this.Dispatcher.Dispose();
@@ -139,10 +136,10 @@ namespace JSSoft.Communication
                     this.Debug($"Service Context closed.");
                 });
             }
-            catch
+            catch (Exception e)
             {
                 await this.AbortAsync();
-                throw;
+                throw e;
             }
         }
 
@@ -309,10 +306,6 @@ namespace JSSoft.Communication
                     this.callbackByServiceHost.Remove(serviceHost);
                 }
             });
-            if (service == null || callback == null)
-            {
-                int qwer = 0;
-            }
             await this.DestroyInstanceAsync(serviceHost, service, callback);
         }
 
@@ -379,10 +372,6 @@ namespace JSSoft.Communication
                 }
                 else
                 {
-                    var (service, callback) = await this.Dispatcher.InvokeAsync(() =>
-                    {
-                        return (this.serviceByServiceHost[item], this.callbackByServiceHost[item]);
-                    });
                     peer.RemoveInstance(item);
                 }
             }

@@ -8,7 +8,6 @@
             "name": "launch-communication-client",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build client",
             "program": "${workspaceFolder}/Client-MEF/bin/Debug/netcoreapp3.1/client.dll",
             "args": [
                 "--host",
@@ -23,7 +22,6 @@
             "name": "launch-communication-server",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build all",
             "program": "${workspaceFolder}/Server-MEF/bin/Debug/netcoreapp3.1/server.dll",
             "args": [
                 "--verbose"
