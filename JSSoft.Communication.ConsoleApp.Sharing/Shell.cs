@@ -239,7 +239,15 @@ namespace JSSoft.Communication.ConsoleApp
             this.cancellation = new CancellationTokenSource();
             this.serviceHost.Host = this.settings.Host;
             this.serviceHost.Port = this.settings.Port;
-            this.Token = await this.serviceHost.OpenAsync();
+            try
+            {
+                this.Token = await this.serviceHost.OpenAsync();
+            }
+            catch (Exception e)
+            {
+                var text = TerminalStrings.Foreground(e.Message, TerminalColor.BrightRed);
+                Console.Error.WriteLine(text);
+            }
             await base.StartAsync(this.cancellation.Token);
         }
 
