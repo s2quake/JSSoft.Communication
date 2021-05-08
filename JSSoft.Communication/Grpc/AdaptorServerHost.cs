@@ -273,6 +273,7 @@ namespace JSSoft.Communication.Grpc
                 }
                 this.cancellation = new CancellationTokenSource();
                 this.serializer = this.serviceContext.GetService(typeof(ISerializer)) as ISerializer;
+                this.closeCode = 0;
             });
             await Task.Run(this.server.Start);
         }

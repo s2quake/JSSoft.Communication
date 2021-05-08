@@ -62,12 +62,7 @@ namespace JSSoft.Communication.Grpc
                     this.cancellation = new CancellationTokenSource();
                     this.serializer = this.serviceContext.GetService(typeof(ISerializer)) as ISerializer;
                 });
-                this.task = Task.Run(() =>
-                {
-                    var eventSet = new ManualResetEvent(false);
-                    this.PollAsync(this.cancellation.Token, eventSet);
-                    eventSet.WaitOne();
-                });
+                this.task = this.PollAsync(this.cancellation.Token);
             }
             catch
             {
@@ -106,7 +101,7 @@ namespace JSSoft.Communication.Grpc
             this.Disconnected?.Invoke(this, e);
         }
 
-        private async void PollAsync(CancellationToken cancellationToken, ManualResetEvent eventSet)
+        private async Task PollAsync(CancellationToken cancellationToken)
         {
             var closeCode = int.MinValue;
             try
@@ -145,17 +140,16 @@ namespace JSSoft.Communication.Grpc
                 this.adaptorImpl = null;
                 this.OnDisconnected(new CloseEventArgs(closeCode));
             }
-            eventSet.Set();
         }
 
-        private async void InvokeCallback(IServiceHost serviceHost, string name, string[] datas)
+        private void InvokeCallback(IServiceHost serviceHost, string name, string[] datas)
         {
             if (serviceHost.MethodDescriptors.ContainsKey(name) == false)
                 throw new InvalidOperationException();
             var methodDescriptor = serviceHost.MethodDescriptors[name];
             var args = this.serializer.DeserializeMany(methodDescriptor.ParameterTypes, datas);
             var instance = this.adaptorImpl.Callbacks[serviceHost];
-            await methodDescriptor.InvokeAsync(this.serviceContext, instance, args);
+            Task.Run(() => methodDescriptor.InvokeAsync(this.serviceContext, instance, args));
         }
 
         private void InvokeCallback(IEnumerable<PollReplyItem> pollItems)

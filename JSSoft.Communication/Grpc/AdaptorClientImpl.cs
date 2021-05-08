@@ -89,20 +89,23 @@ namespace JSSoft.Communication.Grpc
 
         public IReadOnlyDictionary<IServiceHost, object> Callbacks => this.callbacks;
 
-        private async void Timer_Elapsed(object sender, ElapsedEventArgs e)
+        private void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             var request = new PingRequest()
             {
                 Token = this.Token.ToString()
             };
-            try
+            Task.Run(async () =>
             {
-                await this.PingAsync(request);
-            }
-            catch
-            {
+                try
+                {
+                    await this.PingAsync(request);
+                }
+                catch
+                {
 
-            }
+                }
+            });
         }
 
         #region IPeer

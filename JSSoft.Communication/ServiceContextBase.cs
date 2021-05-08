@@ -274,9 +274,9 @@ namespace JSSoft.Communication
             return this.Dispatcher.InvokeAsync(() => this.Debug(message));
         }
 
-        private async void AdaptorHost_Disconnected(object sender, CloseEventArgs e)
+        private void AdaptorHost_Disconnected(object sender, CloseEventArgs e)
         {
-            await this.CloseAsync(this.token.Guid, e.CloseCode);
+            Task.Run(() => this.CloseAsync(this.token.Guid, e.CloseCode));
         }
 
         private async Task InitializeInstanceAsync(IServiceHost serviceHost)
