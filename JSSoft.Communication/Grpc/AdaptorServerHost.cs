@@ -37,7 +37,7 @@ namespace JSSoft.Communication.Grpc
 {
     class AdaptorServerHost : IAdaptorHost
     {
-        private static readonly TimeSpan timeout = new TimeSpan(0, 0, 30);
+        private static readonly TimeSpan timeout = new(0, 0, 30);
         private static readonly string localAddress = "127.0.0.1";
         private readonly ServerContextBase serviceContext;
         private readonly IContainer<IServiceHost> serviceHosts;

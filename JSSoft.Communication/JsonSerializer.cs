@@ -29,7 +29,7 @@ namespace JSSoft.Communication
 {
     class JsonSerializer : ISerializer
     {
-        private static readonly JsonSerializerSettings settings = new JsonSerializerSettings();
+        private static readonly JsonSerializerSettings settings = new();
         private readonly Dictionary<Type, IDataSerializer> dataSerializerByType;
 
         public JsonSerializer(IDataSerializer[] dataSerializers)

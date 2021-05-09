@@ -38,6 +38,6 @@ namespace JSSoft.Communication
             return new ServiceToken(Guid.NewGuid());
         }
 
-        internal static readonly ServiceToken Empty = new ServiceToken(Guid.Empty);
+        internal static readonly ServiceToken Empty = new(Guid.Empty);
     }
 }

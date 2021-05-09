@@ -27,7 +27,7 @@ namespace JSSoft.Communication.Grpc
 {
     class PollReplyItemCollection : IEnumerable<PollReplyItem>, IReadOnlyList<PollReplyItem>
     {
-        private readonly List<PollReplyItem> itemList = new List<PollReplyItem>();
+        private readonly List<PollReplyItem> itemList = new();
 
         public PollReplyItemCollection()
         {

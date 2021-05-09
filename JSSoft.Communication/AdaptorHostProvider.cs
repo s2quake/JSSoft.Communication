@@ -43,6 +43,6 @@ namespace JSSoft.Communication
 
         public string Name => DefaultName;
 
-        public static readonly AdaptorHostProvider Default = new AdaptorHostProvider();
+        public static readonly AdaptorHostProvider Default = new();
     }
 }

@@ -62,6 +62,6 @@ namespace JSSoft.Communication
 
         public IExceptionDescriptor[] ExceptionDescriptors { get; }
 
-        public static readonly ComponentProvider Default = new ComponentProvider();
+        public static readonly ComponentProvider Default = new();
     }
 }

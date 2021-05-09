@@ -33,6 +33,6 @@ namespace JSSoft.Communication
 
         public string Name => DefaultName;
 
-        public static readonly JsonSerializerProvider Default = new JsonSerializerProvider();
+        public static readonly JsonSerializerProvider Default = new();
     }
 }

@@ -51,6 +51,6 @@ namespace JSSoft.Communication.Logging
             Console.Error.WriteLine(message);
         }
 
-        public static readonly ConsoleLogger Default = new ConsoleLogger();
+        public static readonly ConsoleLogger Default = new();
     }
 }

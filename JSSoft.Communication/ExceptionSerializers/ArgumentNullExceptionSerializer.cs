@@ -27,7 +27,7 @@ namespace JSSoft.Communication.ExceptionSerializers
 {
     class ArgumentNullExceptionSerializer : ExceptionSerializerBase<ArgumentNullException>
     {
-        private readonly Dictionary<string, string> messageByParam = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> messageByParam = new();
 
         public ArgumentNullExceptionSerializer()
             : base(-3)
@@ -41,7 +41,7 @@ namespace JSSoft.Communication.ExceptionSerializers
             typeof(string)
         };
 
-        public static readonly ArgumentNullExceptionSerializer Default = new ArgumentNullExceptionSerializer();
+        public static readonly ArgumentNullExceptionSerializer Default = new();
 
         protected override ArgumentNullException CreateInstance(object[] args)
         {

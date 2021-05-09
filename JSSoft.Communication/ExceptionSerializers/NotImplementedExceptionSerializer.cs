@@ -26,7 +26,7 @@ namespace JSSoft.Communication.ExceptionSerializers
 {
     class NotImplementedExceptionSerializer : ExceptionSerializerBase<NotImplementedException>
     {
-        private static readonly NotImplementedException empty = new NotImplementedException();
+        private static readonly NotImplementedException empty = new();
 
         public NotImplementedExceptionSerializer()
             : base(-4)
@@ -36,7 +36,7 @@ namespace JSSoft.Communication.ExceptionSerializers
 
         public override Type[] PropertyTypes => new Type[] { typeof(string) };
 
-        public static readonly NotImplementedExceptionSerializer Default = new NotImplementedExceptionSerializer();
+        public static readonly NotImplementedExceptionSerializer Default = new();
 
         protected override NotImplementedException CreateInstance(object[] args)
         {

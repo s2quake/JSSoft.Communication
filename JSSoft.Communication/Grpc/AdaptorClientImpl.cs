@@ -32,8 +32,8 @@ namespace JSSoft.Communication.Grpc
 {
     class AdaptorClientImpl : Adaptor.AdaptorClient, IPeer
     {
-        private static readonly TimeSpan timeout = new TimeSpan(0, 0, 15);
-        private readonly Dictionary<IServiceHost, object> callbacks = new Dictionary<IServiceHost, object>();
+        private static readonly TimeSpan timeout = new(0, 0, 15);
+        private readonly Dictionary<IServiceHost, object> callbacks = new();
         private Timer timer;
 
         public AdaptorClientImpl(Channel channel, string id, IServiceHost[] serviceHosts)

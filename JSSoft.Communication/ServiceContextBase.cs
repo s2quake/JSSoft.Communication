@@ -36,8 +36,8 @@ namespace JSSoft.Communication
         public const string DefaultHost = "localhost";
         public const int DefaultPort = 4004;
         private readonly IComponentProvider componentProvider;
-        private readonly InstanceCollection serviceByServiceHost = new InstanceCollection();
-        private readonly InstanceCollection callbackByServiceHost = new InstanceCollection();
+        private readonly InstanceCollection serviceByServiceHost = new();
+        private readonly InstanceCollection callbackByServiceHost = new();
         private readonly ServiceInstanceBuilder instanceBuilder;
         private readonly bool isServer;
         private IAdaptorHostProvider adpatorHostProvider;

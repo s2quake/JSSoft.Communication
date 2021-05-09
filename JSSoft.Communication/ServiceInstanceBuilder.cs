@@ -33,7 +33,7 @@ namespace JSSoft.Communication
     sealed class ServiceInstanceBuilder
     {
         private const string ns = "JSSoft.Communication.Runtime";
-        private readonly Dictionary<string, Type> typeByName = new Dictionary<string, Type>();
+        private readonly Dictionary<string, Type> typeByName = new();
         private readonly AssemblyBuilder assemblyBuilder;
         private readonly ModuleBuilder moduleBuilder;
 

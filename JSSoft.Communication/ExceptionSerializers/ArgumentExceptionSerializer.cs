@@ -27,7 +27,7 @@ namespace JSSoft.Communication.ExceptionSerializers
 {
     class ArgumentExceptionSerializer : ExceptionSerializerBase<ArgumentException>
     {
-        private readonly Dictionary<string, string> messageByParam = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> messageByParam = new();
 
         public ArgumentExceptionSerializer()
             : base(-2)
@@ -41,7 +41,7 @@ namespace JSSoft.Communication.ExceptionSerializers
             typeof(string)
         };
 
-        public static readonly ArgumentExceptionSerializer Default = new ArgumentExceptionSerializer();
+        public static readonly ArgumentExceptionSerializer Default = new();
 
         protected override ArgumentException CreateInstance(object[] args)
         {

@@ -26,7 +26,7 @@ namespace JSSoft.Communication.ExceptionSerializers
 {
     class ExceptionSerializer : ExceptionSerializerBase<Exception>
     {
-        private static readonly Exception empty = new Exception();
+        private static readonly Exception empty = new();
 
         public ExceptionSerializer()
             : base(-1)
@@ -36,7 +36,7 @@ namespace JSSoft.Communication.ExceptionSerializers
 
         public override Type[] PropertyTypes => new Type[] { typeof(string) };
 
-        public static readonly ExceptionSerializer Default = new ExceptionSerializer();
+        public static readonly ExceptionSerializer Default = new();
 
         protected override Exception CreateInstance(object[] args)
         {

@@ -49,6 +49,6 @@ namespace JSSoft.Communication.Logging
 
         }
 
-        public static readonly EmptyLogger Default = new EmptyLogger();
+        public static readonly EmptyLogger Default = new();
     }
 }

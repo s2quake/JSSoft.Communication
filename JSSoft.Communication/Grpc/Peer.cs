@@ -29,7 +29,7 @@ namespace JSSoft.Communication.Grpc
 {
     sealed class Peer : IPeer
     {
-        private readonly CancellationTokenSource cancellation = new CancellationTokenSource();
+        private readonly CancellationTokenSource cancellation = new();
 
         public Peer(string id, IServiceHost[] serviceHosts)
         {
