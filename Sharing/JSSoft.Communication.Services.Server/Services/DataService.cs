@@ -32,7 +32,7 @@ namespace JSSoft.Communication.Services
     [Export(typeof(DataService))]
     class DataService : IDataService
     {
-        private readonly HashSet<string> dataBases = new HashSet<string>();
+        private readonly HashSet<string> dataBases = new();
 
         public DataService()
         {

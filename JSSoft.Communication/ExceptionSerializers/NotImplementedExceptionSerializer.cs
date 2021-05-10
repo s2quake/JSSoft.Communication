@@ -40,7 +40,7 @@ namespace JSSoft.Communication.ExceptionSerializers
 
         protected override NotImplementedException CreateInstance(object[] args)
         {
-            if (!(args[0] is string message))
+            if (args[0] is not string message)
                 return new NotImplementedException();
             return new NotImplementedException(message);
         }

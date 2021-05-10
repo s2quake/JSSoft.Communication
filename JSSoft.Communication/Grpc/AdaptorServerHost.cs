@@ -179,7 +179,7 @@ namespace JSSoft.Communication.Grpc
             var datas = this.serializer.SerializeMany(types, args);
             return this.Dispatcher.InvokeAsync(() =>
             {
-                var peers = !(instance.Peer is Peer peer) ? this.Peers : EnumerableUtility.One(peer);
+                var peers = instance.Peer is not Peer peer ? this.Peers : EnumerableUtility.One(peer);
                 var service = instance.ServiceHost;
                 foreach (var item in peers)
                 {

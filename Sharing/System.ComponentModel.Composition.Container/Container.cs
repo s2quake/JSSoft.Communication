@@ -36,10 +36,10 @@ namespace System.ComponentModel.Composition
 {
     static class Container
     {
-        private static readonly List<ICommand> commandList = new List<ICommand>();
+        private static readonly List<ICommand> commandList = new();
         private static readonly Shell shell;
         private static readonly CommandContext commandContext;
-        private static readonly List<object> instanceList = new List<object>();
+        private static readonly List<object> instanceList = new();
 #if SERVER
         private static readonly ServerContext serviceContext;
 #else

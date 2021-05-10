@@ -22,7 +22,6 @@
 
 using JSSoft.Library.Commands;
 using System;
-using System.ComponentModel;
 
 namespace JSSoft.Communication.ConsoleApp
 {

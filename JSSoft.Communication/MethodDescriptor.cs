@@ -50,7 +50,7 @@ namespace JSSoft.Communication
 
         public async Task<(int, Type, object)> InvokeAsync(IServiceProvider serviceProvider, object instance, object[] args)
         {
-            if (!(serviceProvider.GetService(typeof(IComponentProvider)) is IComponentProvider componentProvider))
+            if (serviceProvider.GetService(typeof(IComponentProvider)) is not IComponentProvider componentProvider)
             {
                 throw new InvalidOperationException("can not get interface of IComponentProvider at serviceProvider");
             }

@@ -23,9 +23,9 @@
 using JSSoft.Communication.ConsoleApp;
 using JSSoft.Library.Commands;
 using System;
-using System.Threading.Tasks;
-using System.Threading;
 using System.ComponentModel.Composition;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace JSSoft.Communication.Commands
 {

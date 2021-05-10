@@ -40,7 +40,7 @@ namespace JSSoft.Communication.ExceptionSerializers
 
         protected override Exception CreateInstance(object[] args)
         {
-            if (!(args[0] is string message))
+            if (args[0] is not string message)
                 return new Exception();
             return new Exception(message);
         }

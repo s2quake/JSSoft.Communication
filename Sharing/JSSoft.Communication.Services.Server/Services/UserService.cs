@@ -34,8 +34,8 @@ namespace JSSoft.Communication.Services
     [Export(typeof(UserService))]
     class UserService : IUserService, INotifyUserService
     {
-        private readonly Dictionary<string, UserInfo> userByID = new Dictionary<string, UserInfo>();
-        private readonly Dictionary<Guid, UserInfo> userByToken = new Dictionary<Guid, UserInfo>();
+        private readonly Dictionary<string, UserInfo> userByID = new();
+        private readonly Dictionary<Guid, UserInfo> userByToken = new();
 
         private IUserServiceCallback callback;
 

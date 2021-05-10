@@ -163,7 +163,7 @@ namespace JSSoft.Communication.Grpc
 
         private void ThrowException(int code, string data)
         {
-            if (!(this.serviceContext.GetService(typeof(IComponentProvider)) is IComponentProvider componentProvider))
+            if (this.serviceContext.GetService(typeof(IComponentProvider)) is not IComponentProvider componentProvider)
             {
                 throw new InvalidOperationException("can not get interface of IComponentProvider at serviceProvider");
             }

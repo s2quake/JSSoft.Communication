@@ -21,13 +21,12 @@
 // SOFTWARE.
 
 using JSSoft.Communication.ConsoleApp;
-using System;
-using System.ComponentModel;
-using System.Threading.Tasks;
-using JSSoft.Library.Commands;
 using JSSoft.Communication.Services;
-using System.Threading;
+using JSSoft.Library.Commands;
+using System;
 using System.ComponentModel.Composition;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace JSSoft.Communication.Commands
 {
