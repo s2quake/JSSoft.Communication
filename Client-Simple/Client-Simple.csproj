@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\JSSoft.Communication\JSSoft.Communication.csproj" />
   </ItemGroup>
-  <Import Project="..\JSSoft.Communication.Services.Sharing\JSSoft.Communication.Services.Sharing.projitems" Label="Shared" />
-  <Import Project="..\JSSoft.Communication.Services.Client.Sharing\JSSoft.Communication.Services.Client.Sharing.projitems" Label="Shared" />
+  <Import Project="..\Sharing\JSSoft.Communication.Services.Client\JSSoft.Communication.Services.Client.projitems" Label="Shared" />
+  <Import Project="..\Sharing\JSSoft.Communication.Services\JSSoft.Communication.Services.projitems" Label="Shared" />
+  <Import Project="..\Sharing\System.ComponentModel.Composition\System.ComponentModel.Composition.projitems" Label="Shared" />
 </Project>

@@ -12,7 +12,9 @@
     <ProjectReference Include="..\..\JSSoft.Library\JSSoft.Library.Random\JSSoft.Library.Random.csproj" />
     <ProjectReference Include="..\..\JSSoft.Library.Commands\JSSoft.Library.Commands\JSSoft.Library.Commands.csproj" />
   </ItemGroup>
-  <Import Project="..\JSSoft.Communication.Services.Sharing\JSSoft.Communication.Services.Sharing.projitems" Label="Shared" />
-  <Import Project="..\JSSoft.Communication.ConsoleApp.Sharing\JSSoft.Communication.ConsoleApp.Sharing.projitems" Label="Shared" />
-  <Import Project="..\JSSoft.Communication.Services.Server.Sharing\JSSoft.Communication.Services.Server.Sharing.projitems" Label="Shared" />
+  <Import Project="..\Sharing\JSSoft.Communication.Services.Server\JSSoft.Communication.Services.Server.projitems" Label="Shared" />
+  <Import Project="..\Sharing\JSSoft.Communication.Services\JSSoft.Communication.Services.projitems" Label="Shared" />
+  <Import Project="..\Sharing\JSSoft.Communication.ConsoleApp\JSSoft.Communication.ConsoleApp.projitems" Label="Shared" />
+  <Import Project="..\Sharing\System.ComponentModel.Composition\System.ComponentModel.Composition.projitems" Label="Shared" />
+  <Import Project="..\Sharing\System.ComponentModel.Composition.Container\System.ComponentModel.Composition.Container.projitems" Label="Shared" />
 </Project>
