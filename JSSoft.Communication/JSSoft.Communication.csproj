@@ -5,6 +5,7 @@
     <PublishName>communication\lib</PublishName>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)'=='net45'">
+    <Reference Include="System.Runtime" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>
