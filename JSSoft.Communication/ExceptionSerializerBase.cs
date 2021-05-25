@@ -26,14 +26,14 @@ namespace JSSoft.Communication
 {
     public abstract class ExceptionSerializerBase<T> : IExceptionDescriptor, IDataSerializer
     {
-        protected ExceptionSerializerBase(int exceptionCode)
+        protected ExceptionSerializerBase(Guid id)
         {
-            this.ExceptionCode = exceptionCode;
+            this.ID = id;
         }
 
         public Type ExceptionType => typeof(T);
 
-        public int ExceptionCode { get; }
+        public Guid ID { get; }
 
         public abstract Type[] PropertyTypes { get; }
 

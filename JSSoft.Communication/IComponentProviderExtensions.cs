@@ -46,9 +46,9 @@ namespace JSSoft.Communication
             return exceptionSerializer ?? ExceptionSerializer.Default;
         }
 
-        public static IExceptionDescriptor GetExceptionDescriptor(this IComponentProvider componentProvider, int exceptionCode)
+        public static IExceptionDescriptor GetExceptionDescriptor(this IComponentProvider componentProvider, Guid exceptionID)
         {
-            var exceptionSerializer = componentProvider.ExceptionDescriptors.FirstOrDefault(item => item.ExceptionCode == exceptionCode);
+            var exceptionSerializer = componentProvider.ExceptionDescriptors.FirstOrDefault(item => item.ID == exceptionID);
             return exceptionSerializer ?? ExceptionSerializer.Default;
         }
     }

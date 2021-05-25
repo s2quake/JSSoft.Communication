@@ -30,7 +30,7 @@ namespace JSSoft.Communication.ExceptionSerializers
         private readonly Dictionary<string, string> messageByParam = new();
 
         public ArgumentExceptionSerializer()
-            : base(-2)
+            : base(new Guid("7b1402a9-9b4a-4da6-a854-14501baf91ef"))
         {
 
         }
@@ -57,7 +57,7 @@ namespace JSSoft.Communication.ExceptionSerializers
         protected override object[] SelectProperties(ArgumentException e)
         {
             var paramName = e.ParamName;
-            if (this.messageByParam.ContainsKey(paramName) == false)
+            if (paramName != null && this.messageByParam.ContainsKey(paramName) == false)
             {
                 var exception = new ArgumentException(paramName);
                 this.messageByParam.Add(paramName, exception.Message);

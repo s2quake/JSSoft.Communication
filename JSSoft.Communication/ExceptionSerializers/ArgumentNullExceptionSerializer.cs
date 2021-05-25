@@ -30,7 +30,7 @@ namespace JSSoft.Communication.ExceptionSerializers
         private readonly Dictionary<string, string> messageByParam = new();
 
         public ArgumentNullExceptionSerializer()
-            : base(-3)
+            : base(new Guid("429dfc10-5ee5-4fb0-93da-9e06a85ff3cc"))
         {
 
         }

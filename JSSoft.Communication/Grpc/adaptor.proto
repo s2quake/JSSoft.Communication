@@ -49,7 +49,7 @@ message InvokeRequest {
 }
 
 message InvokeReply {
-    int32 code = 1;
+    string ID = 1;
     string data = 3;
 }
 

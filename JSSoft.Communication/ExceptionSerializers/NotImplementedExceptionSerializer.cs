@@ -29,7 +29,7 @@ namespace JSSoft.Communication.ExceptionSerializers
         private static readonly NotImplementedException empty = new();
 
         public NotImplementedExceptionSerializer()
-            : base(-4)
+            : base(new Guid("3239526a-5a59-4015-b08a-b4a00e885db8"))
         {
 
         }

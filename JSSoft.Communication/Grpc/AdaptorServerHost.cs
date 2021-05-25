@@ -112,10 +112,10 @@ namespace JSSoft.Communication.Grpc
             var peer = this.Peers[token];
             var instance = peer.Services[service];
             var args = this.serializer.DeserializeMany(methodDescriptor.ParameterTypes, request.Datas.ToArray());
-            var (code, valueType, value) = await methodDescriptor.InvokeAsync(this.serviceContext, instance, args);
+            var (id, valueType, value) = await methodDescriptor.InvokeAsync(this.serviceContext, instance, args);
             var reply = new InvokeReply()
             {
-                Code = code,
+                ID = $"{id}",
                 Data = this.serializer.Serialize(valueType, value)
             };
             LogUtility.Debug($"{context.Peer} Invoke: {request.ServiceName}.{methodDescriptor.ShortName}");

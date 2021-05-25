@@ -161,13 +161,13 @@ namespace JSSoft.Communication.Grpc
             }
         }
 
-        private void ThrowException(int code, string data)
+        private void ThrowException(Guid id, string data)
         {
             if (this.serviceContext.GetService(typeof(IComponentProvider)) is not IComponentProvider componentProvider)
             {
                 throw new InvalidOperationException("can not get interface of IComponentProvider at serviceProvider");
             }
-            var exceptionDescriptor = componentProvider.GetExceptionDescriptor(code);
+            var exceptionDescriptor = componentProvider.GetExceptionDescriptor(id);
             var exception = (Exception)this.serializer.Deserialize(exceptionDescriptor.ExceptionType, data);
             throw exception;
         }
@@ -186,9 +186,10 @@ namespace JSSoft.Communication.Grpc
             };
             request.Datas.AddRange(datas);
             var reply = this.adaptorImpl.Invoke(request);
-            if (reply.Code != 0)
+            var id = Guid.Parse(reply.ID);
+            if (id != Guid.Empty)
             {
-                this.ThrowException(reply.Code, reply.Data);
+                this.ThrowException(id, reply.Data);
             }
         }
 
@@ -204,9 +205,10 @@ namespace JSSoft.Communication.Grpc
             };
             request.Datas.AddRange(datas);
             var reply = this.adaptorImpl.Invoke(request);
-            if (reply.Code != 0)
+            var id = Guid.Parse(reply.ID);
+            if (id != Guid.Empty)
             {
-                this.ThrowException(reply.Code, reply.Data);
+                this.ThrowException(id, reply.Data);
             }
             return (T)this.serializer.Deserialize(typeof(T), reply.Data);
         }
@@ -223,9 +225,10 @@ namespace JSSoft.Communication.Grpc
             };
             request.Datas.AddRange(datas);
             var reply = await this.adaptorImpl.InvokeAsync(request);
-            if (reply.Code != 0)
+            var id = Guid.Parse(reply.ID);
+            if (id != Guid.Empty)
             {
-                this.ThrowException(reply.Code, reply.Data);
+                this.ThrowException(id, reply.Data);
             }
         }
 
@@ -241,9 +244,10 @@ namespace JSSoft.Communication.Grpc
             };
             request.Datas.AddRange(datas);
             var reply = await this.adaptorImpl.InvokeAsync(request);
-            if (reply.Code != 0)
+            var id = Guid.Parse(reply.ID);
+            if (id != Guid.Empty)
             {
-                this.ThrowException(reply.Code, reply.Data);
+                this.ThrowException(id, reply.Data);
             }
             return (T)this.serializer.Deserialize(typeof(T), reply.Data);
         }

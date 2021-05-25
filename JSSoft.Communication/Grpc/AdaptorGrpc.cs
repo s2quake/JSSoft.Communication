@@ -8,7 +8,7 @@
 using grpc = global::Grpc.Core;
 
 namespace JSSoft.Communication.Grpc {
-  internal static partial class Adaptor
+  public static partial class Adaptor
   {
     static readonly string __ServiceName = "JSSoft.communication.grpc.Adaptor";
 

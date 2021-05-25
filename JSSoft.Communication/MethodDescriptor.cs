@@ -48,7 +48,7 @@ namespace JSSoft.Communication
             this.ShortName = methodInfo.Name;
         }
 
-        public async Task<(int, Type, object)> InvokeAsync(IServiceProvider serviceProvider, object instance, object[] args)
+        public async Task<(Guid, Type, object)> InvokeAsync(IServiceProvider serviceProvider, object instance, object[] args)
         {
             if (serviceProvider.GetService(typeof(IComponentProvider)) is not IComponentProvider componentProvider)
             {
@@ -57,18 +57,18 @@ namespace JSSoft.Communication
             try
             {
                 var (type, value) = await this.InvokeAsync(instance, args);
-                return (0, type, value);
+                return (Guid.Empty, type, value);
             }
             catch (TargetInvocationException e)
             {
                 var exception = e.InnerException ?? e;
                 var exceptionSerializer = componentProvider.GetExceptionDescriptor(exception);
-                return (exceptionSerializer.ExceptionCode, exception.GetType(), exception);
+                return (exceptionSerializer.ID, exception.GetType(), exception);
             }
             catch (Exception e)
             {
                 var exceptionSerializer = componentProvider.GetExceptionDescriptor(e);
-                return (exceptionSerializer.ExceptionCode, e.GetType(), e);
+                return (exceptionSerializer.ID, e.GetType(), e);
             }
         }
 

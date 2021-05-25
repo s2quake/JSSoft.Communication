@@ -28,6 +28,6 @@ namespace JSSoft.Communication
     {
         Type ExceptionType { get; }
 
-        int ExceptionCode { get; }
+        Guid ID { get; }
     }
 }

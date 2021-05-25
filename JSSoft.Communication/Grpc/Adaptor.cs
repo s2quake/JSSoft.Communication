@@ -12,7 +12,7 @@ using scg = global::System.Collections.Generic;
 namespace JSSoft.Communication.Grpc {
 
   /// <summary>Holder for reflection information generated from Grpc/adaptor.proto</summary>
-  internal static partial class AdaptorReflection {
+  public static partial class AdaptorReflection {
 
     #region Descriptor
     /// <summary>File descriptor for Grpc/adaptor.proto</summary>
@@ -31,44 +31,44 @@ namespace JSSoft.Communication.Grpc {
             "ASABKAMiKgoLUGluZ1JlcXVlc3QSDQoFdG9rZW4YASABKAkSDAoEdGltZRgC",
             "IAEoAyIoCglQaW5nUmVwbHkSDAoEdGltZRgBIAEoAxINCgV0b2tlbhgCIAEo",
             "CSJQCg1JbnZva2VSZXF1ZXN0Eg0KBXRva2VuGAEgASgJEhMKC3NlcnZpY2VO",
-            "YW1lGAIgASgJEgwKBG5hbWUYAyABKAkSDQoFZGF0YXMYBCADKAkiKQoLSW52",
-            "b2tlUmVwbHkSDAoEY29kZRgBIAEoBRIMCgRkYXRhGAMgASgJIhwKC1BvbGxS",
-            "ZXF1ZXN0Eg0KBXRva2VuGAEgASgJIkEKDVBvbGxSZXBseUl0ZW0SEwoLc2Vy",
-            "dmljZU5hbWUYAiABKAkSDAoEbmFtZRgDIAEoCRINCgVkYXRhcxgEIAMoCSJS",
-            "CglQb2xsUmVwbHkSDAoEY29kZRgBIAEoBRI3CgVpdGVtcxgCIAMoCzIoLkpT",
-            "U29mdC5jb21tdW5pY2F0aW9uLmdycGMuUG9sbFJlcGx5SXRlbTLEAwoHQWRh",
-            "cHRvchJUCgRPcGVuEiYuSlNTb2Z0LmNvbW11bmljYXRpb24uZ3JwYy5PcGVu",
-            "UmVxdWVzdBokLkpTU29mdC5jb21tdW5pY2F0aW9uLmdycGMuT3BlblJlcGx5",
-            "ElcKBUNsb3NlEicuSlNTb2Z0LmNvbW11bmljYXRpb24uZ3JwYy5DbG9zZVJl",
-            "cXVlc3QaJS5KU1NvZnQuY29tbXVuaWNhdGlvbi5ncnBjLkNsb3NlUmVwbHkS",
-            "VAoEUGluZxImLkpTU29mdC5jb21tdW5pY2F0aW9uLmdycGMuUGluZ1JlcXVl",
-            "c3QaJC5KU1NvZnQuY29tbXVuaWNhdGlvbi5ncnBjLlBpbmdSZXBseRJaCgZJ",
-            "bnZva2USKC5KU1NvZnQuY29tbXVuaWNhdGlvbi5ncnBjLkludm9rZVJlcXVl",
-            "c3QaJi5KU1NvZnQuY29tbXVuaWNhdGlvbi5ncnBjLkludm9rZVJlcGx5ElgK",
-            "BFBvbGwSJi5KU1NvZnQuY29tbXVuaWNhdGlvbi5ncnBjLlBvbGxSZXF1ZXN0",
-            "GiQuSlNTb2Z0LmNvbW11bmljYXRpb24uZ3JwYy5Qb2xsUmVwbHkoATABYgZw",
-            "cm90bzM="));
+            "YW1lGAIgASgJEgwKBG5hbWUYAyABKAkSDQoFZGF0YXMYBCADKAkiJwoLSW52",
+            "b2tlUmVwbHkSCgoCSUQYASABKAkSDAoEZGF0YRgDIAEoCSIcCgtQb2xsUmVx",
+            "dWVzdBINCgV0b2tlbhgBIAEoCSJBCg1Qb2xsUmVwbHlJdGVtEhMKC3NlcnZp",
+            "Y2VOYW1lGAIgASgJEgwKBG5hbWUYAyABKAkSDQoFZGF0YXMYBCADKAkiUgoJ",
+            "UG9sbFJlcGx5EgwKBGNvZGUYASABKAUSNwoFaXRlbXMYAiADKAsyKC5KU1Nv",
+            "ZnQuY29tbXVuaWNhdGlvbi5ncnBjLlBvbGxSZXBseUl0ZW0yxAMKB0FkYXB0",
+            "b3ISVAoET3BlbhImLkpTU29mdC5jb21tdW5pY2F0aW9uLmdycGMuT3BlblJl",
+            "cXVlc3QaJC5KU1NvZnQuY29tbXVuaWNhdGlvbi5ncnBjLk9wZW5SZXBseRJX",
+            "CgVDbG9zZRInLkpTU29mdC5jb21tdW5pY2F0aW9uLmdycGMuQ2xvc2VSZXF1",
+            "ZXN0GiUuSlNTb2Z0LmNvbW11bmljYXRpb24uZ3JwYy5DbG9zZVJlcGx5ElQK",
+            "BFBpbmcSJi5KU1NvZnQuY29tbXVuaWNhdGlvbi5ncnBjLlBpbmdSZXF1ZXN0",
+            "GiQuSlNTb2Z0LmNvbW11bmljYXRpb24uZ3JwYy5QaW5nUmVwbHkSWgoGSW52",
+            "b2tlEiguSlNTb2Z0LmNvbW11bmljYXRpb24uZ3JwYy5JbnZva2VSZXF1ZXN0",
+            "GiYuSlNTb2Z0LmNvbW11bmljYXRpb24uZ3JwYy5JbnZva2VSZXBseRJYCgRQ",
+            "b2xsEiYuSlNTb2Z0LmNvbW11bmljYXRpb24uZ3JwYy5Qb2xsUmVxdWVzdBok",
+            "LkpTU29mdC5jb21tdW5pY2F0aW9uLmdycGMuUG9sbFJlcGx5KAEwAWIGcHJv",
+            "dG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
-          new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::JSSoft.Communication.Grpc.OpenRequest), global::JSSoft.Communication.Grpc.OpenRequest.Parser, new[]{ "ServiceNames", "Time" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::JSSoft.Communication.Grpc.OpenReply), global::JSSoft.Communication.Grpc.OpenReply.Parser, new[]{ "Token" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::JSSoft.Communication.Grpc.CloseRequest), global::JSSoft.Communication.Grpc.CloseRequest.Parser, new[]{ "Token" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::JSSoft.Communication.Grpc.CloseReply), global::JSSoft.Communication.Grpc.CloseReply.Parser, new[]{ "Time" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::JSSoft.Communication.Grpc.PingRequest), global::JSSoft.Communication.Grpc.PingRequest.Parser, new[]{ "Token", "Time" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::JSSoft.Communication.Grpc.PingReply), global::JSSoft.Communication.Grpc.PingReply.Parser, new[]{ "Time", "Token" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::JSSoft.Communication.Grpc.InvokeRequest), global::JSSoft.Communication.Grpc.InvokeRequest.Parser, new[]{ "Token", "ServiceName", "Name", "Datas" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::JSSoft.Communication.Grpc.InvokeReply), global::JSSoft.Communication.Grpc.InvokeReply.Parser, new[]{ "Code", "Data" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::JSSoft.Communication.Grpc.PollRequest), global::JSSoft.Communication.Grpc.PollRequest.Parser, new[]{ "Token" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::JSSoft.Communication.Grpc.PollReplyItem), global::JSSoft.Communication.Grpc.PollReplyItem.Parser, new[]{ "ServiceName", "Name", "Datas" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::JSSoft.Communication.Grpc.PollReply), global::JSSoft.Communication.Grpc.PollReply.Parser, new[]{ "Code", "Items" }, null, null, null)
+          new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
+            new pbr::GeneratedClrTypeInfo(typeof(global::JSSoft.Communication.Grpc.OpenRequest), global::JSSoft.Communication.Grpc.OpenRequest.Parser, new[]{ "ServiceNames", "Time" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::JSSoft.Communication.Grpc.OpenReply), global::JSSoft.Communication.Grpc.OpenReply.Parser, new[]{ "Token" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::JSSoft.Communication.Grpc.CloseRequest), global::JSSoft.Communication.Grpc.CloseRequest.Parser, new[]{ "Token" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::JSSoft.Communication.Grpc.CloseReply), global::JSSoft.Communication.Grpc.CloseReply.Parser, new[]{ "Time" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::JSSoft.Communication.Grpc.PingRequest), global::JSSoft.Communication.Grpc.PingRequest.Parser, new[]{ "Token", "Time" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::JSSoft.Communication.Grpc.PingReply), global::JSSoft.Communication.Grpc.PingReply.Parser, new[]{ "Time", "Token" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::JSSoft.Communication.Grpc.InvokeRequest), global::JSSoft.Communication.Grpc.InvokeRequest.Parser, new[]{ "Token", "ServiceName", "Name", "Datas" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::JSSoft.Communication.Grpc.InvokeReply), global::JSSoft.Communication.Grpc.InvokeReply.Parser, new[]{ "ID", "Data" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::JSSoft.Communication.Grpc.PollRequest), global::JSSoft.Communication.Grpc.PollRequest.Parser, new[]{ "Token" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::JSSoft.Communication.Grpc.PollReplyItem), global::JSSoft.Communication.Grpc.PollReplyItem.Parser, new[]{ "ServiceName", "Name", "Datas" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::JSSoft.Communication.Grpc.PollReply), global::JSSoft.Communication.Grpc.PollReply.Parser, new[]{ "Code", "Items" }, null, null, null, null)
           }));
     }
     #endregion
 
   }
   #region Messages
-  internal sealed partial class OpenRequest : pb::IMessage<OpenRequest> {
+  public sealed partial class OpenRequest : pb::IMessage<OpenRequest> {
     private static readonly pb::MessageParser<OpenRequest> _parser = new pb::MessageParser<OpenRequest>(() => new OpenRequest());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -217,7 +217,7 @@ namespace JSSoft.Communication.Grpc {
 
   }
 
-  internal sealed partial class OpenReply : pb::IMessage<OpenReply> {
+  public sealed partial class OpenReply : pb::IMessage<OpenReply> {
     private static readonly pb::MessageParser<OpenReply> _parser = new pb::MessageParser<OpenReply>(() => new OpenReply());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -346,7 +346,7 @@ namespace JSSoft.Communication.Grpc {
 
   }
 
-  internal sealed partial class CloseRequest : pb::IMessage<CloseRequest> {
+  public sealed partial class CloseRequest : pb::IMessage<CloseRequest> {
     private static readonly pb::MessageParser<CloseRequest> _parser = new pb::MessageParser<CloseRequest>(() => new CloseRequest());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -475,7 +475,7 @@ namespace JSSoft.Communication.Grpc {
 
   }
 
-  internal sealed partial class CloseReply : pb::IMessage<CloseReply> {
+  public sealed partial class CloseReply : pb::IMessage<CloseReply> {
     private static readonly pb::MessageParser<CloseReply> _parser = new pb::MessageParser<CloseReply>(() => new CloseReply());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -604,7 +604,7 @@ namespace JSSoft.Communication.Grpc {
 
   }
 
-  internal sealed partial class PingRequest : pb::IMessage<PingRequest> {
+  public sealed partial class PingRequest : pb::IMessage<PingRequest> {
     private static readonly pb::MessageParser<PingRequest> _parser = new pb::MessageParser<PingRequest>(() => new PingRequest());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -761,7 +761,7 @@ namespace JSSoft.Communication.Grpc {
 
   }
 
-  internal sealed partial class PingReply : pb::IMessage<PingReply> {
+  public sealed partial class PingReply : pb::IMessage<PingReply> {
     private static readonly pb::MessageParser<PingReply> _parser = new pb::MessageParser<PingReply>(() => new PingReply());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -918,7 +918,7 @@ namespace JSSoft.Communication.Grpc {
 
   }
 
-  internal sealed partial class InvokeRequest : pb::IMessage<InvokeRequest> {
+  public sealed partial class InvokeRequest : pb::IMessage<InvokeRequest> {
     private static readonly pb::MessageParser<InvokeRequest> _parser = new pb::MessageParser<InvokeRequest>(() => new InvokeRequest());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1123,7 +1123,7 @@ namespace JSSoft.Communication.Grpc {
 
   }
 
-  internal sealed partial class InvokeReply : pb::IMessage<InvokeReply> {
+  public sealed partial class InvokeReply : pb::IMessage<InvokeReply> {
     private static readonly pb::MessageParser<InvokeReply> _parser = new pb::MessageParser<InvokeReply>(() => new InvokeReply());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1148,7 +1148,7 @@ namespace JSSoft.Communication.Grpc {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public InvokeReply(InvokeReply other) : this() {
-      code_ = other.code_;
+      iD_ = other.iD_;
       data_ = other.data_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
@@ -1158,14 +1158,14 @@ namespace JSSoft.Communication.Grpc {
       return new InvokeReply(this);
     }
 
-    /// <summary>Field number for the "code" field.</summary>
-    public const int CodeFieldNumber = 1;
-    private int code_;
+    /// <summary>Field number for the "ID" field.</summary>
+    public const int IDFieldNumber = 1;
+    private string iD_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public int Code {
-      get { return code_; }
+    public string ID {
+      get { return iD_; }
       set {
-        code_ = value;
+        iD_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
       }
     }
 
@@ -1193,7 +1193,7 @@ namespace JSSoft.Communication.Grpc {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (Code != other.Code) return false;
+      if (ID != other.ID) return false;
       if (Data != other.Data) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
@@ -1201,7 +1201,7 @@ namespace JSSoft.Communication.Grpc {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override int GetHashCode() {
       int hash = 1;
-      if (Code != 0) hash ^= Code.GetHashCode();
+      if (ID.Length != 0) hash ^= ID.GetHashCode();
       if (Data.Length != 0) hash ^= Data.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
@@ -1216,9 +1216,9 @@ namespace JSSoft.Communication.Grpc {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
-      if (Code != 0) {
-        output.WriteRawTag(8);
-        output.WriteInt32(Code);
+      if (ID.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(ID);
       }
       if (Data.Length != 0) {
         output.WriteRawTag(26);
@@ -1232,8 +1232,8 @@ namespace JSSoft.Communication.Grpc {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
       int size = 0;
-      if (Code != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Code);
+      if (ID.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(ID);
       }
       if (Data.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Data);
@@ -1249,8 +1249,8 @@ namespace JSSoft.Communication.Grpc {
       if (other == null) {
         return;
       }
-      if (other.Code != 0) {
-        Code = other.Code;
+      if (other.ID.Length != 0) {
+        ID = other.ID;
       }
       if (other.Data.Length != 0) {
         Data = other.Data;
@@ -1266,8 +1266,8 @@ namespace JSSoft.Communication.Grpc {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
-          case 8: {
-            Code = input.ReadInt32();
+          case 10: {
+            ID = input.ReadString();
             break;
           }
           case 26: {
@@ -1280,7 +1280,7 @@ namespace JSSoft.Communication.Grpc {
 
   }
 
-  internal sealed partial class PollRequest : pb::IMessage<PollRequest> {
+  public sealed partial class PollRequest : pb::IMessage<PollRequest> {
     private static readonly pb::MessageParser<PollRequest> _parser = new pb::MessageParser<PollRequest>(() => new PollRequest());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1409,7 +1409,7 @@ namespace JSSoft.Communication.Grpc {
 
   }
 
-  internal sealed partial class PollReplyItem : pb::IMessage<PollReplyItem> {
+  public sealed partial class PollReplyItem : pb::IMessage<PollReplyItem> {
     private static readonly pb::MessageParser<PollReplyItem> _parser = new pb::MessageParser<PollReplyItem>(() => new PollReplyItem());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1586,7 +1586,7 @@ namespace JSSoft.Communication.Grpc {
 
   }
 
-  internal sealed partial class PollReply : pb::IMessage<PollReply> {
+  public sealed partial class PollReply : pb::IMessage<PollReply> {
     private static readonly pb::MessageParser<PollReply> _parser = new pb::MessageParser<PollReply>(() => new PollReply());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
