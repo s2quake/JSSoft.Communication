@@ -42,6 +42,7 @@ namespace JSSoft.Communication
                 ArgumentNullExceptionSerializer.Default,
                 ExceptionSerializer.Default,
                 NotImplementedExceptionSerializer.Default,
+                SystemExceptionSerializer.Default,
             };
             this.ExceptionDescriptors = new IExceptionDescriptor[]
             {
@@ -49,6 +50,7 @@ namespace JSSoft.Communication
                 ArgumentNullExceptionSerializer.Default,
                 ExceptionSerializer.Default,
                 NotImplementedExceptionSerializer.Default,
+                SystemExceptionSerializer.Default,
             };
         }
 

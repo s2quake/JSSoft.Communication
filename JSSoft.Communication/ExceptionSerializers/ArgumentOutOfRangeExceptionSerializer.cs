@@ -25,12 +25,12 @@ using System.Collections.Generic;
 
 namespace JSSoft.Communication.ExceptionSerializers
 {
-    class ArgumentNullExceptionSerializer : ExceptionSerializerBase<ArgumentNullException>
+    class ArgumentOutOfRangeExceptionSerializer : ExceptionSerializerBase<ArgumentOutOfRangeException>
     {
-        private readonly static Dictionary<string, string> messageByParam = new();
+        private readonly Dictionary<string, string> messageByParam = new();
 
-        public ArgumentNullExceptionSerializer()
-            : base(new Guid("429dfc10-5ee5-4fb0-93da-9e06a85ff3cc"))
+        public ArgumentOutOfRangeExceptionSerializer()
+            : base(new Guid("34afa93f-3856-4995-a6a3-613169cf599b"))
         {
 
         }
@@ -41,33 +41,28 @@ namespace JSSoft.Communication.ExceptionSerializers
             typeof(string)
         };
 
-        public static readonly ArgumentNullExceptionSerializer Default = new();
+        public static readonly ArgumentOutOfRangeExceptionSerializer Default = new();
 
-        protected override ArgumentNullException CreateInstance(object[] args)
+        protected override ArgumentOutOfRangeException CreateInstance(object[] args)
         {
             var paramName = args[0] as string;
             if (paramName != null && args[1] is string message)
-                new ArgumentNullException(paramName, message);
+                new ArgumentOutOfRangeException(paramName, message);
             else if (paramName != null)
-                return new ArgumentNullException(paramName);
-            return new ArgumentNullException();
+                return new ArgumentOutOfRangeException(paramName);
+            return new ArgumentOutOfRangeException();
         }
 
-        protected override object[] SelectProperties(ArgumentNullException e)
+        protected override object[] SelectProperties(ArgumentOutOfRangeException e)
         {
             var paramName = e.ParamName;
-            var message = e.Message == GetMessage(paramName) ? null : e.Message;
-            return new object[] { paramName, message };
-        }
-
-        private static string GetMessage(string paramName)
-        {
-            if (paramName is not null && messageByParam.ContainsKey(paramName))
+            if (this.messageByParam.ContainsKey(paramName) == false)
             {
-                var exception = new ArgumentNullException(paramName);
-                messageByParam.Add(paramName, exception.Message);
+                var exception = new ArgumentOutOfRangeException(paramName);
+                this.messageByParam.Add(paramName, exception.Message);
             }
-            return paramName != null ? messageByParam[paramName] : null;
+            var message = e.Message == this.messageByParam[paramName] ? null : e.Message; ;
+            return new object[] { paramName, message };
         }
     }
 }

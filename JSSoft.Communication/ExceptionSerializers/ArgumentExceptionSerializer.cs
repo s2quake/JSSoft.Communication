@@ -27,12 +27,12 @@ namespace JSSoft.Communication.ExceptionSerializers
 {
     class ArgumentExceptionSerializer : ExceptionSerializerBase<ArgumentException>
     {
-        private readonly Dictionary<string, string> messageByParam = new();
+        private static readonly Dictionary<string, string> messageByParam = new();
+        private static readonly ArgumentException empty = new(null, paramName: null);
 
         public ArgumentExceptionSerializer()
             : base(new Guid("7b1402a9-9b4a-4da6-a854-14501baf91ef"))
         {
-
         }
 
         public override Type[] PropertyTypes => new Type[]
@@ -48,7 +48,7 @@ namespace JSSoft.Communication.ExceptionSerializers
             var paramName = args[0] as string;
             var message = args[1] as string;
             if (paramName != null && message != null)
-                new ArgumentException(message, paramName);
+                return new ArgumentException(message, paramName);
             else if (paramName == null)
                 return new ArgumentException(message);
             return new ArgumentException();
@@ -57,13 +57,25 @@ namespace JSSoft.Communication.ExceptionSerializers
         protected override object[] SelectProperties(ArgumentException e)
         {
             var paramName = e.ParamName;
-            if (paramName != null && this.messageByParam.ContainsKey(paramName) == false)
-            {
-                var exception = new ArgumentException(paramName);
-                this.messageByParam.Add(paramName, exception.Message);
-            }
-            var message = e.Message == this.messageByParam[paramName] ? null : e.Message; ;
+            var message = GetMessage(e.ParamName, e.Message);
             return new object[] { paramName, message };
+        }
+
+        private static string GetMessage(string paramName, string message)
+        {
+            if (paramName is not null)
+            {
+                if (messageByParam.ContainsKey(paramName) == false)
+                {
+                    var exception = new ArgumentNullException(paramName);
+                    messageByParam.Add(paramName, exception.Message);
+                }
+                return messageByParam[paramName] == message ? null : messageByParam[paramName];
+            }
+            else
+            {
+                return message == empty.Message ? null : message;
+            }
         }
     }
 }

@@ -24,27 +24,27 @@ using System;
 
 namespace JSSoft.Communication.ExceptionSerializers
 {
-    class ExceptionSerializer : ExceptionSerializerBase<Exception>
+    class SystemExceptionSerializer : ExceptionSerializerBase<SystemException>
     {
-        private static readonly Exception empty = new();
+        private static readonly SystemException empty = new();
 
-        public ExceptionSerializer()
-            : base(new Guid("417fd69f-76ba-49cf-908e-19bc0b41b656"))
+        public SystemExceptionSerializer()
+            : base(new Guid("93cff4d8-4934-4819-af2d-56eaed9dd164"))
         {
         }
 
         public override Type[] PropertyTypes => new Type[] { typeof(string) };
 
-        public static readonly ExceptionSerializer Default = new();
+        public static readonly SystemExceptionSerializer Default = new();
 
-        protected override Exception CreateInstance(object[] args)
+        protected override SystemException CreateInstance(object[] args)
         {
             if (args[0] is not string message)
-                return new Exception();
-            return new Exception(message);
+                return new SystemException();
+            return new SystemException(message);
         }
 
-        protected override object[] SelectProperties(Exception e)
+        protected override object[] SelectProperties(SystemException e)
         {
             if (e.Message == empty.Message)
                 return new object[] { null };
