@@ -41,16 +41,24 @@ namespace JSSoft.Communication.Grpc
             await this.Dispatcher.InvokeAsync(() => base.AddBase(item.ID, item));
         }
 
-        public async Task<Peer> RemoveAsync(string id)
+        public async Task RemoveAsync(string id)
         {
             var peer = await this.Dispatcher.InvokeAsync(() =>
             {
-                var item = base[id];
-                base.RemoveBase(id);
-                return item;
+                if (base.ContainsKey(id) == true)
+                {
+                    var item = base[id];
+                    base.RemoveBase(id);
+                    
+                    return item;
+                }
+                return null;
             });
-            await this.serviceContext.RemovePeekAsync(peer);
-            return peer;
+            if (peer != null)
+            {
+                await this.serviceContext.RemovePeekAsync(peer);
+                peer.Dispose();
+            }
         }
 
         public Dispatcher Dispatcher => this.serviceContext?.Dispatcher;

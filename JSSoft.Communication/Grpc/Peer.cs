@@ -72,6 +72,8 @@ namespace JSSoft.Communication.Grpc
 
         public string ID { get; }
 
+        public bool IsTrash { get; set; }
+
         public IServiceHost[] ServiceHosts { get; }
 
         public Guid Token { get; set; } = Guid.NewGuid();

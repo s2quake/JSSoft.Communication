@@ -79,8 +79,7 @@ namespace JSSoft.Communication.Grpc
         public async Task<CloseReply> Close(CloseRequest request, ServerCallContext context)
         {
             var token = request.Token;
-            var peer = await this.Peers.RemoveAsync(token);
-            peer.Dispose();
+            await this.Peers.RemoveAsync(token);
             LogUtility.Debug($"{context.Peer}({token}) Disconnected");
             return new CloseReply();
         }
@@ -156,11 +155,16 @@ namespace JSSoft.Communication.Grpc
                 });
                 await responseStream.WriteAsync(reply);
             }
-            if (this.cancellation.IsCancellationRequested == true || peer.Cancellation.IsCancellationRequested == true)
-            {
-                await this.Peers.RemoveAsync(peer.ID);
-                peer.Dispose();
-            }
+            await this.Peers.RemoveAsync(peer.ID);
+            //if (this.cancellation.IsCancellationRequested == true || peer.Cancellation.IsCancellationRequested == true)
+            //{
+            //    await this.Peers.RemoveAsync(peer.ID);
+            //    peer.Dispose();
+            //}
+            //else
+            //{
+            //    peer.Abort();
+            //}
         }
 
         public PeerCollection Peers { get; }
@@ -239,20 +243,18 @@ namespace JSSoft.Communication.Grpc
             }
         }
 
-        private void Timer_TimerCallback(object state)
+        private async void Timer_TimerCallback(object state)
         {
-            this.Dispatcher.Invoke(() =>
+            var items = await this.Dispatcher.InvokeAsync(() =>
             {
                 var dateTime = DateTime.UtcNow;
                 var query = from item in this.Peers
                             where dateTime - item.PingTime > timeout
                             select item;
-                var items = query.ToArray();
-                foreach (var item in items)
-                {
-                    item.Abort();
-                }
+                return query.ToArray();
             });
+            var tasks = items.Select(item => this.Peers.RemoveAsync(item.ID));
+            await Task.WhenAll(tasks);
         }
 
         #region IAdaptorHost
