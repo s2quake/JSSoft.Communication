@@ -22,47 +22,31 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace JSSoft.Communication.ExceptionSerializers
 {
     class ArgumentOutOfRangeExceptionSerializer : ExceptionSerializerBase<ArgumentOutOfRangeException>
     {
-        private readonly Dictionary<string, string> messageByParam = new();
-
         public ArgumentOutOfRangeExceptionSerializer()
-            : base(new Guid("34afa93f-3856-4995-a6a3-613169cf599b"))
+            : base("34afa93f-3856-4995-a6a3-613169cf599b")
         {
-
         }
 
-        public override Type[] PropertyTypes => new Type[]
-        {
-            typeof(string),
-            typeof(string)
-        };
+        public static ArgumentOutOfRangeExceptionSerializer Default { get; } = new();
 
-        public static readonly ArgumentOutOfRangeExceptionSerializer Default = new();
-
-        protected override ArgumentOutOfRangeException CreateInstance(object[] args)
+        protected override void GetSerializationInfo(IReadOnlyDictionary<string, object> properties, SerializationInfo info)
         {
-            var paramName = args[0] as string;
-            if (paramName != null && args[1] is string message)
-                new ArgumentOutOfRangeException(paramName, message);
-            else if (paramName != null)
-                return new ArgumentOutOfRangeException(paramName);
-            return new ArgumentOutOfRangeException();
+            base.GetSerializationInfo(properties, info);
+            info.AddValue("ParamName", properties["ParamName"], typeof(string));
+            info.AddValue("ActualValue", properties["ActualValue"], typeof(string));
         }
 
-        protected override object[] SelectProperties(ArgumentOutOfRangeException e)
+        protected override void GetProperties(SerializationInfo info, IDictionary<string, object> properties)
         {
-            var paramName = e.ParamName;
-            if (this.messageByParam.ContainsKey(paramName) == false)
-            {
-                var exception = new ArgumentOutOfRangeException(paramName);
-                this.messageByParam.Add(paramName, exception.Message);
-            }
-            var message = e.Message == this.messageByParam[paramName] ? null : e.Message; ;
-            return new object[] { paramName, message };
-        }
+            base.GetProperties(info, properties);
+            properties.Add("ParamName", info.GetString("ParamName"));
+            properties.Add("ActualValue", info.GetString("ActualValue"));
+        }     
     }
 }

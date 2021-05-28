@@ -22,52 +22,29 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace JSSoft.Communication.ExceptionSerializers
 {
     class ArgumentNullExceptionSerializer : ExceptionSerializerBase<ArgumentNullException>
     {
-        private readonly static Dictionary<string, string> messageByParam = new();
-
         public ArgumentNullExceptionSerializer()
-            : base(new Guid("429dfc10-5ee5-4fb0-93da-9e06a85ff3cc"))
+            : base("429dfc10-5ee5-4fb0-93da-9e06a85ff3cc")
         {
-
         }
 
-        public override Type[] PropertyTypes => new Type[]
-        {
-            typeof(string),
-            typeof(string)
-        };
+        public static ArgumentNullExceptionSerializer Default { get; } = new();
 
-        public static readonly ArgumentNullExceptionSerializer Default = new();
-
-        protected override ArgumentNullException CreateInstance(object[] args)
+        protected override void GetSerializationInfo(IReadOnlyDictionary<string, object> properties, SerializationInfo info)
         {
-            var paramName = args[0] as string;
-            if (paramName != null && args[1] is string message)
-                new ArgumentNullException(paramName, message);
-            else if (paramName != null)
-                return new ArgumentNullException(paramName);
-            return new ArgumentNullException();
+            base.GetSerializationInfo(properties, info);
+            info.AddValue("ParamName", properties["ParamName"], typeof(string));
         }
 
-        protected override object[] SelectProperties(ArgumentNullException e)
+        protected override void GetProperties(SerializationInfo info, IDictionary<string, object> properties)
         {
-            var paramName = e.ParamName;
-            var message = e.Message == GetMessage(paramName) ? null : e.Message;
-            return new object[] { paramName, message };
-        }
-
-        private static string GetMessage(string paramName)
-        {
-            if (paramName is not null && messageByParam.ContainsKey(paramName))
-            {
-                var exception = new ArgumentNullException(paramName);
-                messageByParam.Add(paramName, exception.Message);
-            }
-            return paramName != null ? messageByParam[paramName] : null;
-        }
+            base.GetProperties(info, properties);
+            properties.Add("ParamName", info.GetString("ParamName"));
+        }     
     }
 }

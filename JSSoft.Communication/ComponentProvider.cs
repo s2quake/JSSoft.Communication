@@ -40,6 +40,7 @@ namespace JSSoft.Communication
             {
                 ArgumentExceptionSerializer.Default,
                 ArgumentNullExceptionSerializer.Default,
+                ArgumentOutOfRangeExceptionSerializer.Default,
                 ExceptionSerializer.Default,
                 NotImplementedExceptionSerializer.Default,
                 SystemExceptionSerializer.Default,
@@ -48,6 +49,7 @@ namespace JSSoft.Communication
             {
                 ArgumentExceptionSerializer.Default,
                 ArgumentNullExceptionSerializer.Default,
+                ArgumentOutOfRangeExceptionSerializer.Default,
                 ExceptionSerializer.Default,
                 NotImplementedExceptionSerializer.Default,
                 SystemExceptionSerializer.Default,

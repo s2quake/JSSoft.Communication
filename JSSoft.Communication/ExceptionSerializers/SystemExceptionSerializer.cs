@@ -26,29 +26,11 @@ namespace JSSoft.Communication.ExceptionSerializers
 {
     class SystemExceptionSerializer : ExceptionSerializerBase<SystemException>
     {
-        private static readonly SystemException empty = new();
-
         public SystemExceptionSerializer()
-            : base(new Guid("93cff4d8-4934-4819-af2d-56eaed9dd164"))
+            : base("93cff4d8-4934-4819-af2d-56eaed9dd164")
         {
         }
 
-        public override Type[] PropertyTypes => new Type[] { typeof(string) };
-
-        public static readonly SystemExceptionSerializer Default = new();
-
-        protected override SystemException CreateInstance(object[] args)
-        {
-            if (args[0] is not string message)
-                return new SystemException();
-            return new SystemException(message);
-        }
-
-        protected override object[] SelectProperties(SystemException e)
-        {
-            if (e.Message == empty.Message)
-                return new object[] { null };
-            return new object[] { e.Message };
-        }
+        public static SystemExceptionSerializer Default { get; } = new();
     }
 }

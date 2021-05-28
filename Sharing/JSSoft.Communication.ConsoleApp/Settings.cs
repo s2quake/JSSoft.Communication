@@ -49,7 +49,7 @@ namespace JSSoft.Communication.ConsoleApp
         {
             var settings = new Settings();
             var parser = new CommandLineParser(settings);
-            parser.Parse(Environment.CommandLine);
+            parser.ParseCommandLine(Environment.CommandLine);
             return settings;
         }
     }

@@ -26,30 +26,11 @@ namespace JSSoft.Communication.ExceptionSerializers
 {
     class NotImplementedExceptionSerializer : ExceptionSerializerBase<NotImplementedException>
     {
-        private static readonly NotImplementedException empty = new();
-
         public NotImplementedExceptionSerializer()
-            : base(new Guid("3239526a-5a59-4015-b08a-b4a00e885db8"))
+            : base("3239526a-5a59-4015-b08a-b4a00e885db8")
         {
-
         }
 
-        public override Type[] PropertyTypes => new Type[] { typeof(string) };
-
-        public static readonly NotImplementedExceptionSerializer Default = new();
-
-        protected override NotImplementedException CreateInstance(object[] args)
-        {
-            if (args[0] is not string message)
-                return new NotImplementedException();
-            return new NotImplementedException(message);
-        }
-
-        protected override object[] SelectProperties(NotImplementedException e)
-        {
-            if (e.Message == empty.Message)
-                return new object[] { null };
-            return new object[] { e.Message };
-        }
+        public static NotImplementedExceptionSerializer Default { get; } = new();
     }
 }

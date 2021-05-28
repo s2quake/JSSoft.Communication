@@ -24,6 +24,7 @@ using JSSoft.Communication.Logging;
 using JSSoft.Library.ObjectModel;
 using JSSoft.Library.Threading;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
@@ -54,6 +55,7 @@ namespace JSSoft.Communication
             this.ServiceHosts = new ServiceHostCollection(serviceHost);
             this.isServer = IsServer(this);
             this.instanceBuilder = ServiceInstanceBuilder.Create();
+            this.ValidateExceptionDescriptors();
         }
 
         protected ServiceContextBase(IServiceHost[] serviceHost)
@@ -339,6 +341,21 @@ namespace JSSoft.Communication
             else
             {
                 return serviceHost.DestroyInstanceAsync(callback);
+            }
+        }
+
+        private void ValidateExceptionDescriptors()
+        {
+            var descriptorByID = new Dictionary<Guid, IExceptionDescriptor>(this.componentProvider.ExceptionDescriptors.Length);
+            foreach (var item in this.componentProvider.ExceptionDescriptors)
+            {
+                if (descriptorByID.ContainsKey(item.ID) == true)
+                {
+                    var value = descriptorByID[item.ID];
+                    var message = $"'{item.ID}: {item.GetType()}' is already used in '{value.GetType()}'.";
+                    throw new InvalidOperationException(message);
+                }
+                descriptorByID.Add(item.ID, item);
             }
         }
 
