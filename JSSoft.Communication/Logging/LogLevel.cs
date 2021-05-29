@@ -24,21 +24,18 @@ using System;
 
 namespace JSSoft.Communication.Logging
 {
-    [Flags]
-    public enum LogVerbose
+    public enum LogLevel
     {
         None,
 
-        Debug = 1,
+        Debug,
 
-        Info = 2,
+        Info,
 
-        Error = 4,
+        Warn,
 
-        Warn = 8,
+        Error,
 
-        Fatal = 16,
-
-        All = Debug | Info | Error | Warn | Fatal,
+        Fatal,
     }
 }

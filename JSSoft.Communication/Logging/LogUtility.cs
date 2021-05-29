@@ -25,7 +25,7 @@ namespace JSSoft.Communication.Logging
     public static class LogUtility
     {
         private static ILogger logger;
-        private static LogVerbose verbose = LogVerbose.All;
+        private static LogLevel logLevel = LogLevel.Fatal;
 
         public static ILogger Logger
         {
@@ -33,39 +33,39 @@ namespace JSSoft.Communication.Logging
             set => logger = value;
         }
 
-        public static LogVerbose Verbose
+        public static LogLevel LogLevel
         {
-            get => verbose;
-            set => verbose = value;
+            get => logLevel;
+            set => logLevel = value;
         }
 
         public static void Debug(object message)
         {
-            if (Verbose.HasFlag(LogVerbose.Debug) == true)
+            if (logLevel >= LogLevel.Debug)
                 LoggerInternal.Debug(message);
         }
 
         public static void Info(object message)
         {
-            if (Verbose.HasFlag(LogVerbose.Info) == true)
+            if (logLevel >= LogLevel.Info)
                 LoggerInternal.Info(message);
         }
 
         public static void Error(object message)
         {
-            if (Verbose.HasFlag(LogVerbose.Error) == true)
+            if (logLevel >= LogLevel.Error)
                 LoggerInternal.Error(message);
         }
 
         public static void Warn(object message)
         {
-            if (Verbose.HasFlag(LogVerbose.Warn) == true)
+            if (logLevel >= LogLevel.Warn)
                 LoggerInternal.Warn(message);
         }
 
         public static void Fatal(object message)
         {
-            if (Verbose.HasFlag(LogVerbose.Fatal) == true)
+            if (logLevel >= LogLevel.Fatal)
                 LoggerInternal.Fatal(message);
         }
 
