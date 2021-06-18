@@ -36,12 +36,12 @@ namespace JSSoft.Communication.Services
             this.dataService = dataService;
         }
 
-        protected override void OnServiceCreated(IDataService service)
+        protected override void OnServiceCreated(IPeer peer, IDataService service)
         {
             this.dataService.SetDataService(service);
         }
 
-        protected override void OnServiceDestroyed()
+        protected override void OnServiceDestroyed(IPeer peer)
         {
             this.dataService.SetDataService(null);
         }

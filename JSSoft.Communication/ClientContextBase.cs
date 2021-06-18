@@ -38,15 +38,5 @@ namespace JSSoft.Communication
         {
 
         }
-
-        internal Task AddPeerAsync(IPeer peer)
-        {
-            return this.CreateInstanceAsync(peer);
-        }
-
-        internal Task RemovePeekAsync(IPeer peer)
-        {
-            return this.DestroyInstanceAsync(peer);
-        }
     }
 }

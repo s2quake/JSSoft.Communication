@@ -20,16 +20,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System;
+
 namespace JSSoft.Communication
 {
     public interface IPeer
     {
-        string ID { get; }
-
-        IServiceHost[] ServiceHosts { get; }
-
-        void AddInstance(IServiceHost serviceHost, object service, object callback);
-
-        (object service, object callback) RemoveInstance(IServiceHost serviceHost);
+        Guid ID { get; }
     }
 }

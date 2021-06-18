@@ -20,29 +20,36 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using JSSoft.Communication.Logging;
 using System;
+using System.Collections.Generic;
+using System.Threading;
 
 namespace JSSoft.Communication
 {
-    class AdaptorHostProvider : IAdaptorHostProvider
+    public sealed class PeerDescriptor
     {
-        public const string DefaultName = "grpc";
-
-        public IAdaptorHost Create(IServiceContext serviceContext, IInstanceContext instanceContext, ServiceToken token)
+        public void Dispose()
         {
-            // Environment.SetEnvironmentVariable("GRPC_VERBOSITY", "DEBUG");
-            // Environment.SetEnvironmentVariable("GRPC_TRACE", "all");
-            // global::Grpc.Core.GrpcEnvironment.SetLogger(new global::Grpc.Core.Logging.ConsoleLogger());
-
-            if (serviceContext is ServerContextBase serverContextBase)
-                return new Grpc.AdaptorServerHost(serverContextBase, instanceContext);
-            else if (serviceContext is ClientContextBase clientContextBase)
-                return new Grpc.AdaptorClientHost(clientContextBase, instanceContext);
-            throw new NotImplementedException();
+            this.Callbacks.DisposeAll();
         }
 
-        public string Name => DefaultName;
+        public void AddInstance(IServiceHost serviceHost, object service, object callback)
+        {
+            this.Services.Add(serviceHost, service);
+            this.Callbacks.Add(serviceHost, callback);
+        }
 
-        public static readonly AdaptorHostProvider Default = new();
+        public (object service, object callback) RemoveInstance(IServiceHost serviceHost)
+        {
+            var value = (this.Services[serviceHost], this.Callbacks[serviceHost]);
+            this.Services.Remove(serviceHost);
+            this.Callbacks.Remove(serviceHost);
+            return value;
+        }
+
+        public Dictionary<IServiceHost, object> Services { get; } = new Dictionary<IServiceHost, object>();
+
+        public Dictionary<IServiceHost, object> Callbacks { get; } = new Dictionary<IServiceHost, object>();
     }
 }

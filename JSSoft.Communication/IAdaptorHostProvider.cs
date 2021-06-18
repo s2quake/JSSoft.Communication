@@ -24,7 +24,7 @@ namespace JSSoft.Communication
 {
     public interface IAdaptorHostProvider
     {
-        IAdaptorHost Create(IServiceContext serviceHost, ServiceToken token);
+        IAdaptorHost Create(IServiceContext serviceHost, IInstanceContext instanceContext, ServiceToken token);
 
         string Name { get; }
     }

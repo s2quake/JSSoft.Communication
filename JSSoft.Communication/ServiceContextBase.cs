@@ -36,10 +36,12 @@ namespace JSSoft.Communication
     {
         public const string DefaultHost = "localhost";
         public const int DefaultPort = 4004;
+        private static readonly Guid defaultPeerID = Guid.Parse("6e0188b8-c43d-44e7-a6da-a6e637a28535");
         private readonly IComponentProvider componentProvider;
-        private readonly InstanceCollection serviceByServiceHost = new();
-        private readonly InstanceCollection callbackByServiceHost = new();
+        // private readonly InstanceCollection serviceByServiceHost = new();
+        // private readonly InstanceCollection callbackByServiceHost = new();
         private readonly ServiceInstanceBuilder instanceBuilder;
+        private readonly InstanceContext instanceContext;
         private readonly bool isServer;
         private IAdaptorHostProvider adpatorHostProvider;
         private ISerializerProvider serializerProvider;
@@ -55,6 +57,8 @@ namespace JSSoft.Communication
             this.ServiceHosts = new ServiceHostCollection(serviceHost);
             this.isServer = IsServer(this);
             this.instanceBuilder = ServiceInstanceBuilder.Create();
+            this.instanceContext = new InstanceContext(this);
+
             this.ValidateExceptionDescriptors();
         }
 
@@ -79,13 +83,13 @@ namespace JSSoft.Communication
                     this.serializer = this.serializerProvider.Create(this, this.componentProvider.DataSerializers);
                     this.Debug($"{this.serializerProvider.Name} Serializer created.");
                     this.adpatorHostProvider = this.componentProvider.GetAdaptorHostProvider(this.AdaptorHostType);
-                    this.adaptorHost = this.adpatorHostProvider.Create(this, token);
+                    this.adaptorHost = this.adpatorHostProvider.Create(this, this.instanceContext, token);
                     this.Debug($"{this.adpatorHostProvider.Name} Adaptor created.");
                     this.adaptorHost.Disconnected += AdaptorHost_Disconnected;
                 });
+                await this.instanceContext.InitializeInstanceAsync();
                 foreach (var item in this.ServiceHosts)
                 {
-                    await this.InitializeInstanceAsync(item);
                     await item.OpenAsync(token);
                     await this.DebugAsync($"{item.Name} Service opened.");
                 }
@@ -122,12 +126,12 @@ namespace JSSoft.Communication
                 foreach (var item in this.ServiceHosts.Reverse())
                 {
                     await item.CloseAsync(this.token);
-                    await this.ReleaseInstanceAsync(item);
                     await this.Dispatcher.InvokeAsync(() =>
                     {
                         this.Debug($"{item.Name} Service closed.");
                     });
                 }
+                await this.instanceContext.ReleaseInstanceAsync();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.adaptorHost.Disconnected -= AdaptorHost_Disconnected;
@@ -245,6 +249,36 @@ namespace JSSoft.Communication
             return false;
         }
 
+        internal async Task<(object, object)> CreateInstanceAsync(IServiceHost serviceHost, IPeer peer)
+        {
+            var adaptorHost = this.adaptorHost;
+            var baseType = GetInstanceType(this, serviceHost);
+            var instance = this.CreateInstance(baseType);
+            if (instance != null)
+            {
+                instance.ServiceHost = serviceHost;
+                instance.AdaptorHost = adaptorHost;
+                instance.Peer = peer;
+            }
+
+            var impl = await serviceHost.CreateInstanceAsync(peer, instance);
+            var service = this.isServer ? impl : instance;
+            var callback = this.isServer ? instance : impl;
+            return (service, callback);
+        }
+
+        internal Task DestroyInstanceAsync(IServiceHost serviceHost, IPeer peer, object service, object callback)
+        {
+            if (this.isServer == true)
+            {
+                return serviceHost.DestroyInstanceAsync(peer, service);
+            }
+            else
+            {
+                return serviceHost.DestroyInstanceAsync(peer, callback);
+            }
+        }
+
         private async Task AbortAsync()
         {
             foreach (var item in this.ServiceHosts)
@@ -258,8 +292,6 @@ namespace JSSoft.Communication
                 this.serializer = null;
                 this.adpatorHostProvider = null;
                 this.adaptorHost = null;
-                this.serviceByServiceHost.Clear();
-                this.callbackByServiceHost.Clear();
                 this.ServiceState = ServiceState.None;
                 this.Dispatcher?.Dispose();
                 this.Dispatcher = null;
@@ -281,69 +313,6 @@ namespace JSSoft.Communication
             Task.Run(() => this.CloseAsync(this.token.Guid, e.CloseCode));
         }
 
-        private async Task InitializeInstanceAsync(IServiceHost serviceHost)
-        {
-            var isPerPeer = IsPerPeer(this, serviceHost);
-            if (isPerPeer == true)
-                return;
-            var (service, callback) = await this.CreateInstanceAsync(serviceHost, null);
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                this.serviceByServiceHost.Add(serviceHost, service);
-                this.callbackByServiceHost.Add(serviceHost, callback);
-            });
-        }
-
-        private async Task ReleaseInstanceAsync(IServiceHost serviceHost)
-        {
-            var service = null as object;
-            var callback = null as object;
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                if (this.serviceByServiceHost.ContainsKey(serviceHost) == true)
-                {
-                    service = this.serviceByServiceHost[serviceHost];
-                    this.serviceByServiceHost.Remove(serviceHost);
-                }
-                if (this.callbackByServiceHost.ContainsKey(serviceHost) == true)
-                {
-                    callback = this.callbackByServiceHost[serviceHost];
-                    this.callbackByServiceHost.Remove(serviceHost);
-                }
-            });
-            await this.DestroyInstanceAsync(serviceHost, service, callback);
-        }
-
-        private async Task<(object, object)> CreateInstanceAsync(IServiceHost serviceHost, IPeer peer)
-        {
-            var adaptorHost = this.adaptorHost;
-            var baseType = GetInstanceType(this, serviceHost);
-            var instance = this.CreateInstance(baseType);
-            if (instance != null)
-            {
-                instance.ServiceHost = serviceHost;
-                instance.AdaptorHost = adaptorHost;
-                instance.Peer = peer;
-            }
-
-            var impl = await serviceHost.CreateInstanceAsync(instance);
-            var service = this.isServer ? impl : instance;
-            var callback = this.isServer ? instance : impl;
-            return (service, callback);
-        }
-
-        private Task DestroyInstanceAsync(IServiceHost serviceHost, object service, object callback)
-        {
-            if (this.isServer == true)
-            {
-                return serviceHost.DestroyInstanceAsync(service);
-            }
-            else
-            {
-                return serviceHost.DestroyInstanceAsync(callback);
-            }
-        }
-
         private void ValidateExceptionDescriptors()
         {
             var descriptorByID = new Dictionary<Guid, IExceptionDescriptor>(this.componentProvider.ExceptionDescriptors.Length);
@@ -356,44 +325,6 @@ namespace JSSoft.Communication
                     throw new InvalidOperationException(message);
                 }
                 descriptorByID.Add(item.ID, item);
-            }
-        }
-
-        internal async Task CreateInstanceAsync(IPeer peer)
-        {
-            foreach (var item in peer.ServiceHosts)
-            {
-                var isPerPeer = IsPerPeer(this, item);
-                if (isPerPeer == true)
-                {
-                    var (service, callback) = await this.CreateInstanceAsync(item, peer);
-                    peer.AddInstance(item, service, callback);
-                }
-                else
-                {
-                    var (service, callback) = await this.Dispatcher.InvokeAsync(() =>
-                    {
-                        return (this.serviceByServiceHost[item], this.callbackByServiceHost[item]);
-                    });
-                    peer.AddInstance(item, service, callback);
-                }
-            }
-        }
-
-        internal async Task DestroyInstanceAsync(IPeer peer)
-        {
-            foreach (var item in peer.ServiceHosts.Reverse())
-            {
-                var isPerPeer = IsPerPeer(this, item);
-                if (isPerPeer == true)
-                {
-                    var (service, callback) = peer.RemoveInstance(item);
-                    await this.DestroyInstanceAsync(item, service, callback);
-                }
-                else
-                {
-                    peer.RemoveInstance(item);
-                }
             }
         }
 

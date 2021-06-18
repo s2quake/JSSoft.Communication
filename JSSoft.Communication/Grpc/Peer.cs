@@ -31,16 +31,23 @@ namespace JSSoft.Communication.Grpc
     {
         private readonly CancellationTokenSource cancellation = new();
 
-        public Peer(string id, IServiceHost[] serviceHosts)
+        public Peer(Guid id, IServiceHost[] serviceHosts)
         {
             this.ID = id;
             this.ServiceHosts = serviceHosts;
             this.Ping();
+            foreach (var item in serviceHosts)
+            {
+                this.PollReplyItems.Add(item, new PollReplyItemCollection());
+            }
         }
 
         public void Dispose()
         {
-            this.Callbacks.DisposeAll();
+            foreach (var item in this.ServiceHosts)
+            {
+                this.PollReplyItems.Remove(item);
+            }
         }
 
         public void Abort()
@@ -49,30 +56,12 @@ namespace JSSoft.Communication.Grpc
             LogUtility.Debug($"{this.ID} Aboreted.");
         }
 
-        public void AddInstance(IServiceHost serviceHost, object service, object callback)
-        {
-            this.Services.Add(serviceHost, service);
-            this.Callbacks.Add(serviceHost, callback);
-            this.PollReplyItems.Add(serviceHost, new PollReplyItemCollection());
-        }
-
-        public (object service, object callback) RemoveInstance(IServiceHost serviceHost)
-        {
-            var value = (this.Services[serviceHost], this.Callbacks[serviceHost]);
-            this.PollReplyItems.Remove(serviceHost);
-            this.Services.Remove(serviceHost);
-            this.Callbacks.Remove(serviceHost);
-            return value;
-        }
-
         public void Ping()
         {
             this.PingTime = DateTime.UtcNow;
         }
 
-        public string ID { get; }
-
-        public bool IsTrash { get; set; }
+        public Guid ID { get; }
 
         public IServiceHost[] ServiceHosts { get; }
 
@@ -80,13 +69,11 @@ namespace JSSoft.Communication.Grpc
 
         public DateTime PingTime { get; set; }
 
-        public Dictionary<IServiceHost, object> Services { get; } = new Dictionary<IServiceHost, object>();
+        public PeerDescriptor Descriptor { get; set; }
 
-        public Dictionary<IServiceHost, object> Callbacks { get; } = new Dictionary<IServiceHost, object>();
+        public Dictionary<IServiceHost, object> Services => this.Descriptor.Services;
 
         public Dictionary<IServiceHost, PollReplyItemCollection> PollReplyItems { get; } = new Dictionary<IServiceHost, PollReplyItemCollection>();
-
-        public Dictionary<string, object> Properties { get; } = new Dictionary<string, object>();
 
         public CancellationToken Cancellation => this.cancellation.Token;
     }

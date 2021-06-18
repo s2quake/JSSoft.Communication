@@ -34,24 +34,24 @@ namespace JSSoft.Communication
 
         }
 
-        protected virtual Task<U> CreateCallbackAsync(T service)
+        protected virtual Task<U> CreateCallbackAsync(IPeer peer, T service)
         {
             return Task.Run(() => TypeDescriptor.CreateInstance(null, this.CallbackType, null, null) as U);
         }
 
-        protected virtual Task DestroyCallbackAsync(U callback)
+        protected virtual Task DestroyCallbackAsync(IPeer peer, U callback)
         {
             return Task.Delay(1);
         }
 
-        private protected override async Task<object> CreateInstanceInternalAsync(object obj)
+        private protected override async Task<object> CreateInstanceInternalAsync(IPeer peer, object obj)
         {
-            return await this.CreateCallbackAsync(obj as T);
+            return await this.CreateCallbackAsync(peer, obj as T);
         }
 
-        private protected override Task DestroyInstanceInternalAsync(object obj)
+        private protected override Task DestroyInstanceInternalAsync(IPeer peer, object obj)
         {
-            return this.DestroyCallbackAsync(obj as U);
+            return this.DestroyCallbackAsync(peer, obj as U);
         }
     }
 
@@ -64,25 +64,25 @@ namespace JSSoft.Communication
 
         }
 
-        protected virtual void OnServiceCreated(T service)
+        protected virtual void OnServiceCreated(IPeer peer, T service)
         {
 
         }
 
-        protected virtual void OnServiceDestroyed()
+        protected virtual void OnServiceDestroyed(IPeer peer)
         {
 
         }
 
-        private protected override Task<object> CreateInstanceInternalAsync(object obj)
+        private protected override Task<object> CreateInstanceInternalAsync(IPeer peer, object obj)
         {
-            this.OnServiceCreated(obj as T);
+            this.OnServiceCreated(peer, obj as T);
             return Task.Run(() => null as object);
         }
 
-        private protected override Task DestroyInstanceInternalAsync(object obj)
+        private protected override Task DestroyInstanceInternalAsync(IPeer peer, object obj)
         {
-            this.OnServiceDestroyed();
+            this.OnServiceDestroyed(peer);
             return Task.Delay(1);
         }
     }

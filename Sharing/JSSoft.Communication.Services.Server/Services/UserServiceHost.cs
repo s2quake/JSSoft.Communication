@@ -36,14 +36,14 @@ namespace JSSoft.Communication.Services
             this.userService = userService;
         }
 
-        protected override async Task<IUserService> CreateServiceAsync(IUserServiceCallback callback)
+        protected override async Task<IUserService> CreateServiceAsync(IPeer peer, IUserServiceCallback callback)
         {
             await Task.Delay(1);
             this.userService.SetCallback(callback);
             return this.userService;
         }
 
-        protected override async Task DestroyServiceAsync(IUserService service)
+        protected override async Task DestroyServiceAsync(IPeer peer, IUserService service)
         {
             if (service is UserService userService)
             {

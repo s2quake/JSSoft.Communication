@@ -32,17 +32,20 @@ namespace JSSoft.Communication.Grpc
 {
     class AdaptorClientHost : IAdaptorHost
     {
-        private readonly ClientContextBase serviceContext;
+        private readonly IServiceContext serviceContext;
+        private readonly IInstanceContext instanceContext;
         private readonly IContainer<IServiceHost> serviceHosts;
         private CancellationTokenSource cancellation;
         private Task task;
         private Channel channel;
         private AdaptorClientImpl adaptorImpl;
         private ISerializer serializer;
+        private PeerDescriptor descriptor;
 
-        public AdaptorClientHost(ClientContextBase serviceContext)
+        public AdaptorClientHost(IServiceContext serviceContext, IInstanceContext instanceContext)
         {
             this.serviceContext = serviceContext;
+            this.instanceContext = instanceContext;
             this.serviceHosts = serviceContext.ServiceHosts;
         }
 
@@ -53,12 +56,12 @@ namespace JSSoft.Communication.Grpc
                 await Task.Run(() =>
                 {
                     this.channel = new Channel($"{host}:{port}", ChannelCredentials.Insecure);
-                    this.adaptorImpl = new AdaptorClientImpl(this.channel, host, this.serviceHosts.ToArray());
+                    this.adaptorImpl = new AdaptorClientImpl(this.channel, Guid.NewGuid(), this.serviceHosts.ToArray());
                 });
                 await this.adaptorImpl.OpenAsync();
+                this.descriptor = await this.instanceContext.CreateInstanceAsync(this.adaptorImpl);
                 await Task.Run(() =>
                 {
-                    this.serviceContext.AddPeerAsync(this.adaptorImpl);
                     this.cancellation = new CancellationTokenSource();
                     this.serializer = this.serviceContext.GetService(typeof(ISerializer)) as ISerializer;
                 });
@@ -85,7 +88,7 @@ namespace JSSoft.Communication.Grpc
                 this.task = null;
             });
             if (this.adaptorImpl != null)
-                await this.serviceContext.RemovePeekAsync(this.adaptorImpl);
+                await this.instanceContext.DestroyInstanceAsync(this.adaptorImpl);
             if (this.adaptorImpl != null)
                 await this.adaptorImpl.CloseAsync();
             this.adaptorImpl = null;
@@ -148,7 +151,7 @@ namespace JSSoft.Communication.Grpc
                 throw new InvalidOperationException();
             var methodDescriptor = serviceHost.MethodDescriptors[name];
             var args = this.serializer.DeserializeMany(methodDescriptor.ParameterTypes, datas);
-            var instance = this.adaptorImpl.Callbacks[serviceHost];
+            var instance = this.descriptor.Callbacks[serviceHost];
             Task.Run(() => methodDescriptor.InvokeAsync(this.serviceContext, instance, args));
         }
 

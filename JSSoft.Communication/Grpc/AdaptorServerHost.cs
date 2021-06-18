@@ -39,7 +39,8 @@ namespace JSSoft.Communication.Grpc
     {
         private static readonly TimeSpan timeout = new(0, 0, 30);
         private static readonly string localAddress = "127.0.0.1";
-        private readonly ServerContextBase serviceContext;
+        private readonly IServiceContext serviceContext;
+        private readonly IInstanceContext instanceContext;
         private readonly IContainer<IServiceHost> serviceHosts;
         private int closeCode;
         private CancellationTokenSource cancellation;
@@ -56,11 +57,12 @@ namespace JSSoft.Communication.Grpc
                 localAddress = $"{address}";
         }
 
-        public AdaptorServerHost(ServerContextBase serviceContext)
+        public AdaptorServerHost(IServiceContext serviceContext, IInstanceContext instanceContext)
         {
             this.serviceContext = serviceContext;
+            this.instanceContext = instanceContext;
             this.serviceHosts = serviceContext.ServiceHosts;
-            this.Peers = new PeerCollection(serviceContext);
+            this.Peers = new PeerCollection(serviceContext, instanceContext);
             this.Peers.CollectionChanged += PeerCollection_CollectionChanged;
         }
 
@@ -70,7 +72,7 @@ namespace JSSoft.Communication.Grpc
             var serviceNames = request.ServiceNames;
             var serviceHosts = serviceNames.Select(item => this.serviceHosts[item]).ToArray();
             var peerID = context.Peer;
-            var peer = new Peer($"{token}", serviceHosts) { Token = token };
+            var peer = new Peer(token, serviceHosts) { Token = token };
             await this.Peers.AddAsync(peer);
             LogUtility.Debug($"{context.Peer}({token}) Connected");
             return new OpenReply() { Token = $"{token}" };
@@ -155,16 +157,7 @@ namespace JSSoft.Communication.Grpc
                 });
                 await responseStream.WriteAsync(reply);
             }
-            await this.Peers.RemoveAsync(peer.ID);
-            //if (this.cancellation.IsCancellationRequested == true || peer.Cancellation.IsCancellationRequested == true)
-            //{
-            //    await this.Peers.RemoveAsync(peer.ID);
-            //    peer.Dispose();
-            //}
-            //else
-            //{
-            //    peer.Abort();
-            //}
+            await this.Peers.RemoveAsync($"{peer.ID}");
         }
 
         public PeerCollection Peers { get; }
@@ -253,7 +246,7 @@ namespace JSSoft.Communication.Grpc
                             select item;
                 return query.ToArray();
             });
-            var tasks = items.Select(item => this.Peers.RemoveAsync(item.ID));
+            var tasks = items.Select(item => this.Peers.RemoveAsync($"{item.ID}"));
             await Task.WhenAll(tasks);
         }
 

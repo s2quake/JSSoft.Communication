@@ -28,17 +28,20 @@ namespace JSSoft.Communication.Grpc
 {
     class PeerCollection : ContainerBase<Peer>
     {
-        private readonly ServerContextBase serviceContext;
+        private readonly IServiceContext serviceContext;
+        private readonly IInstanceContext instanceContext;
 
-        public PeerCollection(ServerContextBase serviceContext)
+        public PeerCollection(IServiceContext serviceContext, IInstanceContext instanceContext)
         {
             this.serviceContext = serviceContext;
+            this.instanceContext = instanceContext;
         }
 
         public async Task AddAsync(Peer item)
         {
-            await this.serviceContext.AddPeerAsync(item);
-            await this.Dispatcher.InvokeAsync(() => base.AddBase(item.ID, item));
+            var descrptor = await this.instanceContext.CreateInstanceAsync(item);
+            item.Descriptor = descrptor;
+            await this.Dispatcher.InvokeAsync(() => base.AddBase($"{item.ID}", item));
         }
 
         public async Task RemoveAsync(string id)
@@ -49,14 +52,15 @@ namespace JSSoft.Communication.Grpc
                 {
                     var item = base[id];
                     base.RemoveBase(id);
-                    
+
                     return item;
                 }
                 return null;
             });
             if (peer != null)
             {
-                await this.serviceContext.RemovePeekAsync(peer);
+                await this.instanceContext.DestroyInstanceAsync(peer);
+                peer.Descriptor = null;
                 peer.Dispose();
             }
         }

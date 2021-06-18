@@ -33,10 +33,9 @@ namespace JSSoft.Communication.Grpc
     class AdaptorClientImpl : Adaptor.AdaptorClient, IPeer
     {
         private static readonly TimeSpan timeout = new(0, 0, 15);
-        private readonly Dictionary<IServiceHost, object> callbacks = new();
         private Timer timer;
 
-        public AdaptorClientImpl(Channel channel, string id, IServiceHost[] serviceHosts)
+        public AdaptorClientImpl(Channel channel, Guid id, IServiceHost[] serviceHosts)
             : base(channel)
         {
             this.ID = id;
@@ -81,13 +80,11 @@ namespace JSSoft.Communication.Grpc
             });
         }
 
-        public string ID { get; }
+        public Guid ID { get; }
 
         public Guid Token { get; private set; }
 
         public IServiceHost[] ServiceHosts { get; }
-
-        public IReadOnlyDictionary<IServiceHost, object> Callbacks => this.callbacks;
 
         private void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
@@ -107,21 +104,5 @@ namespace JSSoft.Communication.Grpc
                 }
             });
         }
-
-        #region IPeer
-
-        void IPeer.AddInstance(IServiceHost serviceHost, object service, object callback)
-        {
-            this.callbacks.Add(serviceHost, callback);
-        }
-
-        (object service, object callback) IPeer.RemoveInstance(IServiceHost serviceHost)
-        {
-            var value = this.callbacks[serviceHost];
-            this.callbacks.Remove(serviceHost);
-            return (null, value);
-        }
-
-        #endregion
     }
 }

@@ -118,9 +118,9 @@ namespace JSSoft.Communication
             return t.IsVisible == false && t.IsPublic == false && t.IsNotPublic == true;
         }
 
-        private protected abstract Task<object> CreateInstanceInternalAsync(object obj);
+        private protected abstract Task<object> CreateInstanceInternalAsync(IPeer peer, object obj);
 
-        private protected abstract Task DestroyInstanceInternalAsync(object obj);
+        private protected abstract Task DestroyInstanceInternalAsync(IPeer peer, object obj);
 
         internal static bool IsServer(ServiceHostBase serviceHost)
         {
@@ -133,14 +133,14 @@ namespace JSSoft.Communication
 
         #region IServiceHost
 
-        Task<object> IServiceHost.CreateInstanceAsync(object obj)
+        Task<object> IServiceHost.CreateInstanceAsync(IPeer peer, object obj)
         {
-            return this.CreateInstanceInternalAsync(obj);
+            return this.CreateInstanceInternalAsync(peer, obj);
         }
 
-        Task IServiceHost.DestroyInstanceAsync(object obj)
+        Task IServiceHost.DestroyInstanceAsync(IPeer peer, object obj)
         {
-            return this.DestroyInstanceInternalAsync(obj);
+            return this.DestroyInstanceInternalAsync(peer, obj);
         }
 
         IContainer<MethodDescriptor> IServiceHost.MethodDescriptors => this.MethodDescriptors;

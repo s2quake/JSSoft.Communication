@@ -41,12 +41,12 @@ namespace JSSoft.Communication.Services
             this.dataService.Dispose();
         }
 
-        protected override Task<IDataService> CreateServiceAsync()
+        protected override Task<IDataService> CreateServiceAsync(IPeer peer)
         {
             return Task.Run<IDataService>(() => this.dataService);
         }
 
-        protected override async Task DestroyServiceAsync(IDataService service)
+        protected override async Task DestroyServiceAsync(IPeer peer, IDataService service)
         {
             await Task.Delay(1);
         }

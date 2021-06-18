@@ -21,28 +21,15 @@
 // SOFTWARE.
 
 using System;
+using System.Threading.Tasks;
+using JSSoft.Communication.Grpc;
 
 namespace JSSoft.Communication
 {
-    class AdaptorHostProvider : IAdaptorHostProvider
+    public interface IInstanceContext
     {
-        public const string DefaultName = "grpc";
+        Task<PeerDescriptor> CreateInstanceAsync(IPeer peer);
 
-        public IAdaptorHost Create(IServiceContext serviceContext, IInstanceContext instanceContext, ServiceToken token)
-        {
-            // Environment.SetEnvironmentVariable("GRPC_VERBOSITY", "DEBUG");
-            // Environment.SetEnvironmentVariable("GRPC_TRACE", "all");
-            // global::Grpc.Core.GrpcEnvironment.SetLogger(new global::Grpc.Core.Logging.ConsoleLogger());
-
-            if (serviceContext is ServerContextBase serverContextBase)
-                return new Grpc.AdaptorServerHost(serverContextBase, instanceContext);
-            else if (serviceContext is ClientContextBase clientContextBase)
-                return new Grpc.AdaptorClientHost(clientContextBase, instanceContext);
-            throw new NotImplementedException();
-        }
-
-        public string Name => DefaultName;
-
-        public static readonly AdaptorHostProvider Default = new();
+        Task DestroyInstanceAsync(IPeer peer);
     }
 }
