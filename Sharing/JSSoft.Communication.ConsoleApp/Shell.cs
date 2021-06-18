@@ -103,12 +103,13 @@ namespace JSSoft.Communication.ConsoleApp
             else
             {
                 var tb = new TerminalStringBuilder();
-                var pattern = $"(.+@)(.+){postfix}";
+                var pattern = $"(.+@)(.+).{{{postfix.Length}}}";
                 var match = Regex.Match(prompt, pattern);
                 tb.Append(match.Groups[1].Value);
                 tb.Foreground = TerminalColor.BrightGreen;
                 tb.Append(match.Groups[2].Value);
                 tb.Foreground = null;
+                tb.Append(postfix);
                 return tb.ToString();
             }
         }
