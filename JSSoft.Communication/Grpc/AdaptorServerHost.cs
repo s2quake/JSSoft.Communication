@@ -40,7 +40,6 @@ namespace JSSoft.Communication.Grpc
         private static readonly TimeSpan timeout = new(0, 0, 30);
         private static readonly string localAddress = "127.0.0.1";
         private readonly IServiceContext serviceContext;
-        private readonly IInstanceContext instanceContext;
         private readonly IContainer<IServiceHost> serviceHosts;
         private int closeCode;
         private CancellationTokenSource cancellation;
@@ -60,7 +59,6 @@ namespace JSSoft.Communication.Grpc
         public AdaptorServerHost(IServiceContext serviceContext, IInstanceContext instanceContext)
         {
             this.serviceContext = serviceContext;
-            this.instanceContext = instanceContext;
             this.serviceHosts = serviceContext.ServiceHosts;
             this.Peers = new PeerCollection(serviceContext, instanceContext);
             this.Peers.CollectionChanged += PeerCollection_CollectionChanged;

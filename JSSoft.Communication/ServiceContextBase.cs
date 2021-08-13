@@ -36,10 +36,7 @@ namespace JSSoft.Communication
     {
         public const string DefaultHost = "localhost";
         public const int DefaultPort = 4004;
-        private static readonly Guid defaultPeerID = Guid.Parse("6e0188b8-c43d-44e7-a6da-a6e637a28535");
         private readonly IComponentProvider componentProvider;
-        // private readonly InstanceCollection serviceByServiceHost = new();
-        // private readonly InstanceCollection callbackByServiceHost = new();
         private readonly ServiceInstanceBuilder instanceBuilder;
         private readonly InstanceContext instanceContext;
         private readonly bool isServer;
