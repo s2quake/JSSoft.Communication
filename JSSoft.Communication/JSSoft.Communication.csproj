@@ -9,7 +9,7 @@
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="google.protobuf" Version="3.9.0" />
+    <PackageReference Include="google.protobuf" Version="3.15.0" />
     <PackageReference Include="Grpc" Version="2.28.1" />
     <PackageReference Include="Grpc.Tools" Version="2.28.1">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
