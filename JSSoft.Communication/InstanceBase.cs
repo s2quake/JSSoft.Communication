@@ -43,52 +43,52 @@ public class InstanceBase
 
     internal IServiceHost ServiceHost { get; set; }
 
-    internal string ServiceName => this.ServiceHost.Name;
+    internal string ServiceName => ServiceHost.Name;
 
     internal IPeer Peer { get; set; }
 
     [InstanceMethod(InvokeMethod)]
     protected void Invoke(string name, Type[] types, object[] args)
     {
-        this.AdaptorHost.Invoke(this, name, types, args);
+        AdaptorHost.Invoke(this, name, types, args);
     }
 
     protected void Invoke((string name, Type[] types, object[] args) info)
     {
-        this.AdaptorHost.Invoke(this, info.name, info.types, info.args);
+        AdaptorHost.Invoke(this, info.name, info.types, info.args);
     }
 
     [InstanceMethod(InvokeGenericMethod)]
     protected T Invoke<T>(string name, Type[] types, object[] args)
     {
-        return this.AdaptorHost.Invoke<T>(this, name, types, args);
+        return AdaptorHost.Invoke<T>(this, name, types, args);
     }
 
     protected T Invoke<T>((string name, Type[] types, object[] args) info)
     {
-        return this.AdaptorHost.Invoke<T>(this, info.name, info.types, info.args);
+        return AdaptorHost.Invoke<T>(this, info.name, info.types, info.args);
     }
 
     [InstanceMethod(InvokeAsyncMethod)]
     protected Task InvokeAsync(string name, Type[] types, object[] args)
     {
-        return this.AdaptorHost.InvokeAsync(this, name, types, args);
+        return AdaptorHost.InvokeAsync(this, name, types, args);
     }
 
     protected Task InvokeAsync((string name, Type[] types, object[] args) info)
     {
-        return this.AdaptorHost.InvokeAsync(this, info.name, info.types, info.args);
+        return AdaptorHost.InvokeAsync(this, info.name, info.types, info.args);
     }
 
     [InstanceMethod(InvokeGenericAsyncMethod)]
     protected Task<T> InvokeAsync<T>(string name, Type[] types, object[] args)
     {
-        return this.AdaptorHost.InvokeAsync<T>(this, name, types, args);
+        return AdaptorHost.InvokeAsync<T>(this, name, types, args);
     }
 
     protected Task<T> InvokeAsync<T>((string name, Type[] types, object[] args) info)
     {
-        return this.AdaptorHost.InvokeAsync<T>(this, info.name, info.types, info.args);
+        return AdaptorHost.InvokeAsync<T>(this, info.name, info.types, info.args);
     }
 
     protected static (string, Type[], object[]) Info<P>(MethodInfo methodInfo, Type serviceType, P arg)

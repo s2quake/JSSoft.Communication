@@ -33,16 +33,16 @@ class DataServiceHost : ClientServiceHostBase<IDataService>
     public DataServiceHost(DataService dataService)
         : base()
     {
-        this._dataService = dataService;
+        _dataService = dataService;
     }
 
     protected override void OnServiceCreated(IPeer peer, IDataService service)
     {
-        this._dataService.SetDataService(service);
+        _dataService.SetDataService(service);
     }
 
     protected override void OnServiceDestroyed(IPeer peer)
     {
-        this._dataService.SetDataService(null);
+        _dataService.SetDataService(null);
     }
 }

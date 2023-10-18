@@ -39,17 +39,17 @@ class LogoutCommand : CommandAsyncBase
     [ImportingConstructor]
     public LogoutCommand(Application application, Lazy<IUserService> userService)
     {
-        this._application = application;
-        this._userService = userService;
+        _application = application;
+        _userService = userService;
     }
 
     public override bool IsEnabled => _application.UserToken != Guid.Empty;
 
     protected override async Task OnExecuteAsync(CancellationToken cancellationToken)
     {
-        await this.UserService.LogoutAsync(_application.UserToken);
+        await UserService.LogoutAsync(_application.UserToken);
         _application.Logout();
     }
 
-    private IUserService UserService => this._userService.Value;
+    private IUserService UserService => _userService.Value;
 }

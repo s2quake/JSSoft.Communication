@@ -35,40 +35,40 @@ class PollReplyItemCollection : IEnumerable<PollReplyItem>, IReadOnlyList<PollRe
 
     public void Add(PollReplyItem item)
     {
-        this._itemList.Add(item);
+        _itemList.Add(item);
     }
 
     public void Remove(PollReplyItem item)
     {
-        this._itemList.Remove(item);
+        _itemList.Remove(item);
     }
 
     public int IndexOf(PollReplyItem item)
     {
-        return this._itemList.IndexOf(item);
+        return _itemList.IndexOf(item);
     }
 
-    public PollReplyItem this[int index] => this._itemList[index];
+    public PollReplyItem this[int index] => _itemList[index];
 
     public bool Contains(PollReplyItem item)
     {
-        return this._itemList.Contains(item);
+        return _itemList.Contains(item);
     }
 
     public PollReplyItem[] Flush()
     {
-        var items = this._itemList.ToArray();
-        this._itemList.Clear();
+        var items = _itemList.ToArray();
+        _itemList.Clear();
         return items;
     }
 
-    public int Count => this._itemList.Count;
+    public int Count => _itemList.Count;
 
     #region IEnumerable
 
     IEnumerator<PollReplyItem> IEnumerable<PollReplyItem>.GetEnumerator()
     {
-        foreach (var item in this._itemList)
+        foreach (var item in _itemList)
         {
             yield return item;
         }
@@ -76,7 +76,7 @@ class PollReplyItemCollection : IEnumerable<PollReplyItem>, IReadOnlyList<PollRe
 
     IEnumerator IEnumerable.GetEnumerator()
     {
-        foreach (var item in this._itemList)
+        foreach (var item in _itemList)
         {
             yield return item;
         }

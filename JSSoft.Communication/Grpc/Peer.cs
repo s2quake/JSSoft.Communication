@@ -33,32 +33,32 @@ sealed class Peer : IPeer
 
     public Peer(Guid id, IServiceHost[] serviceHosts)
     {
-        this.ID = id;
-        this.ServiceHosts = serviceHosts;
-        this.Ping();
+        ID = id;
+        ServiceHosts = serviceHosts;
+        Ping();
         foreach (var item in serviceHosts)
         {
-            this.PollReplyItems.Add(item, new PollReplyItemCollection());
+            PollReplyItems.Add(item, new PollReplyItemCollection());
         }
     }
 
     public void Dispose()
     {
-        foreach (var item in this.ServiceHosts)
+        foreach (var item in ServiceHosts)
         {
-            this.PollReplyItems.Remove(item);
+            PollReplyItems.Remove(item);
         }
     }
 
     public void Abort()
     {
-        this._cancellationTokenSource.Cancel();
-        LogUtility.Debug($"{this.ID} Aboreted.");
+        _cancellationTokenSource.Cancel();
+        LogUtility.Debug($"{ID} Aboreted.");
     }
 
     public void Ping()
     {
-        this.PingTime = DateTime.UtcNow;
+        PingTime = DateTime.UtcNow;
     }
 
     public Guid ID { get; }
@@ -71,9 +71,9 @@ sealed class Peer : IPeer
 
     public PeerDescriptor Descriptor { get; set; }
 
-    public Dictionary<IServiceHost, object> Services => this.Descriptor.Services;
+    public Dictionary<IServiceHost, object> Services => Descriptor.Services;
 
     public Dictionary<IServiceHost, PollReplyItemCollection> PollReplyItems { get; } = new Dictionary<IServiceHost, PollReplyItemCollection>();
 
-    public CancellationToken Cancellation => this._cancellationTokenSource.Token;
+    public CancellationToken Cancellation => _cancellationTokenSource.Token;
 }

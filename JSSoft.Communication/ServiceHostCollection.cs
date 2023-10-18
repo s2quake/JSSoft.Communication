@@ -31,7 +31,7 @@ public class ServiceHostCollection : ContainerBase<IServiceHost>
     {
         foreach (var item in serviceHosts)
         {
-            this.AddBase(item.Name, item);
+            AddBase(item.Name, item);
         }
     }
 }

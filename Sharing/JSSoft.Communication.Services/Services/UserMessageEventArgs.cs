@@ -28,9 +28,9 @@ public class UserMessageEventArgs : EventArgs
 {
     public UserMessageEventArgs(string sender, string receiver, string message)
     {
-        this.Sender = sender;
-        this.Receiver = receiver;
-        this.Message = message;
+        Sender = sender;
+        Receiver = receiver;
+        Message = message;
     }
 
     public string Sender { get; }

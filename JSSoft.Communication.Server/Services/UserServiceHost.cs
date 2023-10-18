@@ -33,14 +33,14 @@ class UserServiceHost : ServerServiceHostBase<IUserService, IUserServiceCallback
     [ImportingConstructor]
     public UserServiceHost(UserService userService)
     {
-        this._userService = userService;
+        _userService = userService;
     }
 
     protected override async Task<IUserService> CreateServiceAsync(IPeer peer, IUserServiceCallback callback)
     {
         await Task.Delay(1);
-        this._userService.SetCallback(callback);
-        return this._userService;
+        _userService.SetCallback(callback);
+        return _userService;
     }
 
     protected override async Task DestroyServiceAsync(IPeer peer, IUserService service)

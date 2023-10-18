@@ -50,51 +50,51 @@ class UserServiceInstance : InstanceBase, IUserService
 {
     public Task CreateAsync(Guid token, string userID, string password, Authority authority)
     {
-        return this.InvokeAsync(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token, userID, password, authority));
+        return InvokeAsync(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token, userID, password, authority));
     }
 
     public Task DeleteAsync(Guid token, string userID)
     {
-        return this.InvokeAsync(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token, userID));
+        return InvokeAsync(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token, userID));
     }
 
     public Task<(string userName, Authority authority)> GetInfoAsync(Guid token, string userID)
     {
-        return this.InvokeAsync<(string, Authority)>(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token, userID));
+        return InvokeAsync<(string, Authority)>(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token, userID));
     }
 
     public Task<string[]> GetUsersAsync(Guid token)
     {
-        return this.InvokeAsync<string[]>(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token));
+        return InvokeAsync<string[]>(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token));
     }
 
     public Task<bool> IsOnlineAsync(Guid token, string userID)
     {
-        return this.InvokeAsync<bool>(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token, userID));
+        return InvokeAsync<bool>(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token, userID));
     }
 
     public Task<Guid> LoginAsync(string userID, string password)
     {
-        return this.InvokeAsync<Guid>(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), userID, password));
+        return InvokeAsync<Guid>(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), userID, password));
     }
 
     public Task LogoutAsync(Guid token)
     {
-        return this.InvokeAsync(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token));
+        return InvokeAsync(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token));
     }
 
     public Task RenameAsync(Guid token, string userName)
     {
-        return this.InvokeAsync(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token, userName));
+        return InvokeAsync(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token, userName));
     }
 
     public Task SendMessageAsync(Guid token, string userID, string message)
     {
-        return this.InvokeAsync(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token, userID, message));
+        return InvokeAsync(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token, userID, message));
     }
 
     public Task SetAuthorityAsync(Guid token, string userID, Authority authority)
     {
-        return this.InvokeAsync(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token, userID, authority));
+        return InvokeAsync(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token, userID, authority));
     }
 }

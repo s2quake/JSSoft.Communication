@@ -34,17 +34,17 @@ class DataServiceHost : ServerServiceHostBase<IDataService>, IDisposable
     [ImportingConstructor]
     public DataServiceHost(DataService dataService)
     {
-        this._dataService = dataService;
+        _dataService = dataService;
     }
 
     public void Dispose()
     {
-        this._dataService.Dispose();
+        _dataService.Dispose();
     }
 
     protected override Task<IDataService> CreateServiceAsync(IPeer peer)
     {
-        return Task.Run<IDataService>(() => this._dataService);
+        return Task.Run<IDataService>(() => _dataService);
     }
 
     protected override async Task DestroyServiceAsync(IPeer peer, IDataService service)

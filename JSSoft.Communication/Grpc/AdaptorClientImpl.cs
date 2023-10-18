@@ -38,15 +38,15 @@ class AdaptorClientImpl : Adaptor.AdaptorClient, IPeer
     public AdaptorClientImpl(Channel channel, Guid id, IServiceHost[] serviceHosts)
         : base(channel)
     {
-        this.ID = id;
-        this.ServiceHosts = serviceHosts;
+        ID = id;
+        ServiceHosts = serviceHosts;
     }
 
     public async Task OpenAsync()
     {
         var request = await Task.Run(() =>
         {
-            var serviceNames = this.ServiceHosts.Select(item => item.Name).ToArray();
+            var serviceNames = ServiceHosts.Select(item => item.Name).ToArray();
             var req = new OpenRequest() { Time = DateTime.UtcNow.Ticks };
             req.ServiceNames.AddRange(serviceNames);
             return req;
@@ -54,10 +54,10 @@ class AdaptorClientImpl : Adaptor.AdaptorClient, IPeer
         var reply = await base.OpenAsync(request);
         await Task.Run(() =>
         {
-            this.Token = Guid.Parse(reply.Token);
-            this._timer = new Timer(timeout.TotalMilliseconds);
-            this._timer.Elapsed += Timer_Elapsed;
-            this._timer.Start();
+            Token = Guid.Parse(reply.Token);
+            _timer = new Timer(timeout.TotalMilliseconds);
+            _timer.Elapsed += Timer_Elapsed;
+            _timer.Start();
         });
     }
 
@@ -65,18 +65,18 @@ class AdaptorClientImpl : Adaptor.AdaptorClient, IPeer
     {
         await Task.Run(() =>
         {
-            this._timer.Dispose();
-            this._timer = null;
+            _timer.Dispose();
+            _timer = null;
         });
-        await base.CloseAsync(new CloseRequest() { Token = this.Token.ToString() });
+        await base.CloseAsync(new CloseRequest() { Token = Token.ToString() });
     }
 
     public async Task AbortAsync()
     {
         await Task.Run(() =>
         {
-            this._timer.Dispose();
-            this._timer = null;
+            _timer.Dispose();
+            _timer = null;
         });
     }
 
@@ -90,13 +90,13 @@ class AdaptorClientImpl : Adaptor.AdaptorClient, IPeer
     {
         var request = new PingRequest()
         {
-            Token = this.Token.ToString()
+            Token = Token.ToString()
         };
         Task.Run(async () =>
         {
             try
             {
-                await this.PingAsync(request);
+                await PingAsync(request);
             }
             catch
             {

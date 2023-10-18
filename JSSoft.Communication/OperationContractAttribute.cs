@@ -34,8 +34,8 @@ public class OperationContractAttribute : Attribute
 
     public OperationContractAttribute(string name)
     {
-        this.Name = name ?? throw new ArgumentNullException(nameof(name));
-        JSSoft.Library.IdentifierValidator.Verify(this.Name);
+        Name = name ?? throw new ArgumentNullException(nameof(name));
+        JSSoft.Library.IdentifierValidator.Verify(Name);
     }
 
     public string Name { get; }

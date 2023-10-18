@@ -29,7 +29,7 @@ public class InstanceMethodAttribute : Attribute
 {
     public InstanceMethodAttribute(string methodName)
     {
-        this.MethodName = methodName;
+        MethodName = methodName;
     }
 
     public string MethodName { get; }

@@ -34,11 +34,11 @@ class DataService : IDataService
 
     public Task<DateTime> CreateDataBaseAsync(string dataBaseName)
     {
-        return this._dataService.CreateDataBaseAsync(dataBaseName);
+        return _dataService.CreateDataBaseAsync(dataBaseName);
     }
 
     public void SetDataService(IDataService dataService)
     {
-        this._dataService = dataService;
+        _dataService = dataService;
     }
 }

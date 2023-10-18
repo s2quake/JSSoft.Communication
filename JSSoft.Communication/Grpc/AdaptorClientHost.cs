@@ -44,9 +44,9 @@ class AdaptorClientHost : IAdaptorHost
 
     public AdaptorClientHost(IServiceContext serviceContext, IInstanceContext instanceContext)
     {
-        this._serviceContext = serviceContext;
-        this._instanceContext = instanceContext;
-        this._serviceHosts = serviceContext.ServiceHosts;
+        _serviceContext = serviceContext;
+        _instanceContext = instanceContext;
+        _serviceHosts = serviceContext.ServiceHosts;
     }
 
     public async Task OpenAsync(string host, int port)
@@ -55,24 +55,24 @@ class AdaptorClientHost : IAdaptorHost
         {
             await Task.Run(() =>
             {
-                this._channel = new Channel($"{host}:{port}", ChannelCredentials.Insecure);
-                this._adaptorImpl = new AdaptorClientImpl(this._channel, Guid.NewGuid(), this._serviceHosts.ToArray());
+                _channel = new Channel($"{host}:{port}", ChannelCredentials.Insecure);
+                _adaptorImpl = new AdaptorClientImpl(_channel, Guid.NewGuid(), _serviceHosts.ToArray());
             });
-            await this._adaptorImpl.OpenAsync();
-            this._descriptor = await this._instanceContext.CreateInstanceAsync(this._adaptorImpl);
+            await _adaptorImpl.OpenAsync();
+            _descriptor = await _instanceContext.CreateInstanceAsync(_adaptorImpl);
             await Task.Run(() =>
             {
-                this._cancellationTokenSource = new CancellationTokenSource();
-                this._serializer = this._serviceContext.GetService(typeof(ISerializer)) as ISerializer;
+                _cancellationTokenSource = new CancellationTokenSource();
+                _serializer = _serviceContext.GetService(typeof(ISerializer)) as ISerializer;
             });
-            this._task = this.PollAsync(this._cancellationTokenSource.Token);
+            _task = PollAsync(_cancellationTokenSource.Token);
         }
         catch
         {
-            if (this._channel != null)
+            if (_channel != null)
             {
-                await this._channel.ShutdownAsync();
-                this._channel = null;
+                await _channel.ShutdownAsync();
+                _channel = null;
             }
             throw;
         }
@@ -82,26 +82,26 @@ class AdaptorClientHost : IAdaptorHost
     {
         await Task.Run(() =>
         {
-            this._cancellationTokenSource?.Cancel();
-            this._cancellationTokenSource = null;
-            this._task?.Wait();
-            this._task = null;
+            _cancellationTokenSource?.Cancel();
+            _cancellationTokenSource = null;
+            _task?.Wait();
+            _task = null;
         });
-        if (this._adaptorImpl != null)
-            await this._instanceContext.DestroyInstanceAsync(this._adaptorImpl);
-        if (this._adaptorImpl != null)
-            await this._adaptorImpl.CloseAsync();
-        this._adaptorImpl = null;
-        if (this._channel != null)
-            await this._channel.ShutdownAsync();
-        this._channel = null;
+        if (_adaptorImpl != null)
+            await _instanceContext.DestroyInstanceAsync(_adaptorImpl);
+        if (_adaptorImpl != null)
+            await _adaptorImpl.CloseAsync();
+        _adaptorImpl = null;
+        if (_channel != null)
+            await _channel.ShutdownAsync();
+        _channel = null;
     }
 
     public event EventHandler<CloseEventArgs> Disconnected;
 
     protected virtual void OnDisconnected(CloseEventArgs e)
     {
-        this.Disconnected?.Invoke(this, e);
+        Disconnected?.Invoke(this, e);
     }
 
     private async Task PollAsync(CancellationToken cancellationToken)
@@ -109,12 +109,12 @@ class AdaptorClientHost : IAdaptorHost
         var closeCode = int.MinValue;
         try
         {
-            using var call = this._adaptorImpl.Poll();
+            using var call = _adaptorImpl.Poll();
             while (!cancellationToken.IsCancellationRequested)
             {
                 var request = new PollRequest()
                 {
-                    Token = $"{this._adaptorImpl.Token}"
+                    Token = $"{_adaptorImpl.Token}"
                 };
                 await call.RequestStream.WriteAsync(request);
                 await call.ResponseStream.MoveNext();
@@ -124,7 +124,7 @@ class AdaptorClientHost : IAdaptorHost
                     closeCode = reply.Code;
                     break;
                 }
-                this.InvokeCallback(reply.Items);
+                InvokeCallback(reply.Items);
                 reply.Items.Clear();
                 await Task.Delay(1);
             }
@@ -138,10 +138,10 @@ class AdaptorClientHost : IAdaptorHost
         }
         if (closeCode != int.MinValue)
         {
-            this._task = null;
-            await this._adaptorImpl.AbortAsync();
-            this._adaptorImpl = null;
-            this.OnDisconnected(new CloseEventArgs(closeCode));
+            _task = null;
+            await _adaptorImpl.AbortAsync();
+            _adaptorImpl = null;
+            OnDisconnected(new CloseEventArgs(closeCode));
         }
     }
 
@@ -150,28 +150,28 @@ class AdaptorClientHost : IAdaptorHost
         if (serviceHost.MethodDescriptors.ContainsKey(name) == false)
             throw new InvalidOperationException();
         var methodDescriptor = serviceHost.MethodDescriptors[name];
-        var args = this._serializer.DeserializeMany(methodDescriptor.ParameterTypes, datas);
-        var instance = this._descriptor.Callbacks[serviceHost];
-        Task.Run(() => methodDescriptor.InvokeAsync(this._serviceContext, instance, args));
+        var args = _serializer.DeserializeMany(methodDescriptor.ParameterTypes, datas);
+        var instance = _descriptor.Callbacks[serviceHost];
+        Task.Run(() => methodDescriptor.InvokeAsync(_serviceContext, instance, args));
     }
 
     private void InvokeCallback(IEnumerable<PollReplyItem> pollItems)
     {
         foreach (var item in pollItems)
         {
-            var service = this._serviceHosts[item.ServiceName];
-            this.InvokeCallback(service, item.Name, item.Datas.ToArray());
+            var service = _serviceHosts[item.ServiceName];
+            InvokeCallback(service, item.Name, item.Datas.ToArray());
         }
     }
 
     private void ThrowException(Guid id, string data)
     {
-        if (this._serviceContext.GetService(typeof(IComponentProvider)) is not IComponentProvider componentProvider)
+        if (_serviceContext.GetService(typeof(IComponentProvider)) is not IComponentProvider componentProvider)
         {
             throw new InvalidOperationException("can not get interface of IComponentProvider at serviceProvider");
         }
         var exceptionDescriptor = componentProvider.GetExceptionDescriptor(id);
-        var exception = (Exception)this._serializer.Deserialize(exceptionDescriptor.ExceptionType, data);
+        var exception = (Exception)_serializer.Deserialize(exceptionDescriptor.ExceptionType, data);
         throw exception;
     }
 
@@ -179,8 +179,8 @@ class AdaptorClientHost : IAdaptorHost
 
     void IAdaptorHost.Invoke(InstanceBase instance, string name, Type[] types, object[] args)
     {
-        var token = $"{this._adaptorImpl.Token}";
-        var datas = this._serializer.SerializeMany(types, args);
+        var token = $"{_adaptorImpl.Token}";
+        var datas = _serializer.SerializeMany(types, args);
         var request = new InvokeRequest()
         {
             ServiceName = instance.ServiceName,
@@ -188,18 +188,18 @@ class AdaptorClientHost : IAdaptorHost
             Token = token
         };
         request.Datas.AddRange(datas);
-        var reply = this._adaptorImpl.Invoke(request);
+        var reply = _adaptorImpl.Invoke(request);
         var id = Guid.Parse(reply.ID);
         if (id != Guid.Empty)
         {
-            this.ThrowException(id, reply.Data);
+            ThrowException(id, reply.Data);
         }
     }
 
     T IAdaptorHost.Invoke<T>(InstanceBase instance, string name, Type[] types, object[] args)
     {
-        var token = $"{this._adaptorImpl.Token}";
-        var datas = this._serializer.SerializeMany(types, args);
+        var token = $"{_adaptorImpl.Token}";
+        var datas = _serializer.SerializeMany(types, args);
         var request = new InvokeRequest()
         {
             ServiceName = instance.ServiceName,
@@ -207,19 +207,19 @@ class AdaptorClientHost : IAdaptorHost
             Token = token
         };
         request.Datas.AddRange(datas);
-        var reply = this._adaptorImpl.Invoke(request);
+        var reply = _adaptorImpl.Invoke(request);
         var id = Guid.Parse(reply.ID);
         if (id != Guid.Empty)
         {
-            this.ThrowException(id, reply.Data);
+            ThrowException(id, reply.Data);
         }
-        return (T)this._serializer.Deserialize(typeof(T), reply.Data);
+        return (T)_serializer.Deserialize(typeof(T), reply.Data);
     }
 
     async Task IAdaptorHost.InvokeAsync(InstanceBase instance, string name, Type[] types, object[] args)
     {
-        var token = $"{this._adaptorImpl.Token}";
-        var datas = this._serializer.SerializeMany(types, args);
+        var token = $"{_adaptorImpl.Token}";
+        var datas = _serializer.SerializeMany(types, args);
         var request = new InvokeRequest()
         {
             ServiceName = instance.ServiceName,
@@ -227,18 +227,18 @@ class AdaptorClientHost : IAdaptorHost
             Token = token
         };
         request.Datas.AddRange(datas);
-        var reply = await this._adaptorImpl.InvokeAsync(request);
+        var reply = await _adaptorImpl.InvokeAsync(request);
         var id = Guid.Parse(reply.ID);
         if (id != Guid.Empty)
         {
-            this.ThrowException(id, reply.Data);
+            ThrowException(id, reply.Data);
         }
     }
 
     async Task<T> IAdaptorHost.InvokeAsync<T>(InstanceBase instance, string name, Type[] types, object[] args)
     {
-        var token = $"{this._adaptorImpl.Token}";
-        var datas = this._serializer.SerializeMany(types, args);
+        var token = $"{_adaptorImpl.Token}";
+        var datas = _serializer.SerializeMany(types, args);
         var request = new InvokeRequest()
         {
             ServiceName = instance.ServiceName,
@@ -246,13 +246,13 @@ class AdaptorClientHost : IAdaptorHost
             Token = token
         };
         request.Datas.AddRange(datas);
-        var reply = await this._adaptorImpl.InvokeAsync(request);
+        var reply = await _adaptorImpl.InvokeAsync(request);
         var id = Guid.Parse(reply.ID);
         if (id != Guid.Empty)
         {
-            this.ThrowException(id, reply.Data);
+            ThrowException(id, reply.Data);
         }
-        return (T)this._serializer.Deserialize(typeof(T), reply.Data);
+        return (T)_serializer.Deserialize(typeof(T), reply.Data);
     }
 
     #endregion

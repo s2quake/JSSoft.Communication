@@ -31,20 +31,20 @@ public sealed class PeerDescriptor
 {
     public void Dispose()
     {
-        this.Callbacks.DisposeAll();
+        Callbacks.DisposeAll();
     }
 
     public void AddInstance(IServiceHost serviceHost, object service, object callback)
     {
-        this.Services.Add(serviceHost, service);
-        this.Callbacks.Add(serviceHost, callback);
+        Services.Add(serviceHost, service);
+        Callbacks.Add(serviceHost, callback);
     }
 
     public (object service, object callback) RemoveInstance(IServiceHost serviceHost)
     {
-        var value = (this.Services[serviceHost], this.Callbacks[serviceHost]);
-        this.Services.Remove(serviceHost);
-        this.Callbacks.Remove(serviceHost);
+        var value = (Services[serviceHost], Callbacks[serviceHost]);
+        Services.Remove(serviceHost);
+        Callbacks.Remove(serviceHost);
         return value;
     }
 

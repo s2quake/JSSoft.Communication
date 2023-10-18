@@ -40,44 +40,44 @@ sealed class InstanceContext : IInstanceContext, IPeer
 
     public InstanceContext(ServiceContextBase serviceContext)
     {
-        this._serviceContext = serviceContext;
-        this.ID = Guid.NewGuid();
+        _serviceContext = serviceContext;
+        ID = Guid.NewGuid();
     }
 
     public async Task InitializeInstanceAsync()
     {
-        var query = from item in this._serviceContext.ServiceHosts
-                    where ServiceContextBase.IsPerPeer(this._serviceContext, item) == false
+        var query = from item in _serviceContext.ServiceHosts
+                    where ServiceContextBase.IsPerPeer(_serviceContext, item) == false
                     select item;
         foreach (var item in query)
         {
-            var (service, callback) = await this._serviceContext.CreateInstanceAsync(item, this);
-            this._descriptor.AddInstance(item, service, callback);
+            var (service, callback) = await _serviceContext.CreateInstanceAsync(item, this);
+            _descriptor.AddInstance(item, service, callback);
         }
     }
 
     public async Task ReleaseInstanceAsync()
     {
-        var isServer = ServiceContextBase.IsServer(this._serviceContext);
-        var query = from item in this._serviceContext.ServiceHosts.Reverse()
-                    where ServiceContextBase.IsPerPeer(this._serviceContext, item) == false
+        var isServer = ServiceContextBase.IsServer(_serviceContext);
+        var query = from item in _serviceContext.ServiceHosts.Reverse()
+                    where ServiceContextBase.IsPerPeer(_serviceContext, item) == false
                     select item;
         foreach (var item in query)
         {
-            var (service, callback) = this._descriptor.RemoveInstance(item);
-            await this._serviceContext.DestroyInstanceAsync(item, this, service, callback);
+            var (service, callback) = _descriptor.RemoveInstance(item);
+            await _serviceContext.DestroyInstanceAsync(item, this, service, callback);
         }
     }
 
     public async Task<PeerDescriptor> CreateInstanceAsync(IPeer peer)
     {
         var peerDescriptor = new PeerDescriptor();
-        foreach (var item in this._serviceContext.ServiceHosts)
+        foreach (var item in _serviceContext.ServiceHosts)
         {
-            var isPerPeer = ServiceContextBase.IsPerPeer(this._serviceContext, item);
+            var isPerPeer = ServiceContextBase.IsPerPeer(_serviceContext, item);
             if (isPerPeer == true)
             {
-                var (service, callback) = await this._serviceContext.CreateInstanceAsync(item, peer);
+                var (service, callback) = await _serviceContext.CreateInstanceAsync(item, peer);
                 peerDescriptor.AddInstance(item, service, callback);
             }
             else
@@ -86,20 +86,20 @@ sealed class InstanceContext : IInstanceContext, IPeer
                 peerDescriptor.AddInstance(item, service, callback);
             }
         }
-        this._descriptorByPeer.Add(peer, peerDescriptor);
+        _descriptorByPeer.Add(peer, peerDescriptor);
         return peerDescriptor;
     }
 
     public async Task DestroyInstanceAsync(IPeer peer)
     {
-        var peerDescriptor = this._descriptorByPeer[peer];
-        foreach (var item in this._serviceContext.ServiceHosts.Reverse())
+        var peerDescriptor = _descriptorByPeer[peer];
+        foreach (var item in _serviceContext.ServiceHosts.Reverse())
         {
-            var isPerPeer = ServiceContextBase.IsPerPeer(this._serviceContext, item);
+            var isPerPeer = ServiceContextBase.IsPerPeer(_serviceContext, item);
             if (isPerPeer == true)
             {
                 var (service, callback) = peerDescriptor.RemoveInstance(item);
-                await this._serviceContext.DestroyInstanceAsync(item, peer, service, callback);
+                await _serviceContext.DestroyInstanceAsync(item, peer, service, callback);
             }
             else
             {
@@ -107,10 +107,10 @@ sealed class InstanceContext : IInstanceContext, IPeer
             }
         }
         peerDescriptor.Dispose();
-        this._descriptorByPeer.Remove(peer);
+        _descriptorByPeer.Remove(peer);
     }
 
-    public Dispatcher Dispatcher => this._serviceContext.Dispatcher;
+    public Dispatcher Dispatcher => _serviceContext.Dispatcher;
 
     public Guid ID { get; }
 }

@@ -38,14 +38,14 @@ class OpenCommand : CommandAsyncBase
     [ImportingConstructor]
     public OpenCommand(IServiceContext serviceHost, Application application)
     {
-        this._serviceHost = serviceHost;
-        this._application = application;
+        _serviceHost = serviceHost;
+        _application = application;
     }
 
-    public override bool IsEnabled => this._serviceHost.ServiceState == ServiceState.None;
+    public override bool IsEnabled => _serviceHost.ServiceState == ServiceState.None;
 
     protected override async Task OnExecuteAsync(CancellationToken cancellationToken)
     {
-        _application.Token = await this._serviceHost.OpenAsync();
+        _application.Token = await _serviceHost.OpenAsync();
     }
 }

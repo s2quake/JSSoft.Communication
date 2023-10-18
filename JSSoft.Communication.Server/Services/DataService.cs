@@ -36,16 +36,16 @@ class DataService : IDataService
 
     public DataService()
     {
-        this.Dispatcher = new Dispatcher(this);
+        Dispatcher = new Dispatcher(this);
     }
 
     public Task<DateTime> CreateDataBaseAsync(string dataBaseName)
     {
-        return this.Dispatcher.InvokeAsync(() =>
+        return Dispatcher.InvokeAsync(() =>
         {
-            if (this._dataBases.Contains(dataBaseName) == true)
+            if (_dataBases.Contains(dataBaseName) == true)
                 throw new ArgumentNullException(nameof(dataBaseName));
-            this._dataBases.Add(dataBaseName);
+            _dataBases.Add(dataBaseName);
             return DateTime.UtcNow;
         });
     }
@@ -54,7 +54,7 @@ class DataService : IDataService
 
     public void Dispose()
     {
-        this.Dispatcher.Dispose();
-        this.Dispatcher = null;
+        Dispatcher.Dispose();
+        Dispatcher = null;
     }
 }

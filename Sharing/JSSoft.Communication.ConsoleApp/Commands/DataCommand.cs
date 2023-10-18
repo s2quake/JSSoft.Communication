@@ -45,7 +45,7 @@ class DataCommand : CommandMethodBase
     [CommandMethod]
     public Task CreateAsync(string dataBaseName)
     {
-        return this.DataService.CreateDataBaseAsync(dataBaseName);
+        return DataService.CreateDataBaseAsync(dataBaseName);
     }
 
     public override bool IsEnabled => _application.UserToken != Guid.Empty;

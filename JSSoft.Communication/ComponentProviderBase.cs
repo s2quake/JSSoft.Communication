@@ -31,10 +31,10 @@ public class ComponentProviderBase : IComponentProvider
                                     IDataSerializer[] dataSerializers,
                                     IExceptionDescriptor[] exceptionDescriptors)
     {
-        this.AdaptorHostProviders = ComponentProvider.Default.AdaptorHostProviders.Concat(adaptorHostProviders ?? new IAdaptorHostProvider[] { }).ToArray();
-        this.SerializerProviders = ComponentProvider.Default.SerializerProviders.Concat(serializerProviders ?? new ISerializerProvider[] { }).ToArray();
-        this.DataSerializers = ComponentProvider.Default.DataSerializers.Concat(dataSerializers ?? new IDataSerializer[] { }).ToArray();
-        this.ExceptionDescriptors = ComponentProvider.Default.ExceptionDescriptors.Concat(exceptionDescriptors ?? new IExceptionDescriptor[] { }).ToArray();
+        AdaptorHostProviders = ComponentProvider.Default.AdaptorHostProviders.Concat(adaptorHostProviders ?? new IAdaptorHostProvider[] { }).ToArray();
+        SerializerProviders = ComponentProvider.Default.SerializerProviders.Concat(serializerProviders ?? new ISerializerProvider[] { }).ToArray();
+        DataSerializers = ComponentProvider.Default.DataSerializers.Concat(dataSerializers ?? new IDataSerializer[] { }).ToArray();
+        ExceptionDescriptors = ComponentProvider.Default.ExceptionDescriptors.Concat(exceptionDescriptors ?? new IExceptionDescriptor[] { }).ToArray();
     }
 
     public IAdaptorHostProvider[] AdaptorHostProviders { get; }

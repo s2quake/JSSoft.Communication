@@ -33,20 +33,20 @@ class PeerCollection : ContainerBase<Peer>
 
     public PeerCollection(IServiceContext serviceContext, IInstanceContext instanceContext)
     {
-        this._serviceContext = serviceContext;
-        this._instanceContext = instanceContext;
+        _serviceContext = serviceContext;
+        _instanceContext = instanceContext;
     }
 
     public async Task AddAsync(Peer item)
     {
-        var descrptor = await this._instanceContext.CreateInstanceAsync(item);
+        var descrptor = await _instanceContext.CreateInstanceAsync(item);
         item.Descriptor = descrptor;
-        await this.Dispatcher.InvokeAsync(() => base.AddBase($"{item.ID}", item));
+        await Dispatcher.InvokeAsync(() => base.AddBase($"{item.ID}", item));
     }
 
     public async Task RemoveAsync(string id)
     {
-        var peer = await this.Dispatcher.InvokeAsync(() =>
+        var peer = await Dispatcher.InvokeAsync(() =>
         {
             if (base.ContainsKey(id) == true)
             {
@@ -59,11 +59,11 @@ class PeerCollection : ContainerBase<Peer>
         });
         if (peer != null)
         {
-            await this._instanceContext.DestroyInstanceAsync(peer);
+            await _instanceContext.DestroyInstanceAsync(peer);
             peer.Descriptor = null;
             peer.Dispose();
         }
     }
 
-    public Dispatcher Dispatcher => this._serviceContext?.Dispatcher;
+    public Dispatcher Dispatcher => _serviceContext?.Dispatcher;
 }

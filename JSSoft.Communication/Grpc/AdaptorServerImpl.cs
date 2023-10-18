@@ -31,31 +31,31 @@ class AdaptorServerImpl : Adaptor.AdaptorBase
 
     public AdaptorServerImpl(AdaptorServerHost adaptorHost)
     {
-        this._adaptorHost = adaptorHost;
+        _adaptorHost = adaptorHost;
     }
 
     public override Task<OpenReply> Open(OpenRequest request, ServerCallContext context)
     {
-        return this._adaptorHost.Open(request, context);
+        return _adaptorHost.Open(request, context);
     }
 
     public override Task<CloseReply> Close(CloseRequest request, ServerCallContext context)
     {
-        return this._adaptorHost.Close(request, context);
+        return _adaptorHost.Close(request, context);
     }
 
     public override Task<PingReply> Ping(PingRequest request, ServerCallContext context)
     {
-        return this._adaptorHost.Ping(request, context);
+        return _adaptorHost.Ping(request, context);
     }
 
     public override Task<InvokeReply> Invoke(InvokeRequest request, ServerCallContext context)
     {
-        return this._adaptorHost.Invoke(request, context);
+        return _adaptorHost.Invoke(request, context);
     }
 
     public override Task Poll(IAsyncStreamReader<PollRequest> requestStream, IServerStreamWriter<PollReply> responseStream, ServerCallContext context)
     {
-        return this._adaptorHost.Poll(requestStream, responseStream, context);
+        return _adaptorHost.Poll(requestStream, responseStream, context);
     }
 }

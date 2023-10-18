@@ -35,57 +35,57 @@ class UserService : IUserService, IUserServiceCallback, INotifyUserService
 
     public Task CreateAsync(Guid token, string userID, string password, Authority authority)
     {
-        return this._userService.CreateAsync(token, userID, password, authority);
+        return _userService.CreateAsync(token, userID, password, authority);
     }
 
     public Task DeleteAsync(Guid token, string userID)
     {
-        return this._userService.DeleteAsync(token, userID);
+        return _userService.DeleteAsync(token, userID);
     }
 
     public Task<(string userName, Authority authority)> GetInfoAsync(Guid token, string userID)
     {
-        return this._userService.GetInfoAsync(token, userID);
+        return _userService.GetInfoAsync(token, userID);
     }
 
     public Task<string[]> GetUsersAsync(Guid token)
     {
-        return this._userService.GetUsersAsync(token);
+        return _userService.GetUsersAsync(token);
     }
 
     public Task<bool> IsOnlineAsync(Guid token, string userID)
     {
-        return this._userService.IsOnlineAsync(token, userID);
+        return _userService.IsOnlineAsync(token, userID);
     }
 
     public Task<Guid> LoginAsync(string userID, string password)
     {
-        return this._userService.LoginAsync(userID, password);
+        return _userService.LoginAsync(userID, password);
     }
 
     public Task LogoutAsync(Guid token)
     {
-        return this._userService.LogoutAsync(token);
+        return _userService.LogoutAsync(token);
     }
 
     public Task RenameAsync(Guid token, string userName)
     {
-        return this._userService.RenameAsync(token, userName);
+        return _userService.RenameAsync(token, userName);
     }
 
     public Task SendMessageAsync(Guid token, string userID, string message)
     {
-        return this._userService.SendMessageAsync(token, userID, message);
+        return _userService.SendMessageAsync(token, userID, message);
     }
 
     public Task SetAuthorityAsync(Guid token, string userID, Authority authority)
     {
-        return this._userService.SetAuthorityAsync(token, userID, authority);
+        return _userService.SetAuthorityAsync(token, userID, authority);
     }
 
     public void SetUserService(IUserService userService)
     {
-        this._userService = userService;
+        _userService = userService;
     }
 
     public event EventHandler<UserEventArgs> LoggedIn;
@@ -104,74 +104,74 @@ class UserService : IUserService, IUserServiceCallback, INotifyUserService
 
     protected virtual void OnCreated(UserEventArgs e)
     {
-        this.Created?.Invoke(this, e);
+        Created?.Invoke(this, e);
     }
 
     protected virtual void OnDeleted(UserEventArgs e)
     {
-        this.Deleted?.Invoke(this, e);
+        Deleted?.Invoke(this, e);
     }
 
     protected virtual void OnLoggedIn(UserEventArgs e)
     {
-        this.LoggedIn?.Invoke(this, e);
+        LoggedIn?.Invoke(this, e);
     }
 
     protected virtual void OnLoggedOut(UserEventArgs e)
     {
-        this.LoggedOut?.Invoke(this, e);
+        LoggedOut?.Invoke(this, e);
     }
 
     protected virtual void OnMessageReceived(UserMessageEventArgs e)
     {
-        this.MessageReceived?.Invoke(this, e);
+        MessageReceived?.Invoke(this, e);
     }
 
     protected virtual void OnRenamed(UserNameEventArgs e)
     {
-        this.Renamed?.Invoke(this, e);
+        Renamed?.Invoke(this, e);
     }
 
     protected virtual void OnAuthorityChanged(UserAuthorityEventArgs e)
     {
-        this.AuthorityChanged?.Invoke(this, e);
+        AuthorityChanged?.Invoke(this, e);
     }
 
     #region IUserServiceCallback
 
     void IUserServiceCallback.OnCreated(string userID)
     {
-        this.OnCreated(new UserEventArgs(userID));
+        OnCreated(new UserEventArgs(userID));
     }
 
     void IUserServiceCallback.OnDeleted(string userID)
     {
-        this.OnDeleted(new UserEventArgs(userID));
+        OnDeleted(new UserEventArgs(userID));
     }
 
     void IUserServiceCallback.OnLoggedIn(string userID)
     {
-        this.OnLoggedIn(new UserEventArgs(userID));
+        OnLoggedIn(new UserEventArgs(userID));
     }
 
     void IUserServiceCallback.OnLoggedOut(string userID)
     {
-        this.OnLoggedOut(new UserEventArgs(userID));
+        OnLoggedOut(new UserEventArgs(userID));
     }
 
     void IUserServiceCallback.OnMessageReceived(string sender, string receiver, string message)
     {
-        this.OnMessageReceived(new UserMessageEventArgs(sender, receiver, message));
+        OnMessageReceived(new UserMessageEventArgs(sender, receiver, message));
     }
 
     void IUserServiceCallback.OnRenamed(string userID, string userName)
     {
-        this.OnRenamed(new UserNameEventArgs(userID, userName));
+        OnRenamed(new UserNameEventArgs(userID, userName));
     }
 
     void IUserServiceCallback.OnAuthorityChanged(string userID, Authority authority)
     {
-        this.OnAuthorityChanged(new UserAuthorityEventArgs(userID, authority));
+        OnAuthorityChanged(new UserAuthorityEventArgs(userID, authority));
     }
 
     #endregion

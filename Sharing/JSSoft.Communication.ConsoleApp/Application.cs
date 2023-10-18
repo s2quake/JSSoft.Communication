@@ -70,17 +70,17 @@ sealed class Application : IApplication, IServiceProvider
         _container.ComposeExportedValue(this);
 
         // _terminalLazy = terminalLazy;
-        this._settings = Settings.CreateFromCommandLine();
-        // this.Prompt = postfix;
-        this._serviceHost = _container.GetExportedValue<IServiceContext>();
-        this._serviceHost.Opened += ServiceHost_Opened;
-        this._serviceHost.Closed += ServiceHost_Closed;
-        this._userServiceNotification = _container.GetExportedValue<INotifyUserService>();
-        this._userServiceNotification.LoggedIn += UserServiceNotification_LoggedIn;
-        this._userServiceNotification.LoggedOut += UserServiceNotification_LoggedOut;
-        this._userServiceNotification.MessageReceived += UserServiceNotification_MessageReceived;
-        // this.commandContext = commandContext;
-        this.Title = "Server";
+        _settings = Settings.CreateFromCommandLine();
+        // Prompt = postfix;
+        _serviceHost = _container.GetExportedValue<IServiceContext>();
+        _serviceHost.Opened += ServiceHost_Opened;
+        _serviceHost.Closed += ServiceHost_Closed;
+        _userServiceNotification = _container.GetExportedValue<INotifyUserService>();
+        _userServiceNotification.LoggedIn += UserServiceNotification_LoggedIn;
+        _userServiceNotification.LoggedOut += UserServiceNotification_LoggedOut;
+        _userServiceNotification.MessageReceived += UserServiceNotification_MessageReceived;
+        // commandContext = commandContext;
+        Title = "Server";
     }
 
     // public static IApplication Create()
@@ -90,10 +90,10 @@ sealed class Application : IApplication, IServiceProvider
 
     public void Dispose()
     {
-        if (this._isDisposed == false)
+        if (_isDisposed == false)
         {
             _container.Dispose();
-            this._isDisposed = true;
+            _isDisposed = true;
         }
     }
 
@@ -107,17 +107,17 @@ sealed class Application : IApplication, IServiceProvider
 
     internal void Login(string userID, Guid token)
     {
-        this.UserID = userID;
-        this.UserToken = token;
-        this.UpdatePrompt();
-        this.Out.WriteLine("사용자 관련 명령을 수행하려면 'help user' 을(를) 입력하세요.");
+        UserID = userID;
+        UserToken = token;
+        UpdatePrompt();
+        Out.WriteLine("사용자 관련 명령을 수행하려면 'help user' 을(를) 입력하세요.");
     }
 
     internal void Logout()
     {
-        this.UserID = string.Empty;
-        this.UserToken = Guid.Empty;
-        this.UpdatePrompt();
+        UserID = string.Empty;
+        UserToken = Guid.Empty;
+        UpdatePrompt();
     }
 
     internal Guid Token { get; set; }
@@ -133,10 +133,10 @@ sealed class Application : IApplication, IServiceProvider
     private void UpdatePrompt()
     {
         var prompt = string.Empty;
-        var isOpened = this.IsOpened;
-        var host = this._serviceHost.Host;
-        var port = this._serviceHost.Port;
-        var userID = this.UserID;
+        var isOpened = IsOpened;
+        var host = _serviceHost.Host;
+        var port = _serviceHost.Port;
+        var userID = UserID;
 
         if (isOpened == true)
         {
@@ -149,62 +149,62 @@ sealed class Application : IApplication, IServiceProvider
 
     private void ServiceHost_Opened(object sender, EventArgs e)
     {
-        this.IsOpened = true;
-        this.UpdatePrompt();
+        IsOpened = true;
+        UpdatePrompt();
 
-        if (this._isServer)
+        if (_isServer)
         {
-            this.Title = $"Server {this._serviceHost.Host}:{this._serviceHost.Port}";
-            this.Out.WriteLine("서버가 시작되었습니다.");
+            Title = $"Server {_serviceHost.Host}:{_serviceHost.Port}";
+            Out.WriteLine("서버가 시작되었습니다.");
         }
         else
         {
-            this.Title = $"Client {this._serviceHost.Host}:{this._serviceHost.Port}";
-            this.Out.WriteLine("서버에 연결되었습니다.");
+            Title = $"Client {_serviceHost.Host}:{_serviceHost.Port}";
+            Out.WriteLine("서버에 연결되었습니다.");
         }
-        this.Out.WriteLine("사용 가능한 명령을 확인려면 'help' 을(를) 입력하세요.");
-        this.Out.WriteLine("로그인을 하려면 'login admin admin' 을(를) 입력하세요.");
+        Out.WriteLine("사용 가능한 명령을 확인려면 'help' 을(를) 입력하세요.");
+        Out.WriteLine("로그인을 하려면 'login admin admin' 을(를) 입력하세요.");
     }
 
     private void ServiceHost_Closed(object sender, EventArgs e)
     {
-        this.IsOpened = false;
-        this.UpdatePrompt();
-        if (this._isServer)
+        IsOpened = false;
+        UpdatePrompt();
+        if (_isServer)
         {
-            this.Title = $"Server - Closed";
-            this.Out.WriteLine("서버가 중단되었습니다.");
-            this.Out.WriteLine("서버를 시작하려면 'open' 을(를) 입력하세요.");
+            Title = $"Server - Closed";
+            Out.WriteLine("서버가 중단되었습니다.");
+            Out.WriteLine("서버를 시작하려면 'open' 을(를) 입력하세요.");
         }
         else
         {
-            this.Title = $"Client - Disconnected";
-            this.Out.WriteLine("서버와 연결이 끊어졌습니다.");
-            this.Out.WriteLine("서버에 연결하려면 'open' 을(를) 입력하세요.");
+            Title = $"Client - Disconnected";
+            Out.WriteLine("서버와 연결이 끊어졌습니다.");
+            Out.WriteLine("서버에 연결하려면 'open' 을(를) 입력하세요.");
         }
     }
 
     private void UserServiceNotification_LoggedIn(object sender, UserEventArgs e)
     {
-        this.Out.WriteLine($"User logged in: {e.UserID}");
+        Out.WriteLine($"User logged in: {e.UserID}");
     }
 
     private void UserServiceNotification_LoggedOut(object sender, UserEventArgs e)
     {
-        this.Out.WriteLine($"User logged out: {e.UserID}");
+        Out.WriteLine($"User logged out: {e.UserID}");
     }
 
     private void UserServiceNotification_MessageReceived(object sender, UserMessageEventArgs e)
     {
-        if (e.Sender == this.UserID)
+        if (e.Sender == UserID)
         {
             var text = TerminalStrings.Foreground($"'{e.Receiver}'에게 귓속말: {e.Message}", TerminalColor.BrightMagenta);
-            this.Out.WriteLine(text);
+            Out.WriteLine(text);
         }
-        else if (e.Receiver == this.UserID)
+        else if (e.Receiver == UserID)
         {
             var text = TerminalStrings.Foreground($"'{e.Receiver}'의 귓속말: {e.Message}", TerminalColor.BrightMagenta);
-            this.Out.WriteLine(text);
+            Out.WriteLine(text);
         }
     }
 
@@ -244,28 +244,28 @@ sealed class Application : IApplication, IServiceProvider
 
     public async Task StartAsync()
     {
-        this._cancellation = new CancellationTokenSource();
-        this._serviceHost.Host = this._settings.Host;
-        this._serviceHost.Port = this._settings.Port;
+        _cancellation = new CancellationTokenSource();
+        _serviceHost.Host = _settings.Host;
+        _serviceHost.Port = _settings.Port;
         try
         {
-            this.Token = await this._serviceHost.OpenAsync();
+            Token = await _serviceHost.OpenAsync();
         }
         catch (Exception e)
         {
             var text = TerminalStrings.Foreground(e.Message, TerminalColor.BrightRed);
             Console.Error.WriteLine(text);
         }
-        await Terminal.StartAsync(this._cancellation.Token);
+        await Terminal.StartAsync(_cancellation.Token);
     }
 
     public async Task StopAsync(int exitCode)
     {
-        this._cancellation.Cancel();
-        if (this._serviceHost.ServiceState == ServiceState.Open)
+        _cancellation.Cancel();
+        if (_serviceHost.ServiceState == ServiceState.Open)
         {
-            this._serviceHost.Closed -= ServiceHost_Closed;
-            await this._serviceHost.CloseAsync(this.Token, exitCode);
+            _serviceHost.Closed -= ServiceHost_Closed;
+            await _serviceHost.CloseAsync(Token, exitCode);
         }
     }
 

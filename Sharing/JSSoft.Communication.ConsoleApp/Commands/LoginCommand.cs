@@ -41,7 +41,7 @@ class LoginCommand : CommandAsyncBase
     public LoginCommand(Application application, Lazy<IUserService> userService)
     {
         _application = application;
-        this._userService = userService;
+        _userService = userService;
     }
 
     [CommandPropertyRequired]
@@ -60,9 +60,9 @@ class LoginCommand : CommandAsyncBase
 
     protected override async Task OnExecuteAsync(CancellationToken cancellationToken)
     {
-        var token = await this.UserService.LoginAsync(this.UserID, this.Password);
-        _application.Login(this.UserID, token);
+        var token = await UserService.LoginAsync(UserID, Password);
+        _application.Login(UserID, token);
     }
 
-    private IUserService UserService => this._userService.Value;
+    private IUserService UserService => _userService.Value;
 }

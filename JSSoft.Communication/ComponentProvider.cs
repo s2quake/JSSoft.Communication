@@ -28,15 +28,15 @@ class ComponentProvider : IComponentProvider
 {
     public ComponentProvider()
     {
-        this.AdaptorHostProviders = new IAdaptorHostProvider[]
+        AdaptorHostProviders = new IAdaptorHostProvider[]
         {
             AdaptorHostProvider.Default,
         };
-        this.SerializerProviders = new ISerializerProvider[]
+        SerializerProviders = new ISerializerProvider[]
         {
             JsonSerializerProvider.Default,
         };
-        this.DataSerializers = new IDataSerializer[]
+        DataSerializers = new IDataSerializer[]
         {
             ArgumentExceptionSerializer.Default,
             ArgumentNullExceptionSerializer.Default,
@@ -46,7 +46,7 @@ class ComponentProvider : IComponentProvider
             NotImplementedExceptionSerializer.Default,
             SystemExceptionSerializer.Default,
         };
-        this.ExceptionDescriptors = new IExceptionDescriptor[]
+        ExceptionDescriptors = new IExceptionDescriptor[]
         {
             ArgumentExceptionSerializer.Default,
             ArgumentNullExceptionSerializer.Default,

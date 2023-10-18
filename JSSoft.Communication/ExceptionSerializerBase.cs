@@ -32,7 +32,7 @@ public abstract class ExceptionSerializerBase<T> : IExceptionDescriptor, IDataSe
 {
     protected ExceptionSerializerBase(Guid id)
     {
-        this.ID = id;
+        ID = id;
     }
 
     protected ExceptionSerializerBase(string id)
@@ -82,11 +82,11 @@ public abstract class ExceptionSerializerBase<T> : IExceptionDescriptor, IDataSe
     object IDataSerializer.Deserialize(ISerializer serializer, string text)
     {
         var converter = new FormatterConverter();
-        var info = new SerializationInfo(this.ExceptionType, converter);
+        var info = new SerializationInfo(ExceptionType, converter);
         var context = new StreamingContext(StreamingContextStates.Clone);
         var propserties = serializer.Deserialize(typeof(Dictionary<string, object>), text) as Dictionary<string, object>;
-        this.GetSerializationInfo(propserties, info);
-        return Activator.CreateInstance(this.ExceptionType, BindingFlags.NonPublic | BindingFlags.Instance, null, new object[] { info, context }, null);
+        GetSerializationInfo(propserties, info);
+        return Activator.CreateInstance(ExceptionType, BindingFlags.NonPublic | BindingFlags.Instance, null, new object[] { info, context }, null);
     }
 
     string IDataSerializer.Serialize(ISerializer serializer, object data)
@@ -94,11 +94,11 @@ public abstract class ExceptionSerializerBase<T> : IExceptionDescriptor, IDataSe
         var e = data as T;
         var info = GetSerializationInfo(e);
         var properties = new Dictionary<string, object>(info.MemberCount);
-        this.GetProperties(info, properties);
+        GetProperties(info, properties);
         return serializer.Serialize(properties.GetType(), properties);
     }
 
-    Type IDataSerializer.Type => this.ExceptionType;
+    Type IDataSerializer.Type => ExceptionType;
 
     #endregion
 }

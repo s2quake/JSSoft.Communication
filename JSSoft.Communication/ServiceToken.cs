@@ -28,7 +28,7 @@ public sealed class ServiceToken
 {
     internal ServiceToken(Guid guid)
     {
-        this.Guid = guid;
+        Guid = guid;
     }
 
     internal Guid Guid { get; }

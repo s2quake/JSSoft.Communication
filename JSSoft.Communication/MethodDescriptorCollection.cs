@@ -37,7 +37,7 @@ public sealed class MethodDescriptorCollection : ContainerBase<MethodDescriptor>
             if (item.GetCustomAttribute(typeof(OperationContractAttribute)) is OperationContractAttribute)
             {
                 var methodDescriptor = new MethodDescriptor(item);
-                this.AddBase(methodDescriptor.Name, methodDescriptor);
+                AddBase(methodDescriptor.Name, methodDescriptor);
             }
         }
     }

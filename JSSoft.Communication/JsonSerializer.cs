@@ -34,7 +34,7 @@ class JsonSerializer : ISerializer
 
     public JsonSerializer(IDataSerializer[] dataSerializers)
     {
-        this._dataSerializerByType = dataSerializers.ToDictionary(item => item.Type);
+        _dataSerializerByType = dataSerializers.ToDictionary(item => item.Type);
     }
 
     public string Serialize(Type type, object data)
@@ -42,9 +42,9 @@ class JsonSerializer : ISerializer
         var currentType = type;
         while (currentType != null)
         {
-            if (this._dataSerializerByType.ContainsKey(currentType) == true)
+            if (_dataSerializerByType.ContainsKey(currentType) == true)
             {
-                var dataSerializer = this._dataSerializerByType[currentType];
+                var dataSerializer = _dataSerializerByType[currentType];
                 return dataSerializer.Serialize(this, data);
             }
             currentType = currentType.BaseType;
@@ -55,9 +55,9 @@ class JsonSerializer : ISerializer
 
     public object Deserialize(Type type, string text)
     {
-        if (this._dataSerializerByType.ContainsKey(type) == true)
+        if (_dataSerializerByType.ContainsKey(type) == true)
         {
-            var dataSerializer = this._dataSerializerByType[type];
+            var dataSerializer = _dataSerializerByType[type];
             return dataSerializer.Deserialize(this, text);
         }
         return JsonConvert.DeserializeObject(text, type, settings);

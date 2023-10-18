@@ -50,13 +50,13 @@ public abstract class ServiceContextBase : IServiceContext
 
     protected ServiceContextBase(IComponentProvider componentProvider, IServiceHost[] serviceHost)
     {
-        this._componentProvider = componentProvider ?? ComponentProvider.Default;
-        this.ServiceHosts = new ServiceHostCollection(serviceHost);
-        this._isServer = IsServer(this);
-        this._instanceBuilder = ServiceInstanceBuilder.Create();
-        this._instanceContext = new InstanceContext(this);
+        _componentProvider = componentProvider ?? ComponentProvider.Default;
+        ServiceHosts = new ServiceHostCollection(serviceHost);
+        _isServer = IsServer(this);
+        _instanceBuilder = ServiceInstanceBuilder.Create();
+        _instanceContext = new InstanceContext(this);
 
-        this.ValidateExceptionDescriptors();
+        ValidateExceptionDescriptors();
     }
 
     protected ServiceContextBase(IServiceHost[] serviceHost)
@@ -67,84 +67,84 @@ public abstract class ServiceContextBase : IServiceContext
 
     public async Task<Guid> OpenAsync()
     {
-        if (this.ServiceState != ServiceState.None)
+        if (ServiceState != ServiceState.None)
             throw new InvalidOperationException();
-        this.ServiceState = ServiceState.Opening;
-        this.Dispatcher = await Dispatcher.CreateAsync(this);
+        ServiceState = ServiceState.Opening;
+        Dispatcher = await Dispatcher.CreateAsync(this);
         try
         {
-            await this.Dispatcher.InvokeAsync(() =>
+            await Dispatcher.InvokeAsync(() =>
             {
-                this._token = ServiceToken.NewToken();
-                this._serializerProvider = this._componentProvider.GetserializerProvider(this.SerializerType);
-                this._serializer = this._serializerProvider.Create(this, this._componentProvider.DataSerializers);
-                this.Debug($"{this._serializerProvider.Name} Serializer created.");
-                this._adpatorHostProvider = this._componentProvider.GetAdaptorHostProvider(this.AdaptorHostType);
-                this._adaptorHost = this._adpatorHostProvider.Create(this, this._instanceContext, _token);
-                this.Debug($"{this._adpatorHostProvider.Name} Adaptor created.");
-                this._adaptorHost.Disconnected += AdaptorHost_Disconnected;
+                _token = ServiceToken.NewToken();
+                _serializerProvider = _componentProvider.GetserializerProvider(SerializerType);
+                _serializer = _serializerProvider.Create(this, _componentProvider.DataSerializers);
+                Debug($"{_serializerProvider.Name} Serializer created.");
+                _adpatorHostProvider = _componentProvider.GetAdaptorHostProvider(AdaptorHostType);
+                _adaptorHost = _adpatorHostProvider.Create(this, _instanceContext, _token);
+                Debug($"{_adpatorHostProvider.Name} Adaptor created.");
+                _adaptorHost.Disconnected += AdaptorHost_Disconnected;
             });
-            await this._instanceContext.InitializeInstanceAsync();
-            foreach (var item in this.ServiceHosts)
+            await _instanceContext.InitializeInstanceAsync();
+            foreach (var item in ServiceHosts)
             {
                 await item.OpenAsync(_token);
-                await this.DebugAsync($"{item.Name} Service opened.");
+                await DebugAsync($"{item.Name} Service opened.");
             }
-            await this._adaptorHost.OpenAsync(this.Host, this.Port);
-            await this.DebugAsync($"{this._adpatorHostProvider.Name} Adaptor opened.");
-            await this.Dispatcher.InvokeAsync(() =>
+            await _adaptorHost.OpenAsync(Host, Port);
+            await DebugAsync($"{_adpatorHostProvider.Name} Adaptor opened.");
+            await Dispatcher.InvokeAsync(() =>
             {
-                this.Debug($"Service Context opened.");
-                this.ServiceState = ServiceState.Open;
-                this.OnOpened(EventArgs.Empty);
+                Debug($"Service Context opened.");
+                ServiceState = ServiceState.Open;
+                OnOpened(EventArgs.Empty);
             });
-            return this._token.Guid;
+            return _token.Guid;
         }
         catch
         {
-            this.ServiceState = ServiceState.None;
-            await this.AbortAsync();
+            ServiceState = ServiceState.None;
+            await AbortAsync();
             throw;
         }
     }
 
     public async Task CloseAsync(Guid token, int closeCode)
     {
-        if (token == Guid.Empty || this._token.Guid != token)
+        if (token == Guid.Empty || _token.Guid != token)
             throw new ArgumentException($"invalid token: {token}", nameof(token));
-        if (this.ServiceState != ServiceState.Open)
+        if (ServiceState != ServiceState.Open)
             throw new InvalidOperationException();
         if (closeCode == int.MinValue)
             throw new ArgumentException($"invalid close code: '{closeCode}'", nameof(closeCode));
         try
         {
-            await this._adaptorHost.CloseAsync(closeCode);
-            await this.DebugAsync($"{this._adpatorHostProvider.Name} Adaptor closed.");
-            foreach (var item in this.ServiceHosts.Reverse())
+            await _adaptorHost.CloseAsync(closeCode);
+            await DebugAsync($"{_adpatorHostProvider.Name} Adaptor closed.");
+            foreach (var item in ServiceHosts.Reverse())
             {
-                await item.CloseAsync(this._token);
-                await this.Dispatcher.InvokeAsync(() =>
+                await item.CloseAsync(_token);
+                await Dispatcher.InvokeAsync(() =>
                 {
-                    this.Debug($"{item.Name} Service closed.");
+                    Debug($"{item.Name} Service closed.");
                 });
             }
-            await this._instanceContext.ReleaseInstanceAsync();
-            await this.Dispatcher.InvokeAsync(() =>
+            await _instanceContext.ReleaseInstanceAsync();
+            await Dispatcher.InvokeAsync(() =>
             {
-                this._adaptorHost.Disconnected -= AdaptorHost_Disconnected;
-                this._adaptorHost = null;
-                this._serializer = null;
-                this.Dispatcher.Dispose();
-                this.Dispatcher = null;
-                this._token = ServiceToken.Empty;
-                this.ServiceState = ServiceState.None;
-                this.OnClosed(new CloseEventArgs(closeCode));
-                this.Debug($"Service Context closed.");
+                _adaptorHost.Disconnected -= AdaptorHost_Disconnected;
+                _adaptorHost = null;
+                _serializer = null;
+                Dispatcher.Dispose();
+                Dispatcher = null;
+                _token = ServiceToken.Empty;
+                ServiceState = ServiceState.None;
+                OnClosed(new CloseEventArgs(closeCode));
+                Debug($"Service Context closed.");
             });
         }
         catch (Exception e)
         {
-            await this.AbortAsync();
+            await AbortAsync();
             throw e;
         }
     }
@@ -152,9 +152,9 @@ public abstract class ServiceContextBase : IServiceContext
     public object GetService(Type serviceType)
     {
         if (serviceType == typeof(ISerializer))
-            return this._serializer;
+            return _serializer;
         if (serviceType == typeof(IComponentProvider))
-            return this._componentProvider;
+            return _componentProvider;
         return null;
     }
 
@@ -168,23 +168,23 @@ public abstract class ServiceContextBase : IServiceContext
 
     public string Host
     {
-        get => this._host ?? DefaultHost;
+        get => _host ?? DefaultHost;
         set
         {
-            if (this.ServiceState != ServiceState.None)
-                throw new InvalidOperationException($"cannot set host. service state is '{this.ServiceState}'.");
-            this._host = value;
+            if (ServiceState != ServiceState.None)
+                throw new InvalidOperationException($"cannot set host. service state is '{ServiceState}'.");
+            _host = value;
         }
     }
 
     public int Port
     {
-        get => this._port;
+        get => _port;
         set
         {
-            if (this.ServiceState != ServiceState.None)
-                throw new InvalidOperationException($"cannot set port. service state is '{this.ServiceState}'.");
-            this._port = value;
+            if (ServiceState != ServiceState.None)
+                throw new InvalidOperationException($"cannot set port. service state is '{ServiceState}'.");
+            _port = value;
         }
     }
 
@@ -196,23 +196,23 @@ public abstract class ServiceContextBase : IServiceContext
 
     protected virtual InstanceBase CreateInstance(Type type)
     {
-        if (this._instanceBuilder == null)
+        if (_instanceBuilder == null)
             throw new InvalidOperationException($"cannot create instance of {type}");
         if (type == typeof(void))
             return null;
         var typeName = $"{type.Name}Impl";
-        var instanceType = this._instanceBuilder.CreateType(typeName, typeof(InstanceBase), type);
+        var instanceType = _instanceBuilder.CreateType(typeName, typeof(InstanceBase), type);
         return TypeDescriptor.CreateInstance(null, instanceType, null, null) as InstanceBase;
     }
 
     protected virtual void OnOpened(EventArgs e)
     {
-        this.Opened?.Invoke(this, e);
+        Opened?.Invoke(this, e);
     }
 
     protected virtual void OnClosed(CloseEventArgs e)
     {
-        this.Closed?.Invoke(this, e);
+        Closed?.Invoke(this, e);
     }
 
     internal static bool IsServer(ServiceContextBase serviceContext)
@@ -248,9 +248,9 @@ public abstract class ServiceContextBase : IServiceContext
 
     internal async Task<(object, object)> CreateInstanceAsync(IServiceHost serviceHost, IPeer peer)
     {
-        var adaptorHost = this._adaptorHost;
+        var adaptorHost = _adaptorHost;
         var baseType = GetInstanceType(this, serviceHost);
-        var instance = this.CreateInstance(baseType);
+        var instance = CreateInstance(baseType);
         if (instance != null)
         {
             instance.ServiceHost = serviceHost;
@@ -259,14 +259,14 @@ public abstract class ServiceContextBase : IServiceContext
         }
 
         var impl = await serviceHost.CreateInstanceAsync(peer, instance);
-        var service = this._isServer ? impl : instance;
-        var callback = this._isServer ? instance : impl;
+        var service = _isServer ? impl : instance;
+        var callback = _isServer ? instance : impl;
         return (service, callback);
     }
 
     internal Task DestroyInstanceAsync(IServiceHost serviceHost, IPeer peer, object service, object callback)
     {
-        if (this._isServer == true)
+        if (_isServer == true)
         {
             return serviceHost.DestroyInstanceAsync(peer, service);
         }
@@ -278,20 +278,20 @@ public abstract class ServiceContextBase : IServiceContext
 
     private async Task AbortAsync()
     {
-        foreach (var item in this.ServiceHosts)
+        foreach (var item in ServiceHosts)
         {
-            await item.CloseAsync(this._token);
+            await item.CloseAsync(_token);
         }
         await Task.Run(() =>
         {
-            this._token = null;
-            this._serializerProvider = null;
-            this._serializer = null;
-            this._adpatorHostProvider = null;
-            this._adaptorHost = null;
-            this.ServiceState = ServiceState.None;
-            this.Dispatcher?.Dispose();
-            this.Dispatcher = null;
+            _token = null;
+            _serializerProvider = null;
+            _serializer = null;
+            _adpatorHostProvider = null;
+            _adaptorHost = null;
+            ServiceState = ServiceState.None;
+            Dispatcher?.Dispose();
+            Dispatcher = null;
         });
     }
 
@@ -302,18 +302,18 @@ public abstract class ServiceContextBase : IServiceContext
 
     private Task DebugAsync(string message)
     {
-        return this.Dispatcher.InvokeAsync(() => this.Debug(message));
+        return Dispatcher.InvokeAsync(() => Debug(message));
     }
 
     private void AdaptorHost_Disconnected(object sender, CloseEventArgs e)
     {
-        Task.Run(() => this.CloseAsync(this._token.Guid, e.CloseCode));
+        Task.Run(() => CloseAsync(_token.Guid, e.CloseCode));
     }
 
     private void ValidateExceptionDescriptors()
     {
-        var descriptorByID = new Dictionary<Guid, IExceptionDescriptor>(this._componentProvider.ExceptionDescriptors.Length);
-        foreach (var item in this._componentProvider.ExceptionDescriptors)
+        var descriptorByID = new Dictionary<Guid, IExceptionDescriptor>(_componentProvider.ExceptionDescriptors.Length);
+        foreach (var item in _componentProvider.ExceptionDescriptors)
         {
             if (descriptorByID.ContainsKey(item.ID) == true)
             {
@@ -327,7 +327,7 @@ public abstract class ServiceContextBase : IServiceContext
 
     #region IServiecHost
 
-    IContainer<IServiceHost> IServiceContext.ServiceHosts => this.ServiceHosts;
+    IContainer<IServiceHost> IServiceContext.ServiceHosts => ServiceHosts;
 
     #endregion
 }

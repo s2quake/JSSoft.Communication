@@ -49,6 +49,6 @@ class ExitCommand : CommandAsyncBase
 
     protected override Task OnExecuteAsync(CancellationToken cancellationToken)
     {
-        return _application.StopAsync(this.ExitCode);
+        return _application.StopAsync(ExitCode);
     }
 }

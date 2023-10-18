@@ -27,7 +27,7 @@ public class UserAuthorityEventArgs : UserEventArgs
     public UserAuthorityEventArgs(string userID, Authority authority)
         : base(userID)
     {
-        this.Authority = authority;
+        Authority = authority;
     }
 
     public Authority Authority { get; }

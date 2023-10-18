@@ -27,7 +27,7 @@ public class UserNameEventArgs : UserEventArgs
     public UserNameEventArgs(string userID, string userName)
         : base(userID)
     {
-        this.UserName = userName;
+        UserName = userName;
     }
 
     public string UserName { get; }

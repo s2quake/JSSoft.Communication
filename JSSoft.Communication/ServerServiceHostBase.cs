@@ -36,7 +36,7 @@ public abstract class ServerServiceHostBase<T, U> : ServiceHostBase where T : cl
 
     protected virtual Task<T> CreateServiceAsync(IPeer peer, U callback)
     {
-        return Task.Run(() => TypeDescriptor.CreateInstance(null, this.ServiceType, null, null) as T);
+        return Task.Run(() => TypeDescriptor.CreateInstance(null, ServiceType, null, null) as T);
     }
 
     protected virtual Task DestroyServiceAsync(IPeer peer, T service)
@@ -46,12 +46,12 @@ public abstract class ServerServiceHostBase<T, U> : ServiceHostBase where T : cl
 
     private protected override async Task<object> CreateInstanceInternalAsync(IPeer peer, object obj)
     {
-        return await this.CreateServiceAsync(peer, obj as U);
+        return await CreateServiceAsync(peer, obj as U);
     }
 
     private protected override Task DestroyInstanceInternalAsync(IPeer peer, object obj)
     {
-        return this.DestroyServiceAsync(peer, obj as T);
+        return DestroyServiceAsync(peer, obj as T);
     }
 }
 
@@ -66,7 +66,7 @@ public abstract class ServerServiceHostBase<T> : ServiceHostBase where T : class
 
     protected virtual Task<T> CreateServiceAsync(IPeer peer)
     {
-        return Task.Run(() => TypeDescriptor.CreateInstance(null, this.ServiceType, null, null) as T);
+        return Task.Run(() => TypeDescriptor.CreateInstance(null, ServiceType, null, null) as T);
     }
 
     protected virtual Task DestroyServiceAsync(IPeer peer, T service)
@@ -76,11 +76,11 @@ public abstract class ServerServiceHostBase<T> : ServiceHostBase where T : class
 
     private protected override async Task<object> CreateInstanceInternalAsync(IPeer peer, object obj)
     {
-        return await this.CreateServiceAsync(peer);
+        return await CreateServiceAsync(peer);
     }
 
     private protected override async Task DestroyInstanceInternalAsync(IPeer peer, object obj)
     {
-        await this.DestroyServiceAsync(peer, obj as T);
+        await DestroyServiceAsync(peer, obj as T);
     }
 }

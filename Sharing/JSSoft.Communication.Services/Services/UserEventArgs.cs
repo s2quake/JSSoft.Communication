@@ -28,7 +28,7 @@ public class UserEventArgs : EventArgs
 {
     public UserEventArgs(string userID)
     {
-        this.UserID = userID;
+        UserID = userID;
     }
 
     public string UserID { get; }

@@ -34,19 +34,19 @@ class UserServiceHost : ClientServiceHostBase<IUserService, IUserServiceCallback
     public UserServiceHost(UserService userService)
         : base()
     {
-        this._userService = userService;
+        _userService = userService;
     }
 
     protected override async Task<IUserServiceCallback> CreateCallbackAsync(IPeer peer, IUserService service)
     {
         await Task.Delay(1);
-        this._userService.SetUserService(service);
-        return this._userService;
+        _userService.SetUserService(service);
+        return _userService;
     }
 
     protected override async Task DestroyCallbackAsync(IPeer peer, IUserServiceCallback callback)
     {
         await Task.Delay(1);
-        this._userService.SetUserService(null);
+        _userService.SetUserService(null);
     }
 }

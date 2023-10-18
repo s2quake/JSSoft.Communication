@@ -41,7 +41,7 @@ class UserService : IUserService, INotifyUserService
 
     public UserService()
     {
-        this._userByID.Add("admin", new UserInfo()
+        _userByID.Add("admin", new UserInfo()
         {
             UserID = "admin",
             Password = "admin",
@@ -58,17 +58,17 @@ class UserService : IUserService, INotifyUserService
                 UserName = $"사용자{i}",
                 Authority = Authority.Member,
             };
-            this._userByID.Add(user.UserID, user);
+            _userByID.Add(user.UserID, user);
         }
     }
 
     public Task CreateAsync(Guid token, string userID, string password, Authority authority)
     {
-        return this.Dispatcher.InvokeAsync(() =>
+        return Dispatcher.InvokeAsync(() =>
         {
-            this.ValidateCreate(token, userID, password);
+            ValidateCreate(token, userID, password);
 
-            var user = this._userByToken[token];
+            var user = _userByToken[token];
             var userInfo = new UserInfo()
             {
                 UserID = userID,
@@ -76,134 +76,134 @@ class UserService : IUserService, INotifyUserService
                 UserName = string.Empty,
                 Authority = authority
             };
-            this._userByID.Add(userID, userInfo);
-            this._callback.OnCreated(userID);
-            this.OnCreated(new UserEventArgs(userID));
+            _userByID.Add(userID, userInfo);
+            _callback.OnCreated(userID);
+            OnCreated(new UserEventArgs(userID));
         });
     }
 
     public Task DeleteAsync(Guid token, string userID)
     {
-        return this.Dispatcher.InvokeAsync(() =>
+        return Dispatcher.InvokeAsync(() =>
         {
-            this.ValidateDelete(token, userID);
+            ValidateDelete(token, userID);
 
-            this._userByID.Remove(userID);
-            this._callback.OnDeleted(userID);
-            this.OnDeleted(new UserEventArgs(userID));
+            _userByID.Remove(userID);
+            _callback.OnDeleted(userID);
+            OnDeleted(new UserEventArgs(userID));
         });
     }
 
     public Task<(string, Authority)> GetInfoAsync(Guid token, string userID)
     {
-        return this.Dispatcher.InvokeAsync(() =>
+        return Dispatcher.InvokeAsync(() =>
         {
-            this.ValidateUser(token);
-            this.ValidateUser(userID);
+            ValidateUser(token);
+            ValidateUser(userID);
 
-            var user = this._userByID[userID];
+            var user = _userByID[userID];
             return (user.UserName, user.Authority);
         });
     }
 
     public Task<string[]> GetUsersAsync(Guid token)
     {
-        return this.Dispatcher.InvokeAsync(() =>
+        return Dispatcher.InvokeAsync(() =>
         {
-            this.ValidateUser(token);
+            ValidateUser(token);
 
-            return this._userByID.Keys.ToArray();
+            return _userByID.Keys.ToArray();
         });
     }
 
     public Task<bool> IsOnlineAsync(Guid token, string userID)
     {
-        return this.Dispatcher.InvokeAsync(() =>
+        return Dispatcher.InvokeAsync(() =>
         {
-            this.ValidateUser(token);
-            this.ValidateUser(userID);
+            ValidateUser(token);
+            ValidateUser(userID);
 
-            var user = this._userByID[userID];
+            var user = _userByID[userID];
             return user.Token != Guid.Empty;
         });
     }
 
     public Task<Guid> LoginAsync(string userID, string password)
     {
-        return this.Dispatcher.InvokeAsync(() =>
+        return Dispatcher.InvokeAsync(() =>
         {
-            this.ValidatePassword(userID, password);
+            ValidatePassword(userID, password);
 
             var token = Guid.NewGuid();
-            var user = this._userByID[userID];
+            var user = _userByID[userID];
             user.Token = token;
-            this._userByToken.Add(token, user);
-            this._callback.OnLoggedIn(userID);
-            this.OnLoggedIn(new UserEventArgs(userID));
+            _userByToken.Add(token, user);
+            _callback.OnLoggedIn(userID);
+            OnLoggedIn(new UserEventArgs(userID));
             return token;
         });
     }
 
     public Task LogoutAsync(Guid token)
     {
-        return this.Dispatcher.InvokeAsync(() =>
+        return Dispatcher.InvokeAsync(() =>
         {
-            this.ValidateUser(token);
+            ValidateUser(token);
 
-            var user = this._userByToken[token];
+            var user = _userByToken[token];
             user.Token = Guid.Empty;
-            this._userByToken.Remove(token);
-            this._callback.OnLoggedOut(user.UserID);
-            this.OnLoggedOut(new UserEventArgs(user.UserID));
+            _userByToken.Remove(token);
+            _callback.OnLoggedOut(user.UserID);
+            OnLoggedOut(new UserEventArgs(user.UserID));
         });
     }
 
     public Task SendMessageAsync(Guid token, string userID, string message)
     {
-        return this.Dispatcher.InvokeAsync(() =>
+        return Dispatcher.InvokeAsync(() =>
         {
-            this.ValidateUser(token);
-            this.ValidateOnline(userID);
-            this.ValidateMessage(message);
+            ValidateUser(token);
+            ValidateOnline(userID);
+            ValidateMessage(message);
 
-            var user = this._userByToken[token];
-            this._callback.OnMessageReceived(user.UserID, userID, message);
-            this.OnMessageReceived(new UserMessageEventArgs(user.UserID, userID, message));
+            var user = _userByToken[token];
+            _callback.OnMessageReceived(user.UserID, userID, message);
+            OnMessageReceived(new UserMessageEventArgs(user.UserID, userID, message));
         });
     }
 
     public Task RenameAsync(Guid token, string userName)
     {
-        return this.Dispatcher.InvokeAsync(() =>
+        return Dispatcher.InvokeAsync(() =>
         {
-            this.ValidateRename(token, userName);
+            ValidateRename(token, userName);
 
-            var user = this._userByToken[token];
+            var user = _userByToken[token];
             user.UserName = userName;
-            this._callback.OnRenamed(user.UserID, userName);
-            this.OnRenamed(new UserNameEventArgs(user.UserID, userName));
+            _callback.OnRenamed(user.UserID, userName);
+            OnRenamed(new UserNameEventArgs(user.UserID, userName));
         });
     }
 
     public Task SetAuthorityAsync(Guid token, string userID, Authority authority)
     {
-        return this.Dispatcher.InvokeAsync(() =>
+        return Dispatcher.InvokeAsync(() =>
         {
-            this.ValidateSetAuthority(token, userID);
+            ValidateSetAuthority(token, userID);
 
-            var user = this._userByID[userID];
+            var user = _userByID[userID];
             user.Authority = authority;
-            this._callback.OnAuthorityChanged(userID, authority);
-            this.OnAuthorityChanged(new UserAuthorityEventArgs(userID, authority));
+            _callback.OnAuthorityChanged(userID, authority);
+            OnAuthorityChanged(new UserAuthorityEventArgs(userID, authority));
         });
     }
 
     public async Task DisposeAsync()
     {
-        if (this.Dispatcher == null)
+        if (Dispatcher == null)
             throw new ObjectDisposedException(nameof(UserService));
-        await this.Dispatcher.DisposeAsync();
-        this.Dispatcher = null;
+        await Dispatcher.DisposeAsync();
+        Dispatcher = null;
     }
 
     public Dispatcher Dispatcher { get; private set; }
@@ -224,73 +224,73 @@ class UserService : IUserService, INotifyUserService
 
     internal void SetCallback(IUserServiceCallback callback)
     {
-        this._callback = callback;
-        this.Dispatcher = new Dispatcher(this);
+        _callback = callback;
+        Dispatcher = new Dispatcher(this);
     }
 
     protected virtual void OnCreated(UserEventArgs e)
     {
-        this.Created?.Invoke(this, e);
+        Created?.Invoke(this, e);
     }
 
     protected virtual void OnDeleted(UserEventArgs e)
     {
-        this.Deleted?.Invoke(this, e);
+        Deleted?.Invoke(this, e);
     }
 
     protected virtual void OnLoggedIn(UserEventArgs e)
     {
-        this.LoggedIn?.Invoke(this, e);
+        LoggedIn?.Invoke(this, e);
     }
 
     protected virtual void OnLoggedOut(UserEventArgs e)
     {
-        this.LoggedOut?.Invoke(this, e);
+        LoggedOut?.Invoke(this, e);
     }
 
     protected virtual void OnMessageReceived(UserMessageEventArgs e)
     {
-        this.MessageReceived?.Invoke(this, e);
+        MessageReceived?.Invoke(this, e);
     }
 
     protected virtual void OnRenamed(UserNameEventArgs e)
     {
-        this.Renamed?.Invoke(this, e);
+        Renamed?.Invoke(this, e);
     }
 
     protected virtual void OnAuthorityChanged(UserAuthorityEventArgs e)
     {
-        this.AuthorityChanged?.Invoke(this, e);
+        AuthorityChanged?.Invoke(this, e);
     }
 
     private void ValidateUser(string userID)
     {
-        this.Dispatcher.VerifyAccess();
+        Dispatcher.VerifyAccess();
         if (userID == null)
             throw new ArgumentNullException(nameof(userID));
-        if (this._userByID.ContainsKey(userID) == false)
+        if (_userByID.ContainsKey(userID) == false)
             throw new ArgumentException("invalid userID", nameof(userID));
     }
 
     private void ValidateNotUser(string userID)
     {
-        this.Dispatcher.VerifyAccess();
+        Dispatcher.VerifyAccess();
         if (userID == null)
             throw new ArgumentNullException(nameof(userID));
-        if (this._userByID.ContainsKey(userID) == true)
+        if (_userByID.ContainsKey(userID) == true)
             throw new ArgumentException("user is already exists.", nameof(userID));
     }
 
     private void ValidateUser(Guid token)
     {
-        this.Dispatcher.VerifyAccess();
-        if (this._userByToken.ContainsKey(token) == false)
+        Dispatcher.VerifyAccess();
+        if (_userByToken.ContainsKey(token) == false)
             throw new ArgumentException("invalid token.", nameof(token));
     }
 
     private void ValidatePassword(string password)
     {
-        this.Dispatcher.VerifyAccess();
+        Dispatcher.VerifyAccess();
         if (password == null)
             throw new ArgumentNullException(nameof(password));
         if (password == string.Empty)
@@ -301,38 +301,38 @@ class UserService : IUserService, INotifyUserService
 
     private void ValidatePassword(string userID, string password)
     {
-        this.Dispatcher.VerifyAccess();
-        this.ValidateUser(userID);
+        Dispatcher.VerifyAccess();
+        ValidateUser(userID);
         if (password == null)
             throw new ArgumentNullException(nameof(password));
-        var user = this._userByID[userID];
+        var user = _userByID[userID];
         if (user.Password != password)
             throw new InvalidOperationException("wrong userID or password.");
     }
 
     private void ValidateCreate(Guid token, string userID, string password)
     {
-        this.Dispatcher.VerifyAccess();
-        this.ValidateUser(token);
-        this.ValidateNotUser(userID);
-        this.ValidatePassword(password);
-        var user = this._userByToken[token];
+        Dispatcher.VerifyAccess();
+        ValidateUser(token);
+        ValidateNotUser(userID);
+        ValidatePassword(password);
+        var user = _userByToken[token];
         if (user.Authority != Authority.Admin)
             throw new InvalidOperationException("permission denied.");
     }
 
     private void ValidateMessage(string message)
     {
-        this.Dispatcher.VerifyAccess();
+        Dispatcher.VerifyAccess();
         if (message == null)
             throw new ArgumentNullException(nameof(message));
     }
 
     private void ValidateOnline(string userID)
     {
-        this.Dispatcher.VerifyAccess();
-        this.ValidateUser(userID);
-        var user = this._userByID[userID];
+        Dispatcher.VerifyAccess();
+        ValidateUser(userID);
+        var user = _userByID[userID];
 
         if (user.Token == Guid.Empty)
             throw new InvalidOperationException($"user is offline.");
@@ -340,13 +340,13 @@ class UserService : IUserService, INotifyUserService
 
     private void ValidateRename(Guid token, string userName)
     {
-        this.Dispatcher.VerifyAccess();
-        this.ValidateUser(token);
+        Dispatcher.VerifyAccess();
+        ValidateUser(token);
         if (userName == null)
             throw new ArgumentNullException(nameof(userName));
         if (userName == string.Empty)
             throw new ArgumentException("invalid name.", nameof(userName));
-        var user = this._userByToken[token];
+        var user = _userByToken[token];
         if (user.UserName == userName)
             throw new ArgumentException("same name can not set.", nameof(userName));
         if (user.UserID == "admin")
@@ -355,15 +355,15 @@ class UserService : IUserService, INotifyUserService
 
     private void ValidateSetAuthority(Guid token, string userID)
     {
-        this.Dispatcher.VerifyAccess();
-        this.ValidateUser(token);
-        this.ValidateUser(userID);
-        var user1 = this._userByToken[token];
+        Dispatcher.VerifyAccess();
+        ValidateUser(token);
+        ValidateUser(userID);
+        var user1 = _userByToken[token];
         if (user1.UserID == userID)
             throw new InvalidOperationException("can not set authority.");
         if (user1.Authority != Authority.Admin)
             throw new InvalidOperationException("permission denied.");
-        var user2 = this._userByID[userID];
+        var user2 = _userByID[userID];
         if (user2.Token != Guid.Empty)
             throw new InvalidOperationException("can not set authority of online user.");
         if (userID == "admin")
@@ -372,13 +372,13 @@ class UserService : IUserService, INotifyUserService
 
     private void ValidateDelete(Guid token, string userID)
     {
-        this.Dispatcher.VerifyAccess();
-        this.ValidateUser(token);
-        this.ValidateNotUser(userID);
-        var user1 = this._userByToken[token];
+        Dispatcher.VerifyAccess();
+        ValidateUser(token);
+        ValidateNotUser(userID);
+        var user1 = _userByToken[token];
         if (user1.Authority != Authority.Admin)
             throw new InvalidOperationException("permission denied.");
-        var user2 = this._userByID[userID];
+        var user2 = _userByID[userID];
         if (user2.Token != Guid.Empty)
             throw new InvalidOperationException("can not delete online user.");
         if (userID == "admin")

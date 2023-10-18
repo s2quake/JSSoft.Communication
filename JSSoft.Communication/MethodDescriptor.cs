@@ -31,21 +31,21 @@ public sealed class MethodDescriptor
 {
     internal MethodDescriptor(MethodInfo methodInfo)
     {
-        this.MethodInfo = methodInfo;
-        this.ParameterTypes = methodInfo.GetParameters().Select(item => item.ParameterType).ToArray();
-        this.ReturnType = methodInfo.ReturnType;
-        if (this.ReturnType == typeof(Task))
+        MethodInfo = methodInfo;
+        ParameterTypes = methodInfo.GetParameters().Select(item => item.ParameterType).ToArray();
+        ReturnType = methodInfo.ReturnType;
+        if (ReturnType == typeof(Task))
         {
-            this.ReturnType = typeof(void);
-            this.IsAsync = true;
+            ReturnType = typeof(void);
+            IsAsync = true;
         }
-        else if (this.ReturnType.IsSubclassOf(typeof(Task)) == true)
+        else if (ReturnType.IsSubclassOf(typeof(Task)) == true)
         {
-            this.ReturnType = this.ReturnType.GetGenericArguments().First();
-            this.IsAsync = true;
+            ReturnType = ReturnType.GetGenericArguments().First();
+            IsAsync = true;
         }
-        this.Name = GenerateName(methodInfo);
-        this.ShortName = methodInfo.Name;
+        Name = GenerateName(methodInfo);
+        ShortName = methodInfo.Name;
     }
 
     public async Task<(Guid, Type, object)> InvokeAsync(IServiceProvider serviceProvider, object instance, object[] args)
@@ -56,7 +56,7 @@ public sealed class MethodDescriptor
         }
         try
         {
-            var (type, value) = await this.InvokeAsync(instance, args);
+            var (type, value) = await InvokeAsync(instance, args);
             return (Guid.Empty, type, value);
         }
         catch (TargetInvocationException e)
@@ -104,8 +104,8 @@ public sealed class MethodDescriptor
 
     private async Task<(Type, object)> InvokeAsync(object instance, object[] args)
     {
-        var value = await Task.Run(() => this.MethodInfo.Invoke(instance, args));
-        var valueType = this.MethodInfo.ReturnType;
+        var value = await Task.Run(() => MethodInfo.Invoke(instance, args));
+        var valueType = MethodInfo.ReturnType;
         if (value is Task task)
         {
             await task;

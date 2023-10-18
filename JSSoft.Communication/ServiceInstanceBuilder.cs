@@ -38,9 +38,9 @@ sealed class ServiceInstanceBuilder
 
     internal ServiceInstanceBuilder()
     {
-        this.AssemblyName = new AssemblyName(ns);
-        this._assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(this.AssemblyName, AssemblyBuilderAccess.RunAndCollect);
-        this._moduleBuilder = _assemblyBuilder.DefineDynamicModule(this.AssemblyName.Name);
+        AssemblyName = new AssemblyName(ns);
+        _assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(AssemblyName, AssemblyBuilderAccess.RunAndCollect);
+        _moduleBuilder = _assemblyBuilder.DefineDynamicModule(AssemblyName.Name);
     }
 
     internal static ServiceInstanceBuilder Create()
@@ -57,13 +57,13 @@ sealed class ServiceInstanceBuilder
 
     public Type CreateType(string name, Type baseType, Type interfaceType)
     {
-        var fullname = $"{this.AssemblyName}.{name}";
-        if (this._typeByName.ContainsKey(fullname) == false)
+        var fullname = $"{AssemblyName}.{name}";
+        if (_typeByName.ContainsKey(fullname) == false)
         {
-            var type = CreateType(this._moduleBuilder, name, baseType, interfaceType);
-            this._typeByName.Add(fullname, type);
+            var type = CreateType(_moduleBuilder, name, baseType, interfaceType);
+            _typeByName.Add(fullname, type);
         }
-        return this._typeByName[fullname];
+        return _typeByName[fullname];
     }
 
     public AssemblyName AssemblyName { get; }
