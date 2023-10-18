@@ -33,22 +33,20 @@ namespace JSSoft.Communication.Commands
     class OpenCommand : CommandAsyncBase
     {
         private readonly IServiceContext serviceHost;
-        private readonly Lazy<Shell> shell = null;
+        private readonly Application _application = null;
 
         [ImportingConstructor]
-        public OpenCommand(IServiceContext serviceHost, Lazy<Shell> shell)
+        public OpenCommand(IServiceContext serviceHost, Application application)
         {
             this.serviceHost = serviceHost;
-            this.shell = shell;
+            this._application = application;
         }
 
         public override bool IsEnabled => this.serviceHost.ServiceState == ServiceState.None;
 
         protected override async Task OnExecuteAsync(CancellationToken cancellationToken)
         {
-            this.Shell.Token = await this.serviceHost.OpenAsync();
+            _application.Token = await this.serviceHost.OpenAsync();
         }
-
-        private Shell Shell => this.shell.Value;
     }
 }

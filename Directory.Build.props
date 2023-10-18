@@ -23,7 +23,7 @@ SOFTWARE. -->
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Condition="'$(SolutionDir)' != '' and '$(SolutionDir)' != '$(MSBuildThisFileDirectory)' and $([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../')) != ''" Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net45</TargetFrameworks>
+    <TargetFrameworks>net7.0</TargetFrameworks>
     <Version>2.0.0</Version>
     <AssemblyVersion>2.0</AssemblyVersion>
     <FileVersion>2.0.0</FileVersion>
@@ -35,7 +35,7 @@ SOFTWARE. -->
 	  <Authors>s2quake</Authors>
 	  <PackageProjectUrl>https://github.com/s2quake/JSSoft.Communication</PackageProjectUrl>
 	  <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>preview</LangVersion>
     <RootPath Condition="'$(SolutionDir)' != ''">$(SolutionDir)</RootPath>
     <RootPath Condition="'$(SolutionDir)' == ''">$(MSBuildThisFileDirectory)\</RootPath>
     <ConfigurationType Condition="'$(Configuration)' == ''">Debug</ConfigurationType>

@@ -3,8 +3,6 @@
 # IDE0060: 사용하지 않는 매개 변수를 제거하세요.
 dotnet_code_quality_unused_parameters = non_public:none
 
-
-
 # IDE0003: 한정자 제거
 dotnet_style_qualification_for_event = false:none
 
@@ -17,9 +15,14 @@ dotnet_style_qualification_for_method = false:none
 # IDE0003: 한정자 제거
 dotnet_style_qualification_for_property = false:none
 
-
 # IDE0059: 불필요한 값 할당
 csharp_style_unused_value_assignment_preference = unused_local_variable:suggestion
 
 # IDE0056: 인덱스 연산자 사용
 csharp_style_prefer_index_operator = true:silent
+
+# IDE0032: auto 속성 사용
+dotnet_style_prefer_auto_properties = true:suggestion
+
+# IDE0057: 범위 연산자 사용
+csharp_style_prefer_range_operator = false

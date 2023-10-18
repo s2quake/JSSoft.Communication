@@ -31,8 +31,8 @@ namespace JSSoft.Communication.ConsoleApp
         {
             try
             {
-                using var shell = Shell.Create();
-                await shell.StartAsync();
+                using var application = new Application();
+                await application.StartAsync();
             }
             catch (Exception e)
             {

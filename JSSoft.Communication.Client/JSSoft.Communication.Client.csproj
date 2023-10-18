@@ -3,7 +3,7 @@
   <Import Project="..\netfx.props" />
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <DefineConstants>CLIENT;MEF</DefineConstants>
+    <DefineConstants>CLIENT</DefineConstants>
     <AssemblyName>client</AssemblyName>
     <PublishName>communication\client</PublishName>
   </PropertyGroup>
@@ -18,6 +18,4 @@
   </ItemGroup>
   <Import Project="..\Sharing\JSSoft.Communication.ConsoleApp\JSSoft.Communication.ConsoleApp.projitems" Label="Shared" />
   <Import Project="..\Sharing\JSSoft.Communication.Services\JSSoft.Communication.Services.projitems" Label="Shared" />
-  <Import Project="..\Sharing\JSSoft.Communication.Services.Client\JSSoft.Communication.Services.Client.projitems" Label="Shared" />
-  <Import Project="..\Sharing\JSSoft.Communication.ConsoleApp.Container\JSSoft.Communication.ConsoleApp.Container.projitems" Label="Shared" />
 </Project>

@@ -34,13 +34,13 @@ namespace JSSoft.Communication.Commands
     [Export(typeof(ICommand))]
     class LoginCommand : CommandAsyncBase
     {
-        private readonly Lazy<Shell> shell = null;
+        private readonly Application _application;
         private readonly Lazy<IUserService> userService = null;
 
         [ImportingConstructor]
-        public LoginCommand(Lazy<Shell> shell, Lazy<IUserService> userService)
+        public LoginCommand(Application application, Lazy<IUserService> userService)
         {
-            this.shell = shell;
+            _application = application;
             this.userService = userService;
         }
 
@@ -56,16 +56,14 @@ namespace JSSoft.Communication.Commands
             get; set;
         }
 
-        public override bool IsEnabled => this.Shell.UserToken == Guid.Empty;
+        public override bool IsEnabled => _application.UserToken == Guid.Empty;
 
         protected override async Task OnExecuteAsync(CancellationToken cancellationToken)
         {
             var token = await this.UserService.LoginAsync(this.UserID, this.Password);
-            this.Shell.Login(this.UserID, token);
+            _application.Login(this.UserID, token);
         }
 
         private IUserService UserService => this.userService.Value;
-
-        private Shell Shell => this.shell.Value;
     }
 }

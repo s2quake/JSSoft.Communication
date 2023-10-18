@@ -32,23 +32,21 @@ namespace JSSoft.Communication.Commands
     [Export(typeof(ICommand))]
     class CloseCommand : CommandAsyncBase
     {
-        private readonly IServiceContext serviceHost;
-        private readonly Lazy<Shell> shell;
+        private readonly IServiceContext _serviceHost;
+        private readonly Application _application;
 
         [ImportingConstructor]
-        public CloseCommand(IServiceContext serviceHost, Lazy<Shell> shell)
+        public CloseCommand(IServiceContext serviceHost, Application application)
         {
-            this.serviceHost = serviceHost;
-            this.shell = shell;
+            _serviceHost = serviceHost;
+            _application = application;
         }
 
-        public override bool IsEnabled => this.serviceHost.ServiceState == ServiceState.Open;
+        public override bool IsEnabled => _serviceHost.ServiceState == ServiceState.Open;
 
         protected override Task OnExecuteAsync(CancellationToken cancellationToken)
         {
-            return this.serviceHost.CloseAsync(this.Shell.Token, 0);
+            return _serviceHost.CloseAsync(_application.Token, 0);
         }
-
-        private Shell Shell => this.shell.Value;
     }
 }

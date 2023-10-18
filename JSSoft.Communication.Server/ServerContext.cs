@@ -21,25 +21,18 @@
 // SOFTWARE.
 
 using System;
-using System.Threading.Tasks;
+using System.ComponentModel.Composition;
 
 namespace JSSoft.Communication.ConsoleApp
 {
-    class Program
+    [Export(typeof(IServiceContext))]
+    class ServerContext : ServerContextBase
     {
-        static async Task Main(string[] _)
+        [ImportingConstructor]
+        public ServerContext(IComponentProvider componentProvider, [ImportMany] IServiceHost[] serviceHosts)
+            : base(componentProvider, serviceHosts)
         {
-            try
-            {
-                using var shell = Shell.Create();
-                await shell.StartAsync();
-            }
-            catch (Exception e)
-            {
-                Console.Error.WriteLine(e);
-                Console.ReadKey();
-                Environment.Exit(1);
-            }
+
         }
     }
 }

@@ -1,4 +1,4 @@
-// MIT License
+﻿// MIT License
 // 
 // Copyright (c) 2019 Jeesu Choi
 // 
@@ -20,11 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using JSSoft.Communication.Services;
 using System;
 using System.ComponentModel.Composition;
-using System.Reflection;
 using System.Threading.Tasks;
+using System.Reflection;
+using JSSoft.Communication.Services;
 
 namespace JSSoft.Communication.ConsoleApp
 {
@@ -98,5 +98,4 @@ namespace JSSoft.Communication.ConsoleApp
             return this.InvokeAsync(Info(MethodInfo.GetCurrentMethod() as MethodInfo, typeof(IUserService), token, userID, authority));
         }
     }
-
 }

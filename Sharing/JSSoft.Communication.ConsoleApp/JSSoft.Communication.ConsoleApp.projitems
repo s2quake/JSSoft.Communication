@@ -5,8 +5,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)CommandContext.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)IShell.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Shell.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IApplication.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Application.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Terminal.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Settings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceComponentProvider.cs" />
 

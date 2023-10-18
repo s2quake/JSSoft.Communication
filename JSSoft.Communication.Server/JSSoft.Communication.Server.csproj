@@ -5,16 +5,17 @@
     <OutputType>Exe</OutputType>
     <DefineConstants>SERVER</DefineConstants>
     <AssemblyName>server</AssemblyName>
+    <PublishName>communication\server</PublishName>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="System.ComponentModel.Composition" Version="4.7.0" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\JSSoft.Communication\JSSoft.Communication.csproj" />
     <ProjectReference Include="..\..\JSSoft.Library\JSSoft.Library\JSSoft.Library.csproj" />
     <ProjectReference Include="..\..\JSSoft.Library\JSSoft.Library.Random\JSSoft.Library.Random.csproj" />
     <ProjectReference Include="..\..\JSSoft.Library.Commands\JSSoft.Library.Commands\JSSoft.Library.Commands.csproj" />
   </ItemGroup>
-  <Import Project="..\Sharing\JSSoft.Communication.Services.Server\JSSoft.Communication.Services.Server.projitems" Label="Shared" />
   <Import Project="..\Sharing\JSSoft.Communication.Services\JSSoft.Communication.Services.projitems" Label="Shared" />
   <Import Project="..\Sharing\JSSoft.Communication.ConsoleApp\JSSoft.Communication.ConsoleApp.projitems" Label="Shared" />
-  <Import Project="..\Sharing\System.ComponentModel.Composition\System.ComponentModel.Composition.projitems" Label="Shared" />
-  <Import Project="..\Sharing\System.ComponentModel.Composition.Container\System.ComponentModel.Composition.Container.projitems" Label="Shared" />
 </Project>

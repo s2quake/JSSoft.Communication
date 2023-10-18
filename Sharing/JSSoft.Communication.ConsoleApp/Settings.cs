@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 using JSSoft.Library.Commands;
+using JSSoft.Library.Commands.Extensions;
 using System;
 
 namespace JSSoft.Communication.ConsoleApp
@@ -48,7 +49,7 @@ namespace JSSoft.Communication.ConsoleApp
         public static Settings CreateFromCommandLine()
         {
             var settings = new Settings();
-            var parser = new CommandLineParser(settings);
+            var parser = new CommandParser(settings);
             parser.ParseCommandLine(Environment.CommandLine);
             return settings;
         }

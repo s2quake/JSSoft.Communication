@@ -20,18 +20,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System.ComponentModel.Composition;
+using System;
+using System.Threading.Tasks;
 
 namespace JSSoft.Communication.ConsoleApp
 {
-    [Export(typeof(IServiceContext))]
-    class ServerContext : ServerContextBase
+    public interface IApplication : IDisposable
     {
-        [ImportingConstructor]
-        public ServerContext(IComponentProvider componentProvider, [ImportMany] IServiceHost[] serviceHosts)
-            : base(componentProvider, serviceHosts)
-        {
+        Task StartAsync();
 
-        }
+        Task StopAsync(int exitCode);
+
+        string Title { get; set; }
     }
 }

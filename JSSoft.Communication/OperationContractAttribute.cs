@@ -35,7 +35,7 @@ namespace JSSoft.Communication
         public OperationContractAttribute(string name)
         {
             this.Name = name ?? throw new ArgumentNullException(nameof(name));
-            JSSoft.Library.IdentifierValidator.Validate(this.Name);
+            JSSoft.Library.IdentifierValidator.Verify(this.Name);
         }
 
         public string Name { get; }

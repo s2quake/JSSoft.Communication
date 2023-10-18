@@ -32,14 +32,14 @@ namespace JSSoft.Communication.Commands
     [Export(typeof(ICommand))]
     class DataCommand : CommandMethodBase
     {
-        private readonly Lazy<Shell> shell = null;
-        private readonly Lazy<IDataService> dataService = null;
+        private readonly Application _application = null;
+        private readonly Lazy<IDataService> _dataServiceLazy = null;
 
         [ImportingConstructor]
-        public DataCommand(Lazy<Shell> shell, Lazy<IDataService> dataService)
+        public DataCommand(Application application, Lazy<IDataService> dataServiceLazy)
         {
-            this.shell = shell;
-            this.dataService = dataService;
+            _application = application;
+            _dataServiceLazy = dataServiceLazy;
         }
 
         [CommandMethod]
@@ -48,15 +48,13 @@ namespace JSSoft.Communication.Commands
             return this.DataService.CreateDataBaseAsync(dataBaseName);
         }
 
-        public override bool IsEnabled => this.Shell.UserToken != Guid.Empty;
+        public override bool IsEnabled => _application.UserToken != Guid.Empty;
 
         protected override bool IsMethodEnabled(CommandMethodDescriptor descriptor)
         {
-            return this.Shell.UserToken != Guid.Empty;
+            return _application.UserToken != Guid.Empty;
         }
 
-        private IDataService DataService => this.dataService.Value;
-
-        private Shell Shell => this.shell.Value;
+        private IDataService DataService => _dataServiceLazy.Value;
     }
 }

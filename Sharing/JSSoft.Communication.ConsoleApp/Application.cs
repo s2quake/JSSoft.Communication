@@ -28,23 +28,28 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.ComponentModel.Composition;
+using System.ComponentModel.Composition.Hosting;
+using System.Collections;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace JSSoft.Communication.ConsoleApp
 {
-    [Export(typeof(IShell))]
-    [Export(typeof(IServiceProvider))]
-    [Export(typeof(Shell))]
-    class Shell : CommandContextTerminal, IShell, IServiceProvider
+    // [Export(typeof(IApplication))]
+    // [Export(typeof(IServiceProvider))]
+    // [Export(typeof(Application))]
+    sealed class Application : IApplication, IServiceProvider
     {
-        private static readonly string postfix = Terminal.IsWin32NT == true ? ">" : "$ ";
+        private static readonly string postfix = CommandSettings.IsWin32NT == true ? ">" : "$ ";
         private readonly Settings settings;
-        private readonly CommandContext commandContext;
+        // private readonly CommandContext commandContext;
         private readonly IServiceContext serviceHost;
         private readonly INotifyUserService userServiceNotification;
         private bool isDisposed;
         private CancellationTokenSource cancellation;
+        private readonly CompositionContainer _container;
 
-        static Shell()
+        static Application()
         {
             JSSoft.Communication.Logging.LogUtility.Logger = JSSoft.Communication.Logging.ConsoleLogger.Default;
         }
@@ -55,12 +60,18 @@ namespace JSSoft.Communication.ConsoleApp
         private readonly bool isServer = false;
 #endif
 
-        [ImportingConstructor]
-        public Shell(CommandContext commandContext, IServiceContext serviceHost, INotifyUserService userServiceNotification)
-           : base(commandContext)
+        // private readonly Lazy<Terminal> _terminalLazy;
+
+        public Application()
         {
+            _container = new CompositionContainer(new AssemblyCatalog(typeof(Application).Assembly));
+            _container.ComposeExportedValue<IApplication>(this);
+            _container.ComposeExportedValue<IServiceProvider>(this);
+            _container.ComposeExportedValue(this);
+
+            // _terminalLazy = terminalLazy;
             this.settings = Settings.CreateFromCommandLine();
-            this.Prompt = postfix;
+            // this.Prompt = postfix;
             this.serviceHost = serviceHost;
             this.serviceHost.Opened += ServiceHost_Opened;
             this.serviceHost.Closed += ServiceHost_Closed;
@@ -68,20 +79,20 @@ namespace JSSoft.Communication.ConsoleApp
             this.userServiceNotification.LoggedIn += UserServiceNotification_LoggedIn;
             this.userServiceNotification.LoggedOut += UserServiceNotification_LoggedOut;
             this.userServiceNotification.MessageReceived += UserServiceNotification_MessageReceived;
-            this.commandContext = commandContext;
+            // this.commandContext = commandContext;
             this.Title = "Server";
         }
 
-        public static IShell Create()
-        {
-            return Container.GetService<IShell>();
-        }
+        // public static IApplication Create()
+        // {
+        //     return Container.GetService<IApplication>();
+        // }
 
         public void Dispose()
         {
             if (this.isDisposed == false)
             {
-                Container.Release();
+                _container.Dispose();
                 this.isDisposed = true;
             }
         }
@@ -92,26 +103,6 @@ namespace JSSoft.Communication.ConsoleApp
         {
             get => Console.Title;
             set => Console.Title = value;
-        }
-
-        protected override string FormatPrompt(string prompt)
-        {
-            if (this.UserID == string.Empty)
-            {
-                return prompt;
-            }
-            else
-            {
-                var tb = new TerminalStringBuilder();
-                var pattern = $"(.+@)(.+).{{{postfix.Length}}}";
-                var match = Regex.Match(prompt, pattern);
-                tb.Append(match.Groups[1].Value);
-                tb.Foreground = TerminalColor.BrightGreen;
-                tb.Append(match.Groups[2].Value);
-                tb.Foreground = null;
-                tb.Append(postfix);
-                return tb.ToString();
-            }
         }
 
         internal void Login(string userID, Guid token)
@@ -135,7 +126,9 @@ namespace JSSoft.Communication.ConsoleApp
 
         internal string UserID { get; private set; } = string.Empty;
 
-        private TextWriter Out => this.commandContext.Out;
+        private TextWriter Out => Console.Out;
+
+        private Terminal Terminal => _container.GetExportedValue<Terminal>();
 
         private void UpdatePrompt()
         {
@@ -151,7 +144,7 @@ namespace JSSoft.Communication.ConsoleApp
                 if (userID != string.Empty)
                     prompt += $"@{userID}";
             }
-            this.Prompt = prompt + postfix;
+            // Terminal.Prompt = prompt + postfix;
         }
 
         private void ServiceHost_Opened(object sender, EventArgs e)
@@ -222,14 +215,34 @@ namespace JSSoft.Communication.ConsoleApp
             if (serviceType == typeof(IServiceProvider))
                 return this;
 
-            return Container.GetService(serviceType);
+            if (typeof(IEnumerable).IsAssignableFrom(serviceType) && serviceType.GenericTypeArguments.Length == 1)
+            {
+                var itemType = serviceType.GenericTypeArguments.First();
+                var contractName = AttributedModelServices.GetContractName(itemType);
+                var items = _container.GetExportedValues<object>(contractName);
+                var listGenericType = typeof(List<>);
+                var list = listGenericType.MakeGenericType(itemType);
+                var ci = list.GetConstructor(new Type[] { typeof(int) });
+                var instance = ci.Invoke(new object[] { items.Count(), }) as IList;
+                foreach (var item in items)
+                {
+                    instance.Add(item);
+                }
+                return instance;
+            }
+            else
+            {
+                var contractName = AttributedModelServices.GetContractName(serviceType);
+                return _container.GetExportedValue<object>(contractName);
+            }
+            // return Container.GetService(serviceType);
         }
 
         #endregion
 
-        #region IShell
+        #region IApplication
 
-        async Task IShell.StartAsync()
+        public async Task StartAsync()
         {
             this.cancellation = new CancellationTokenSource();
             this.serviceHost.Host = this.settings.Host;
@@ -243,10 +256,10 @@ namespace JSSoft.Communication.ConsoleApp
                 var text = TerminalStrings.Foreground(e.Message, TerminalColor.BrightRed);
                 Console.Error.WriteLine(text);
             }
-            await base.StartAsync(this.cancellation.Token);
+            await Terminal.StartAsync(this.cancellation.Token);
         }
 
-        async Task IShell.StopAsync(int exitCode)
+        public async Task StopAsync(int exitCode)
         {
             this.cancellation.Cancel();
             if (this.serviceHost.ServiceState == ServiceState.Open)

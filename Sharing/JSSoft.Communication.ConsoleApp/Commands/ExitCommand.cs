@@ -33,12 +33,12 @@ namespace JSSoft.Communication.Commands
     [Export(typeof(ICommand))]
     class ExitCommand : CommandAsyncBase
     {
-        private readonly Lazy<IShell> shell = null;
+        private readonly IApplication _application;
 
         [ImportingConstructor]
-        public ExitCommand(Lazy<IShell> shell)
+        public ExitCommand(IApplication application)
         {
-            this.shell = shell;
+            _application = application;
         }
 
         [CommandPropertyRequired(DefaultValue = 0)]
@@ -49,7 +49,7 @@ namespace JSSoft.Communication.Commands
 
         protected override Task OnExecuteAsync(CancellationToken cancellationToken)
         {
-            return this.shell.Value.StopAsync(this.ExitCode);
+            return _application.StopAsync(this.ExitCode);
         }
     }
 }
