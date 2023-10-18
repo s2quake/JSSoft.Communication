@@ -22,15 +22,14 @@
 
 using System;
 
-namespace JSSoft.Communication.Services
-{
-    public class UserEventArgs : EventArgs
-    {
-        public UserEventArgs(string userID)
-        {
-            this.UserID = userID;
-        }
+namespace JSSoft.Communication.Services;
 
-        public string UserID { get; }
+public class UserEventArgs : EventArgs
+{
+    public UserEventArgs(string userID)
+    {
+        this.UserID = userID;
     }
+
+    public string UserID { get; }
 }

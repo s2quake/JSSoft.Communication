@@ -25,30 +25,29 @@ using JSSoft.Library.Threading;
 using System;
 using System.Threading.Tasks;
 
-namespace JSSoft.Communication
+namespace JSSoft.Communication;
+
+public interface IServiceHost
 {
-    public interface IServiceHost
-    {
-        Task OpenAsync(ServiceToken token);
+    Task OpenAsync(ServiceToken token);
 
-        Task CloseAsync(ServiceToken token);
+    Task CloseAsync(ServiceToken token);
 
-        IContainer<MethodDescriptor> MethodDescriptors { get; }
+    IContainer<MethodDescriptor> MethodDescriptors { get; }
 
-        Task<object> CreateInstanceAsync(IPeer peer, object obj);
+    Task<object> CreateInstanceAsync(IPeer peer, object obj);
 
-        Task DestroyInstanceAsync(IPeer peer, object obj);
+    Task DestroyInstanceAsync(IPeer peer, object obj);
 
-        Type ServiceType { get; }
+    Type ServiceType { get; }
 
-        Type CallbackType { get; }
+    Type CallbackType { get; }
 
-        string Name { get; }
+    string Name { get; }
 
-        Dispatcher Dispatcher { get; }
+    Dispatcher Dispatcher { get; }
 
-        event EventHandler Opened;
+    event EventHandler Opened;
 
-        event EventHandler Closed;
-    }
+    event EventHandler Closed;
 }

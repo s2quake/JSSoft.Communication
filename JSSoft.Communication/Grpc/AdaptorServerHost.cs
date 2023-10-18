@@ -33,278 +33,277 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace JSSoft.Communication.Grpc
+namespace JSSoft.Communication.Grpc;
+
+class AdaptorServerHost : IAdaptorHost
 {
-    class AdaptorServerHost : IAdaptorHost
+    private static readonly TimeSpan timeout = new(0, 0, 30);
+    private static readonly string localAddress = "127.0.0.1";
+    private readonly IServiceContext _serviceContext;
+    private readonly IContainer<IServiceHost> _serviceHosts;
+    private int _closeCode;
+    private CancellationTokenSource _cancellationTokenSource;
+    private Server _server;
+    private AdaptorServerImpl _adaptor;
+    private ISerializer _serializer;
+    private Timer _timer;
+
+    static AdaptorServerHost()
     {
-        private static readonly TimeSpan timeout = new(0, 0, 30);
-        private static readonly string localAddress = "127.0.0.1";
-        private readonly IServiceContext serviceContext;
-        private readonly IContainer<IServiceHost> serviceHosts;
-        private int closeCode;
-        private CancellationTokenSource cancellation;
-        private Server server;
-        private AdaptorServerImpl adaptor;
-        private ISerializer serializer;
-        private Timer timer;
+        var addressList = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
+        var address = addressList.FirstOrDefault(item => $"{item}" != "127.0.0.1" && item.AddressFamily == AddressFamily.InterNetwork);
+        if (address != null)
+            localAddress = $"{address}";
+    }
 
-        static AdaptorServerHost()
+    public AdaptorServerHost(IServiceContext serviceContext, IInstanceContext instanceContext)
+    {
+        this._serviceContext = serviceContext;
+        this._serviceHosts = serviceContext.ServiceHosts;
+        this.Peers = new PeerCollection(serviceContext, instanceContext);
+        this.Peers.CollectionChanged += PeerCollection_CollectionChanged;
+    }
+
+    internal async Task<OpenReply> Open(OpenRequest request, ServerCallContext context)
+    {
+        var token = Guid.NewGuid();
+        var serviceNames = request.ServiceNames;
+        var serviceHosts = serviceNames.Select(item => this._serviceHosts[item]).ToArray();
+        var peerID = context.Peer;
+        var peer = new Peer(token, serviceHosts) { Token = token };
+        await this.Peers.AddAsync(peer);
+        LogUtility.Debug($"{context.Peer}({token}) Connected");
+        return new OpenReply() { Token = $"{token}" };
+    }
+
+    public async Task<CloseReply> Close(CloseRequest request, ServerCallContext context)
+    {
+        var token = request.Token;
+        await this.Peers.RemoveAsync(token);
+        LogUtility.Debug($"{context.Peer}({token}) Disconnected");
+        return new CloseReply();
+    }
+
+    public Task<PingReply> Ping(PingRequest request, ServerCallContext context)
+    {
+        var token = request.Token;
+        return this.Dispatcher.InvokeAsync(() =>
         {
-            var addressList = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
-            var address = addressList.FirstOrDefault(item => $"{item}" != "127.0.0.1" && item.AddressFamily == AddressFamily.InterNetwork);
-            if (address != null)
-                localAddress = $"{address}";
-        }
-
-        public AdaptorServerHost(IServiceContext serviceContext, IInstanceContext instanceContext)
-        {
-            this.serviceContext = serviceContext;
-            this.serviceHosts = serviceContext.ServiceHosts;
-            this.Peers = new PeerCollection(serviceContext, instanceContext);
-            this.Peers.CollectionChanged += PeerCollection_CollectionChanged;
-        }
-
-        internal async Task<OpenReply> Open(OpenRequest request, ServerCallContext context)
-        {
-            var token = Guid.NewGuid();
-            var serviceNames = request.ServiceNames;
-            var serviceHosts = serviceNames.Select(item => this.serviceHosts[item]).ToArray();
-            var peerID = context.Peer;
-            var peer = new Peer(token, serviceHosts) { Token = token };
-            await this.Peers.AddAsync(peer);
-            LogUtility.Debug($"{context.Peer}({token}) Connected");
-            return new OpenReply() { Token = $"{token}" };
-        }
-
-        public async Task<CloseReply> Close(CloseRequest request, ServerCallContext context)
-        {
-            var token = request.Token;
-            await this.Peers.RemoveAsync(token);
-            LogUtility.Debug($"{context.Peer}({token}) Disconnected");
-            return new CloseReply();
-        }
-
-        public Task<PingReply> Ping(PingRequest request, ServerCallContext context)
-        {
-            var token = request.Token;
-            return this.Dispatcher.InvokeAsync(() =>
-            {
-                var peer = this.Peers[token];
-                if (peer == null)
-                    throw new InvalidOperationException($"invalid token: '{token}'");
-                peer.Ping();
-                LogUtility.Debug($"{context.Peer}({token}) Ping: {DateTime.Now}");
-                return new PingReply() { Time = peer.PingTime.Ticks };
-            });
-        }
-
-        public async Task<InvokeReply> Invoke(InvokeRequest request, ServerCallContext context)
-        {
-            if (this.serviceHosts.ContainsKey(request.ServiceName) == false)
-                throw new InvalidOperationException();
-            var service = this.serviceHosts[request.ServiceName];
-            if (service.MethodDescriptors.ContainsKey(request.Name) == false)
-                throw new InvalidOperationException($"method '{request.Name}' does not exists.");
-
-            var token = request.Token;
-            var methodDescriptor = service.MethodDescriptors[request.Name];
             var peer = this.Peers[token];
-            var instance = peer.Services[service];
-            var args = this.serializer.DeserializeMany(methodDescriptor.ParameterTypes, request.Datas.ToArray());
-            var (id, valueType, value) = await methodDescriptor.InvokeAsync(this.serviceContext, instance, args);
-            var reply = new InvokeReply()
-            {
-                ID = $"{id}",
-                Data = this.serializer.Serialize(valueType, value)
-            };
-            LogUtility.Debug($"{context.Peer} Invoke: {request.ServiceName}.{methodDescriptor.ShortName}");
-            return reply;
-        }
+            if (peer == null)
+                throw new InvalidOperationException($"invalid token: '{token}'");
+            peer.Ping();
+            LogUtility.Debug($"{context.Peer}({token}) Ping: {DateTime.Now}");
+            return new PingReply() { Time = peer.PingTime.Ticks };
+        });
+    }
 
-        public async Task Poll(IAsyncStreamReader<PollRequest> requestStream, IServerStreamWriter<PollReply> responseStream, ServerCallContext context)
+    public async Task<InvokeReply> Invoke(InvokeRequest request, ServerCallContext context)
+    {
+        if (this._serviceHosts.ContainsKey(request.ServiceName) == false)
+            throw new InvalidOperationException();
+        var service = this._serviceHosts[request.ServiceName];
+        if (service.MethodDescriptors.ContainsKey(request.Name) == false)
+            throw new InvalidOperationException($"method '{request.Name}' does not exists.");
+
+        var token = request.Token;
+        var methodDescriptor = service.MethodDescriptors[request.Name];
+        var peer = this.Peers[token];
+        var instance = peer.Services[service];
+        var args = this._serializer.DeserializeMany(methodDescriptor.ParameterTypes, request.Datas.ToArray());
+        var (id, valueType, value) = await methodDescriptor.InvokeAsync(this._serviceContext, instance, args);
+        var reply = new InvokeReply()
         {
-            var cancellationToken = this.cancellation.Token;
-            var peerID = context.Peer;
-            var peer = null as Peer;
-            while (await requestStream.MoveNext())
+            ID = $"{id}",
+            Data = this._serializer.Serialize(valueType, value)
+        };
+        LogUtility.Debug($"{context.Peer} Invoke: {request.ServiceName}.{methodDescriptor.ShortName}");
+        return reply;
+    }
+
+    public async Task Poll(IAsyncStreamReader<PollRequest> requestStream, IServerStreamWriter<PollReply> responseStream, ServerCallContext context)
+    {
+        var cancellationToken = this._cancellationTokenSource.Token;
+        var peerID = context.Peer;
+        var peer = null as Peer;
+        while (await requestStream.MoveNext())
+        {
+            if (peer == null)
             {
-                if (peer == null)
-                {
-                    var token = requestStream.Current.Token;
-                    peer = await this.Dispatcher.InvokeAsync(() => this.Peers[token]);
-                }
-                var request = requestStream.Current;
-                var services = peer.ServiceHosts;
-                if (this.cancellation.IsCancellationRequested == true)
-                {
-                    await responseStream.WriteAsync(new PollReply() { Code = this.closeCode });
-                    break;
-                }
-                if (peer.Cancellation.IsCancellationRequested == true)
-                {
-                    break;
-                }
-                var reply = new PollReply() { Code = int.MinValue };
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    foreach (var item in services)
-                    {
-                        var items = this.Poll(peer, item);
-                        reply.Items.AddRange(items);
-                    }
-                });
-                await responseStream.WriteAsync(reply);
+                var token = requestStream.Current.Token;
+                peer = await this.Dispatcher.InvokeAsync(() => this.Peers[token]);
             }
-            await this.Peers.RemoveAsync($"{peer.ID}");
-        }
-
-        public PeerCollection Peers { get; }
-
-        public Dispatcher Dispatcher => this.serviceContext.Dispatcher;
-
-        public event EventHandler<CloseEventArgs> Disconnected;
-
-        protected virtual void OnDisconnected(CloseEventArgs e)
-        {
-            this.Disconnected?.Invoke(this, e);
-        }
-
-        private Task AddCallback(InstanceBase instance, string name, Type[] types, object[] args)
-        {
-            var datas = this.serializer.SerializeMany(types, args);
-            return this.Dispatcher.InvokeAsync(() =>
+            var request = requestStream.Current;
+            var services = peer.ServiceHosts;
+            if (this._cancellationTokenSource.IsCancellationRequested == true)
             {
-                var peers = instance.Peer is not Peer peer ? this.Peers : EnumerableUtility.One(peer);
-                var service = instance.ServiceHost;
-                foreach (var item in peers)
-                {
-                    if (item.PollReplyItems.ContainsKey(service) == true)
-                    {
-                        var callbacks = item.PollReplyItems[service];
-                        var pollItem = new PollReplyItem()
-                        {
-                            Name = name,
-                            ServiceName = instance.ServiceName
-                        };
-                        pollItem.Datas.AddRange(datas);
-                        callbacks.Add(pollItem);
-                    }
-                }
-            });
-        }
-
-        private PollReplyItem[] Poll(Peer peer, IServiceHost service)
-        {
-            this.Dispatcher.VerifyAccess();
-            var callbacks = peer.PollReplyItems[service];
-            return callbacks.Flush();
-        }
-
-        private void PeerCollection_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            switch (e.Action)
-            {
-                case NotifyCollectionChangedAction.Add:
-                    {
-                        if (this.timer == null)
-                        {
-                            var milliseconds = (int)timeout.TotalMilliseconds;
-                            this.timer = new Timer(Timer_TimerCallback, null, milliseconds, milliseconds);
-                        }
-                    }
-                    break;
-                case NotifyCollectionChangedAction.Remove:
-                    {
-                        if (this.Peers.Any() == false)
-                        {
-                            this.timer.Dispose();
-                            this.timer = null;
-                        }
-                    }
-                    break;
-                case NotifyCollectionChangedAction.Reset:
-                    {
-                        if (this.timer != null)
-                        {
-                            this.timer.Dispose();
-                            this.timer = null;
-                        }
-                    }
-                    break;
+                await responseStream.WriteAsync(new PollReply() { Code = this._closeCode });
+                break;
             }
-        }
-
-        private async void Timer_TimerCallback(object state)
-        {
-            var items = await this.Dispatcher.InvokeAsync(() =>
+            if (peer.Cancellation.IsCancellationRequested == true)
             {
-                var dateTime = DateTime.UtcNow;
-                var query = from item in this.Peers
-                            where dateTime - item.PingTime > timeout
-                            select item;
-                return query.ToArray();
-            });
-            var tasks = items.Select(item => this.Peers.RemoveAsync($"{item.ID}"));
-            await Task.WhenAll(tasks);
-        }
-
-        #region IAdaptorHost
-
-        async Task IAdaptorHost.OpenAsync(string host, int port)
-        {
+                break;
+            }
+            var reply = new PollReply() { Code = int.MinValue };
             await this.Dispatcher.InvokeAsync(() =>
             {
-                this.adaptor = new AdaptorServerImpl(this);
-                this.server = new Server()
+                foreach (var item in services)
                 {
-                    Services = { Adaptor.BindService(this.adaptor) },
-                    Ports = { new ServerPort(host, port, ServerCredentials.Insecure) },
-                };
-                if (host == ServiceContextBase.DefaultHost)
-                {
-                    this.server.Ports.Add(new ServerPort(localAddress, port, ServerCredentials.Insecure));
+                    var items = this.Poll(peer, item);
+                    reply.Items.AddRange(items);
                 }
-                this.cancellation = new CancellationTokenSource();
-                this.serializer = this.serviceContext.GetService(typeof(ISerializer)) as ISerializer;
-                this.closeCode = 0;
             });
-            await Task.Run(this.server.Start);
+            await responseStream.WriteAsync(reply);
         }
-
-        async Task IAdaptorHost.CloseAsync(int closeCode)
-        {
-            this.closeCode = closeCode;
-            this.cancellation.Cancel();
-            while (await this.Dispatcher.InvokeAsync(this.Peers.Any))
-            {
-                await Task.Delay(1);
-            }
-            await this.server.ShutdownAsync();
-            this.adaptor = null;
-            this.serializer = null;
-            this.server = null;
-        }
-
-        void IAdaptorHost.Invoke(InstanceBase instance, string name, Type[] types, object[] args)
-        {
-            this.AddCallback(instance, name, types, args);
-        }
-
-        T IAdaptorHost.Invoke<T>(InstanceBase instance, string name, Type[] types, object[] args)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task IAdaptorHost.InvokeAsync(InstanceBase instance, string name, Type[] types, object[] args)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<T> IAdaptorHost.InvokeAsync<T>(InstanceBase instance, string name, Type[] types, object[] args)
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
+        await this.Peers.RemoveAsync($"{peer.ID}");
     }
+
+    public PeerCollection Peers { get; }
+
+    public Dispatcher Dispatcher => this._serviceContext.Dispatcher;
+
+    public event EventHandler<CloseEventArgs> Disconnected;
+
+    protected virtual void OnDisconnected(CloseEventArgs e)
+    {
+        this.Disconnected?.Invoke(this, e);
+    }
+
+    private Task AddCallback(InstanceBase instance, string name, Type[] types, object[] args)
+    {
+        var datas = this._serializer.SerializeMany(types, args);
+        return this.Dispatcher.InvokeAsync(() =>
+        {
+            var peers = instance.Peer is not Peer peer ? this.Peers : EnumerableUtility.One(peer);
+            var service = instance.ServiceHost;
+            foreach (var item in peers)
+            {
+                if (item.PollReplyItems.ContainsKey(service) == true)
+                {
+                    var callbacks = item.PollReplyItems[service];
+                    var pollItem = new PollReplyItem()
+                    {
+                        Name = name,
+                        ServiceName = instance.ServiceName
+                    };
+                    pollItem.Datas.AddRange(datas);
+                    callbacks.Add(pollItem);
+                }
+            }
+        });
+    }
+
+    private PollReplyItem[] Poll(Peer peer, IServiceHost service)
+    {
+        this.Dispatcher.VerifyAccess();
+        var callbacks = peer.PollReplyItems[service];
+        return callbacks.Flush();
+    }
+
+    private void PeerCollection_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    {
+        switch (e.Action)
+        {
+            case NotifyCollectionChangedAction.Add:
+                {
+                    if (this._timer == null)
+                    {
+                        var milliseconds = (int)timeout.TotalMilliseconds;
+                        this._timer = new Timer(Timer_TimerCallback, null, milliseconds, milliseconds);
+                    }
+                }
+                break;
+            case NotifyCollectionChangedAction.Remove:
+                {
+                    if (this.Peers.Any() == false)
+                    {
+                        this._timer.Dispose();
+                        this._timer = null;
+                    }
+                }
+                break;
+            case NotifyCollectionChangedAction.Reset:
+                {
+                    if (this._timer != null)
+                    {
+                        this._timer.Dispose();
+                        this._timer = null;
+                    }
+                }
+                break;
+        }
+    }
+
+    private async void Timer_TimerCallback(object state)
+    {
+        var items = await this.Dispatcher.InvokeAsync(() =>
+        {
+            var dateTime = DateTime.UtcNow;
+            var query = from item in this.Peers
+                        where dateTime - item.PingTime > timeout
+                        select item;
+            return query.ToArray();
+        });
+        var tasks = items.Select(item => this.Peers.RemoveAsync($"{item.ID}"));
+        await Task.WhenAll(tasks);
+    }
+
+    #region IAdaptorHost
+
+    async Task IAdaptorHost.OpenAsync(string host, int port)
+    {
+        await this.Dispatcher.InvokeAsync(() =>
+        {
+            this._adaptor = new AdaptorServerImpl(this);
+            this._server = new Server()
+            {
+                Services = { Adaptor.BindService(this._adaptor) },
+                Ports = { new ServerPort(host, port, ServerCredentials.Insecure) },
+            };
+            if (host == ServiceContextBase.DefaultHost)
+            {
+                this._server.Ports.Add(new ServerPort(localAddress, port, ServerCredentials.Insecure));
+            }
+            this._cancellationTokenSource = new CancellationTokenSource();
+            this._serializer = this._serviceContext.GetService(typeof(ISerializer)) as ISerializer;
+            this._closeCode = 0;
+        });
+        await Task.Run(this._server.Start);
+    }
+
+    async Task IAdaptorHost.CloseAsync(int closeCode)
+    {
+        this._closeCode = closeCode;
+        this._cancellationTokenSource.Cancel();
+        while (await this.Dispatcher.InvokeAsync(this.Peers.Any))
+        {
+            await Task.Delay(1);
+        }
+        await this._server.ShutdownAsync();
+        this._adaptor = null;
+        this._serializer = null;
+        this._server = null;
+    }
+
+    void IAdaptorHost.Invoke(InstanceBase instance, string name, Type[] types, object[] args)
+    {
+        this.AddCallback(instance, name, types, args);
+    }
+
+    T IAdaptorHost.Invoke<T>(InstanceBase instance, string name, Type[] types, object[] args)
+    {
+        throw new NotImplementedException();
+    }
+
+    Task IAdaptorHost.InvokeAsync(InstanceBase instance, string name, Type[] types, object[] args)
+    {
+        throw new NotImplementedException();
+    }
+
+    Task<T> IAdaptorHost.InvokeAsync<T>(InstanceBase instance, string name, Type[] types, object[] args)
+    {
+        throw new NotImplementedException();
+    }
+
+    #endregion
 }

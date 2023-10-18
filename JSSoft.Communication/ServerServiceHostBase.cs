@@ -23,65 +23,64 @@
 using System.ComponentModel;
 using System.Threading.Tasks;
 
-namespace JSSoft.Communication
+namespace JSSoft.Communication;
+
+[ServiceHost(IsServer = true)]
+public abstract class ServerServiceHostBase<T, U> : ServiceHostBase where T : class where U : class
 {
-    [ServiceHost(IsServer = true)]
-    public abstract class ServerServiceHostBase<T, U> : ServiceHostBase where T : class where U : class
+    protected ServerServiceHostBase()
+        : base(typeof(T), typeof(U))
     {
-        protected ServerServiceHostBase()
-            : base(typeof(T), typeof(U))
-        {
 
-        }
-
-        protected virtual Task<T> CreateServiceAsync(IPeer peer, U callback)
-        {
-            return Task.Run(() => TypeDescriptor.CreateInstance(null, this.ServiceType, null, null) as T);
-        }
-
-        protected virtual Task DestroyServiceAsync(IPeer peer, T service)
-        {
-            return Task.Delay(1);
-        }
-
-        private protected override async Task<object> CreateInstanceInternalAsync(IPeer peer, object obj)
-        {
-            return await this.CreateServiceAsync(peer, obj as U);
-        }
-
-        private protected override Task DestroyInstanceInternalAsync(IPeer peer, object obj)
-        {
-            return this.DestroyServiceAsync(peer, obj as T);
-        }
     }
 
-    [ServiceHost(IsServer = true)]
-    public abstract class ServerServiceHostBase<T> : ServiceHostBase where T : class
+    protected virtual Task<T> CreateServiceAsync(IPeer peer, U callback)
     {
-        protected ServerServiceHostBase()
-            : base(typeof(T), typeof(void))
-        {
+        return Task.Run(() => TypeDescriptor.CreateInstance(null, this.ServiceType, null, null) as T);
+    }
 
-        }
+    protected virtual Task DestroyServiceAsync(IPeer peer, T service)
+    {
+        return Task.Delay(1);
+    }
 
-        protected virtual Task<T> CreateServiceAsync(IPeer peer)
-        {
-            return Task.Run(() => TypeDescriptor.CreateInstance(null, this.ServiceType, null, null) as T);
-        }
+    private protected override async Task<object> CreateInstanceInternalAsync(IPeer peer, object obj)
+    {
+        return await this.CreateServiceAsync(peer, obj as U);
+    }
 
-        protected virtual Task DestroyServiceAsync(IPeer peer, T service)
-        {
-            return Task.Delay(1);
-        }
+    private protected override Task DestroyInstanceInternalAsync(IPeer peer, object obj)
+    {
+        return this.DestroyServiceAsync(peer, obj as T);
+    }
+}
 
-        private protected override async Task<object> CreateInstanceInternalAsync(IPeer peer, object obj)
-        {
-            return await this.CreateServiceAsync(peer);
-        }
+[ServiceHost(IsServer = true)]
+public abstract class ServerServiceHostBase<T> : ServiceHostBase where T : class
+{
+    protected ServerServiceHostBase()
+        : base(typeof(T), typeof(void))
+    {
 
-        private protected override async Task DestroyInstanceInternalAsync(IPeer peer, object obj)
-        {
-            await this.DestroyServiceAsync(peer, obj as T);
-        }
+    }
+
+    protected virtual Task<T> CreateServiceAsync(IPeer peer)
+    {
+        return Task.Run(() => TypeDescriptor.CreateInstance(null, this.ServiceType, null, null) as T);
+    }
+
+    protected virtual Task DestroyServiceAsync(IPeer peer, T service)
+    {
+        return Task.Delay(1);
+    }
+
+    private protected override async Task<object> CreateInstanceInternalAsync(IPeer peer, object obj)
+    {
+        return await this.CreateServiceAsync(peer);
+    }
+
+    private protected override async Task DestroyInstanceInternalAsync(IPeer peer, object obj)
+    {
+        await this.DestroyServiceAsync(peer, obj as T);
     }
 }

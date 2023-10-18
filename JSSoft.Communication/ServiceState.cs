@@ -20,18 +20,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace JSSoft.Communication
+namespace JSSoft.Communication;
+
+public enum ServiceState
 {
-    public enum ServiceState
-    {
-        None,
+    None,
 
-        Opening,
+    Opening,
 
-        Open,
+    Open,
 
-        Closing,
+    Closing,
 
-        Closed = None,
-    }
+    Closed = None,
 }

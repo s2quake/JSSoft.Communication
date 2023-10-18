@@ -28,28 +28,27 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.ComponentModel.Composition;
 
-namespace JSSoft.Communication.Commands
+namespace JSSoft.Communication.Commands;
+
+[Export(typeof(ICommand))]
+class ExitCommand : CommandAsyncBase
 {
-    [Export(typeof(ICommand))]
-    class ExitCommand : CommandAsyncBase
+    private readonly IApplication _application;
+
+    [ImportingConstructor]
+    public ExitCommand(IApplication application)
     {
-        private readonly IApplication _application;
+        _application = application;
+    }
 
-        [ImportingConstructor]
-        public ExitCommand(IApplication application)
-        {
-            _application = application;
-        }
+    [CommandPropertyRequired(DefaultValue = 0)]
+    public int ExitCode
+    {
+        get; set;
+    }
 
-        [CommandPropertyRequired(DefaultValue = 0)]
-        public int ExitCode
-        {
-            get; set;
-        }
-
-        protected override Task OnExecuteAsync(CancellationToken cancellationToken)
-        {
-            return _application.StopAsync(this.ExitCode);
-        }
+    protected override Task OnExecuteAsync(CancellationToken cancellationToken)
+    {
+        return _application.StopAsync(this.ExitCode);
     }
 }

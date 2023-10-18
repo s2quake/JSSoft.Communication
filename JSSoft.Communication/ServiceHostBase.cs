@@ -26,125 +26,124 @@ using System;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace JSSoft.Communication
+namespace JSSoft.Communication;
+
+public abstract class ServiceHostBase : IServiceHost
 {
-    public abstract class ServiceHostBase : IServiceHost
+    private ServiceToken _token;
+
+    internal ServiceHostBase(Type serviceType, Type callbackType)
     {
-        private ServiceToken token;
-
-        internal ServiceHostBase(Type serviceType, Type callbackType)
-        {
-            this.ServiceType = serviceType ?? throw new ArgumentNullException(nameof(serviceType));
-            this.CallbackType = callbackType ?? throw new ArgumentNullException(nameof(callbackType));
-            this.Name = serviceType.Name;
-            this.MethodDescriptors = new MethodDescriptorCollection(this);
-            this.OnValidate();
-        }
-
-        public Type ServiceType { get; }
-
-        public Type CallbackType { get; }
-
-        public Dispatcher Dispatcher { get; private set; }
-
-        public MethodDescriptorCollection MethodDescriptors { get; }
-
-        public async Task OpenAsync(ServiceToken token)
-        {
-            this.token = token;
-            this.Dispatcher = new Dispatcher(this);
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                this.OnOpened(EventArgs.Empty);
-            });
-        }
-
-        public async Task CloseAsync(ServiceToken token)
-        {
-            if (this.token != token)
-                throw new InvalidOperationException();
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                this.OnClosed(EventArgs.Empty);
-            });
-            this.token = null;
-            this.Dispatcher.Dispose();
-            this.Dispatcher = null;
-        }
-
-        public string Name { get; }
-
-        public event EventHandler Opened;
-
-        public event EventHandler Closed;
-
-        protected virtual void OnOpened(EventArgs e)
-        {
-            this.Opened?.Invoke(this, e);
-        }
-
-        protected virtual void OnClosed(EventArgs e)
-        {
-            this.Closed?.Invoke(this, e);
-        }
-
-        protected virtual void OnValidate()
-        {
-            if (this.ServiceType.IsInterface == false)
-                throw new InvalidOperationException("service type must be interface.");
-            if (this.ServiceType.IsNested == true)
-                throw new InvalidOperationException("service type can not be nested type.");
-            if (IsPublicType(this.ServiceType) == false && IsInternalType(this.ServiceType) == false)
-                throw new InvalidOperationException($"'{this.ServiceType.Name}' must be public or internal.");
-
-            if (this.CallbackType != typeof(void))
-            {
-                if (this.CallbackType.IsInterface == false)
-                    throw new InvalidOperationException("callback type must be interface.");
-                if (this.CallbackType.IsNested == true)
-                    throw new InvalidOperationException("callback type can not be nested type.");
-                if (IsPublicType(this.CallbackType) == false && IsInternalType(this.CallbackType) == false)
-                    throw new InvalidOperationException($"'{this.ServiceType.Name}' type must be public or internal.");
-            }
-        }
-
-        private static bool IsPublicType(Type type)
-        {
-            return type.IsVisible == true && type.IsPublic == true && type.IsNotPublic == false;
-        }
-
-        private static bool IsInternalType(Type t)
-        {
-            return t.IsVisible == false && t.IsPublic == false && t.IsNotPublic == true;
-        }
-
-        private protected abstract Task<object> CreateInstanceInternalAsync(IPeer peer, object obj);
-
-        private protected abstract Task DestroyInstanceInternalAsync(IPeer peer, object obj);
-
-        internal static bool IsServer(ServiceHostBase serviceHost)
-        {
-            if (serviceHost.GetType().GetCustomAttribute(typeof(ServiceHostAttribute)) is ServiceHostAttribute attribute)
-            {
-                return attribute.IsServer;
-            }
-            return false;
-        }
-
-        #region IServiceHost
-
-        Task<object> IServiceHost.CreateInstanceAsync(IPeer peer, object obj)
-        {
-            return this.CreateInstanceInternalAsync(peer, obj);
-        }
-
-        Task IServiceHost.DestroyInstanceAsync(IPeer peer, object obj)
-        {
-            return this.DestroyInstanceInternalAsync(peer, obj);
-        }
-
-        IContainer<MethodDescriptor> IServiceHost.MethodDescriptors => this.MethodDescriptors;
-
-        #endregion
+        this.ServiceType = serviceType ?? throw new ArgumentNullException(nameof(serviceType));
+        this.CallbackType = callbackType ?? throw new ArgumentNullException(nameof(callbackType));
+        this.Name = serviceType.Name;
+        this.MethodDescriptors = new MethodDescriptorCollection(this);
+        this.OnValidate();
     }
+
+    public Type ServiceType { get; }
+
+    public Type CallbackType { get; }
+
+    public Dispatcher Dispatcher { get; private set; }
+
+    public MethodDescriptorCollection MethodDescriptors { get; }
+
+    public async Task OpenAsync(ServiceToken token)
+    {
+        this._token = token;
+        this.Dispatcher = new Dispatcher(this);
+        await this.Dispatcher.InvokeAsync(() =>
+        {
+            this.OnOpened(EventArgs.Empty);
+        });
+    }
+
+    public async Task CloseAsync(ServiceToken token)
+    {
+        if (this._token != token)
+            throw new InvalidOperationException();
+        await this.Dispatcher.InvokeAsync(() =>
+        {
+            this.OnClosed(EventArgs.Empty);
+        });
+        this._token = null;
+        this.Dispatcher.Dispose();
+        this.Dispatcher = null;
+    }
+
+    public string Name { get; }
+
+    public event EventHandler Opened;
+
+    public event EventHandler Closed;
+
+    protected virtual void OnOpened(EventArgs e)
+    {
+        this.Opened?.Invoke(this, e);
+    }
+
+    protected virtual void OnClosed(EventArgs e)
+    {
+        this.Closed?.Invoke(this, e);
+    }
+
+    protected virtual void OnValidate()
+    {
+        if (this.ServiceType.IsInterface == false)
+            throw new InvalidOperationException("service type must be interface.");
+        if (this.ServiceType.IsNested == true)
+            throw new InvalidOperationException("service type can not be nested type.");
+        if (IsPublicType(this.ServiceType) == false && IsInternalType(this.ServiceType) == false)
+            throw new InvalidOperationException($"'{this.ServiceType.Name}' must be public or internal.");
+
+        if (this.CallbackType != typeof(void))
+        {
+            if (this.CallbackType.IsInterface == false)
+                throw new InvalidOperationException("callback type must be interface.");
+            if (this.CallbackType.IsNested == true)
+                throw new InvalidOperationException("callback type can not be nested type.");
+            if (IsPublicType(this.CallbackType) == false && IsInternalType(this.CallbackType) == false)
+                throw new InvalidOperationException($"'{this.ServiceType.Name}' type must be public or internal.");
+        }
+    }
+
+    private static bool IsPublicType(Type type)
+    {
+        return type.IsVisible == true && type.IsPublic == true && type.IsNotPublic == false;
+    }
+
+    private static bool IsInternalType(Type t)
+    {
+        return t.IsVisible == false && t.IsPublic == false && t.IsNotPublic == true;
+    }
+
+    private protected abstract Task<object> CreateInstanceInternalAsync(IPeer peer, object obj);
+
+    private protected abstract Task DestroyInstanceInternalAsync(IPeer peer, object obj);
+
+    internal static bool IsServer(ServiceHostBase serviceHost)
+    {
+        if (serviceHost.GetType().GetCustomAttribute(typeof(ServiceHostAttribute)) is ServiceHostAttribute attribute)
+        {
+            return attribute.IsServer;
+        }
+        return false;
+    }
+
+    #region IServiceHost
+
+    Task<object> IServiceHost.CreateInstanceAsync(IPeer peer, object obj)
+    {
+        return this.CreateInstanceInternalAsync(peer, obj);
+    }
+
+    Task IServiceHost.DestroyInstanceAsync(IPeer peer, object obj)
+    {
+        return this.DestroyInstanceInternalAsync(peer, obj);
+    }
+
+    IContainer<MethodDescriptor> IServiceHost.MethodDescriptors => this.MethodDescriptors;
+
+    #endregion
 }

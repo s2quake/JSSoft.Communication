@@ -20,35 +20,34 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace JSSoft.Communication.Logging
+namespace JSSoft.Communication.Logging;
+
+public class EmptyLogger : ILogger
 {
-    public class EmptyLogger : ILogger
+    public void Debug(object message)
     {
-        public void Debug(object message)
-        {
 
-        }
-
-        public void Info(object message)
-        {
-
-        }
-
-        public void Error(object message)
-        {
-
-        }
-
-        public void Warn(object message)
-        {
-
-        }
-
-        public void Fatal(object message)
-        {
-
-        }
-
-        public static readonly EmptyLogger Default = new();
     }
+
+    public void Info(object message)
+    {
+
+    }
+
+    public void Error(object message)
+    {
+
+    }
+
+    public void Warn(object message)
+    {
+
+    }
+
+    public void Fatal(object message)
+    {
+
+    }
+
+    public static readonly EmptyLogger Default = new();
 }

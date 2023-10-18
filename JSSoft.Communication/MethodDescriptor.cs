@@ -25,104 +25,103 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace JSSoft.Communication
+namespace JSSoft.Communication;
+
+public sealed class MethodDescriptor
 {
-    public sealed class MethodDescriptor
+    internal MethodDescriptor(MethodInfo methodInfo)
     {
-        internal MethodDescriptor(MethodInfo methodInfo)
+        this.MethodInfo = methodInfo;
+        this.ParameterTypes = methodInfo.GetParameters().Select(item => item.ParameterType).ToArray();
+        this.ReturnType = methodInfo.ReturnType;
+        if (this.ReturnType == typeof(Task))
         {
-            this.MethodInfo = methodInfo;
-            this.ParameterTypes = methodInfo.GetParameters().Select(item => item.ParameterType).ToArray();
-            this.ReturnType = methodInfo.ReturnType;
-            if (this.ReturnType == typeof(Task))
-            {
-                this.ReturnType = typeof(void);
-                this.IsAsync = true;
-            }
-            else if (this.ReturnType.IsSubclassOf(typeof(Task)) == true)
-            {
-                this.ReturnType = this.ReturnType.GetGenericArguments().First();
-                this.IsAsync = true;
-            }
-            this.Name = GenerateName(methodInfo);
-            this.ShortName = methodInfo.Name;
+            this.ReturnType = typeof(void);
+            this.IsAsync = true;
         }
-
-        public async Task<(Guid, Type, object)> InvokeAsync(IServiceProvider serviceProvider, object instance, object[] args)
+        else if (this.ReturnType.IsSubclassOf(typeof(Task)) == true)
         {
-            if (serviceProvider.GetService(typeof(IComponentProvider)) is not IComponentProvider componentProvider)
-            {
-                throw new InvalidOperationException("can not get interface of IComponentProvider at serviceProvider");
-            }
-            try
-            {
-                var (type, value) = await this.InvokeAsync(instance, args);
-                return (Guid.Empty, type, value);
-            }
-            catch (TargetInvocationException e)
-            {
-                var exception = e.InnerException ?? e;
-                var exceptionSerializer = componentProvider.GetExceptionDescriptor(exception);
-                return (exceptionSerializer.ID, exception.GetType(), exception);
-            }
-            catch (Exception e)
-            {
-                var exceptionSerializer = componentProvider.GetExceptionDescriptor(e);
-                return (exceptionSerializer.ID, e.GetType(), e);
-            }
+            this.ReturnType = this.ReturnType.GetGenericArguments().First();
+            this.IsAsync = true;
         }
+        this.Name = GenerateName(methodInfo);
+        this.ShortName = methodInfo.Name;
+    }
 
-        public string Name { get; }
-
-        public string ShortName { get; }
-
-        public Type[] ParameterTypes { get; }
-
-        public Type ReturnType { get; }
-
-        public bool IsAsync { get; }
-
-        internal static string GenerateName(MethodInfo methodInfo)
+    public async Task<(Guid, Type, object)> InvokeAsync(IServiceProvider serviceProvider, object instance, object[] args)
+    {
+        if (serviceProvider.GetService(typeof(IComponentProvider)) is not IComponentProvider componentProvider)
         {
-            var parameterTypes = methodInfo.GetParameters().Select(item => item.ParameterType).ToArray();
-            return GenerateName(methodInfo.ReturnType, methodInfo.ReflectedType, methodInfo.Name, parameterTypes);
+            throw new InvalidOperationException("can not get interface of IComponentProvider at serviceProvider");
         }
-
-        internal static string GenerateName(MethodInfo methodInfo, Type serviceType)
+        try
         {
-            var parameterTypes = methodInfo.GetParameters().Select(item => item.ParameterType).ToArray();
-            return GenerateName(methodInfo.ReturnType, serviceType, methodInfo.Name, parameterTypes);
+            var (type, value) = await this.InvokeAsync(instance, args);
+            return (Guid.Empty, type, value);
         }
-
-        internal static string GenerateName(Type returnType, Type reflectedType, string methodName, params Type[] parameterTypes)
+        catch (TargetInvocationException e)
         {
-            var parameterTypeNames = string.Join<Type>(", ", parameterTypes);
-            return $"{returnType} {reflectedType}.{methodName}({parameterTypeNames})";
+            var exception = e.InnerException ?? e;
+            var exceptionSerializer = componentProvider.GetExceptionDescriptor(exception);
+            return (exceptionSerializer.ID, exception.GetType(), exception);
         }
-
-        internal MethodInfo MethodInfo { get; }
-
-        private async Task<(Type, object)> InvokeAsync(object instance, object[] args)
+        catch (Exception e)
         {
-            var value = await Task.Run(() => this.MethodInfo.Invoke(instance, args));
-            var valueType = this.MethodInfo.ReturnType;
-            if (value is Task task)
+            var exceptionSerializer = componentProvider.GetExceptionDescriptor(e);
+            return (exceptionSerializer.ID, e.GetType(), e);
+        }
+    }
+
+    public string Name { get; }
+
+    public string ShortName { get; }
+
+    public Type[] ParameterTypes { get; }
+
+    public Type ReturnType { get; }
+
+    public bool IsAsync { get; }
+
+    internal static string GenerateName(MethodInfo methodInfo)
+    {
+        var parameterTypes = methodInfo.GetParameters().Select(item => item.ParameterType).ToArray();
+        return GenerateName(methodInfo.ReturnType, methodInfo.ReflectedType, methodInfo.Name, parameterTypes);
+    }
+
+    internal static string GenerateName(MethodInfo methodInfo, Type serviceType)
+    {
+        var parameterTypes = methodInfo.GetParameters().Select(item => item.ParameterType).ToArray();
+        return GenerateName(methodInfo.ReturnType, serviceType, methodInfo.Name, parameterTypes);
+    }
+
+    internal static string GenerateName(Type returnType, Type reflectedType, string methodName, params Type[] parameterTypes)
+    {
+        var parameterTypeNames = string.Join<Type>(", ", parameterTypes);
+        return $"{returnType} {reflectedType}.{methodName}({parameterTypeNames})";
+    }
+
+    internal MethodInfo MethodInfo { get; }
+
+    private async Task<(Type, object)> InvokeAsync(object instance, object[] args)
+    {
+        var value = await Task.Run(() => this.MethodInfo.Invoke(instance, args));
+        var valueType = this.MethodInfo.ReturnType;
+        if (value is Task task)
+        {
+            await task;
+            var taskType = task.GetType();
+            if (taskType.GetGenericArguments().Any() == true)
             {
-                await task;
-                var taskType = task.GetType();
-                if (taskType.GetGenericArguments().Any() == true)
-                {
-                    var propertyInfo = taskType.GetProperty(nameof(Task<object>.Result));
-                    value = propertyInfo.GetValue(task);
-                    valueType = propertyInfo.PropertyType;
-                }
-                else
-                {
-                    value = null;
-                    valueType = typeof(void);
-                }
+                var propertyInfo = taskType.GetProperty(nameof(Task<object>.Result));
+                value = propertyInfo.GetValue(task);
+                valueType = propertyInfo.PropertyType;
             }
-            return (valueType, value);
+            else
+            {
+                value = null;
+                valueType = typeof(void);
+            }
         }
+        return (valueType, value);
     }
 }

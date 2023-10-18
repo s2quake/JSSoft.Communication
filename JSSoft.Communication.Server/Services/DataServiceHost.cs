@@ -24,31 +24,31 @@ using System;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 
-namespace JSSoft.Communication.Services
+namespace JSSoft.Communication.Services;
+
+[Export(typeof(IServiceHost))]
+class DataServiceHost : ServerServiceHostBase<IDataService>, IDisposable
 {
-    [Export(typeof(IServiceHost))]
-    class DataServiceHost : ServerServiceHostBase<IDataService>, IDisposable
+    private readonly DataService _dataService;
+
+    [ImportingConstructor]
+    public DataServiceHost(DataService dataService)
     {
-        private readonly DataService dataService;
-        [ImportingConstructor]
-        public DataServiceHost(DataService dataService)
-        {
-            this.dataService = dataService;
-        }
+        this._dataService = dataService;
+    }
 
-        public void Dispose()
-        {
-            this.dataService.Dispose();
-        }
+    public void Dispose()
+    {
+        this._dataService.Dispose();
+    }
 
-        protected override Task<IDataService> CreateServiceAsync(IPeer peer)
-        {
-            return Task.Run<IDataService>(() => this.dataService);
-        }
+    protected override Task<IDataService> CreateServiceAsync(IPeer peer)
+    {
+        return Task.Run<IDataService>(() => this._dataService);
+    }
 
-        protected override async Task DestroyServiceAsync(IPeer peer, IDataService service)
-        {
-            await Task.Delay(1);
-        }
+    protected override async Task DestroyServiceAsync(IPeer peer, IDataService service)
+    {
+        await Task.Delay(1);
     }
 }

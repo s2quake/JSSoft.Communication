@@ -22,12 +22,11 @@
 
 using System;
 
-namespace JSSoft.Communication
-{
-    public interface ISerializer
-    {
-        string Serialize(Type type, object data);
+namespace JSSoft.Communication;
 
-        object Deserialize(Type type, string text);
-    }
+public interface ISerializer
+{
+    string Serialize(Type type, object data);
+
+    object Deserialize(Type type, string text);
 }

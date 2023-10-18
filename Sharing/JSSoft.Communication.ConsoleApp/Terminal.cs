@@ -29,24 +29,24 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.ComponentModel.Composition;
 
-namespace JSSoft.Communication.ConsoleApp
-{
-    [Export]
-    sealed class Terminal : TerminalBase
-    {
-        private static readonly string postfix = CommandSettings.IsWin32NT == true ? ">" : "$ ";
-        // private readonly Settings settings;
-        // private readonly CommandContext commandContext;
-        // private readonly IServiceContext serviceHost;
-        // private readonly INotifyUserService userServiceNotification;
-        // private bool isDisposed;
-        // private CancellationTokenSource cancellation;
-        private readonly Application _application;
+namespace JSSoft.Communication.ConsoleApp;
 
-        // static Shell()
-        // {
-        //     JSSoft.Communication.Logging.LogUtility.Logger = JSSoft.Communication.Logging.ConsoleLogger.Default;
-        // }
+[Export]
+sealed class Terminal : TerminalBase
+{
+    private static readonly string postfix = CommandSettings.IsWin32NT == true ? ">" : "$ ";
+    // private readonly Settings settings;
+    // private readonly CommandContext commandContext;
+    // private readonly IServiceContext serviceHost;
+    // private readonly INotifyUserService userServiceNotification;
+    // private bool isDisposed;
+    // private CancellationTokenSource cancellation;
+    private readonly Application _application;
+
+    // static Shell()
+    // {
+    //     JSSoft.Communication.Logging.LogUtility.Logger = JSSoft.Communication.Logging.ConsoleLogger.Default;
+    // }
 
 // #if SERVER
 //         private readonly bool isServer = true;
@@ -54,36 +54,35 @@ namespace JSSoft.Communication.ConsoleApp
 //         private readonly bool isServer = false;
 // #endif
 
-        [ImportingConstructor]
-        public Terminal(Application application, CommandContext commandContext)
-           : base(commandContext)
+    [ImportingConstructor]
+    public Terminal(Application application, CommandContext commandContext)
+       : base(commandContext)
+    {
+        _application = application;
+    }
+
+    // public static IShell Create()
+    // {
+    //     return Container.GetService<IShell>();
+    // }
+
+    protected override string FormatPrompt(string prompt)
+    {
+        if (_application.UserID == string.Empty)
         {
-            _application = application;
+            return prompt;
         }
-
-        // public static IShell Create()
-        // {
-        //     return Container.GetService<IShell>();
-        // }
-
-        protected override string FormatPrompt(string prompt)
+        else
         {
-            if (_application.UserID == string.Empty)
-            {
-                return prompt;
-            }
-            else
-            {
-                var tb = new TerminalStringBuilder();
-                var pattern = $"(.+@)(.+).{{{postfix.Length}}}";
-                var match = Regex.Match(prompt, pattern);
-                tb.Append(match.Groups[1].Value);
-                tb.Foreground = TerminalColor.BrightGreen;
-                tb.Append(match.Groups[2].Value);
-                tb.Foreground = null;
-                tb.Append(postfix);
-                return tb.ToString();
-            }
+            var tb = new TerminalStringBuilder();
+            var pattern = $"(.+@)(.+).{{{postfix.Length}}}";
+            var match = Regex.Match(prompt, pattern);
+            tb.Append(match.Groups[1].Value);
+            tb.Foreground = TerminalColor.BrightGreen;
+            tb.Append(match.Groups[2].Value);
+            tb.Foreground = null;
+            tb.Append(postfix);
+            return tb.ToString();
         }
     }
 }

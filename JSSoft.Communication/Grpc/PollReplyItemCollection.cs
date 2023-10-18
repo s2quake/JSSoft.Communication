@@ -23,65 +23,64 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace JSSoft.Communication.Grpc
+namespace JSSoft.Communication.Grpc;
+
+class PollReplyItemCollection : IEnumerable<PollReplyItem>, IReadOnlyList<PollReplyItem>
 {
-    class PollReplyItemCollection : IEnumerable<PollReplyItem>, IReadOnlyList<PollReplyItem>
+    private readonly List<PollReplyItem> _itemList = new();
+
+    public PollReplyItemCollection()
     {
-        private readonly List<PollReplyItem> itemList = new();
-
-        public PollReplyItemCollection()
-        {
-        }
-
-        public void Add(PollReplyItem item)
-        {
-            this.itemList.Add(item);
-        }
-
-        public void Remove(PollReplyItem item)
-        {
-            this.itemList.Remove(item);
-        }
-
-        public int IndexOf(PollReplyItem item)
-        {
-            return this.itemList.IndexOf(item);
-        }
-
-        public PollReplyItem this[int index] => this.itemList[index];
-
-        public bool Contains(PollReplyItem item)
-        {
-            return this.itemList.Contains(item);
-        }
-
-        public PollReplyItem[] Flush()
-        {
-            var items = this.itemList.ToArray();
-            this.itemList.Clear();
-            return items;
-        }
-
-        public int Count => this.itemList.Count;
-
-        #region IEnumerable
-
-        IEnumerator<PollReplyItem> IEnumerable<PollReplyItem>.GetEnumerator()
-        {
-            foreach (var item in this.itemList)
-            {
-                yield return item;
-            }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            foreach (var item in this.itemList)
-            {
-                yield return item;
-            }
-        }
-
-        #endregion
     }
+
+    public void Add(PollReplyItem item)
+    {
+        this._itemList.Add(item);
+    }
+
+    public void Remove(PollReplyItem item)
+    {
+        this._itemList.Remove(item);
+    }
+
+    public int IndexOf(PollReplyItem item)
+    {
+        return this._itemList.IndexOf(item);
+    }
+
+    public PollReplyItem this[int index] => this._itemList[index];
+
+    public bool Contains(PollReplyItem item)
+    {
+        return this._itemList.Contains(item);
+    }
+
+    public PollReplyItem[] Flush()
+    {
+        var items = this._itemList.ToArray();
+        this._itemList.Clear();
+        return items;
+    }
+
+    public int Count => this._itemList.Count;
+
+    #region IEnumerable
+
+    IEnumerator<PollReplyItem> IEnumerable<PollReplyItem>.GetEnumerator()
+    {
+        foreach (var item in this._itemList)
+        {
+            yield return item;
+        }
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        foreach (var item in this._itemList)
+        {
+            yield return item;
+        }
+    }
+
+    #endregion
 }

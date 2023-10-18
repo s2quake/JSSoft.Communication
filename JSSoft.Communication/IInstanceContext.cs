@@ -24,12 +24,11 @@ using System;
 using System.Threading.Tasks;
 using JSSoft.Communication.Grpc;
 
-namespace JSSoft.Communication
-{
-    public interface IInstanceContext
-    {
-        Task<PeerDescriptor> CreateInstanceAsync(IPeer peer);
+namespace JSSoft.Communication;
 
-        Task DestroyInstanceAsync(IPeer peer);
-    }
+public interface IInstanceContext
+{
+    Task<PeerDescriptor> CreateInstanceAsync(IPeer peer);
+
+    Task DestroyInstanceAsync(IPeer peer);
 }

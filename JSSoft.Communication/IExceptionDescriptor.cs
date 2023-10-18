@@ -22,12 +22,11 @@
 
 using System;
 
-namespace JSSoft.Communication
-{
-    public interface IExceptionDescriptor
-    {
-        Type ExceptionType { get; }
+namespace JSSoft.Communication;
 
-        Guid ID { get; }
-    }
+public interface IExceptionDescriptor
+{
+    Type ExceptionType { get; }
+
+    Guid ID { get; }
 }

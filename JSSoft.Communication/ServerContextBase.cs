@@ -22,21 +22,20 @@
 
 using System.Threading.Tasks;
 
-namespace JSSoft.Communication
+namespace JSSoft.Communication;
+
+[ServiceContext(IsServer = true)]
+public abstract class ServerContextBase : ServiceContextBase
 {
-    [ServiceContext(IsServer = true)]
-    public abstract class ServerContextBase : ServiceContextBase
+    protected ServerContextBase(params IServiceHost[] serviceHosts)
+        : base(serviceHosts)
     {
-        protected ServerContextBase(params IServiceHost[] serviceHosts)
-            : base(serviceHosts)
-        {
 
-        }
+    }
 
-        protected ServerContextBase(IComponentProvider componentProvider, params IServiceHost[] serviceHosts)
-            : base(componentProvider, serviceHosts)
-        {
+    protected ServerContextBase(IComponentProvider componentProvider, params IServiceHost[] serviceHosts)
+        : base(componentProvider, serviceHosts)
+    {
 
-        }
     }
 }

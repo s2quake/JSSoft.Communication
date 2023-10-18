@@ -25,26 +25,25 @@ using JSSoft.Library.Threading;
 using System;
 using System.Threading.Tasks;
 
-namespace JSSoft.Communication
+namespace JSSoft.Communication;
+
+public interface IServiceContext : IServiceProvider
 {
-    public interface IServiceContext : IServiceProvider
-    {
-        Task<Guid> OpenAsync();
+    Task<Guid> OpenAsync();
 
-        Task CloseAsync(Guid token, int closeCode);
+    Task CloseAsync(Guid token, int closeCode);
 
-        IContainer<IServiceHost> ServiceHosts { get; }
+    IContainer<IServiceHost> ServiceHosts { get; }
 
-        string Host { get; set; }
+    string Host { get; set; }
 
-        int Port { get; set; }
+    int Port { get; set; }
 
-        Dispatcher Dispatcher { get; }
+    Dispatcher Dispatcher { get; }
 
-        ServiceState ServiceState { get; }
+    ServiceState ServiceState { get; }
 
-        event EventHandler Opened;
+    event EventHandler Opened;
 
-        event EventHandler<CloseEventArgs> Closed;
-    }
+    event EventHandler<CloseEventArgs> Closed;
 }

@@ -22,28 +22,27 @@
 
 using System.ComponentModel.Composition;
 
-namespace JSSoft.Communication.Services
+namespace JSSoft.Communication.Services;
+
+[Export(typeof(IServiceHost))]
+class DataServiceHost : ClientServiceHostBase<IDataService>
 {
-    [Export(typeof(IServiceHost))]
-    class DataServiceHost : ClientServiceHostBase<IDataService>
+    private readonly DataService _dataService;
+
+    [ImportingConstructor]
+    public DataServiceHost(DataService dataService)
+        : base()
     {
-        private readonly DataService dataService;
+        this._dataService = dataService;
+    }
 
-        [ImportingConstructor]
-        public DataServiceHost(DataService dataService)
-            : base()
-        {
-            this.dataService = dataService;
-        }
+    protected override void OnServiceCreated(IPeer peer, IDataService service)
+    {
+        this._dataService.SetDataService(service);
+    }
 
-        protected override void OnServiceCreated(IPeer peer, IDataService service)
-        {
-            this.dataService.SetDataService(service);
-        }
-
-        protected override void OnServiceDestroyed(IPeer peer)
-        {
-            this.dataService.SetDataService(null);
-        }
+    protected override void OnServiceDestroyed(IPeer peer)
+    {
+        this._dataService.SetDataService(null);
     }
 }

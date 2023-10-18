@@ -20,16 +20,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace JSSoft.Communication.Services
-{
-    public class UserAuthorityEventArgs : UserEventArgs
-    {
-        public UserAuthorityEventArgs(string userID, Authority authority)
-            : base(userID)
-        {
-            this.Authority = authority;
-        }
+namespace JSSoft.Communication.Services;
 
-        public Authority Authority { get; }
+public class UserAuthorityEventArgs : UserEventArgs
+{
+    public UserAuthorityEventArgs(string userID, Authority authority)
+        : base(userID)
+    {
+        this.Authority = authority;
     }
+
+    public Authority Authority { get; }
 }

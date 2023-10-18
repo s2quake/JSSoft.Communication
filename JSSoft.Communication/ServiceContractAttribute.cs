@@ -22,16 +22,15 @@
 
 using System;
 
-namespace JSSoft.Communication
+namespace JSSoft.Communication;
+
+[AttributeUsage(AttributeTargets.Interface)]
+public class ServiceContractAttribute : Attribute
 {
-    [AttributeUsage(AttributeTargets.Interface)]
-    public class ServiceContractAttribute : Attribute
+    public ServiceContractAttribute()
     {
-        public ServiceContractAttribute()
-        {
 
-        }
-
-        public bool PerPeer { get; set; }
     }
+
+    public bool PerPeer { get; set; }
 }

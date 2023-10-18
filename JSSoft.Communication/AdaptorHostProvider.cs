@@ -22,27 +22,26 @@
 
 using System;
 
-namespace JSSoft.Communication
+namespace JSSoft.Communication;
+
+class AdaptorHostProvider : IAdaptorHostProvider
 {
-    class AdaptorHostProvider : IAdaptorHostProvider
+    public const string DefaultName = "grpc";
+
+    public IAdaptorHost Create(IServiceContext serviceContext, IInstanceContext instanceContext, ServiceToken token)
     {
-        public const string DefaultName = "grpc";
+        // Environment.SetEnvironmentVariable("GRPC_VERBOSITY", "DEBUG");
+        // Environment.SetEnvironmentVariable("GRPC_TRACE", "all");
+        // global::Grpc.Core.GrpcEnvironment.SetLogger(new global::Grpc.Core.Logging.ConsoleLogger());
 
-        public IAdaptorHost Create(IServiceContext serviceContext, IInstanceContext instanceContext, ServiceToken token)
-        {
-            // Environment.SetEnvironmentVariable("GRPC_VERBOSITY", "DEBUG");
-            // Environment.SetEnvironmentVariable("GRPC_TRACE", "all");
-            // global::Grpc.Core.GrpcEnvironment.SetLogger(new global::Grpc.Core.Logging.ConsoleLogger());
-
-            if (serviceContext is ServerContextBase serverContextBase)
-                return new Grpc.AdaptorServerHost(serverContextBase, instanceContext);
-            else if (serviceContext is ClientContextBase clientContextBase)
-                return new Grpc.AdaptorClientHost(clientContextBase, instanceContext);
-            throw new NotImplementedException();
-        }
-
-        public string Name => DefaultName;
-
-        public static readonly AdaptorHostProvider Default = new();
+        if (serviceContext is ServerContextBase serverContextBase)
+            return new Grpc.AdaptorServerHost(serverContextBase, instanceContext);
+        else if (serviceContext is ClientContextBase clientContextBase)
+            return new Grpc.AdaptorClientHost(clientContextBase, instanceContext);
+        throw new NotImplementedException();
     }
+
+    public string Name => DefaultName;
+
+    public static readonly AdaptorHostProvider Default = new();
 }

@@ -25,31 +25,30 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace JSSoft.Communication
+namespace JSSoft.Communication;
+
+public sealed class PeerDescriptor
 {
-    public sealed class PeerDescriptor
+    public void Dispose()
     {
-        public void Dispose()
-        {
-            this.Callbacks.DisposeAll();
-        }
-
-        public void AddInstance(IServiceHost serviceHost, object service, object callback)
-        {
-            this.Services.Add(serviceHost, service);
-            this.Callbacks.Add(serviceHost, callback);
-        }
-
-        public (object service, object callback) RemoveInstance(IServiceHost serviceHost)
-        {
-            var value = (this.Services[serviceHost], this.Callbacks[serviceHost]);
-            this.Services.Remove(serviceHost);
-            this.Callbacks.Remove(serviceHost);
-            return value;
-        }
-
-        public Dictionary<IServiceHost, object> Services { get; } = new Dictionary<IServiceHost, object>();
-
-        public Dictionary<IServiceHost, object> Callbacks { get; } = new Dictionary<IServiceHost, object>();
+        this.Callbacks.DisposeAll();
     }
+
+    public void AddInstance(IServiceHost serviceHost, object service, object callback)
+    {
+        this.Services.Add(serviceHost, service);
+        this.Callbacks.Add(serviceHost, callback);
+    }
+
+    public (object service, object callback) RemoveInstance(IServiceHost serviceHost)
+    {
+        var value = (this.Services[serviceHost], this.Callbacks[serviceHost]);
+        this.Services.Remove(serviceHost);
+        this.Callbacks.Remove(serviceHost);
+        return value;
+    }
+
+    public Dictionary<IServiceHost, object> Services { get; } = new Dictionary<IServiceHost, object>();
+
+    public Dictionary<IServiceHost, object> Callbacks { get; } = new Dictionary<IServiceHost, object>();
 }

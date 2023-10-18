@@ -23,11 +23,10 @@
 using System;
 using System.Threading.Tasks;
 
-namespace JSSoft.Communication.Services
+namespace JSSoft.Communication.Services;
+
+public interface IDataService
 {
-    public interface IDataService
-    {
-        [OperationContract]
-        Task<DateTime> CreateDataBaseAsync(string dataBaseName);
-    }
+    [OperationContract]
+    Task<DateTime> CreateDataBaseAsync(string dataBaseName);
 }

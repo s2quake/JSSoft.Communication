@@ -27,26 +27,25 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.ComponentModel.Composition;
 
-namespace JSSoft.Communication.Commands
+namespace JSSoft.Communication.Commands;
+
+[Export(typeof(ICommand))]
+class CloseCommand : CommandAsyncBase
 {
-    [Export(typeof(ICommand))]
-    class CloseCommand : CommandAsyncBase
+    private readonly IServiceContext _serviceHost;
+    private readonly Application _application;
+
+    [ImportingConstructor]
+    public CloseCommand(IServiceContext serviceHost, Application application)
     {
-        private readonly IServiceContext _serviceHost;
-        private readonly Application _application;
+        _serviceHost = serviceHost;
+        _application = application;
+    }
 
-        [ImportingConstructor]
-        public CloseCommand(IServiceContext serviceHost, Application application)
-        {
-            _serviceHost = serviceHost;
-            _application = application;
-        }
+    public override bool IsEnabled => _serviceHost.ServiceState == ServiceState.Open;
 
-        public override bool IsEnabled => _serviceHost.ServiceState == ServiceState.Open;
-
-        protected override Task OnExecuteAsync(CancellationToken cancellationToken)
-        {
-            return _serviceHost.CloseAsync(_application.Token, 0);
-        }
+    protected override Task OnExecuteAsync(CancellationToken cancellationToken)
+    {
+        return _serviceHost.CloseAsync(_application.Token, 0);
     }
 }

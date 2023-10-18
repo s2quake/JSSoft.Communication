@@ -20,55 +20,54 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace JSSoft.Communication.Logging
+namespace JSSoft.Communication.Logging;
+
+public static class LogUtility
 {
-    public static class LogUtility
+    private static ILogger logger;
+    private static LogLevel logLevel = LogLevel.Fatal;
+
+    public static ILogger Logger
     {
-        private static ILogger logger;
-        private static LogLevel logLevel = LogLevel.Fatal;
-
-        public static ILogger Logger
-        {
-            get => logger;
-            set => logger = value;
-        }
-
-        public static LogLevel LogLevel
-        {
-            get => logLevel;
-            set => logLevel = value;
-        }
-
-        public static void Debug(object message)
-        {
-            if (logLevel >= LogLevel.Debug)
-                LoggerInternal.Debug(message);
-        }
-
-        public static void Info(object message)
-        {
-            if (logLevel >= LogLevel.Info)
-                LoggerInternal.Info(message);
-        }
-
-        public static void Error(object message)
-        {
-            if (logLevel >= LogLevel.Error)
-                LoggerInternal.Error(message);
-        }
-
-        public static void Warn(object message)
-        {
-            if (logLevel >= LogLevel.Warn)
-                LoggerInternal.Warn(message);
-        }
-
-        public static void Fatal(object message)
-        {
-            if (logLevel >= LogLevel.Fatal)
-                LoggerInternal.Fatal(message);
-        }
-
-        private static ILogger LoggerInternal => logger ?? EmptyLogger.Default;
+        get => logger;
+        set => logger = value;
     }
+
+    public static LogLevel LogLevel
+    {
+        get => logLevel;
+        set => logLevel = value;
+    }
+
+    public static void Debug(object message)
+    {
+        if (logLevel >= LogLevel.Debug)
+            LoggerInternal.Debug(message);
+    }
+
+    public static void Info(object message)
+    {
+        if (logLevel >= LogLevel.Info)
+            LoggerInternal.Info(message);
+    }
+
+    public static void Error(object message)
+    {
+        if (logLevel >= LogLevel.Error)
+            LoggerInternal.Error(message);
+    }
+
+    public static void Warn(object message)
+    {
+        if (logLevel >= LogLevel.Warn)
+            LoggerInternal.Warn(message);
+    }
+
+    public static void Fatal(object message)
+    {
+        if (logLevel >= LogLevel.Fatal)
+            LoggerInternal.Fatal(message);
+    }
+
+    private static ILogger LoggerInternal => logger ?? EmptyLogger.Default;
 }

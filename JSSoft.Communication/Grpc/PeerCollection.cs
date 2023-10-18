@@ -24,47 +24,46 @@ using JSSoft.Library.ObjectModel;
 using JSSoft.Library.Threading;
 using System.Threading.Tasks;
 
-namespace JSSoft.Communication.Grpc
+namespace JSSoft.Communication.Grpc;
+
+class PeerCollection : ContainerBase<Peer>
 {
-    class PeerCollection : ContainerBase<Peer>
+    private readonly IServiceContext _serviceContext;
+    private readonly IInstanceContext _instanceContext;
+
+    public PeerCollection(IServiceContext serviceContext, IInstanceContext instanceContext)
     {
-        private readonly IServiceContext serviceContext;
-        private readonly IInstanceContext instanceContext;
-
-        public PeerCollection(IServiceContext serviceContext, IInstanceContext instanceContext)
-        {
-            this.serviceContext = serviceContext;
-            this.instanceContext = instanceContext;
-        }
-
-        public async Task AddAsync(Peer item)
-        {
-            var descrptor = await this.instanceContext.CreateInstanceAsync(item);
-            item.Descriptor = descrptor;
-            await this.Dispatcher.InvokeAsync(() => base.AddBase($"{item.ID}", item));
-        }
-
-        public async Task RemoveAsync(string id)
-        {
-            var peer = await this.Dispatcher.InvokeAsync(() =>
-            {
-                if (base.ContainsKey(id) == true)
-                {
-                    var item = base[id];
-                    base.RemoveBase(id);
-
-                    return item;
-                }
-                return null;
-            });
-            if (peer != null)
-            {
-                await this.instanceContext.DestroyInstanceAsync(peer);
-                peer.Descriptor = null;
-                peer.Dispose();
-            }
-        }
-
-        public Dispatcher Dispatcher => this.serviceContext?.Dispatcher;
+        this._serviceContext = serviceContext;
+        this._instanceContext = instanceContext;
     }
+
+    public async Task AddAsync(Peer item)
+    {
+        var descrptor = await this._instanceContext.CreateInstanceAsync(item);
+        item.Descriptor = descrptor;
+        await this.Dispatcher.InvokeAsync(() => base.AddBase($"{item.ID}", item));
+    }
+
+    public async Task RemoveAsync(string id)
+    {
+        var peer = await this.Dispatcher.InvokeAsync(() =>
+        {
+            if (base.ContainsKey(id) == true)
+            {
+                var item = base[id];
+                base.RemoveBase(id);
+
+                return item;
+            }
+            return null;
+        });
+        if (peer != null)
+        {
+            await this._instanceContext.DestroyInstanceAsync(peer);
+            peer.Descriptor = null;
+            peer.Dispose();
+        }
+    }
+
+    public Dispatcher Dispatcher => this._serviceContext?.Dispatcher;
 }

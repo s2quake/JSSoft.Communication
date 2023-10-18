@@ -22,22 +22,21 @@
 
 using System;
 
-namespace JSSoft.Communication
+namespace JSSoft.Communication;
+
+[AttributeUsage(AttributeTargets.Method)]
+public class OperationContractAttribute : Attribute
 {
-    [AttributeUsage(AttributeTargets.Method)]
-    public class OperationContractAttribute : Attribute
+    public OperationContractAttribute()
     {
-        public OperationContractAttribute()
-        {
 
-        }
-
-        public OperationContractAttribute(string name)
-        {
-            this.Name = name ?? throw new ArgumentNullException(nameof(name));
-            JSSoft.Library.IdentifierValidator.Verify(this.Name);
-        }
-
-        public string Name { get; }
     }
+
+    public OperationContractAttribute(string name)
+    {
+        this.Name = name ?? throw new ArgumentNullException(nameof(name));
+        JSSoft.Library.IdentifierValidator.Verify(this.Name);
+    }
+
+    public string Name { get; }
 }

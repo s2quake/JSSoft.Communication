@@ -24,32 +24,31 @@ using JSSoft.Communication.ExceptionSerializers;
 using System;
 using System.Linq;
 
-namespace JSSoft.Communication
+namespace JSSoft.Communication;
+
+static class IComponentProviderExtensions
 {
-    static class IComponentProviderExtensions
+    public static IAdaptorHostProvider GetAdaptorHostProvider(this IComponentProvider componentProvider, string adaptorHostType)
     {
-        public static IAdaptorHostProvider GetAdaptorHostProvider(this IComponentProvider componentProvider, string adaptorHostType)
-        {
-            var type = adaptorHostType ?? AdaptorHostProvider.DefaultName;
-            return componentProvider.AdaptorHostProviders.First(item => item.Name == type);
-        }
+        var type = adaptorHostType ?? AdaptorHostProvider.DefaultName;
+        return componentProvider.AdaptorHostProviders.First(item => item.Name == type);
+    }
 
-        public static ISerializerProvider GetserializerProvider(this IComponentProvider componentProvider, string serializerType)
-        {
-            var type = serializerType ?? JsonSerializerProvider.DefaultName;
-            return componentProvider.SerializerProviders.First(item => item.Name == type);
-        }
+    public static ISerializerProvider GetserializerProvider(this IComponentProvider componentProvider, string serializerType)
+    {
+        var type = serializerType ?? JsonSerializerProvider.DefaultName;
+        return componentProvider.SerializerProviders.First(item => item.Name == type);
+    }
 
-        public static IExceptionDescriptor GetExceptionDescriptor(this IComponentProvider componentProvider, Exception e)
-        {
-            var exceptionSerializer = componentProvider.ExceptionDescriptors.FirstOrDefault(item => item.ExceptionType == e.GetType());
-            return exceptionSerializer ?? ExceptionSerializer.Default;
-        }
+    public static IExceptionDescriptor GetExceptionDescriptor(this IComponentProvider componentProvider, Exception e)
+    {
+        var exceptionSerializer = componentProvider.ExceptionDescriptors.FirstOrDefault(item => item.ExceptionType == e.GetType());
+        return exceptionSerializer ?? ExceptionSerializer.Default;
+    }
 
-        public static IExceptionDescriptor GetExceptionDescriptor(this IComponentProvider componentProvider, Guid exceptionID)
-        {
-            var exceptionSerializer = componentProvider.ExceptionDescriptors.FirstOrDefault(item => item.ID == exceptionID);
-            return exceptionSerializer ?? ExceptionSerializer.Default;
-        }
+    public static IExceptionDescriptor GetExceptionDescriptor(this IComponentProvider componentProvider, Guid exceptionID)
+    {
+        var exceptionSerializer = componentProvider.ExceptionDescriptors.FirstOrDefault(item => item.ID == exceptionID);
+        return exceptionSerializer ?? ExceptionSerializer.Default;
     }
 }

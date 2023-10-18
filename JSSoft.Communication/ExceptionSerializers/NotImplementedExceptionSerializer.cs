@@ -22,15 +22,14 @@
 
 using System;
 
-namespace JSSoft.Communication.ExceptionSerializers
-{
-    class NotImplementedExceptionSerializer : ExceptionSerializerBase<NotImplementedException>
-    {
-        public NotImplementedExceptionSerializer()
-            : base("3239526a-5a59-4015-b08a-b4a00e885db8")
-        {
-        }
+namespace JSSoft.Communication.ExceptionSerializers;
 
-        public static NotImplementedExceptionSerializer Default { get; } = new();
+class NotImplementedExceptionSerializer : ExceptionSerializerBase<NotImplementedException>
+{
+    public NotImplementedExceptionSerializer()
+        : base("3239526a-5a59-4015-b08a-b4a00e885db8")
+    {
     }
+
+    public static NotImplementedExceptionSerializer Default { get; } = new();
 }

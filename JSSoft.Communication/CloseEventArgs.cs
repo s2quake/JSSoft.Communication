@@ -22,15 +22,14 @@
 
 using System;
 
-namespace JSSoft.Communication
-{
-    public class CloseEventArgs : EventArgs
-    {
-        public CloseEventArgs(int closeCode)
-        {
-            this.CloseCode = closeCode;
-        }
+namespace JSSoft.Communication;
 
-        public int CloseCode { get; }
+public class CloseEventArgs : EventArgs
+{
+    public CloseEventArgs(int closeCode)
+    {
+        this.CloseCode = closeCode;
     }
+
+    public int CloseCode { get; }
 }

@@ -23,16 +23,15 @@
 using JSSoft.Library.ObjectModel;
 using System.Collections.Generic;
 
-namespace JSSoft.Communication
+namespace JSSoft.Communication;
+
+public class ServiceHostCollection : ContainerBase<IServiceHost>
 {
-    public class ServiceHostCollection : ContainerBase<IServiceHost>
+    public ServiceHostCollection(IEnumerable<IServiceHost> serviceHosts)
     {
-        public ServiceHostCollection(IEnumerable<IServiceHost> serviceHosts)
+        foreach (var item in serviceHosts)
         {
-            foreach (var item in serviceHosts)
-            {
-                this.AddBase(item.Name, item);
-            }
+            this.AddBase(item.Name, item);
         }
     }
 }

@@ -22,16 +22,15 @@
 
 using System;
 
-namespace JSSoft.Communication
-{
-    [AttributeUsage(AttributeTargets.Method)]
-    public class InstanceMethodAttribute : Attribute
-    {
-        public InstanceMethodAttribute(string methodName)
-        {
-            this.MethodName = methodName;
-        }
+namespace JSSoft.Communication;
 
-        public string MethodName { get; }
+[AttributeUsage(AttributeTargets.Method)]
+public class InstanceMethodAttribute : Attribute
+{
+    public InstanceMethodAttribute(string methodName)
+    {
+        this.MethodName = methodName;
     }
+
+    public string MethodName { get; }
 }

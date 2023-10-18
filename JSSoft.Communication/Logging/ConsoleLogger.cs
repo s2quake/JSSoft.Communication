@@ -22,35 +22,34 @@
 
 using System;
 
-namespace JSSoft.Communication.Logging
+namespace JSSoft.Communication.Logging;
+
+public class ConsoleLogger : ILogger
 {
-    public class ConsoleLogger : ILogger
+    public void Debug(object message)
     {
-        public void Debug(object message)
-        {
-            Console.WriteLine(message);
-        }
-
-        public void Info(object message)
-        {
-            Console.WriteLine(message);
-        }
-
-        public void Error(object message)
-        {
-            Console.Error.WriteLine(message);
-        }
-
-        public void Warn(object message)
-        {
-            Console.WriteLine(message);
-        }
-
-        public void Fatal(object message)
-        {
-            Console.Error.WriteLine(message);
-        }
-
-        public static readonly ConsoleLogger Default = new();
+        Console.WriteLine(message);
     }
+
+    public void Info(object message)
+    {
+        Console.WriteLine(message);
+    }
+
+    public void Error(object message)
+    {
+        Console.Error.WriteLine(message);
+    }
+
+    public void Warn(object message)
+    {
+        Console.WriteLine(message);
+    }
+
+    public void Fatal(object message)
+    {
+        Console.Error.WriteLine(message);
+    }
+
+    public static readonly ConsoleLogger Default = new();
 }

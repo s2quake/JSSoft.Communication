@@ -24,27 +24,26 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace JSSoft.Communication.ExceptionSerializers
+namespace JSSoft.Communication.ExceptionSerializers;
+
+class ArgumentNullExceptionSerializer : ExceptionSerializerBase<ArgumentNullException>
 {
-    class ArgumentNullExceptionSerializer : ExceptionSerializerBase<ArgumentNullException>
+    public ArgumentNullExceptionSerializer()
+        : base("429dfc10-5ee5-4fb0-93da-9e06a85ff3cc")
     {
-        public ArgumentNullExceptionSerializer()
-            : base("429dfc10-5ee5-4fb0-93da-9e06a85ff3cc")
-        {
-        }
-
-        public static ArgumentNullExceptionSerializer Default { get; } = new();
-
-        protected override void GetSerializationInfo(IReadOnlyDictionary<string, object> properties, SerializationInfo info)
-        {
-            base.GetSerializationInfo(properties, info);
-            info.AddValue("ParamName", properties["ParamName"], typeof(string));
-        }
-
-        protected override void GetProperties(SerializationInfo info, IDictionary<string, object> properties)
-        {
-            base.GetProperties(info, properties);
-            properties.Add("ParamName", info.GetString("ParamName"));
-        }     
     }
+
+    public static ArgumentNullExceptionSerializer Default { get; } = new();
+
+    protected override void GetSerializationInfo(IReadOnlyDictionary<string, object> properties, SerializationInfo info)
+    {
+        base.GetSerializationInfo(properties, info);
+        info.AddValue("ParamName", properties["ParamName"], typeof(string));
+    }
+
+    protected override void GetProperties(SerializationInfo info, IDictionary<string, object> properties)
+    {
+        base.GetProperties(info, properties);
+        properties.Add("ParamName", info.GetString("ParamName"));
+    }     
 }

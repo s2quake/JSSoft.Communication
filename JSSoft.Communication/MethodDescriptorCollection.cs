@@ -23,22 +23,21 @@
 using JSSoft.Library.ObjectModel;
 using System.Reflection;
 
-namespace JSSoft.Communication
+namespace JSSoft.Communication;
+
+public sealed class MethodDescriptorCollection : ContainerBase<MethodDescriptor>
 {
-    public sealed class MethodDescriptorCollection : ContainerBase<MethodDescriptor>
+    public MethodDescriptorCollection(ServiceHostBase serviceHost)
     {
-        public MethodDescriptorCollection(ServiceHostBase serviceHost)
+        var isServer = ServiceHostBase.IsServer(serviceHost);
+        var instanceType = isServer ? serviceHost.ServiceType : serviceHost.CallbackType;
+        var methods = instanceType.GetMethods();
+        foreach (var item in methods)
         {
-            var isServer = ServiceHostBase.IsServer(serviceHost);
-            var instanceType = isServer ? serviceHost.ServiceType : serviceHost.CallbackType;
-            var methods = instanceType.GetMethods();
-            foreach (var item in methods)
+            if (item.GetCustomAttribute(typeof(OperationContractAttribute)) is OperationContractAttribute)
             {
-                if (item.GetCustomAttribute(typeof(OperationContractAttribute)) is OperationContractAttribute)
-                {
-                    var methodDescriptor = new MethodDescriptor(item);
-                    this.AddBase(methodDescriptor.Name, methodDescriptor);
-                }
+                var methodDescriptor = new MethodDescriptor(item);
+                this.AddBase(methodDescriptor.Name, methodDescriptor);
             }
         }
     }

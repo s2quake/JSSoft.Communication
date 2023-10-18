@@ -20,14 +20,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace JSSoft.Communication.Services
+namespace JSSoft.Communication.Services;
+
+public enum Authority
 {
-    public enum Authority
-    {
-        Admin,
+    Admin,
 
-        Member,
+    Member,
 
-        Guest
-    }
+    Guest
 }

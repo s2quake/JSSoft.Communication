@@ -25,56 +25,55 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace JSSoft.Communication.Grpc
+namespace JSSoft.Communication.Grpc;
+
+sealed class Peer : IPeer
 {
-    sealed class Peer : IPeer
+    private readonly CancellationTokenSource _cancellationTokenSource = new();
+
+    public Peer(Guid id, IServiceHost[] serviceHosts)
     {
-        private readonly CancellationTokenSource cancellation = new();
-
-        public Peer(Guid id, IServiceHost[] serviceHosts)
+        this.ID = id;
+        this.ServiceHosts = serviceHosts;
+        this.Ping();
+        foreach (var item in serviceHosts)
         {
-            this.ID = id;
-            this.ServiceHosts = serviceHosts;
-            this.Ping();
-            foreach (var item in serviceHosts)
-            {
-                this.PollReplyItems.Add(item, new PollReplyItemCollection());
-            }
+            this.PollReplyItems.Add(item, new PollReplyItemCollection());
         }
-
-        public void Dispose()
-        {
-            foreach (var item in this.ServiceHosts)
-            {
-                this.PollReplyItems.Remove(item);
-            }
-        }
-
-        public void Abort()
-        {
-            this.cancellation.Cancel();
-            LogUtility.Debug($"{this.ID} Aboreted.");
-        }
-
-        public void Ping()
-        {
-            this.PingTime = DateTime.UtcNow;
-        }
-
-        public Guid ID { get; }
-
-        public IServiceHost[] ServiceHosts { get; }
-
-        public Guid Token { get; set; } = Guid.NewGuid();
-
-        public DateTime PingTime { get; set; }
-
-        public PeerDescriptor Descriptor { get; set; }
-
-        public Dictionary<IServiceHost, object> Services => this.Descriptor.Services;
-
-        public Dictionary<IServiceHost, PollReplyItemCollection> PollReplyItems { get; } = new Dictionary<IServiceHost, PollReplyItemCollection>();
-
-        public CancellationToken Cancellation => this.cancellation.Token;
     }
+
+    public void Dispose()
+    {
+        foreach (var item in this.ServiceHosts)
+        {
+            this.PollReplyItems.Remove(item);
+        }
+    }
+
+    public void Abort()
+    {
+        this._cancellationTokenSource.Cancel();
+        LogUtility.Debug($"{this.ID} Aboreted.");
+    }
+
+    public void Ping()
+    {
+        this.PingTime = DateTime.UtcNow;
+    }
+
+    public Guid ID { get; }
+
+    public IServiceHost[] ServiceHosts { get; }
+
+    public Guid Token { get; set; } = Guid.NewGuid();
+
+    public DateTime PingTime { get; set; }
+
+    public PeerDescriptor Descriptor { get; set; }
+
+    public Dictionary<IServiceHost, object> Services => this.Descriptor.Services;
+
+    public Dictionary<IServiceHost, PollReplyItemCollection> PollReplyItems { get; } = new Dictionary<IServiceHost, PollReplyItemCollection>();
+
+    public CancellationToken Cancellation => this._cancellationTokenSource.Token;
 }

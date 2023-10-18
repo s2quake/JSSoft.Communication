@@ -27,76 +27,75 @@ using System;
 using System.Threading.Tasks;
 using System.ComponentModel.Composition;
 
-namespace JSSoft.Communication.Commands
+namespace JSSoft.Communication.Commands;
+
+[Export(typeof(ICommand))]
+class UserCommand : CommandMethodBase
 {
-    [Export(typeof(ICommand))]
-    class UserCommand : CommandMethodBase
+    private readonly Application _application = null;
+    private readonly Lazy<IUserService> _userService = null;
+
+    [ImportingConstructor]
+    public UserCommand(Application application, Lazy<IUserService> userService)
     {
-        private readonly Application _application = null;
-        private readonly Lazy<IUserService> userService = null;
-
-        [ImportingConstructor]
-        public UserCommand(Application application, Lazy<IUserService> userService)
-        {
-            _application = application;
-            this.userService = userService;
-        }
-
-        [CommandMethod]
-        public Task CreateAsync(string userID, string password, Authority authority = Authority.Member)
-        {
-            return this.UserService.CreateAsync(_application.UserToken, userID, password, authority);
-        }
-
-        [CommandMethod]
-        public Task DeleteAsync(string userID)
-        {
-            return this.UserService.DeleteAsync(_application.UserToken, userID);
-        }
-
-        [CommandMethod]
-        public Task RenameAsync(string userName)
-        {
-            return this.UserService.RenameAsync(_application.UserToken, userName);
-        }
-
-        [CommandMethod]
-        public Task AuthorityAsync(string userID, Authority authority)
-        {
-            return this.UserService.SetAuthorityAsync(_application.UserToken, userID, authority);
-        }
-
-        [CommandMethod]
-        public async Task InfoAsync(string userID)
-        {
-            var (userName, authority) = await this.UserService.GetInfoAsync(_application.UserToken, userID);
-            this.Out.WriteLine($"UseName: {userName}");
-            this.Out.WriteLine($"Authority: {authority}");
-        }
-
-        [CommandMethod]
-        public async Task ListAsync()
-        {
-            var items = await this.UserService.GetUsersAsync(_application.UserToken);
-            foreach (var item in items)
-            {
-                this.Out.WriteLine(item);
-            }
-        }
-
-        [CommandMethod]
-        public Task SendMessageAsync(string userID, string message)
-        {
-            return this.UserService.SendMessageAsync(_application.UserToken, userID, message);
-        }
-
-        public override bool IsEnabled => _application.UserToken != Guid.Empty;
-
-        protected override bool IsMethodEnabled(CommandMethodDescriptor descriptor)
-        {
-            return _application.UserToken != Guid.Empty;
-        }
-
-        private IUserService UserService => this.userService.Value;
+        _application = application;
+        this._userService = userService;
     }
+
+    [CommandMethod]
+    public Task CreateAsync(string userID, string password, Authority authority = Authority.Member)
+    {
+        return this.UserService.CreateAsync(_application.UserToken, userID, password, authority);
+    }
+
+    [CommandMethod]
+    public Task DeleteAsync(string userID)
+    {
+        return this.UserService.DeleteAsync(_application.UserToken, userID);
+    }
+
+    [CommandMethod]
+    public Task RenameAsync(string userName)
+    {
+        return this.UserService.RenameAsync(_application.UserToken, userName);
+    }
+
+    [CommandMethod]
+    public Task AuthorityAsync(string userID, Authority authority)
+    {
+        return this.UserService.SetAuthorityAsync(_application.UserToken, userID, authority);
+    }
+
+    [CommandMethod]
+    public async Task InfoAsync(string userID)
+    {
+        var (userName, authority) = await this.UserService.GetInfoAsync(_application.UserToken, userID);
+        this.Out.WriteLine($"UseName: {userName}");
+        this.Out.WriteLine($"Authority: {authority}");
+    }
+
+    [CommandMethod]
+    public async Task ListAsync()
+    {
+        var items = await this.UserService.GetUsersAsync(_application.UserToken);
+        foreach (var item in items)
+        {
+            this.Out.WriteLine(item);
+        }
+    }
+
+    [CommandMethod]
+    public Task SendMessageAsync(string userID, string message)
+    {
+        return this.UserService.SendMessageAsync(_application.UserToken, userID, message);
+    }
+
+    public override bool IsEnabled => _application.UserToken != Guid.Empty;
+
+    protected override bool IsMethodEnabled(CommandMethodDescriptor descriptor)
+    {
+        return _application.UserToken != Guid.Empty;
+    }
+
+    private IUserService UserService => this._userService.Value;
 }

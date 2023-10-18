@@ -23,16 +23,15 @@
 using System;
 using System.ComponentModel.Composition;
 
-namespace JSSoft.Communication.ConsoleApp
-{
-    [Export(typeof(IServiceContext))]
-    class ServerContext : ServerContextBase
-    {
-        [ImportingConstructor]
-        public ServerContext(IComponentProvider componentProvider, [ImportMany] IServiceHost[] serviceHosts)
-            : base(componentProvider, serviceHosts)
-        {
+namespace JSSoft.Communication.ConsoleApp;
 
-        }
+[Export(typeof(IServiceContext))]
+class ServerContext : ServerContextBase
+{
+    [ImportingConstructor]
+    public ServerContext(IComponentProvider componentProvider, [ImportMany] IServiceHost[] serviceHosts)
+        : base(componentProvider, serviceHosts)
+    {
+
     }
 }

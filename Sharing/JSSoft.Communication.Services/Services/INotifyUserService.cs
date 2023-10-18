@@ -22,22 +22,21 @@
 
 using System;
 
-namespace JSSoft.Communication.Services
+namespace JSSoft.Communication.Services;
+
+public interface INotifyUserService
 {
-    public interface INotifyUserService
-    {
-        event EventHandler<UserEventArgs> Created;
+    event EventHandler<UserEventArgs> Created;
 
-        event EventHandler<UserEventArgs> Deleted;
+    event EventHandler<UserEventArgs> Deleted;
 
-        event EventHandler<UserEventArgs> LoggedIn;
+    event EventHandler<UserEventArgs> LoggedIn;
 
-        event EventHandler<UserEventArgs> LoggedOut;
+    event EventHandler<UserEventArgs> LoggedOut;
 
-        event EventHandler<UserMessageEventArgs> MessageReceived;
+    event EventHandler<UserMessageEventArgs> MessageReceived;
 
-        event EventHandler<UserNameEventArgs> Renamed;
+    event EventHandler<UserNameEventArgs> Renamed;
 
-        event EventHandler<UserAuthorityEventArgs> AuthorityChanged;
-    }
+    event EventHandler<UserAuthorityEventArgs> AuthorityChanged;
 }

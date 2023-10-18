@@ -20,16 +20,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace JSSoft.Communication
+namespace JSSoft.Communication;
+
+public interface IComponentProvider
 {
-    public interface IComponentProvider
-    {
-        IAdaptorHostProvider[] AdaptorHostProviders { get; }
+    IAdaptorHostProvider[] AdaptorHostProviders { get; }
 
-        ISerializerProvider[] SerializerProviders { get; }
+    ISerializerProvider[] SerializerProviders { get; }
 
-        IDataSerializer[] DataSerializers { get; }
+    IDataSerializer[] DataSerializers { get; }
 
-        IExceptionDescriptor[] ExceptionDescriptors { get; }
-    }
+    IExceptionDescriptor[] ExceptionDescriptors { get; }
 }

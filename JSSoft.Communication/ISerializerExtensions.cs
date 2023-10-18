@@ -22,32 +22,31 @@
 
 using System;
 
-namespace JSSoft.Communication
-{
-    public static class ISerializerExtensions
-    {
-        public static string[] SerializeMany(this ISerializer serializer, Type[] types, object[] args)
-        {
-            var items = new string[args.Length];
-            for (var i = 0; i < args.Length; i++)
-            {
-                var type = (Type)types[i];
-                var value = args[i];
-                items[i] = serializer.Serialize(type, value);
-            }
-            return items;
-        }
+namespace JSSoft.Communication;
 
-        public static object[] DeserializeMany(this ISerializer serializer, Type[] types, string[] datas)
+public static class ISerializerExtensions
+{
+    public static string[] SerializeMany(this ISerializer serializer, Type[] types, object[] args)
+    {
+        var items = new string[args.Length];
+        for (var i = 0; i < args.Length; i++)
         {
-            var items = new object[datas.Length];
-            for (var i = 0; i < datas.Length; i++)
-            {
-                var type = types[i];
-                var value = datas[i];
-                items[i] = serializer.Deserialize(type, value);
-            }
-            return items;
+            var type = (Type)types[i];
+            var value = args[i];
+            items[i] = serializer.Serialize(type, value);
         }
+        return items;
+    }
+
+    public static object[] DeserializeMany(this ISerializer serializer, Type[] types, string[] datas)
+    {
+        var items = new object[datas.Length];
+        for (var i = 0; i < datas.Length; i++)
+        {
+            var type = types[i];
+            var value = datas[i];
+            items[i] = serializer.Deserialize(type, value);
+        }
+        return items;
     }
 }

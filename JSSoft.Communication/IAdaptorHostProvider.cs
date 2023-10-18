@@ -20,12 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace JSSoft.Communication
-{
-    public interface IAdaptorHostProvider
-    {
-        IAdaptorHost Create(IServiceContext serviceHost, IInstanceContext instanceContext, ServiceToken token);
+namespace JSSoft.Communication;
 
-        string Name { get; }
-    }
+public interface IAdaptorHostProvider
+{
+    IAdaptorHost Create(IServiceContext serviceHost, IInstanceContext instanceContext, ServiceToken token);
+
+    string Name { get; }
 }

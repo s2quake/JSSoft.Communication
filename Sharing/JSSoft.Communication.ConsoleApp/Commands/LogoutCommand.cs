@@ -28,29 +28,28 @@ using System.ComponentModel.Composition;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace JSSoft.Communication.Commands
+namespace JSSoft.Communication.Commands;
+
+[Export(typeof(ICommand))]
+class LogoutCommand : CommandAsyncBase
 {
-    [Export(typeof(ICommand))]
-    class LogoutCommand : CommandAsyncBase
+    private readonly Application _application = null;
+    private readonly Lazy<IUserService> _userService = null;
+
+    [ImportingConstructor]
+    public LogoutCommand(Application application, Lazy<IUserService> userService)
     {
-        private readonly Application _application = null;
-        private readonly Lazy<IUserService> userService = null;
-
-        [ImportingConstructor]
-        public LogoutCommand(Application application, Lazy<IUserService> userService)
-        {
-            this._application = application;
-            this.userService = userService;
-        }
-
-        public override bool IsEnabled => _application.UserToken != Guid.Empty;
-
-        protected override async Task OnExecuteAsync(CancellationToken cancellationToken)
-        {
-            await this.UserService.LogoutAsync(_application.UserToken);
-            _application.Logout();
-        }
-
-        private IUserService UserService => this.userService.Value;
+        this._application = application;
+        this._userService = userService;
     }
+
+    public override bool IsEnabled => _application.UserToken != Guid.Empty;
+
+    protected override async Task OnExecuteAsync(CancellationToken cancellationToken)
+    {
+        await this.UserService.LogoutAsync(_application.UserToken);
+        _application.Logout();
+    }
+
+    private IUserService UserService => this._userService.Value;
 }

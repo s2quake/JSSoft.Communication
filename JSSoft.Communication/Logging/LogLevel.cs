@@ -22,20 +22,19 @@
 
 using System;
 
-namespace JSSoft.Communication.Logging
+namespace JSSoft.Communication.Logging;
+
+public enum LogLevel
 {
-    public enum LogLevel
-    {
-        None,
+    None,
 
-        Debug,
+    Debug,
 
-        Info,
+    Info,
 
-        Warn,
+    Warn,
 
-        Error,
+    Error,
 
-        Fatal,
-    }
+    Fatal,
 }

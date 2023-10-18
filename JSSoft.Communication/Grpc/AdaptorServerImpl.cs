@@ -23,40 +23,39 @@
 using Grpc.Core;
 using System.Threading.Tasks;
 
-namespace JSSoft.Communication.Grpc
+namespace JSSoft.Communication.Grpc;
+
+class AdaptorServerImpl : Adaptor.AdaptorBase
 {
-    class AdaptorServerImpl : Adaptor.AdaptorBase
+    private readonly AdaptorServerHost _adaptorHost;
+
+    public AdaptorServerImpl(AdaptorServerHost adaptorHost)
     {
-        private readonly AdaptorServerHost adaptorHost;
+        this._adaptorHost = adaptorHost;
+    }
 
-        public AdaptorServerImpl(AdaptorServerHost adaptorHost)
-        {
-            this.adaptorHost = adaptorHost;
-        }
+    public override Task<OpenReply> Open(OpenRequest request, ServerCallContext context)
+    {
+        return this._adaptorHost.Open(request, context);
+    }
 
-        public override Task<OpenReply> Open(OpenRequest request, ServerCallContext context)
-        {
-            return this.adaptorHost.Open(request, context);
-        }
+    public override Task<CloseReply> Close(CloseRequest request, ServerCallContext context)
+    {
+        return this._adaptorHost.Close(request, context);
+    }
 
-        public override Task<CloseReply> Close(CloseRequest request, ServerCallContext context)
-        {
-            return this.adaptorHost.Close(request, context);
-        }
+    public override Task<PingReply> Ping(PingRequest request, ServerCallContext context)
+    {
+        return this._adaptorHost.Ping(request, context);
+    }
 
-        public override Task<PingReply> Ping(PingRequest request, ServerCallContext context)
-        {
-            return this.adaptorHost.Ping(request, context);
-        }
+    public override Task<InvokeReply> Invoke(InvokeRequest request, ServerCallContext context)
+    {
+        return this._adaptorHost.Invoke(request, context);
+    }
 
-        public override Task<InvokeReply> Invoke(InvokeRequest request, ServerCallContext context)
-        {
-            return this.adaptorHost.Invoke(request, context);
-        }
-
-        public override Task Poll(IAsyncStreamReader<PollRequest> requestStream, IServerStreamWriter<PollReply> responseStream, ServerCallContext context)
-        {
-            return this.adaptorHost.Poll(requestStream, responseStream, context);
-        }
+    public override Task Poll(IAsyncStreamReader<PollRequest> requestStream, IServerStreamWriter<PollReply> responseStream, ServerCallContext context)
+    {
+        return this._adaptorHost.Poll(requestStream, responseStream, context);
     }
 }

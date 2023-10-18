@@ -22,10 +22,9 @@
 
 using System.Collections.Generic;
 
-namespace JSSoft.Communication
-{
-    class InstanceCollection : Dictionary<IServiceHost, object>
-    {
+namespace JSSoft.Communication;
 
-    }
+class InstanceCollection : Dictionary<IServiceHost, object>
+{
+
 }

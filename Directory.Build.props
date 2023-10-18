@@ -44,5 +44,6 @@ SOFTWARE. -->
 	  <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)JSSoft.Communication.snk</AssemblyOriginatorKeyFile>
 	  <SignAssembly Condition="'$(Configuration)' == 'Release'">true</SignAssembly>
 	  <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 </Project>

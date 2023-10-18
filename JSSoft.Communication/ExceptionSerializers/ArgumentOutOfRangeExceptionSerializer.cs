@@ -24,29 +24,28 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace JSSoft.Communication.ExceptionSerializers
+namespace JSSoft.Communication.ExceptionSerializers;
+
+class ArgumentOutOfRangeExceptionSerializer : ExceptionSerializerBase<ArgumentOutOfRangeException>
 {
-    class ArgumentOutOfRangeExceptionSerializer : ExceptionSerializerBase<ArgumentOutOfRangeException>
+    public ArgumentOutOfRangeExceptionSerializer()
+        : base("34afa93f-3856-4995-a6a3-613169cf599b")
     {
-        public ArgumentOutOfRangeExceptionSerializer()
-            : base("34afa93f-3856-4995-a6a3-613169cf599b")
-        {
-        }
-
-        public static ArgumentOutOfRangeExceptionSerializer Default { get; } = new();
-
-        protected override void GetSerializationInfo(IReadOnlyDictionary<string, object> properties, SerializationInfo info)
-        {
-            base.GetSerializationInfo(properties, info);
-            info.AddValue("ParamName", properties["ParamName"], typeof(string));
-            info.AddValue("ActualValue", properties["ActualValue"], typeof(string));
-        }
-
-        protected override void GetProperties(SerializationInfo info, IDictionary<string, object> properties)
-        {
-            base.GetProperties(info, properties);
-            properties.Add("ParamName", info.GetString("ParamName"));
-            properties.Add("ActualValue", info.GetString("ActualValue"));
-        }     
     }
+
+    public static ArgumentOutOfRangeExceptionSerializer Default { get; } = new();
+
+    protected override void GetSerializationInfo(IReadOnlyDictionary<string, object> properties, SerializationInfo info)
+    {
+        base.GetSerializationInfo(properties, info);
+        info.AddValue("ParamName", properties["ParamName"], typeof(string));
+        info.AddValue("ActualValue", properties["ActualValue"], typeof(string));
+    }
+
+    protected override void GetProperties(SerializationInfo info, IDictionary<string, object> properties)
+    {
+        base.GetProperties(info, properties);
+        properties.Add("ParamName", info.GetString("ParamName"));
+        properties.Add("ActualValue", info.GetString("ActualValue"));
+    }     
 }

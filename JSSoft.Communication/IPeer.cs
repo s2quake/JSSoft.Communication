@@ -22,10 +22,9 @@
 
 using System;
 
-namespace JSSoft.Communication
+namespace JSSoft.Communication;
+
+public interface IPeer
 {
-    public interface IPeer
-    {
-        Guid ID { get; }
-    }
+    Guid ID { get; }
 }

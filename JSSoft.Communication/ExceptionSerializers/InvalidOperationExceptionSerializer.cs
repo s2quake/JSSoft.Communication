@@ -24,15 +24,14 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace JSSoft.Communication.ExceptionSerializers
-{
-    class InvalidOperationExceptionSerializer : ExceptionSerializerBase<InvalidOperationException>
-    {
-        public InvalidOperationExceptionSerializer()
-            : base("a4f11f02-6065-46ab-b26d-c7a01e2bee59")
-        {
-        }
+namespace JSSoft.Communication.ExceptionSerializers;
 
-        public static InvalidOperationExceptionSerializer Default { get; } = new();
+class InvalidOperationExceptionSerializer : ExceptionSerializerBase<InvalidOperationException>
+{
+    public InvalidOperationExceptionSerializer()
+        : base("a4f11f02-6065-46ab-b26d-c7a01e2bee59")
+    {
     }
+
+    public static InvalidOperationExceptionSerializer Default { get; } = new();
 }

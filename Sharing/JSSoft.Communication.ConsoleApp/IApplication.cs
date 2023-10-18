@@ -23,14 +23,13 @@
 using System;
 using System.Threading.Tasks;
 
-namespace JSSoft.Communication.ConsoleApp
+namespace JSSoft.Communication.ConsoleApp;
+
+public interface IApplication : IDisposable
 {
-    public interface IApplication : IDisposable
-    {
-        Task StartAsync();
+    Task StartAsync();
 
-        Task StopAsync(int exitCode);
+    Task StopAsync(int exitCode);
 
-        string Title { get; set; }
-    }
+    string Title { get; set; }
 }

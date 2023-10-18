@@ -22,18 +22,17 @@
 
 using System;
 
-namespace JSSoft.Communication.Services
+namespace JSSoft.Communication.Services;
+
+class UserInfo
 {
-    class UserInfo
-    {
-        public string UserID { get; set; }
+    public string UserID { get; set; }
 
-        public string UserName { get; set; }
+    public string UserName { get; set; }
 
-        public string Password { get; set; }
+    public string Password { get; set; }
 
-        public Authority Authority { get; set; }
+    public Authority Authority { get; set; }
 
-        public Guid Token { get; set; }
-    }
+    public Guid Token { get; set; }
 }

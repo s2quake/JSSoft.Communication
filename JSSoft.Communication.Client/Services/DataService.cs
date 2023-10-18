@@ -24,22 +24,21 @@ using System;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 
-namespace JSSoft.Communication.Services
+namespace JSSoft.Communication.Services;
+
+[Export(typeof(IDataService))]
+[Export(typeof(DataService))]
+class DataService : IDataService
 {
-    [Export(typeof(IDataService))]
-    [Export(typeof(DataService))]
-    class DataService : IDataService
+    private IDataService _dataService;
+
+    public Task<DateTime> CreateDataBaseAsync(string dataBaseName)
     {
-        private IDataService dataService;
+        return this._dataService.CreateDataBaseAsync(dataBaseName);
+    }
 
-        public Task<DateTime> CreateDataBaseAsync(string dataBaseName)
-        {
-            return this.dataService.CreateDataBaseAsync(dataBaseName);
-        }
-
-        public void SetDataService(IDataService dataService)
-        {
-            this.dataService = dataService;
-        }
+    public void SetDataService(IDataService dataService)
+    {
+        this._dataService = dataService;
     }
 }

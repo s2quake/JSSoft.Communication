@@ -29,41 +29,40 @@ using JSSoft.Communication.Services;
 using System.Threading;
 using System.ComponentModel.Composition;
 
-namespace JSSoft.Communication.Commands
+namespace JSSoft.Communication.Commands;
+
+[Export(typeof(ICommand))]
+class LoginCommand : CommandAsyncBase
 {
-    [Export(typeof(ICommand))]
-    class LoginCommand : CommandAsyncBase
+    private readonly Application _application;
+    private readonly Lazy<IUserService> _userService = null;
+
+    [ImportingConstructor]
+    public LoginCommand(Application application, Lazy<IUserService> userService)
     {
-        private readonly Application _application;
-        private readonly Lazy<IUserService> userService = null;
-
-        [ImportingConstructor]
-        public LoginCommand(Application application, Lazy<IUserService> userService)
-        {
-            _application = application;
-            this.userService = userService;
-        }
-
-        [CommandPropertyRequired]
-        public string UserID
-        {
-            get; set;
-        }
-
-        [CommandPropertyRequired]
-        public string Password
-        {
-            get; set;
-        }
-
-        public override bool IsEnabled => _application.UserToken == Guid.Empty;
-
-        protected override async Task OnExecuteAsync(CancellationToken cancellationToken)
-        {
-            var token = await this.UserService.LoginAsync(this.UserID, this.Password);
-            _application.Login(this.UserID, token);
-        }
-
-        private IUserService UserService => this.userService.Value;
+        _application = application;
+        this._userService = userService;
     }
+
+    [CommandPropertyRequired]
+    public string UserID
+    {
+        get; set;
+    }
+
+    [CommandPropertyRequired]
+    public string Password
+    {
+        get; set;
+    }
+
+    public override bool IsEnabled => _application.UserToken == Guid.Empty;
+
+    protected override async Task OnExecuteAsync(CancellationToken cancellationToken)
+    {
+        var token = await this.UserService.LoginAsync(this.UserID, this.Password);
+        _application.Login(this.UserID, token);
+    }
+
+    private IUserService UserService => this._userService.Value;
 }

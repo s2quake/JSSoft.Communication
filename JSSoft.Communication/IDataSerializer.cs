@@ -22,14 +22,13 @@
 
 using System;
 
-namespace JSSoft.Communication
+namespace JSSoft.Communication;
+
+public interface IDataSerializer
 {
-    public interface IDataSerializer
-    {
-        Type Type { get; }
+    Type Type { get; }
 
-        string Serialize(ISerializer serializer, object data);
+    string Serialize(ISerializer serializer, object data);
 
-        object Deserialize(ISerializer serializer, string text);
-    }
+    object Deserialize(ISerializer serializer, string text);
 }

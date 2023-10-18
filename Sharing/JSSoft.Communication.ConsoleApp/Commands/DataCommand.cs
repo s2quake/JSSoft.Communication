@@ -27,34 +27,33 @@ using System;
 using System.Threading.Tasks;
 using System.ComponentModel.Composition;
 
-namespace JSSoft.Communication.Commands
+namespace JSSoft.Communication.Commands;
+
+[Export(typeof(ICommand))]
+class DataCommand : CommandMethodBase
 {
-    [Export(typeof(ICommand))]
-    class DataCommand : CommandMethodBase
+    private readonly Application _application = null;
+    private readonly Lazy<IDataService> _dataServiceLazy = null;
+
+    [ImportingConstructor]
+    public DataCommand(Application application, Lazy<IDataService> dataServiceLazy)
     {
-        private readonly Application _application = null;
-        private readonly Lazy<IDataService> _dataServiceLazy = null;
-
-        [ImportingConstructor]
-        public DataCommand(Application application, Lazy<IDataService> dataServiceLazy)
-        {
-            _application = application;
-            _dataServiceLazy = dataServiceLazy;
-        }
-
-        [CommandMethod]
-        public Task CreateAsync(string dataBaseName)
-        {
-            return this.DataService.CreateDataBaseAsync(dataBaseName);
-        }
-
-        public override bool IsEnabled => _application.UserToken != Guid.Empty;
-
-        protected override bool IsMethodEnabled(CommandMethodDescriptor descriptor)
-        {
-            return _application.UserToken != Guid.Empty;
-        }
-
-        private IDataService DataService => _dataServiceLazy.Value;
+        _application = application;
+        _dataServiceLazy = dataServiceLazy;
     }
+
+    [CommandMethod]
+    public Task CreateAsync(string dataBaseName)
+    {
+        return this.DataService.CreateDataBaseAsync(dataBaseName);
+    }
+
+    public override bool IsEnabled => _application.UserToken != Guid.Empty;
+
+    protected override bool IsMethodEnabled(CommandMethodDescriptor descriptor)
+    {
+        return _application.UserToken != Guid.Empty;
+    }
+
+    private IDataService DataService => _dataServiceLazy.Value;
 }

@@ -22,16 +22,15 @@
 
 using System;
 
-namespace JSSoft.Communication
+namespace JSSoft.Communication;
+
+[AttributeUsage(AttributeTargets.Class)]
+sealed class ServiceContextAttribute : Attribute
 {
-    [AttributeUsage(AttributeTargets.Class)]
-    sealed class ServiceContextAttribute : Attribute
+    public ServiceContextAttribute()
     {
-        public ServiceContextAttribute()
-        {
 
-        }
-
-        public bool IsServer { get; set; }
     }
+
+    public bool IsServer { get; set; }
 }

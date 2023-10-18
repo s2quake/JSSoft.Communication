@@ -20,19 +20,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace JSSoft.Communication
+namespace JSSoft.Communication;
+
+class JsonSerializerProvider : ISerializerProvider
 {
-    class JsonSerializerProvider : ISerializerProvider
+    public const string DefaultName = "json";
+
+    public ISerializer Create(IServiceContext serviceHost, IDataSerializer[] dataSerializers)
     {
-        public const string DefaultName = "json";
-
-        public ISerializer Create(IServiceContext serviceHost, IDataSerializer[] dataSerializers)
-        {
-            return new JsonSerializer(dataSerializers);
-        }
-
-        public string Name => DefaultName;
-
-        public static readonly JsonSerializerProvider Default = new();
+        return new JsonSerializer(dataSerializers);
     }
+
+    public string Name => DefaultName;
+
+    public static readonly JsonSerializerProvider Default = new();
 }

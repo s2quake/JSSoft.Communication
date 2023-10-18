@@ -22,36 +22,35 @@
 
 using System.Reflection.Emit;
 
-namespace JSSoft.Communication
+namespace JSSoft.Communication;
+
+static class ILGeneratorExtensions
 {
-    static class ILGeneratorExtensions
+    private static readonly OpCode[] Ldc_I4 = { OpCodes.Ldc_I4_0, OpCodes.Ldc_I4_1, OpCodes.Ldc_I4_2, OpCodes.Ldc_I4_3,
+                                                OpCodes.Ldc_I4_4, OpCodes.Ldc_I4_5, OpCodes.Ldc_I4_6, OpCodes.Ldc_I4_7, OpCodes.Ldc_I4_8 };
+    private static readonly OpCode[] Ldarg = { OpCodes.Ldarg_0, OpCodes.Ldarg_1, OpCodes.Ldarg_2, OpCodes.Ldarg_3 };
+
+    public static void EmitLdc_I4(this ILGenerator il, int n)
     {
-        private static readonly OpCode[] Ldc_I4 = { OpCodes.Ldc_I4_0, OpCodes.Ldc_I4_1, OpCodes.Ldc_I4_2, OpCodes.Ldc_I4_3,
-                                                    OpCodes.Ldc_I4_4, OpCodes.Ldc_I4_5, OpCodes.Ldc_I4_6, OpCodes.Ldc_I4_7, OpCodes.Ldc_I4_8 };
-        private static readonly OpCode[] Ldarg = { OpCodes.Ldarg_0, OpCodes.Ldarg_1, OpCodes.Ldarg_2, OpCodes.Ldarg_3 };
-
-        public static void EmitLdc_I4(this ILGenerator il, int n)
+        if (n < Ldc_I4.Length)
         {
-            if (n < Ldc_I4.Length)
-            {
-                il.Emit(Ldc_I4[n]);
-            }
-            else
-            {
-                il.Emit(OpCodes.Ldc_I4_S, n);
-            }
+            il.Emit(Ldc_I4[n]);
         }
-
-        public static void EmitLdarg(this ILGenerator il, int n)
+        else
         {
-            if (n < Ldarg.Length)
-            {
-                il.Emit(Ldarg[n]);
-            }
-            else
-            {
-                il.Emit(OpCodes.Ldarg_S, n);
-            }
+            il.Emit(OpCodes.Ldc_I4_S, n);
+        }
+    }
+
+    public static void EmitLdarg(this ILGenerator il, int n)
+    {
+        if (n < Ldarg.Length)
+        {
+            il.Emit(Ldarg[n]);
+        }
+        else
+        {
+            il.Emit(OpCodes.Ldarg_S, n);
         }
     }
 }

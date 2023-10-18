@@ -20,29 +20,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace JSSoft.Communication.Services
+namespace JSSoft.Communication.Services;
+
+public interface IUserServiceCallback
 {
-    public interface IUserServiceCallback
-    {
-        [OperationContract]
-        void OnCreated(string userID);
+    [OperationContract]
+    void OnCreated(string userID);
 
-        [OperationContract]
-        void OnDeleted(string userID);
+    [OperationContract]
+    void OnDeleted(string userID);
 
-        [OperationContract]
-        void OnLoggedIn(string userID);
+    [OperationContract]
+    void OnLoggedIn(string userID);
 
-        [OperationContract]
-        void OnLoggedOut(string userID);
+    [OperationContract]
+    void OnLoggedOut(string userID);
 
-        [OperationContract]
-        void OnMessageReceived(string sender, string receiver, string message);
+    [OperationContract]
+    void OnMessageReceived(string sender, string receiver, string message);
 
-        [OperationContract]
-        void OnRenamed(string userID, string userName);
+    [OperationContract]
+    void OnRenamed(string userID, string userName);
 
-        [OperationContract]
-        void OnAuthorityChanged(string userID, Authority authority);
-    }
+    [OperationContract]
+    void OnAuthorityChanged(string userID, Authority authority);
 }

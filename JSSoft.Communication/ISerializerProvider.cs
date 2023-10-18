@@ -20,12 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace JSSoft.Communication
-{
-    public interface ISerializerProvider
-    {
-        ISerializer Create(IServiceContext serviceHost, IDataSerializer[] dataSerializers);
+namespace JSSoft.Communication;
 
-        string Name { get; }
-    }
+public interface ISerializerProvider
+{
+    ISerializer Create(IServiceContext serviceHost, IDataSerializer[] dataSerializers);
+
+    string Name { get; }
 }

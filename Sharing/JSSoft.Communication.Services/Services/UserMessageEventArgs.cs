@@ -22,21 +22,20 @@
 
 using System;
 
-namespace JSSoft.Communication.Services
+namespace JSSoft.Communication.Services;
+
+public class UserMessageEventArgs : EventArgs
 {
-    public class UserMessageEventArgs : EventArgs
+    public UserMessageEventArgs(string sender, string receiver, string message)
     {
-        public UserMessageEventArgs(string sender, string receiver, string message)
-        {
-            this.Sender = sender;
-            this.Receiver = receiver;
-            this.Message = message;
-        }
-
-        public string Sender { get; }
-
-        public string Receiver { get; }
-
-        public string Message { get; }
+        this.Sender = sender;
+        this.Receiver = receiver;
+        this.Message = message;
     }
+
+    public string Sender { get; }
+
+    public string Receiver { get; }
+
+    public string Message { get; }
 }

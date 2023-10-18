@@ -23,39 +23,38 @@
 using System;
 using System.Threading.Tasks;
 
-namespace JSSoft.Communication.Services
+namespace JSSoft.Communication.Services;
+
+[ServiceContract]
+public interface IUserService
 {
-    [ServiceContract]
-    public interface IUserService
-    {
-        [OperationContract]
-        Task CreateAsync(Guid token, string userID, string password, Authority authority);
+    [OperationContract]
+    Task CreateAsync(Guid token, string userID, string password, Authority authority);
 
-        [OperationContract]
-        Task DeleteAsync(Guid token, string userID);
+    [OperationContract]
+    Task DeleteAsync(Guid token, string userID);
 
-        [OperationContract]
-        Task RenameAsync(Guid token, string userName);
+    [OperationContract]
+    Task RenameAsync(Guid token, string userName);
 
-        [OperationContract]
-        Task SetAuthorityAsync(Guid token, string userID, Authority authority);
+    [OperationContract]
+    Task SetAuthorityAsync(Guid token, string userID, Authority authority);
 
-        [OperationContract]
-        Task<Guid> LoginAsync(string userID, string password);
+    [OperationContract]
+    Task<Guid> LoginAsync(string userID, string password);
 
-        [OperationContract]
-        Task LogoutAsync(Guid token);
+    [OperationContract]
+    Task LogoutAsync(Guid token);
 
-        [OperationContract]
-        Task<(string userName, Authority authority)> GetInfoAsync(Guid token, string userID);
+    [OperationContract]
+    Task<(string userName, Authority authority)> GetInfoAsync(Guid token, string userID);
 
-        [OperationContract]
-        Task<string[]> GetUsersAsync(Guid token);
+    [OperationContract]
+    Task<string[]> GetUsersAsync(Guid token);
 
-        [OperationContract]
-        Task<bool> IsOnlineAsync(Guid token, string userID);
+    [OperationContract]
+    Task<bool> IsOnlineAsync(Guid token, string userID);
 
-        [OperationContract]
-        Task SendMessageAsync(Guid token, string userID, string message);
-    }
+    [OperationContract]
+    Task SendMessageAsync(Guid token, string userID, string message);
 }

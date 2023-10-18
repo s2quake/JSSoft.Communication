@@ -26,36 +26,35 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.ComponentModel.Composition;
 
-namespace JSSoft.Communication.Services
+namespace JSSoft.Communication.Services;
+
+[Export(typeof(IDataService))]
+[Export(typeof(DataService))]
+class DataService : IDataService
 {
-    [Export(typeof(IDataService))]
-    [Export(typeof(DataService))]
-    class DataService : IDataService
+    private readonly HashSet<string> _dataBases = new();
+
+    public DataService()
     {
-        private readonly HashSet<string> dataBases = new();
+        this.Dispatcher = new Dispatcher(this);
+    }
 
-        public DataService()
+    public Task<DateTime> CreateDataBaseAsync(string dataBaseName)
+    {
+        return this.Dispatcher.InvokeAsync(() =>
         {
-            this.Dispatcher = new Dispatcher(this);
-        }
+            if (this._dataBases.Contains(dataBaseName) == true)
+                throw new ArgumentNullException(nameof(dataBaseName));
+            this._dataBases.Add(dataBaseName);
+            return DateTime.UtcNow;
+        });
+    }
 
-        public Task<DateTime> CreateDataBaseAsync(string dataBaseName)
-        {
-            return this.Dispatcher.InvokeAsync(() =>
-            {
-                if (this.dataBases.Contains(dataBaseName) == true)
-                    throw new ArgumentNullException(nameof(dataBaseName));
-                this.dataBases.Add(dataBaseName);
-                return DateTime.UtcNow;
-            });
-        }
+    public Dispatcher Dispatcher { get; private set; }
 
-        public Dispatcher Dispatcher { get; private set; }
-
-        public void Dispose()
-        {
-            this.Dispatcher.Dispose();
-            this.Dispatcher = null;
-        }
+    public void Dispose()
+    {
+        this.Dispatcher.Dispose();
+        this.Dispatcher = null;
     }
 }

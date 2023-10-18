@@ -23,23 +23,22 @@
 using System;
 using System.Threading.Tasks;
 
-namespace JSSoft.Communication.ConsoleApp
+namespace JSSoft.Communication.ConsoleApp;
+
+class Program
 {
-    class Program
+    static async Task Main(string[] _)
     {
-        static async Task Main(string[] _)
+        try
         {
-            try
-            {
-                using var application = new Application();
-                await application.StartAsync();
-            }
-            catch (Exception e)
-            {
-                Console.Error.WriteLine(e);
-                Console.ReadKey();
-                Environment.Exit(1);
-            }
+            using var application = new Application();
+            await application.StartAsync();
+        }
+        catch (Exception e)
+        {
+            Console.Error.WriteLine(e);
+            Console.ReadKey();
+            Environment.Exit(1);
         }
     }
 }

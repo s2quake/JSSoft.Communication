@@ -22,52 +22,51 @@
 
 using JSSoft.Communication.ExceptionSerializers;
 
-namespace JSSoft.Communication
+namespace JSSoft.Communication;
+
+class ComponentProvider : IComponentProvider
 {
-    class ComponentProvider : IComponentProvider
+    public ComponentProvider()
     {
-        public ComponentProvider()
+        this.AdaptorHostProviders = new IAdaptorHostProvider[]
         {
-            this.AdaptorHostProviders = new IAdaptorHostProvider[]
-            {
-                AdaptorHostProvider.Default,
-            };
-            this.SerializerProviders = new ISerializerProvider[]
-            {
-                JsonSerializerProvider.Default,
-            };
-            this.DataSerializers = new IDataSerializer[]
-            {
-                ArgumentExceptionSerializer.Default,
-                ArgumentNullExceptionSerializer.Default,
-                ArgumentOutOfRangeExceptionSerializer.Default,
-                ExceptionSerializer.Default,
-                InvalidOperationExceptionSerializer.Default,
-                NotImplementedExceptionSerializer.Default,
-                SystemExceptionSerializer.Default,
-            };
-            this.ExceptionDescriptors = new IExceptionDescriptor[]
-            {
-                ArgumentExceptionSerializer.Default,
-                ArgumentNullExceptionSerializer.Default,
-                ArgumentOutOfRangeExceptionSerializer.Default,
-                ExceptionSerializer.Default,
-                InvalidOperationExceptionSerializer.Default,
-                NotImplementedExceptionSerializer.Default,
-                SystemExceptionSerializer.Default,
-            };
-        }
-
-        public IAdaptorHostProvider[] AdaptorHostProviders { get; }
-
-        public IServiceHost[] ServiceHosts { get; }
-
-        public ISerializerProvider[] SerializerProviders { get; }
-
-        public IDataSerializer[] DataSerializers { get; }
-
-        public IExceptionDescriptor[] ExceptionDescriptors { get; }
-
-        public static readonly ComponentProvider Default = new();
+            AdaptorHostProvider.Default,
+        };
+        this.SerializerProviders = new ISerializerProvider[]
+        {
+            JsonSerializerProvider.Default,
+        };
+        this.DataSerializers = new IDataSerializer[]
+        {
+            ArgumentExceptionSerializer.Default,
+            ArgumentNullExceptionSerializer.Default,
+            ArgumentOutOfRangeExceptionSerializer.Default,
+            ExceptionSerializer.Default,
+            InvalidOperationExceptionSerializer.Default,
+            NotImplementedExceptionSerializer.Default,
+            SystemExceptionSerializer.Default,
+        };
+        this.ExceptionDescriptors = new IExceptionDescriptor[]
+        {
+            ArgumentExceptionSerializer.Default,
+            ArgumentNullExceptionSerializer.Default,
+            ArgumentOutOfRangeExceptionSerializer.Default,
+            ExceptionSerializer.Default,
+            InvalidOperationExceptionSerializer.Default,
+            NotImplementedExceptionSerializer.Default,
+            SystemExceptionSerializer.Default,
+        };
     }
+
+    public IAdaptorHostProvider[] AdaptorHostProviders { get; }
+
+    public IServiceHost[] ServiceHosts { get; }
+
+    public ISerializerProvider[] SerializerProviders { get; }
+
+    public IDataSerializer[] DataSerializers { get; }
+
+    public IExceptionDescriptor[] ExceptionDescriptors { get; }
+
+    public static readonly ComponentProvider Default = new();
 }

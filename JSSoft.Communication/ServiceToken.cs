@@ -22,22 +22,21 @@
 
 using System;
 
-namespace JSSoft.Communication
+namespace JSSoft.Communication;
+
+public sealed class ServiceToken
 {
-    public sealed class ServiceToken
+    internal ServiceToken(Guid guid)
     {
-        internal ServiceToken(Guid guid)
-        {
-            this.Guid = guid;
-        }
-
-        internal Guid Guid { get; }
-
-        internal static ServiceToken NewToken()
-        {
-            return new ServiceToken(Guid.NewGuid());
-        }
-
-        internal static readonly ServiceToken Empty = new(Guid.Empty);
+        this.Guid = guid;
     }
+
+    internal Guid Guid { get; }
+
+    internal static ServiceToken NewToken()
+    {
+        return new ServiceToken(Guid.NewGuid());
+    }
+
+    internal static readonly ServiceToken Empty = new(Guid.Empty);
 }

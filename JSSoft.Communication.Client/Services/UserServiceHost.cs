@@ -23,31 +23,30 @@
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 
-namespace JSSoft.Communication.Services
+namespace JSSoft.Communication.Services;
+
+[Export(typeof(IServiceHost))]
+class UserServiceHost : ClientServiceHostBase<IUserService, IUserServiceCallback>
 {
-    [Export(typeof(IServiceHost))]
-    class UserServiceHost : ClientServiceHostBase<IUserService, IUserServiceCallback>
+    private readonly UserService _userService;
+
+    [ImportingConstructor]
+    public UserServiceHost(UserService userService)
+        : base()
     {
-        private readonly UserService userService;
+        this._userService = userService;
+    }
 
-        [ImportingConstructor]
-        public UserServiceHost(UserService userService)
-            : base()
-        {
-            this.userService = userService;
-        }
+    protected override async Task<IUserServiceCallback> CreateCallbackAsync(IPeer peer, IUserService service)
+    {
+        await Task.Delay(1);
+        this._userService.SetUserService(service);
+        return this._userService;
+    }
 
-        protected override async Task<IUserServiceCallback> CreateCallbackAsync(IPeer peer, IUserService service)
-        {
-            await Task.Delay(1);
-            this.userService.SetUserService(service);
-            return this.userService;
-        }
-
-        protected override async Task DestroyCallbackAsync(IPeer peer, IUserServiceCallback callback)
-        {
-            await Task.Delay(1);
-            this.userService.SetUserService(null);
-        }
+    protected override async Task DestroyCallbackAsync(IPeer peer, IUserServiceCallback callback)
+    {
+        await Task.Delay(1);
+        this._userService.SetUserService(null);
     }
 }

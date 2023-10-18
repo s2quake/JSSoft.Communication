@@ -25,42 +25,41 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace JSSoft.Communication
+namespace JSSoft.Communication;
+
+class JsonSerializer : ISerializer
 {
-    class JsonSerializer : ISerializer
+    private static readonly JsonSerializerSettings settings = new();
+    private readonly Dictionary<Type, IDataSerializer> _dataSerializerByType;
+
+    public JsonSerializer(IDataSerializer[] dataSerializers)
     {
-        private static readonly JsonSerializerSettings settings = new();
-        private readonly Dictionary<Type, IDataSerializer> dataSerializerByType;
+        this._dataSerializerByType = dataSerializers.ToDictionary(item => item.Type);
+    }
 
-        public JsonSerializer(IDataSerializer[] dataSerializers)
+    public string Serialize(Type type, object data)
+    {
+        var currentType = type;
+        while (currentType != null)
         {
-            this.dataSerializerByType = dataSerializers.ToDictionary(item => item.Type);
-        }
-
-        public string Serialize(Type type, object data)
-        {
-            var currentType = type;
-            while (currentType != null)
+            if (this._dataSerializerByType.ContainsKey(currentType) == true)
             {
-                if (this.dataSerializerByType.ContainsKey(currentType) == true)
-                {
-                    var dataSerializer = this.dataSerializerByType[currentType];
-                    return dataSerializer.Serialize(this, data);
-                }
-                currentType = currentType.BaseType;
+                var dataSerializer = this._dataSerializerByType[currentType];
+                return dataSerializer.Serialize(this, data);
             }
-
-            return JsonConvert.SerializeObject(data, type, settings);
+            currentType = currentType.BaseType;
         }
 
-        public object Deserialize(Type type, string text)
+        return JsonConvert.SerializeObject(data, type, settings);
+    }
+
+    public object Deserialize(Type type, string text)
+    {
+        if (this._dataSerializerByType.ContainsKey(type) == true)
         {
-            if (this.dataSerializerByType.ContainsKey(type) == true)
-            {
-                var dataSerializer = this.dataSerializerByType[type];
-                return dataSerializer.Deserialize(this, text);
-            }
-            return JsonConvert.DeserializeObject(text, type, settings);
+            var dataSerializer = this._dataSerializerByType[type];
+            return dataSerializer.Deserialize(this, text);
         }
+        return JsonConvert.DeserializeObject(text, type, settings);
     }
 }

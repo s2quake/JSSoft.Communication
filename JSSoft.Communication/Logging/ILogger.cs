@@ -20,18 +20,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace JSSoft.Communication.Logging
+namespace JSSoft.Communication.Logging;
+
+public interface ILogger
 {
-    public interface ILogger
-    {
-        void Debug(object message);
+    void Debug(object message);
 
-        void Info(object message);
+    void Info(object message);
 
-        void Error(object message);
+    void Error(object message);
 
-        void Warn(object message);
+    void Warn(object message);
 
-        void Fatal(object message);
-    }
+    void Fatal(object message);
 }

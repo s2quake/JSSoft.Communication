@@ -24,34 +24,33 @@ using JSSoft.Library.Commands;
 using JSSoft.Library.Commands.Extensions;
 using System;
 
-namespace JSSoft.Communication.ConsoleApp
+namespace JSSoft.Communication.ConsoleApp;
+
+public class Settings
 {
-    public class Settings
+    [CommandProperty(InitValue = ServiceContextBase.DefaultPort)]
+    public int Port
     {
-        [CommandProperty(InitValue = ServiceContextBase.DefaultPort)]
-        public int Port
-        {
-            get; set;
-        }
+        get; set;
+    }
 
-        [CommandProperty(InitValue = ServiceContextBase.DefaultHost)]
-        public string Host
-        {
-            get; set;
-        }
+    [CommandProperty(InitValue = ServiceContextBase.DefaultHost)]
+    public string Host
+    {
+        get; set;
+    }
 
-        [CommandPropertySwitch]
-        public bool Verbose
-        {
-            get; set;
-        }
+    [CommandPropertySwitch]
+    public bool Verbose
+    {
+        get; set;
+    }
 
-        public static Settings CreateFromCommandLine()
-        {
-            var settings = new Settings();
-            var parser = new CommandParser(settings);
-            parser.ParseCommandLine(Environment.CommandLine);
-            return settings;
-        }
+    public static Settings CreateFromCommandLine()
+    {
+        var settings = new Settings();
+        var parser = new CommandParser(settings);
+        parser.ParseCommandLine(Environment.CommandLine);
+        return settings;
     }
 }

@@ -22,43 +22,42 @@
 
 using System;
 
-namespace JSSoft.Communication.Logging
+namespace JSSoft.Communication.Logging;
+
+public static class ILoggerExtensions
 {
-    public static class ILoggerExtensions
+    public static void Debug(this ILogger logger, string format, params object[] args)
     {
-        public static void Debug(this ILogger logger, string format, params object[] args)
-        {
-            logger.Debug(string.Format(format, args));
-        }
+        logger.Debug(string.Format(format, args));
+    }
 
-        public static void Info(this ILogger logger, string format, params object[] args)
-        {
-            logger.Info(string.Format(format, args));
-        }
+    public static void Info(this ILogger logger, string format, params object[] args)
+    {
+        logger.Info(string.Format(format, args));
+    }
 
-        public static void Error(this ILogger logger, string format, params object[] args)
-        {
-            logger.Error(string.Format(format, args));
-        }
+    public static void Error(this ILogger logger, string format, params object[] args)
+    {
+        logger.Error(string.Format(format, args));
+    }
 
-        public static void Error(this ILogger logger, Exception e)
-        {
-            logger.Error(e);
-        }
+    public static void Error(this ILogger logger, Exception e)
+    {
+        logger.Error(e);
+    }
 
-        public static void Warn(this ILogger logger, string format, params object[] args)
-        {
-            logger.Warn(string.Format(format, args));
-        }
+    public static void Warn(this ILogger logger, string format, params object[] args)
+    {
+        logger.Warn(string.Format(format, args));
+    }
 
-        public static void Fatal(this ILogger logger, string format, params object[] args)
-        {
-            logger.Fatal(string.Format(format, args));
-        }
+    public static void Fatal(this ILogger logger, string format, params object[] args)
+    {
+        logger.Fatal(string.Format(format, args));
+    }
 
-        public static void Fatal(this ILogger logger, Exception e)
-        {
-            logger.Fatal(e);
-        }
+    public static void Fatal(this ILogger logger, Exception e)
+    {
+        logger.Fatal(e);
     }
 }

@@ -22,27 +22,26 @@
 
 using System.Linq;
 
-namespace JSSoft.Communication
+namespace JSSoft.Communication;
+
+public class ComponentProviderBase : IComponentProvider
 {
-    public class ComponentProviderBase : IComponentProvider
+    protected ComponentProviderBase(IAdaptorHostProvider[] adaptorHostProviders,
+                                    ISerializerProvider[] serializerProviders,
+                                    IDataSerializer[] dataSerializers,
+                                    IExceptionDescriptor[] exceptionDescriptors)
     {
-        protected ComponentProviderBase(IAdaptorHostProvider[] adaptorHostProviders,
-                                        ISerializerProvider[] serializerProviders,
-                                        IDataSerializer[] dataSerializers,
-                                        IExceptionDescriptor[] exceptionDescriptors)
-        {
-            this.AdaptorHostProviders = ComponentProvider.Default.AdaptorHostProviders.Concat(adaptorHostProviders ?? new IAdaptorHostProvider[] { }).ToArray();
-            this.SerializerProviders = ComponentProvider.Default.SerializerProviders.Concat(serializerProviders ?? new ISerializerProvider[] { }).ToArray();
-            this.DataSerializers = ComponentProvider.Default.DataSerializers.Concat(dataSerializers ?? new IDataSerializer[] { }).ToArray();
-            this.ExceptionDescriptors = ComponentProvider.Default.ExceptionDescriptors.Concat(exceptionDescriptors ?? new IExceptionDescriptor[] { }).ToArray();
-        }
-
-        public IAdaptorHostProvider[] AdaptorHostProviders { get; }
-
-        public ISerializerProvider[] SerializerProviders { get; }
-
-        public IDataSerializer[] DataSerializers { get; }
-
-        public IExceptionDescriptor[] ExceptionDescriptors { get; }
+        this.AdaptorHostProviders = ComponentProvider.Default.AdaptorHostProviders.Concat(adaptorHostProviders ?? new IAdaptorHostProvider[] { }).ToArray();
+        this.SerializerProviders = ComponentProvider.Default.SerializerProviders.Concat(serializerProviders ?? new ISerializerProvider[] { }).ToArray();
+        this.DataSerializers = ComponentProvider.Default.DataSerializers.Concat(dataSerializers ?? new IDataSerializer[] { }).ToArray();
+        this.ExceptionDescriptors = ComponentProvider.Default.ExceptionDescriptors.Concat(exceptionDescriptors ?? new IExceptionDescriptor[] { }).ToArray();
     }
+
+    public IAdaptorHostProvider[] AdaptorHostProviders { get; }
+
+    public ISerializerProvider[] SerializerProviders { get; }
+
+    public IDataSerializer[] DataSerializers { get; }
+
+    public IExceptionDescriptor[] ExceptionDescriptors { get; }
 }

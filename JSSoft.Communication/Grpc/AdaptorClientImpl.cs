@@ -28,81 +28,80 @@ using System.Threading.Tasks;
 using System.Timers;
 using Timer = System.Timers.Timer;
 
-namespace JSSoft.Communication.Grpc
+namespace JSSoft.Communication.Grpc;
+
+class AdaptorClientImpl : Adaptor.AdaptorClient, IPeer
 {
-    class AdaptorClientImpl : Adaptor.AdaptorClient, IPeer
+    private static readonly TimeSpan timeout = new(0, 0, 15);
+    private Timer? _timer;
+
+    public AdaptorClientImpl(Channel channel, Guid id, IServiceHost[] serviceHosts)
+        : base(channel)
     {
-        private static readonly TimeSpan timeout = new(0, 0, 15);
-        private Timer timer;
+        this.ID = id;
+        this.ServiceHosts = serviceHosts;
+    }
 
-        public AdaptorClientImpl(Channel channel, Guid id, IServiceHost[] serviceHosts)
-            : base(channel)
+    public async Task OpenAsync()
+    {
+        var request = await Task.Run(() =>
         {
-            this.ID = id;
-            this.ServiceHosts = serviceHosts;
-        }
-
-        public async Task OpenAsync()
+            var serviceNames = this.ServiceHosts.Select(item => item.Name).ToArray();
+            var req = new OpenRequest() { Time = DateTime.UtcNow.Ticks };
+            req.ServiceNames.AddRange(serviceNames);
+            return req;
+        });
+        var reply = await base.OpenAsync(request);
+        await Task.Run(() =>
         {
-            var request = await Task.Run(() =>
-            {
-                var serviceNames = this.ServiceHosts.Select(item => item.Name).ToArray();
-                var req = new OpenRequest() { Time = DateTime.UtcNow.Ticks };
-                req.ServiceNames.AddRange(serviceNames);
-                return req;
-            });
-            var reply = await base.OpenAsync(request);
-            await Task.Run(() =>
-            {
-                this.Token = Guid.Parse(reply.Token);
-                this.timer = new Timer(timeout.TotalMilliseconds);
-                this.timer.Elapsed += Timer_Elapsed;
-                this.timer.Start();
-            });
-        }
+            this.Token = Guid.Parse(reply.Token);
+            this._timer = new Timer(timeout.TotalMilliseconds);
+            this._timer.Elapsed += Timer_Elapsed;
+            this._timer.Start();
+        });
+    }
 
-        public async Task CloseAsync()
+    public async Task CloseAsync()
+    {
+        await Task.Run(() =>
         {
-            await Task.Run(() =>
-            {
-                this.timer.Dispose();
-                this.timer = null;
-            });
-            await base.CloseAsync(new CloseRequest() { Token = this.Token.ToString() });
-        }
+            this._timer.Dispose();
+            this._timer = null;
+        });
+        await base.CloseAsync(new CloseRequest() { Token = this.Token.ToString() });
+    }
 
-        public async Task AbortAsync()
+    public async Task AbortAsync()
+    {
+        await Task.Run(() =>
         {
-            await Task.Run(() =>
-            {
-                this.timer.Dispose();
-                this.timer = null;
-            });
-        }
+            this._timer.Dispose();
+            this._timer = null;
+        });
+    }
 
-        public Guid ID { get; }
+    public Guid ID { get; }
 
-        public Guid Token { get; private set; }
+    public Guid Token { get; private set; }
 
-        public IServiceHost[] ServiceHosts { get; }
+    public IServiceHost[] ServiceHosts { get; }
 
-        private void Timer_Elapsed(object sender, ElapsedEventArgs e)
+    private void Timer_Elapsed(object sender, ElapsedEventArgs e)
+    {
+        var request = new PingRequest()
         {
-            var request = new PingRequest()
+            Token = this.Token.ToString()
+        };
+        Task.Run(async () =>
+        {
+            try
             {
-                Token = this.Token.ToString()
-            };
-            Task.Run(async () =>
+                await this.PingAsync(request);
+            }
+            catch
             {
-                try
-                {
-                    await this.PingAsync(request);
-                }
-                catch
-                {
 
-                }
-            });
-        }
+            }
+        });
     }
 }

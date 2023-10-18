@@ -24,16 +24,15 @@ using JSSoft.Library.Commands;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 
-namespace JSSoft.Communication.ConsoleApp
-{
-    [Export(typeof(CommandContext))]
-    sealed class CommandContext : CommandContextBase
-    {
-        [ImportingConstructor]
-        public CommandContext([ImportMany] IEnumerable<ICommand> commands)
-            : base(commands)
-        {
+namespace JSSoft.Communication.ConsoleApp;
 
-        }
+[Export(typeof(CommandContext))]
+sealed class CommandContext : CommandContextBase
+{
+    [ImportingConstructor]
+    public CommandContext([ImportMany] IEnumerable<ICommand> commands)
+        : base(commands)
+    {
+
     }
 }
