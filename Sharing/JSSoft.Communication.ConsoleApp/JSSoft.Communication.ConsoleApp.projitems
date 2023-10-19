@@ -9,7 +9,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Application.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Terminal.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Settings.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ServiceComponentProvider.cs" />
 
     <Compile Include="$(MSBuildThisFileDirectory)Commands\CloseCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\ExitCommand.cs" />
