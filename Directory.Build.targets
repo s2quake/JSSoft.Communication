@@ -29,6 +29,14 @@ SOFTWARE. -->
     <DesiredPublishDirTemp Condition="'$(PublishDir)' != '$(DesiredPublishDir)'">$(PublishDir)</DesiredPublishDirTemp>
     <DesiredPublishDir>$(DesiredPublishDirTemp)</DesiredPublishDir>
   </PropertyGroup>
+  <Target Name="BeforeBuild">
+    <Exec Command="git -C '$(MSBuildThisFileDirectory)' rev-parse HEAD" ConsoleToMsBuild="true" EchoOff="true" StandardOutputImportance="Low">
+      <Output TaskParameter="ConsoleOutput" PropertyName="RepositorySHA" />
+    </Exec>
+    <PropertyGroup>
+      <Version>$(FileVersion)-$(TargetFramework)-$(RepositorySHA)</Version>
+    </PropertyGroup>
+  </Target>
   <Target Name="AfterBuild">
     <PropertyGroup Condition="'$(PublishName)' != ''">
       <PublishDir>$([System.IO.Path]::Combine($(DesiredPublishDir),$(PublishName)))</PublishDir>
