@@ -38,7 +38,7 @@ public class Settings
     public string Host
     {
         get; set;
-    }
+    } = string.Empty;
 
     [CommandPropertySwitch]
     public bool Verbose

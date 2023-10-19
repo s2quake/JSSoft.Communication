@@ -40,10 +40,10 @@ sealed class ServiceInstanceBuilder
     {
         AssemblyName = new AssemblyName(ns);
         _assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(AssemblyName, AssemblyBuilderAccess.RunAndCollect);
-        _moduleBuilder = _assemblyBuilder.DefineDynamicModule(AssemblyName.Name);
+        _moduleBuilder = _assemblyBuilder.DefineDynamicModule(AssemblyName.Name!);
     }
 
-    internal static ServiceInstanceBuilder Create()
+    internal static ServiceInstanceBuilder? Create()
     {
         try
         {
@@ -103,8 +103,8 @@ sealed class ServiceInstanceBuilder
         var returnType = methodInfo.ReturnType;
         var methodAttributes = MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.HideBySig;
         var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, methodAttributes, CallingConventions.Standard, returnType, parameterTypes);
-        var invokeMethod = FindInvokeMethod(typeBuilder.BaseType, methodName, returnType);
-        var typeofMethod = typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle));
+        var invokeMethod = FindInvokeMethod(typeBuilder.BaseType!, methodName, returnType);
+        var typeofMethod = typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle))!;
 
         for (var i = 0; i < parameterInfos.Length; i++)
         {
@@ -162,8 +162,8 @@ sealed class ServiceInstanceBuilder
         var returnType = methodInfo.ReturnType;
         var methodAttributes = MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.HideBySig;
         var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, methodAttributes, returnType, parameterTypes);
-        var invokeMethod = FindInvokeMethod(typeBuilder.BaseType, methodName, returnType);
-        var typeofMethod = typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle));
+        var invokeMethod = FindInvokeMethod(typeBuilder.BaseType!, methodName, returnType);
+        var typeofMethod = typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle))!;
 
         for (var i = 0; i < parameterInfos.Length; i++)
         {

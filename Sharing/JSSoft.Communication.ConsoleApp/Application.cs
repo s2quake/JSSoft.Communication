@@ -45,9 +45,10 @@ sealed class Application : IApplication, IServiceProvider
     // private readonly CommandContext commandContext;
     private readonly IServiceContext _serviceHost;
     private readonly INotifyUserService _userServiceNotification;
-    private bool _isDisposed;
-    private CancellationTokenSource _cancellation;
     private readonly CompositionContainer _container;
+    private bool _isDisposed;
+    private CancellationTokenSource? _cancellationTokenSource;
+    private string title = string.Empty;
 
     static Application()
     {
@@ -101,8 +102,12 @@ sealed class Application : IApplication, IServiceProvider
 
     public string Title
     {
-        get => Console.Title;
-        set => Console.Title = value;
+        get => title;
+        set
+        {
+            title = value;
+            Console.Title = value;
+        }
     }
 
     internal void Login(string userID, Guid token)
@@ -147,7 +152,7 @@ sealed class Application : IApplication, IServiceProvider
         // Terminal.Prompt = prompt + postfix;
     }
 
-    private void ServiceHost_Opened(object sender, EventArgs e)
+    private void ServiceHost_Opened(object? sender, EventArgs e)
     {
         IsOpened = true;
         UpdatePrompt();
@@ -166,7 +171,7 @@ sealed class Application : IApplication, IServiceProvider
         Out.WriteLine("로그인을 하려면 'login admin admin' 을(를) 입력하세요.");
     }
 
-    private void ServiceHost_Closed(object sender, EventArgs e)
+    private void ServiceHost_Closed(object? sender, EventArgs e)
     {
         IsOpened = false;
         UpdatePrompt();
@@ -184,17 +189,17 @@ sealed class Application : IApplication, IServiceProvider
         }
     }
 
-    private void UserServiceNotification_LoggedIn(object sender, UserEventArgs e)
+    private void UserServiceNotification_LoggedIn(object? sender, UserEventArgs e)
     {
         Out.WriteLine($"User logged in: {e.UserID}");
     }
 
-    private void UserServiceNotification_LoggedOut(object sender, UserEventArgs e)
+    private void UserServiceNotification_LoggedOut(object? sender, UserEventArgs e)
     {
         Out.WriteLine($"User logged out: {e.UserID}");
     }
 
-    private void UserServiceNotification_MessageReceived(object sender, UserMessageEventArgs e)
+    private void UserServiceNotification_MessageReceived(object? sender, UserMessageEventArgs e)
     {
         if (e.Sender == UserID)
         {
@@ -210,7 +215,7 @@ sealed class Application : IApplication, IServiceProvider
 
     #region IServiceProvider
 
-    object IServiceProvider.GetService(Type serviceType)
+    object? IServiceProvider.GetService(Type serviceType)
     {
         if (serviceType == typeof(IServiceProvider))
             return this;
@@ -222,8 +227,8 @@ sealed class Application : IApplication, IServiceProvider
             var items = _container.GetExportedValues<object>(contractName);
             var listGenericType = typeof(List<>);
             var list = listGenericType.MakeGenericType(itemType);
-            var ci = list.GetConstructor(new Type[] { typeof(int) });
-            var instance = ci.Invoke(new object[] { items.Count(), }) as IList;
+            var ci = list.GetConstructor(new Type[] { typeof(int) })!;
+            var instance = (IList)ci.Invoke(new object[] { items.Count(), })!;
             foreach (var item in items)
             {
                 instance.Add(item);
@@ -244,7 +249,10 @@ sealed class Application : IApplication, IServiceProvider
 
     public async Task StartAsync()
     {
-        _cancellation = new CancellationTokenSource();
+        if (_cancellationTokenSource != null)
+            throw new InvalidOperationException();
+
+        _cancellationTokenSource = new CancellationTokenSource();
         _serviceHost.Host = _settings.Host;
         _serviceHost.Port = _settings.Port;
         try
@@ -256,12 +264,15 @@ sealed class Application : IApplication, IServiceProvider
             var text = TerminalStrings.Foreground(e.Message, TerminalColor.BrightRed);
             Console.Error.WriteLine(text);
         }
-        await Terminal.StartAsync(_cancellation.Token);
+        await Terminal.StartAsync(_cancellationTokenSource.Token);
     }
 
     public async Task StopAsync(int exitCode)
     {
-        _cancellation.Cancel();
+        if (_cancellationTokenSource == null)
+            throw new InvalidOperationException();
+
+        _cancellationTokenSource.Cancel();
         if (_serviceHost.ServiceState == ServiceState.Open)
         {
             _serviceHost.Closed -= ServiceHost_Closed;

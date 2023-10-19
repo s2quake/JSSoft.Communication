@@ -31,76 +31,106 @@ namespace JSSoft.Communication.Services;
 [Export(typeof(UserService))]
 class UserService : IUserService, IUserServiceCallback, INotifyUserService
 {
-    private IUserService _userService;
+    private IUserService? _userService;
 
     public Task CreateAsync(Guid token, string userID, string password, Authority authority)
     {
+        if (_userService == null)
+            throw new InvalidOperationException($"'{nameof(UserService)}' has not been initialized.");
+
         return _userService.CreateAsync(token, userID, password, authority);
     }
 
     public Task DeleteAsync(Guid token, string userID)
     {
+        if (_userService == null)
+            throw new InvalidOperationException($"'{nameof(UserService)}' has not been initialized.");
+
         return _userService.DeleteAsync(token, userID);
     }
 
     public Task<(string userName, Authority authority)> GetInfoAsync(Guid token, string userID)
     {
+        if (_userService == null)
+            throw new InvalidOperationException($"'{nameof(UserService)}' has not been initialized.");
+
         return _userService.GetInfoAsync(token, userID);
     }
 
     public Task<string[]> GetUsersAsync(Guid token)
     {
+        if (_userService == null)
+            throw new InvalidOperationException($"'{nameof(UserService)}' has not been initialized.");
+
         return _userService.GetUsersAsync(token);
     }
 
     public Task<bool> IsOnlineAsync(Guid token, string userID)
     {
+        if (_userService == null)
+            throw new InvalidOperationException($"'{nameof(UserService)}' has not been initialized.");
+
         return _userService.IsOnlineAsync(token, userID);
     }
 
     public Task<Guid> LoginAsync(string userID, string password)
     {
+        if (_userService == null)
+            throw new InvalidOperationException($"'{nameof(UserService)}' has not been initialized.");
+
         return _userService.LoginAsync(userID, password);
     }
 
     public Task LogoutAsync(Guid token)
     {
+        if (_userService == null)
+            throw new InvalidOperationException($"'{nameof(UserService)}' has not been initialized.");
+
         return _userService.LogoutAsync(token);
     }
 
     public Task RenameAsync(Guid token, string userName)
     {
+        if (_userService == null)
+            throw new InvalidOperationException($"'{nameof(UserService)}' has not been initialized.");
+
         return _userService.RenameAsync(token, userName);
     }
 
     public Task SendMessageAsync(Guid token, string userID, string message)
     {
+        if (_userService == null)
+            throw new InvalidOperationException($"'{nameof(UserService)}' has not been initialized.");
+
         return _userService.SendMessageAsync(token, userID, message);
     }
 
     public Task SetAuthorityAsync(Guid token, string userID, Authority authority)
     {
+        if (_userService == null)
+            throw new InvalidOperationException($"'{nameof(UserService)}' has not been initialized.");
+
         return _userService.SetAuthorityAsync(token, userID, authority);
     }
 
-    public void SetUserService(IUserService userService)
+    public void SetUserService(IUserService? userService)
     {
         _userService = userService;
     }
 
-    public event EventHandler<UserEventArgs> LoggedIn;
+    public event EventHandler<UserEventArgs>? LoggedIn;
 
-    public event EventHandler<UserEventArgs> LoggedOut;
+    public event EventHandler<UserEventArgs>? LoggedOut;
 
-    public event EventHandler<UserEventArgs> Created;
+    public event EventHandler<UserEventArgs>? Created;
 
-    public event EventHandler<UserEventArgs> Deleted;
+    public event EventHandler<UserEventArgs>? Deleted;
 
-    public event EventHandler<UserMessageEventArgs> MessageReceived;
+    public event EventHandler<UserMessageEventArgs>? MessageReceived;
 
-    public event EventHandler<UserNameEventArgs> Renamed;
+    public event EventHandler<UserNameEventArgs>? Renamed;
 
-    public event EventHandler<UserAuthorityEventArgs> AuthorityChanged;
+    public event EventHandler<UserAuthorityEventArgs>? AuthorityChanged;
 
     protected virtual void OnCreated(UserEventArgs e)
     {

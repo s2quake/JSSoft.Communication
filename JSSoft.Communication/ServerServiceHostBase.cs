@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System.ComponentModel;
+using System;
 using System.Threading.Tasks;
 
 namespace JSSoft.Communication;
@@ -36,7 +36,7 @@ public abstract class ServerServiceHostBase<T, U> : ServiceHostBase where T : cl
 
     protected virtual Task<T> CreateServiceAsync(IPeer peer, U callback)
     {
-        return Task.Run(() => TypeDescriptor.CreateInstance(null, ServiceType, null, null) as T);
+        return Task.Run(Activator.CreateInstance<T>);
     }
 
     protected virtual Task DestroyServiceAsync(IPeer peer, T service)
@@ -46,12 +46,12 @@ public abstract class ServerServiceHostBase<T, U> : ServiceHostBase where T : cl
 
     private protected override async Task<object> CreateInstanceInternalAsync(IPeer peer, object obj)
     {
-        return await CreateServiceAsync(peer, obj as U);
+        return await CreateServiceAsync(peer, (U)obj);
     }
 
     private protected override Task DestroyInstanceInternalAsync(IPeer peer, object obj)
     {
-        return DestroyServiceAsync(peer, obj as T);
+        return DestroyServiceAsync(peer, (T)obj);
     }
 }
 
@@ -66,7 +66,7 @@ public abstract class ServerServiceHostBase<T> : ServiceHostBase where T : class
 
     protected virtual Task<T> CreateServiceAsync(IPeer peer)
     {
-        return Task.Run(() => TypeDescriptor.CreateInstance(null, ServiceType, null, null) as T);
+        return Task.Run(Activator.CreateInstance<T>);
     }
 
     protected virtual Task DestroyServiceAsync(IPeer peer, T service)
@@ -81,6 +81,6 @@ public abstract class ServerServiceHostBase<T> : ServiceHostBase where T : class
 
     private protected override async Task DestroyInstanceInternalAsync(IPeer peer, object obj)
     {
-        await DestroyServiceAsync(peer, obj as T);
+        await DestroyServiceAsync(peer, (T)obj);
     }
 }

@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
 
@@ -36,7 +37,7 @@ public abstract class ClientServiceHostBase<T, U> : ServiceHostBase where T : cl
 
     protected virtual Task<U> CreateCallbackAsync(IPeer peer, T service)
     {
-        return Task.Run(() => TypeDescriptor.CreateInstance(null, CallbackType, null, null) as U);
+        return Task.Run(() => Activator.CreateInstance<U>()!);
     }
 
     protected virtual Task DestroyCallbackAsync(IPeer peer, U callback)
@@ -46,12 +47,12 @@ public abstract class ClientServiceHostBase<T, U> : ServiceHostBase where T : cl
 
     private protected override async Task<object> CreateInstanceInternalAsync(IPeer peer, object obj)
     {
-        return await CreateCallbackAsync(peer, obj as T);
+        return await CreateCallbackAsync(peer, (T)obj);
     }
 
     private protected override Task DestroyInstanceInternalAsync(IPeer peer, object obj)
     {
-        return DestroyCallbackAsync(peer, obj as U);
+        return DestroyCallbackAsync(peer, (U)obj);
     }
 }
 
@@ -76,8 +77,8 @@ public abstract class ClientServiceHostBase<T> : ServiceHostBase where T : class
 
     private protected override Task<object> CreateInstanceInternalAsync(IPeer peer, object obj)
     {
-        OnServiceCreated(peer, obj as T);
-        return Task.Run(() => null as object);
+        OnServiceCreated(peer, (T)obj);
+        return Task.Run(() => new object());
     }
 
     private protected override Task DestroyInstanceInternalAsync(IPeer peer, object obj)

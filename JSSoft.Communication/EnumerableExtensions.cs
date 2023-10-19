@@ -28,9 +28,14 @@ namespace JSSoft.Communication;
 
 static class EnumerableExtensions
 {
-    public static void DisposeAll<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, Func<KeyValuePair<TKey, TValue>, bool> predicate = null)
+    public static void DisposeAll<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary)
     {
-        var items = dictionary.Where(predicate ?? new Func<KeyValuePair<TKey, TValue>, bool>((item) => true))
+        DisposeAll(dictionary, new Func<KeyValuePair<TKey, TValue>, bool>((item) => true));
+    }
+
+    public static void DisposeAll<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, Func<KeyValuePair<TKey, TValue>, bool> predicate)
+    {
+        var items = dictionary.Where(predicate)
                               .Select(item => item.Value)
                               .ToArray();
         foreach (var item in items.OfType<IDisposable>())

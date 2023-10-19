@@ -26,7 +26,7 @@ namespace JSSoft.Communication;
 
 public static class ISerializerExtensions
 {
-    public static string[] SerializeMany(this ISerializer serializer, Type[] types, object[] args)
+    public static string[] SerializeMany(this ISerializer serializer, Type[] types, object?[] args)
     {
         var items = new string[args.Length];
         for (var i = 0; i < args.Length; i++)
@@ -38,9 +38,9 @@ public static class ISerializerExtensions
         return items;
     }
 
-    public static object[] DeserializeMany(this ISerializer serializer, Type[] types, string[] datas)
+    public static object?[] DeserializeMany(this ISerializer serializer, Type[] types, string[] datas)
     {
-        var items = new object[datas.Length];
+        var items = new object?[datas.Length];
         for (var i = 0; i < datas.Length; i++)
         {
             var type = types[i];

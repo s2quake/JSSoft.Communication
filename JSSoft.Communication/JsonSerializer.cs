@@ -37,7 +37,7 @@ class JsonSerializer : ISerializer
         _dataSerializerByType = dataSerializers.ToDictionary(item => item.Type);
     }
 
-    public string Serialize(Type type, object data)
+    public string Serialize(Type type, object? data)
     {
         var currentType = type;
         while (currentType != null)
@@ -53,7 +53,7 @@ class JsonSerializer : ISerializer
         return JsonConvert.SerializeObject(data, type, settings);
     }
 
-    public object Deserialize(Type type, string text)
+    public object? Deserialize(Type type, string text)
     {
         if (_dataSerializerByType.ContainsKey(type) == true)
         {

@@ -47,7 +47,7 @@ public interface IServiceHost
 
     Dispatcher Dispatcher { get; }
 
-    event EventHandler Opened;
+    event EventHandler? Opened;
 
-    event EventHandler Closed;
+    event EventHandler? Closed;
 }

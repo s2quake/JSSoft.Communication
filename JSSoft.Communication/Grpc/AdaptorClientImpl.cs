@@ -65,7 +65,7 @@ class AdaptorClientImpl : Adaptor.AdaptorClient, IPeer
     {
         await Task.Run(() =>
         {
-            _timer.Dispose();
+            _timer?.Dispose();
             _timer = null;
         });
         await base.CloseAsync(new CloseRequest() { Token = Token.ToString() });
@@ -75,7 +75,7 @@ class AdaptorClientImpl : Adaptor.AdaptorClient, IPeer
     {
         await Task.Run(() =>
         {
-            _timer.Dispose();
+            _timer?.Dispose();
             _timer = null;
         });
     }
@@ -86,7 +86,7 @@ class AdaptorClientImpl : Adaptor.AdaptorClient, IPeer
 
     public IServiceHost[] ServiceHosts { get; }
 
-    private void Timer_Elapsed(object sender, ElapsedEventArgs e)
+    private void Timer_Elapsed(object? sender, ElapsedEventArgs e)
     {
         var request = new PingRequest()
         {

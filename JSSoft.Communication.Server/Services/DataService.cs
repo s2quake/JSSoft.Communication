@@ -33,10 +33,11 @@ namespace JSSoft.Communication.Services;
 class DataService : IDataService
 {
     private readonly HashSet<string> _dataBases = new();
+    private Dispatcher? _dispatcher;
 
     public DataService()
     {
-        Dispatcher = new Dispatcher(this);
+        _dispatcher = new Dispatcher(this);
     }
 
     public Task<DateTime> CreateDataBaseAsync(string dataBaseName)
@@ -50,11 +51,22 @@ class DataService : IDataService
         });
     }
 
-    public Dispatcher Dispatcher { get; private set; }
-
     public void Dispose()
     {
-        Dispatcher.Dispose();
-        Dispatcher = null;
+        if (_dispatcher == null)
+            throw new ObjectDisposedException($"{this}");
+
+        _dispatcher.Dispose();
+        _dispatcher = null;
+    }
+
+    public Dispatcher Dispatcher
+    {
+        get
+        {
+            if (_dispatcher == null)
+                throw new ObjectDisposedException($"{this}");
+            return _dispatcher;
+        }
     }
 }

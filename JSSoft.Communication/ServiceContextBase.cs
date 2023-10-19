@@ -37,18 +37,19 @@ public abstract class ServiceContextBase : IServiceContext
     public const string DefaultHost = "localhost";
     public const int DefaultPort = 4004;
     private readonly IComponentProvider _componentProvider;
-    private readonly ServiceInstanceBuilder _instanceBuilder;
+    private readonly ServiceInstanceBuilder? _instanceBuilder;
     private readonly InstanceContext _instanceContext;
     private readonly bool _isServer;
-    private IAdaptorHostProvider _adpatorHostProvider;
-    private ISerializerProvider _serializerProvider;
-    private ISerializer _serializer;
-    private IAdaptorHost _adaptorHost;
-    private string _host;
+    private IAdaptorHostProvider? _adpatorHostProvider;
+    private ISerializerProvider? _serializerProvider;
+    private ISerializer? _serializer;
+    private IAdaptorHost? _adaptorHost;
+    private string _host = string.Empty;
     private int _port = DefaultPort;
-    private ServiceToken _token;
+    private ServiceToken? _token;
+    private Dispatcher? _dispatcher;
 
-    protected ServiceContextBase(IComponentProvider componentProvider, IServiceHost[] serviceHost)
+    protected ServiceContextBase(IComponentProvider? componentProvider, IServiceHost[] serviceHost)
     {
         _componentProvider = componentProvider ?? ComponentProvider.Default;
         ServiceHosts = new ServiceHostCollection(serviceHost);
@@ -70,29 +71,26 @@ public abstract class ServiceContextBase : IServiceContext
         if (ServiceState != ServiceState.None)
             throw new InvalidOperationException();
         ServiceState = ServiceState.Opening;
-        Dispatcher = await Dispatcher.CreateAsync(this);
+        _dispatcher = await Dispatcher.CreateAsync(this);
         try
         {
-            await Dispatcher.InvokeAsync(() =>
-            {
-                _token = ServiceToken.NewToken();
-                _serializerProvider = _componentProvider.GetserializerProvider(SerializerType);
-                _serializer = _serializerProvider.Create(this, _componentProvider.DataSerializers);
-                Debug($"{_serializerProvider.Name} Serializer created.");
-                _adpatorHostProvider = _componentProvider.GetAdaptorHostProvider(AdaptorHostType);
-                _adaptorHost = _adpatorHostProvider.Create(this, _instanceContext, _token);
-                Debug($"{_adpatorHostProvider.Name} Adaptor created.");
-                _adaptorHost.Disconnected += AdaptorHost_Disconnected;
-            });
+            _token = ServiceToken.NewToken();
+            _serializerProvider = _componentProvider.GetserializerProvider(SerializerType);
+            _serializer = _serializerProvider.Create(this, _componentProvider.DataSerializers);
+            Debug($"{_serializerProvider.Name} Serializer created.");
+            _adpatorHostProvider = _componentProvider.GetAdaptorHostProvider(AdaptorHostType);
+            _adaptorHost = _adpatorHostProvider.Create(this, _instanceContext, _token);
+            Debug($"{_adpatorHostProvider.Name} Adaptor created.");
+            _adaptorHost.Disconnected += AdaptorHost_Disconnected;
             await _instanceContext.InitializeInstanceAsync();
             foreach (var item in ServiceHosts)
             {
                 await item.OpenAsync(_token);
-                await DebugAsync($"{item.Name} Service opened.");
+                Debug($"{item.Name} Service opened.");
             }
             await _adaptorHost.OpenAsync(Host, Port);
             await DebugAsync($"{_adpatorHostProvider.Name} Adaptor opened.");
-            await Dispatcher.InvokeAsync(() =>
+            await _dispatcher.InvokeAsync(() =>
             {
                 Debug($"Service Context opened.");
                 ServiceState = ServiceState.Open;
@@ -110,16 +108,16 @@ public abstract class ServiceContextBase : IServiceContext
 
     public async Task CloseAsync(Guid token, int closeCode)
     {
-        if (token == Guid.Empty || _token.Guid != token)
-            throw new ArgumentException($"invalid token: {token}", nameof(token));
         if (ServiceState != ServiceState.Open)
             throw new InvalidOperationException();
+        if (token == Guid.Empty || _token!.Guid != token)
+            throw new ArgumentException($"invalid token: {token}", nameof(token));
         if (closeCode == int.MinValue)
             throw new ArgumentException($"invalid close code: '{closeCode}'", nameof(closeCode));
         try
         {
-            await _adaptorHost.CloseAsync(closeCode);
-            await DebugAsync($"{_adpatorHostProvider.Name} Adaptor closed.");
+            await _adaptorHost!.CloseAsync(closeCode);
+            await DebugAsync($"{_adpatorHostProvider!.Name} Adaptor closed.");
             foreach (var item in ServiceHosts.Reverse())
             {
                 await item.CloseAsync(_token);
@@ -135,21 +133,21 @@ public abstract class ServiceContextBase : IServiceContext
                 _adaptorHost = null;
                 _serializer = null;
                 Dispatcher.Dispose();
-                Dispatcher = null;
+                _dispatcher = null;
                 _token = ServiceToken.Empty;
                 ServiceState = ServiceState.None;
                 OnClosed(new CloseEventArgs(closeCode));
                 Debug($"Service Context closed.");
             });
         }
-        catch (Exception e)
+        catch
         {
             await AbortAsync();
-            throw e;
+            throw;
         }
     }
 
-    public object GetService(Type serviceType)
+    public object? GetService(Type serviceType)
     {
         if (serviceType == typeof(ISerializer))
             return _serializer;
@@ -158,9 +156,9 @@ public abstract class ServiceContextBase : IServiceContext
         return null;
     }
 
-    public string AdaptorHostType { get; set; }
+    public string AdaptorHostType { get; set; } = AdaptorHostProvider.DefaultName;
 
-    public string SerializerType { get; set; }
+    public string SerializerType { get; set; } = JsonSerializerProvider.DefaultName;
 
     public ServiceHostCollection ServiceHosts { get; }
 
@@ -188,21 +186,29 @@ public abstract class ServiceContextBase : IServiceContext
         }
     }
 
-    public Dispatcher Dispatcher { get; private set; }
+    public Dispatcher Dispatcher
+    {
+        get
+        {
+            if (_dispatcher == null)
+                throw new InvalidOperationException();
+            return _dispatcher;
+        }
+    }
 
-    public event EventHandler Opened;
+    public event EventHandler? Opened;
 
-    public event EventHandler<CloseEventArgs> Closed;
+    public event EventHandler<CloseEventArgs>? Closed;
 
     protected virtual InstanceBase CreateInstance(Type type)
     {
         if (_instanceBuilder == null)
             throw new InvalidOperationException($"cannot create instance of {type}");
         if (type == typeof(void))
-            return null;
+            return InstanceBase.Empty;
         var typeName = $"{type.Name}Impl";
         var instanceType = _instanceBuilder.CreateType(typeName, typeof(InstanceBase), type);
-        return TypeDescriptor.CreateInstance(null, instanceType, null, null) as InstanceBase;
+        return (InstanceBase)Activator.CreateInstance(instanceType)!;
     }
 
     protected virtual void OnOpened(EventArgs e)
@@ -251,10 +257,10 @@ public abstract class ServiceContextBase : IServiceContext
         var adaptorHost = _adaptorHost;
         var baseType = GetInstanceType(this, serviceHost);
         var instance = CreateInstance(baseType);
-        if (instance != null)
+        // if (instance != null)
         {
             instance.ServiceHost = serviceHost;
-            instance.AdaptorHost = adaptorHost;
+            instance.AdaptorHost = adaptorHost!;
             instance.Peer = peer;
         }
 
@@ -280,7 +286,7 @@ public abstract class ServiceContextBase : IServiceContext
     {
         foreach (var item in ServiceHosts)
         {
-            await item.CloseAsync(_token);
+            await item.CloseAsync(_token!);
         }
         await Task.Run(() =>
         {
@@ -291,7 +297,7 @@ public abstract class ServiceContextBase : IServiceContext
             _adaptorHost = null;
             ServiceState = ServiceState.None;
             Dispatcher?.Dispose();
-            Dispatcher = null;
+            _dispatcher = null;
         });
     }
 
@@ -305,9 +311,9 @@ public abstract class ServiceContextBase : IServiceContext
         return Dispatcher.InvokeAsync(() => Debug(message));
     }
 
-    private void AdaptorHost_Disconnected(object sender, CloseEventArgs e)
+    private void AdaptorHost_Disconnected(object? sender, CloseEventArgs e)
     {
-        Task.Run(() => CloseAsync(_token.Guid, e.CloseCode));
+        Task.Run(() => CloseAsync(_token!.Guid, e.CloseCode));
     }
 
     private void ValidateExceptionDescriptors()

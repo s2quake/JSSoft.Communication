@@ -35,7 +35,7 @@ namespace JSSoft.Communication.Commands;
 class LoginCommand : CommandAsyncBase
 {
     private readonly Application _application;
-    private readonly Lazy<IUserService> _userService = null;
+    private readonly Lazy<IUserService> _userService;
 
     [ImportingConstructor]
     public LoginCommand(Application application, Lazy<IUserService> userService)
@@ -48,13 +48,13 @@ class LoginCommand : CommandAsyncBase
     public string UserID
     {
         get; set;
-    }
+    } = string.Empty;
 
     [CommandPropertyRequired]
     public string Password
     {
         get; set;
-    }
+    } = string.Empty;
 
     public override bool IsEnabled => _application.UserToken == Guid.Empty;
 

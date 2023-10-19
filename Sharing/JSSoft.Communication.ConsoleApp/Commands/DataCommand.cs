@@ -32,8 +32,8 @@ namespace JSSoft.Communication.Commands;
 [Export(typeof(ICommand))]
 class DataCommand : CommandMethodBase
 {
-    private readonly Application _application = null;
-    private readonly Lazy<IDataService> _dataServiceLazy = null;
+    private readonly Application _application;
+    private readonly Lazy<IDataService> _dataServiceLazy;
 
     [ImportingConstructor]
     public DataCommand(Application application, Lazy<IDataService> dataServiceLazy)

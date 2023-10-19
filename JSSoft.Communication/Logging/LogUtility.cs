@@ -20,11 +20,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using Google.Protobuf.WellKnownTypes;
+
 namespace JSSoft.Communication.Logging;
 
 public static class LogUtility
 {
-    private static ILogger logger;
+    private static ILogger logger = EmptyLogger.Default;
     private static LogLevel logLevel = LogLevel.Fatal;
 
     public static ILogger Logger

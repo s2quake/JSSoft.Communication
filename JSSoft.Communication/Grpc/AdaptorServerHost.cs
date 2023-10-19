@@ -27,6 +27,7 @@ using JSSoft.Library.ObjectModel;
 using JSSoft.Library.Threading;
 using System;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -35,18 +36,19 @@ using System.Threading.Tasks;
 
 namespace JSSoft.Communication.Grpc;
 
-class AdaptorServerHost : IAdaptorHost
+sealed class AdaptorServerHost : IAdaptorHost
 {
     private static readonly TimeSpan timeout = new(0, 0, 30);
     private static readonly string localAddress = "127.0.0.1";
     private readonly IServiceContext _serviceContext;
     private readonly IContainer<IServiceHost> _serviceHosts;
     private int _closeCode;
-    private CancellationTokenSource _cancellationTokenSource;
-    private Server _server;
-    private AdaptorServerImpl _adaptor;
-    private ISerializer _serializer;
-    private Timer _timer;
+    private CancellationTokenSource? _cancellationTokenSource;
+    private Server? _server;
+    private AdaptorServerImpl? _adaptor;
+    private ISerializer? _serializer;
+    private Timer? _timer;
+    private EventHandler<CloseEventArgs>? _disconnectedEventHandler;
 
     static AdaptorServerHost()
     {
@@ -64,7 +66,7 @@ class AdaptorServerHost : IAdaptorHost
         Peers.CollectionChanged += PeerCollection_CollectionChanged;
     }
 
-    internal async Task<OpenReply> Open(OpenRequest request, ServerCallContext context)
+    public async Task<OpenReply> Open(OpenRequest request, ServerCallContext context)
     {
         var token = Guid.NewGuid();
         var serviceNames = request.ServiceNames;
@@ -100,6 +102,8 @@ class AdaptorServerHost : IAdaptorHost
 
     public async Task<InvokeReply> Invoke(InvokeRequest request, ServerCallContext context)
     {
+        if (_serializer == null)
+            throw new InvalidOperationException();
         if (_serviceHosts.ContainsKey(request.ServiceName) == false)
             throw new InvalidOperationException();
         var service = _serviceHosts[request.ServiceName];
@@ -123,9 +127,9 @@ class AdaptorServerHost : IAdaptorHost
 
     public async Task Poll(IAsyncStreamReader<PollRequest> requestStream, IServerStreamWriter<PollReply> responseStream, ServerCallContext context)
     {
-        var cancellationToken = _cancellationTokenSource.Token;
+        var cancellationToken = _cancellationTokenSource!.Token;
         var peerID = context.Peer;
-        var peer = null as Peer;
+        Peer? peer = null;
         while (await requestStream.MoveNext())
         {
             if (peer == null)
@@ -155,22 +159,24 @@ class AdaptorServerHost : IAdaptorHost
             });
             await responseStream.WriteAsync(reply);
         }
-        await Peers.RemoveAsync($"{peer.ID}");
+        await Peers.RemoveAsync($"{peer!.ID}");
     }
 
     public PeerCollection Peers { get; }
 
     public Dispatcher Dispatcher => _serviceContext.Dispatcher;
 
-    public event EventHandler<CloseEventArgs> Disconnected;
-
-    protected virtual void OnDisconnected(CloseEventArgs e)
+    event EventHandler<CloseEventArgs>? IAdaptorHost.Disconnected
     {
-        Disconnected?.Invoke(this, e);
+        add => _disconnectedEventHandler += value;
+        remove => _disconnectedEventHandler -= value;
     }
 
-    private Task AddCallback(InstanceBase instance, string name, Type[] types, object[] args)
+    private Task AddCallback(InstanceBase instance, string name, Type[] types, object?[] args)
     {
+        if (_serializer == null)
+            throw new UnreachableException();
+
         var datas = _serializer.SerializeMany(types, args);
         return Dispatcher.InvokeAsync(() =>
         {
@@ -200,7 +206,7 @@ class AdaptorServerHost : IAdaptorHost
         return callbacks.Flush();
     }
 
-    private void PeerCollection_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    private void PeerCollection_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         switch (e.Action)
         {
@@ -217,7 +223,7 @@ class AdaptorServerHost : IAdaptorHost
                 {
                     if (Peers.Any() == false)
                     {
-                        _timer.Dispose();
+                        _timer?.Dispose();
                         _timer = null;
                     }
                 }
@@ -226,7 +232,7 @@ class AdaptorServerHost : IAdaptorHost
                 {
                     if (_timer != null)
                     {
-                        _timer.Dispose();
+                        _timer?.Dispose();
                         _timer = null;
                     }
                 }
@@ -234,7 +240,7 @@ class AdaptorServerHost : IAdaptorHost
         }
     }
 
-    private async void Timer_TimerCallback(object state)
+    private async void Timer_TimerCallback(object? state)
     {
         var items = await Dispatcher.InvokeAsync(() =>
         {
@@ -268,39 +274,39 @@ class AdaptorServerHost : IAdaptorHost
             _serializer = _serviceContext.GetService(typeof(ISerializer)) as ISerializer;
             _closeCode = 0;
         });
-        await Task.Run(_server.Start);
+        await Task.Run(_server!.Start);
     }
 
     async Task IAdaptorHost.CloseAsync(int closeCode)
     {
         _closeCode = closeCode;
-        _cancellationTokenSource.Cancel();
+        _cancellationTokenSource!.Cancel();
         while (await Dispatcher.InvokeAsync(Peers.Any))
         {
             await Task.Delay(1);
         }
-        await _server.ShutdownAsync();
+        await _server!.ShutdownAsync();
         _adaptor = null;
         _serializer = null;
         _server = null;
     }
 
-    void IAdaptorHost.Invoke(InstanceBase instance, string name, Type[] types, object[] args)
+    void IAdaptorHost.Invoke(InstanceBase instance, string name, Type[] types, object?[] args)
     {
         AddCallback(instance, name, types, args);
     }
 
-    T IAdaptorHost.Invoke<T>(InstanceBase instance, string name, Type[] types, object[] args)
+    T IAdaptorHost.Invoke<T>(InstanceBase instance, string name, Type[] types, object?[] args)
     {
         throw new NotImplementedException();
     }
 
-    Task IAdaptorHost.InvokeAsync(InstanceBase instance, string name, Type[] types, object[] args)
+    Task IAdaptorHost.InvokeAsync(InstanceBase instance, string name, Type[] types, object?[] args)
     {
         throw new NotImplementedException();
     }
 
-    Task<T> IAdaptorHost.InvokeAsync<T>(InstanceBase instance, string name, Type[] types, object[] args)
+    Task<T> IAdaptorHost.InvokeAsync<T>(InstanceBase instance, string name, Type[] types, object?[] args)
     {
         throw new NotImplementedException();
     }

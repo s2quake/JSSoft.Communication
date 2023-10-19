@@ -29,14 +29,13 @@ public class OperationContractAttribute : Attribute
 {
     public OperationContractAttribute()
     {
-
     }
 
     public OperationContractAttribute(string name)
     {
-        Name = name ?? throw new ArgumentNullException(nameof(name));
+        Name = name;
         JSSoft.Library.IdentifierValidator.Verify(Name);
     }
 
-    public string Name { get; }
+    public string Name { get; } = string.Empty;
 }

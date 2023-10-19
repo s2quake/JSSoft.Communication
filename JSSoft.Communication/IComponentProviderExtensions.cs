@@ -30,14 +30,12 @@ static class IComponentProviderExtensions
 {
     public static IAdaptorHostProvider GetAdaptorHostProvider(this IComponentProvider componentProvider, string adaptorHostType)
     {
-        var type = adaptorHostType ?? AdaptorHostProvider.DefaultName;
-        return componentProvider.AdaptorHostProviders.First(item => item.Name == type);
+        return componentProvider.AdaptorHostProviders.First(item => item.Name == adaptorHostType);
     }
 
     public static ISerializerProvider GetserializerProvider(this IComponentProvider componentProvider, string serializerType)
     {
-        var type = serializerType ?? JsonSerializerProvider.DefaultName;
-        return componentProvider.SerializerProviders.First(item => item.Name == type);
+        return componentProvider.SerializerProviders.First(item => item.Name == serializerType);
     }
 
     public static IExceptionDescriptor GetExceptionDescriptor(this IComponentProvider componentProvider, Exception e)

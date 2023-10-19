@@ -60,7 +60,7 @@ class ComponentProvider : IComponentProvider
 
     public IAdaptorHostProvider[] AdaptorHostProviders { get; }
 
-    public IServiceHost[] ServiceHosts { get; }
+    public IServiceHost[] ServiceHosts { get; } = [];
 
     public ISerializerProvider[] SerializerProviders { get; }
 

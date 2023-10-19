@@ -33,8 +33,8 @@ namespace JSSoft.Communication.Commands;
 [Export(typeof(ICommand))]
 class LogoutCommand : CommandAsyncBase
 {
-    private readonly Application _application = null;
-    private readonly Lazy<IUserService> _userService = null;
+    private readonly Application _application;
+    private readonly Lazy<IUserService> _userService;
 
     [ImportingConstructor]
     public LogoutCommand(Application application, Lazy<IUserService> userService)

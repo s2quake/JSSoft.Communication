@@ -30,7 +30,8 @@ namespace JSSoft.Communication;
 
 public abstract class ServiceHostBase : IServiceHost
 {
-    private ServiceToken _token;
+    private ServiceToken? _token;
+    private Dispatcher? _dispatcher;
 
     internal ServiceHostBase(Type serviceType, Type callbackType)
     {
@@ -45,14 +46,19 @@ public abstract class ServiceHostBase : IServiceHost
 
     public Type CallbackType { get; }
 
-    public Dispatcher Dispatcher { get; private set; }
+    public Dispatcher Dispatcher => _dispatcher ?? throw new InvalidOperationException();
 
     public MethodDescriptorCollection MethodDescriptors { get; }
 
     public async Task OpenAsync(ServiceToken token)
     {
+        if (_dispatcher != null)
+            throw new InvalidOperationException();
+        if (token == ServiceToken.Empty)
+            throw new ArgumentException("Empty tokens cannot be used.", nameof(token));
+
         _token = token;
-        Dispatcher = new Dispatcher(this);
+        _dispatcher = new Dispatcher(this);
         await Dispatcher.InvokeAsync(() =>
         {
             OnOpened(EventArgs.Empty);
@@ -61,22 +67,23 @@ public abstract class ServiceHostBase : IServiceHost
 
     public async Task CloseAsync(ServiceToken token)
     {
-        if (_token != token)
+        if (_dispatcher == null || _token != token)
             throw new InvalidOperationException();
+
         await Dispatcher.InvokeAsync(() =>
         {
             OnClosed(EventArgs.Empty);
         });
         _token = null;
-        Dispatcher.Dispose();
-        Dispatcher = null;
+        _dispatcher.Dispose();
+        _dispatcher = null;
     }
 
     public string Name { get; }
 
-    public event EventHandler Opened;
+    public event EventHandler? Opened;
 
-    public event EventHandler Closed;
+    public event EventHandler? Closed;
 
     protected virtual void OnOpened(EventArgs e)
     {

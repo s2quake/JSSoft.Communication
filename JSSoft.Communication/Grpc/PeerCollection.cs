@@ -65,5 +65,5 @@ class PeerCollection : ContainerBase<Peer>
         }
     }
 
-    public Dispatcher Dispatcher => _serviceContext?.Dispatcher;
+    public Dispatcher Dispatcher => _serviceContext.Dispatcher;
 }

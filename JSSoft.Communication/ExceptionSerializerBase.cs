@@ -44,7 +44,7 @@ public abstract class ExceptionSerializerBase<T> : IExceptionDescriptor, IDataSe
 
     public Guid ID { get; }
 
-    protected virtual void GetSerializationInfo(IReadOnlyDictionary<string, object> properties, SerializationInfo info)
+    protected virtual void GetSerializationInfo(IReadOnlyDictionary<string, object?> properties, SerializationInfo info)
     {
         info.AddValue("ClassName", properties["ClassName"], typeof(string));
         info.AddValue("Message", properties["Message"], typeof(string));
@@ -55,12 +55,12 @@ public abstract class ExceptionSerializerBase<T> : IExceptionDescriptor, IDataSe
         info.AddValue("RemoteStackTraceString", null, typeof(string));
         info.AddValue("RemoteStackIndex", 0, typeof(int));
         info.AddValue("ExceptionMethod", null, typeof(string));
-        info.AddValue("HResult", (int)(long)properties["HResult"], typeof(int));
+        info.AddValue("HResult", properties.TryGetValue("HResult", out var v) == true ? (int)(long)(v ?? 0) : 0, typeof(int));
         info.AddValue("Source", null, typeof(string));
         info.AddValue("WatsonBuckets", null, typeof(byte[]));
     }
 
-    protected virtual void GetProperties(SerializationInfo info, IDictionary<string, object> properties)
+    protected virtual void GetProperties(SerializationInfo info, IDictionary<string, object?> properties)
     {
         properties.Add("ClassName", info.GetString("ClassName"));
         properties.Add("Message", info.GetString("Message"));
@@ -79,21 +79,23 @@ public abstract class ExceptionSerializerBase<T> : IExceptionDescriptor, IDataSe
 
     #region IDataSerializer
 
-    object IDataSerializer.Deserialize(ISerializer serializer, string text)
+    object? IDataSerializer.Deserialize(ISerializer serializer, string text)
     {
         var converter = new FormatterConverter();
         var info = new SerializationInfo(ExceptionType, converter);
         var context = new StreamingContext(StreamingContextStates.Clone);
-        var propserties = serializer.Deserialize(typeof(Dictionary<string, object>), text) as Dictionary<string, object>;
+        var propserties = (Dictionary<string, object?>)serializer.Deserialize(typeof(Dictionary<string, object?>), text)!;
         GetSerializationInfo(propserties, info);
         return Activator.CreateInstance(ExceptionType, BindingFlags.NonPublic | BindingFlags.Instance, null, new object[] { info, context }, null);
     }
 
-    string IDataSerializer.Serialize(ISerializer serializer, object data)
+    string IDataSerializer.Serialize(ISerializer serializer, object? data)
     {
-        var e = data as T;
+        ArgumentNullException.ThrowIfNull(data, nameof(data));
+
+        var e = (T)data;
         var info = GetSerializationInfo(e);
-        var properties = new Dictionary<string, object>(info.MemberCount);
+        var properties = new Dictionary<string, object?>(info.MemberCount);
         GetProperties(info, properties);
         return serializer.Serialize(properties.GetType(), properties);
     }

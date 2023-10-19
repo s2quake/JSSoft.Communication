@@ -32,8 +32,8 @@ namespace JSSoft.Communication.Commands;
 [Export(typeof(ICommand))]
 class UserCommand : CommandMethodBase
 {
-    private readonly Application _application = null;
-    private readonly Lazy<IUserService> _userService = null;
+    private readonly Application _application;
+    private readonly Lazy<IUserService> _userService;
 
     [ImportingConstructor]
     public UserCommand(Application application, Lazy<IUserService> userService)

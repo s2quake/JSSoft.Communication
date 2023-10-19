@@ -48,7 +48,7 @@ public sealed class MethodDescriptor
         ShortName = methodInfo.Name;
     }
 
-    public async Task<(Guid, Type, object)> InvokeAsync(IServiceProvider serviceProvider, object instance, object[] args)
+    public async Task<(Guid, Type, object?)> InvokeAsync(IServiceProvider serviceProvider, object instance, object?[] args)
     {
         if (serviceProvider.GetService(typeof(IComponentProvider)) is not IComponentProvider componentProvider)
         {
@@ -85,7 +85,7 @@ public sealed class MethodDescriptor
     internal static string GenerateName(MethodInfo methodInfo)
     {
         var parameterTypes = methodInfo.GetParameters().Select(item => item.ParameterType).ToArray();
-        return GenerateName(methodInfo.ReturnType, methodInfo.ReflectedType, methodInfo.Name, parameterTypes);
+        return GenerateName(methodInfo.ReturnType, methodInfo.ReflectedType!, methodInfo.Name, parameterTypes);
     }
 
     internal static string GenerateName(MethodInfo methodInfo, Type serviceType)
@@ -102,7 +102,7 @@ public sealed class MethodDescriptor
 
     internal MethodInfo MethodInfo { get; }
 
-    private async Task<(Type, object)> InvokeAsync(object instance, object[] args)
+    private async Task<(Type, object?)> InvokeAsync(object? instance, object?[] args)
     {
         var value = await Task.Run(() => MethodInfo.Invoke(instance, args));
         var valueType = MethodInfo.ReturnType;
@@ -113,7 +113,7 @@ public sealed class MethodDescriptor
             if (taskType.GetGenericArguments().Any() == true)
             {
                 var propertyInfo = taskType.GetProperty(nameof(Task<object>.Result));
-                value = propertyInfo.GetValue(task);
+                value = propertyInfo!.GetValue(task);
                 valueType = propertyInfo.PropertyType;
             }
             else

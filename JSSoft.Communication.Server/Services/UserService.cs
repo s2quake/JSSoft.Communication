@@ -37,7 +37,8 @@ class UserService : IUserService, INotifyUserService
     private readonly Dictionary<string, UserInfo> _userByID = new();
     private readonly Dictionary<Guid, UserInfo> _userByToken = new();
 
-    private IUserServiceCallback _callback;
+    private IUserServiceCallback? _callback;
+    private Dispatcher? _dispatcher;
 
     public UserService()
     {
@@ -77,7 +78,7 @@ class UserService : IUserService, INotifyUserService
                 Authority = authority
             };
             _userByID.Add(userID, userInfo);
-            _callback.OnCreated(userID);
+            _callback!.OnCreated(userID);
             OnCreated(new UserEventArgs(userID));
         });
     }
@@ -89,7 +90,7 @@ class UserService : IUserService, INotifyUserService
             ValidateDelete(token, userID);
 
             _userByID.Remove(userID);
-            _callback.OnDeleted(userID);
+            _callback!.OnDeleted(userID);
             OnDeleted(new UserEventArgs(userID));
         });
     }
@@ -138,7 +139,7 @@ class UserService : IUserService, INotifyUserService
             var user = _userByID[userID];
             user.Token = token;
             _userByToken.Add(token, user);
-            _callback.OnLoggedIn(userID);
+            _callback!.OnLoggedIn(userID);
             OnLoggedIn(new UserEventArgs(userID));
             return token;
         });
@@ -153,7 +154,7 @@ class UserService : IUserService, INotifyUserService
             var user = _userByToken[token];
             user.Token = Guid.Empty;
             _userByToken.Remove(token);
-            _callback.OnLoggedOut(user.UserID);
+            _callback!.OnLoggedOut(user.UserID);
             OnLoggedOut(new UserEventArgs(user.UserID));
         });
     }
@@ -167,7 +168,7 @@ class UserService : IUserService, INotifyUserService
             ValidateMessage(message);
 
             var user = _userByToken[token];
-            _callback.OnMessageReceived(user.UserID, userID, message);
+            _callback!.OnMessageReceived(user.UserID, userID, message);
             OnMessageReceived(new UserMessageEventArgs(user.UserID, userID, message));
         });
     }
@@ -180,7 +181,7 @@ class UserService : IUserService, INotifyUserService
 
             var user = _userByToken[token];
             user.UserName = userName;
-            _callback.OnRenamed(user.UserID, userName);
+            _callback!.OnRenamed(user.UserID, userName);
             OnRenamed(new UserNameEventArgs(user.UserID, userName));
         });
     }
@@ -193,39 +194,47 @@ class UserService : IUserService, INotifyUserService
 
             var user = _userByID[userID];
             user.Authority = authority;
-            _callback.OnAuthorityChanged(userID, authority);
+            _callback!.OnAuthorityChanged(userID, authority);
             OnAuthorityChanged(new UserAuthorityEventArgs(userID, authority));
         });
     }
 
     public async Task DisposeAsync()
     {
-        if (Dispatcher == null)
+        if (_dispatcher == null)
             throw new ObjectDisposedException(nameof(UserService));
-        await Dispatcher.DisposeAsync();
-        Dispatcher = null;
+        await _dispatcher.DisposeAsync();
+        _dispatcher = null;
     }
 
-    public Dispatcher Dispatcher { get; private set; }
+    public Dispatcher Dispatcher
+    {
+        get
+        {
+            if (_dispatcher == null)
+                throw new InvalidOperationException($"'{nameof(UserService)}' has not been initialized.");
+            return _dispatcher;
+        }
+    }
 
-    public event EventHandler<UserEventArgs> Created;
+    public event EventHandler<UserEventArgs>? Created;
 
-    public event EventHandler<UserEventArgs> Deleted;
+    public event EventHandler<UserEventArgs>? Deleted;
 
-    public event EventHandler<UserEventArgs> LoggedIn;
+    public event EventHandler<UserEventArgs>? LoggedIn;
 
-    public event EventHandler<UserEventArgs> LoggedOut;
+    public event EventHandler<UserEventArgs>? LoggedOut;
 
-    public event EventHandler<UserMessageEventArgs> MessageReceived;
+    public event EventHandler<UserMessageEventArgs>? MessageReceived;
 
-    public event EventHandler<UserNameEventArgs> Renamed;
+    public event EventHandler<UserNameEventArgs>? Renamed;
 
-    public event EventHandler<UserAuthorityEventArgs> AuthorityChanged;
+    public event EventHandler<UserAuthorityEventArgs>? AuthorityChanged;
 
-    internal void SetCallback(IUserServiceCallback callback)
+    internal void SetCallback(IUserServiceCallback? callback)
     {
         _callback = callback;
-        Dispatcher = new Dispatcher(this);
+        _dispatcher = new Dispatcher(this);
     }
 
     protected virtual void OnCreated(UserEventArgs e)

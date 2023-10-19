@@ -33,7 +33,7 @@ namespace JSSoft.Communication.Commands;
 class OpenCommand : CommandAsyncBase
 {
     private readonly IServiceContext _serviceHost;
-    private readonly Application _application = null;
+    private readonly Application _application ;
 
     [ImportingConstructor]
     public OpenCommand(IServiceContext serviceHost, Application application)

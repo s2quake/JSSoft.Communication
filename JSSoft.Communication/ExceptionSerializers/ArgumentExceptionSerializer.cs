@@ -35,13 +35,13 @@ class ArgumentExceptionSerializer : ExceptionSerializerBase<ArgumentException>
 
     public static ArgumentExceptionSerializer Default { get; } = new();
 
-    protected override void GetSerializationInfo(IReadOnlyDictionary<string, object> properties, SerializationInfo info)
+    protected override void GetSerializationInfo(IReadOnlyDictionary<string, object?> properties, SerializationInfo info)
     {
         base.GetSerializationInfo(properties, info);
         info.AddValue("ParamName", properties["ParamName"], typeof(string));
     }
 
-    protected override void GetProperties(SerializationInfo info, IDictionary<string, object> properties)
+    protected override void GetProperties(SerializationInfo info, IDictionary<string, object?> properties)
     {
         base.GetProperties(info, properties);
         properties.Add("ParamName", info.GetString("ParamName"));

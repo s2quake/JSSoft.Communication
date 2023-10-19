@@ -31,13 +31,13 @@ public interface IAdaptorHost
 
     Task CloseAsync(int closeCode);
 
-    void Invoke(InstanceBase instance, string name, Type[] types, object[] args);
+    void Invoke(InstanceBase instance, string name, Type[] types, object?[] args);
 
-    T Invoke<T>(InstanceBase instance, string name, Type[] types, object[] args);
+    T Invoke<T>(InstanceBase instance, string name, Type[] types, object?[] args);
 
-    Task InvokeAsync(InstanceBase instance, string name, Type[] types, object[] args);
+    Task InvokeAsync(InstanceBase instance, string name, Type[] types, object?[] args);
 
-    Task<T> InvokeAsync<T>(InstanceBase instance, string name, Type[] types, object[] args);
+    Task<T> InvokeAsync<T>(InstanceBase instance, string name, Type[] types, object?[] args);
 
-    event EventHandler<CloseEventArgs> Disconnected;
+    event EventHandler<CloseEventArgs>? Disconnected;
 }

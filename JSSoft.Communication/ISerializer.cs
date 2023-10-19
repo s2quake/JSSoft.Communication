@@ -26,7 +26,7 @@ namespace JSSoft.Communication;
 
 public interface ISerializer
 {
-    string Serialize(Type type, object data);
+    string Serialize(Type type, object? data);
 
-    object Deserialize(Type type, string text);
+    object? Deserialize(Type type, string text);
 }

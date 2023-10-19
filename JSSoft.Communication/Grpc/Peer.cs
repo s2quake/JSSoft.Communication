@@ -69,9 +69,9 @@ sealed class Peer : IPeer
 
     public DateTime PingTime { get; set; }
 
-    public PeerDescriptor Descriptor { get; set; }
+    public PeerDescriptor? Descriptor { get; set; }
 
-    public Dictionary<IServiceHost, object> Services => Descriptor.Services;
+    public Dictionary<IServiceHost, object> Services => Descriptor?.Services ?? [];
 
     public Dictionary<IServiceHost, PollReplyItemCollection> PollReplyItems { get; } = new Dictionary<IServiceHost, PollReplyItemCollection>();
 
