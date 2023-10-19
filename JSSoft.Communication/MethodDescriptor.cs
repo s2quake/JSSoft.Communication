@@ -48,7 +48,7 @@ public sealed class MethodDescriptor
         ShortName = methodInfo.Name;
     }
 
-    public async Task<(Guid, Type, object?)> InvokeAsync(IServiceProvider serviceProvider, object instance, object?[] args)
+    public async Task<(string, Type, object?)> InvokeAsync(IServiceProvider serviceProvider, object instance, object?[] args)
     {
         if (serviceProvider.GetService(typeof(IComponentProvider)) is not IComponentProvider componentProvider)
         {
@@ -57,18 +57,16 @@ public sealed class MethodDescriptor
         try
         {
             var (type, value) = await InvokeAsync(instance, args);
-            return (Guid.Empty, type, value);
+            return (string.Empty, type, value);
         }
         catch (TargetInvocationException e)
         {
             var exception = e.InnerException ?? e;
-            var exceptionSerializer = componentProvider.GetExceptionDescriptor(exception);
-            return (exceptionSerializer.ID, exception.GetType(), exception);
+            return (exception.GetType().AssemblyQualifiedName!, exception.GetType(), exception);
         }
         catch (Exception e)
         {
-            var exceptionSerializer = componentProvider.GetExceptionDescriptor(e);
-            return (exceptionSerializer.ID, e.GetType(), e);
+            return (e.GetType().AssemblyQualifiedName!, e.GetType(), e);
         }
     }
 

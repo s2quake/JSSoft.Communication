@@ -44,7 +44,7 @@ public abstract class ServiceContextBase : IServiceContext
     private ISerializerProvider? _serializerProvider;
     private ISerializer? _serializer;
     private IAdaptorHost? _adaptorHost;
-    private string _host = string.Empty;
+    private string _host = DefaultHost;
     private int _port = DefaultPort;
     private ServiceToken? _token;
     private Dispatcher? _dispatcher;
@@ -57,7 +57,7 @@ public abstract class ServiceContextBase : IServiceContext
         _instanceBuilder = ServiceInstanceBuilder.Create();
         _instanceContext = new InstanceContext(this);
 
-        ValidateExceptionDescriptors();
+        // ValidateExceptionDescriptors();
     }
 
     protected ServiceContextBase(IServiceHost[] serviceHost)
@@ -166,7 +166,7 @@ public abstract class ServiceContextBase : IServiceContext
 
     public string Host
     {
-        get => _host ?? DefaultHost;
+        get => _host;
         set
         {
             if (ServiceState != ServiceState.None)
@@ -254,13 +254,13 @@ public abstract class ServiceContextBase : IServiceContext
 
     internal async Task<(object, object)> CreateInstanceAsync(IServiceHost serviceHost, IPeer peer)
     {
-        var adaptorHost = _adaptorHost;
+        var adaptorHost = _adaptorHost!;
         var baseType = GetInstanceType(this, serviceHost);
         var instance = CreateInstance(baseType);
         // if (instance != null)
         {
             instance.ServiceHost = serviceHost;
-            instance.AdaptorHost = adaptorHost!;
+            instance.AdaptorHost = adaptorHost;
             instance.Peer = peer;
         }
 
@@ -316,20 +316,20 @@ public abstract class ServiceContextBase : IServiceContext
         Task.Run(() => CloseAsync(_token!.Guid, e.CloseCode));
     }
 
-    private void ValidateExceptionDescriptors()
-    {
-        var descriptorByID = new Dictionary<Guid, IExceptionDescriptor>(_componentProvider.ExceptionDescriptors.Length);
-        foreach (var item in _componentProvider.ExceptionDescriptors)
-        {
-            if (descriptorByID.ContainsKey(item.ID) == true)
-            {
-                var value = descriptorByID[item.ID];
-                var message = $"'{item.ID}: {item.GetType()}' is already used in '{value.GetType()}'.";
-                throw new InvalidOperationException(message);
-            }
-            descriptorByID.Add(item.ID, item);
-        }
-    }
+    // private void ValidateExceptionDescriptors()
+    // {
+    //     var descriptorByID = new Dictionary<Guid, IExceptionDescriptor>(_componentProvider.ExceptionDescriptors.Length);
+    //     foreach (var item in _componentProvider.ExceptionDescriptors)
+    //     {
+    //         if (descriptorByID.ContainsKey(item.ID) == true)
+    //         {
+    //             var value = descriptorByID[item.ID];
+    //             var message = $"'{item.ID}: {item.GetType()}' is already used in '{value.GetType()}'.";
+    //             throw new InvalidOperationException(message);
+    //         }
+    //         descriptorByID.Add(item.ID, item);
+    //     }
+    // }
 
     #region IServiecHost
 

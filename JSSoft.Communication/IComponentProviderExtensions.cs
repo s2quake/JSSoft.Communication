@@ -20,7 +20,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using JSSoft.Communication.ExceptionSerializers;
 using System;
 using System.Linq;
 
@@ -38,15 +37,15 @@ static class IComponentProviderExtensions
         return componentProvider.SerializerProviders.First(item => item.Name == serializerType);
     }
 
-    public static IExceptionDescriptor GetExceptionDescriptor(this IComponentProvider componentProvider, Exception e)
-    {
-        var exceptionSerializer = componentProvider.ExceptionDescriptors.FirstOrDefault(item => item.ExceptionType == e.GetType());
-        return exceptionSerializer ?? ExceptionSerializer.Default;
-    }
+    // public static IExceptionDescriptor GetExceptionDescriptor(this IComponentProvider componentProvider, Exception e)
+    // {
+    //     var exceptionSerializer = componentProvider.ExceptionDescriptors.FirstOrDefault(item => item.ExceptionType == e.GetType());
+    //     return exceptionSerializer ?? ExceptionSerializer.Default;
+    // }
 
-    public static IExceptionDescriptor GetExceptionDescriptor(this IComponentProvider componentProvider, Guid exceptionID)
-    {
-        var exceptionSerializer = componentProvider.ExceptionDescriptors.FirstOrDefault(item => item.ID == exceptionID);
-        return exceptionSerializer ?? ExceptionSerializer.Default;
-    }
+    // public static IExceptionDescriptor GetExceptionDescriptor(this IComponentProvider componentProvider, Guid exceptionID)
+    // {
+    //     var exceptionSerializer = componentProvider.ExceptionDescriptors.FirstOrDefault(item => item.ID == exceptionID);
+    //     return exceptionSerializer ?? ExceptionSerializer.Default;
+    // }
 }

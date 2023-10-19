@@ -30,5 +30,5 @@ public interface IComponentProvider
 
     IDataSerializer[] DataSerializers { get; }
 
-    IExceptionDescriptor[] ExceptionDescriptors { get; }
+    // IExceptionDescriptor[] ExceptionDescriptors { get; }
 }

@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using JSSoft.Communication.ExceptionSerializers;
+// using JSSoft.Communication.ExceptionSerializers;
 
 namespace JSSoft.Communication;
 
@@ -28,34 +28,34 @@ class ComponentProvider : IComponentProvider
 {
     public ComponentProvider()
     {
-        AdaptorHostProviders = new IAdaptorHostProvider[]
-        {
+        AdaptorHostProviders =
+        [
             AdaptorHostProvider.Default,
-        };
-        SerializerProviders = new ISerializerProvider[]
-        {
+        ];
+        SerializerProviders =
+        [
             JsonSerializerProvider.Default,
-        };
-        DataSerializers = new IDataSerializer[]
-        {
-            ArgumentExceptionSerializer.Default,
-            ArgumentNullExceptionSerializer.Default,
-            ArgumentOutOfRangeExceptionSerializer.Default,
-            ExceptionSerializer.Default,
-            InvalidOperationExceptionSerializer.Default,
-            NotImplementedExceptionSerializer.Default,
-            SystemExceptionSerializer.Default,
-        };
-        ExceptionDescriptors = new IExceptionDescriptor[]
-        {
-            ArgumentExceptionSerializer.Default,
-            ArgumentNullExceptionSerializer.Default,
-            ArgumentOutOfRangeExceptionSerializer.Default,
-            ExceptionSerializer.Default,
-            InvalidOperationExceptionSerializer.Default,
-            NotImplementedExceptionSerializer.Default,
-            SystemExceptionSerializer.Default,
-        };
+        ];
+        DataSerializers =
+        [
+            // ArgumentExceptionSerializer.Default,
+            // ArgumentNullExceptionSerializer.Default,
+            // ArgumentOutOfRangeExceptionSerializer.Default,
+            // ExceptionSerializer.Default,
+            // InvalidOperationExceptionSerializer.Default,
+            // NotImplementedExceptionSerializer.Default,
+            // SystemExceptionSerializer.Default,
+        ];
+        // ExceptionDescriptors =
+        // [
+        //     ArgumentExceptionSerializer.Default,
+        //     ArgumentNullExceptionSerializer.Default,
+        //     ArgumentOutOfRangeExceptionSerializer.Default,
+        //     ExceptionSerializer.Default,
+        //     InvalidOperationExceptionSerializer.Default,
+        //     NotImplementedExceptionSerializer.Default,
+        //     SystemExceptionSerializer.Default,
+        // ];
     }
 
     public IAdaptorHostProvider[] AdaptorHostProviders { get; }
@@ -66,7 +66,7 @@ class ComponentProvider : IComponentProvider
 
     public IDataSerializer[] DataSerializers { get; }
 
-    public IExceptionDescriptor[] ExceptionDescriptors { get; }
+    // public IExceptionDescriptor[] ExceptionDescriptors { get; }
 
     public static readonly ComponentProvider Default = new();
 }

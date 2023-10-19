@@ -20,8 +20,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System.Threading.Tasks;
-
 namespace JSSoft.Communication;
 
 [ServiceContext(IsServer = false)]
@@ -30,12 +28,10 @@ public abstract class ClientContextBase : ServiceContextBase
     protected ClientContextBase(params IServiceHost[] serviceHosts)
         : base(serviceHosts)
     {
-
     }
 
     protected ClientContextBase(IComponentProvider componentProvider, params IServiceHost[] serviceHosts)
         : base(componentProvider, serviceHosts)
     {
-
     }
 }
