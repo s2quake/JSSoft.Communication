@@ -24,8 +24,6 @@ using JSSoft.Communication.Logging;
 using JSSoft.Library.ObjectModel;
 using JSSoft.Library.Threading;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -36,34 +34,24 @@ public abstract class ServiceContextBase : IServiceContext
 {
     public const string DefaultHost = "localhost";
     public const int DefaultPort = 4004;
-    private readonly IComponentProvider _componentProvider;
     private readonly ServiceInstanceBuilder? _instanceBuilder;
     private readonly InstanceContext _instanceContext;
     private readonly bool _isServer;
-    private IAdaptorHostProvider? _adpatorHostProvider;
-    private ISerializerProvider? _serializerProvider;
+    public abstract IAdaptorHostProvider AdpatorHostProvider { get; }
+    public abstract ISerializerProvider SerializerProvider { get; }
     private ISerializer? _serializer;
     private IAdaptorHost? _adaptorHost;
-    private string _host = string.Empty;
+    private string _host = DefaultHost;
     private int _port = DefaultPort;
     private ServiceToken? _token;
     private Dispatcher? _dispatcher;
 
-    protected ServiceContextBase(IComponentProvider? componentProvider, IServiceHost[] serviceHost)
+    protected ServiceContextBase(IServiceHost[] serviceHost)
     {
-        _componentProvider = componentProvider ?? ComponentProvider.Default;
         ServiceHosts = new ServiceHostCollection(serviceHost);
         _isServer = IsServer(this);
         _instanceBuilder = ServiceInstanceBuilder.Create();
         _instanceContext = new InstanceContext(this);
-
-        ValidateExceptionDescriptors();
-    }
-
-    protected ServiceContextBase(IServiceHost[] serviceHost)
-        : this(null, serviceHost)
-    {
-
     }
 
     public async Task<Guid> OpenAsync()
@@ -75,12 +63,10 @@ public abstract class ServiceContextBase : IServiceContext
         try
         {
             _token = ServiceToken.NewToken();
-            _serializerProvider = _componentProvider.GetserializerProvider(SerializerType);
-            _serializer = _serializerProvider.Create(this, _componentProvider.DataSerializers);
-            Debug($"{_serializerProvider.Name} Serializer created.");
-            _adpatorHostProvider = _componentProvider.GetAdaptorHostProvider(AdaptorHostType);
-            _adaptorHost = _adpatorHostProvider.Create(this, _instanceContext, _token);
-            Debug($"{_adpatorHostProvider.Name} Adaptor created.");
+            _serializer = SerializerProvider.Create(this);
+            Debug($"{SerializerProvider.Name} Serializer created.");
+            _adaptorHost = AdpatorHostProvider.Create(this, _instanceContext, _token);
+            Debug($"{AdpatorHostProvider.Name} Adaptor created.");
             _adaptorHost.Disconnected += AdaptorHost_Disconnected;
             await _instanceContext.InitializeInstanceAsync();
             foreach (var item in ServiceHosts)
@@ -89,7 +75,7 @@ public abstract class ServiceContextBase : IServiceContext
                 Debug($"{item.Name} Service opened.");
             }
             await _adaptorHost.OpenAsync(Host, Port);
-            await DebugAsync($"{_adpatorHostProvider.Name} Adaptor opened.");
+            await DebugAsync($"{AdpatorHostProvider.Name} Adaptor opened.");
             await _dispatcher.InvokeAsync(() =>
             {
                 Debug($"Service Context opened.");
@@ -117,7 +103,7 @@ public abstract class ServiceContextBase : IServiceContext
         try
         {
             await _adaptorHost!.CloseAsync(closeCode);
-            await DebugAsync($"{_adpatorHostProvider!.Name} Adaptor closed.");
+            await DebugAsync($"{AdpatorHostProvider!.Name} Adaptor closed.");
             foreach (var item in ServiceHosts.Reverse())
             {
                 await item.CloseAsync(_token);
@@ -151,8 +137,6 @@ public abstract class ServiceContextBase : IServiceContext
     {
         if (serviceType == typeof(ISerializer))
             return _serializer;
-        if (serviceType == typeof(IComponentProvider))
-            return _componentProvider;
         return null;
     }
 
@@ -166,7 +150,7 @@ public abstract class ServiceContextBase : IServiceContext
 
     public string Host
     {
-        get => _host ?? DefaultHost;
+        get => _host;
         set
         {
             if (ServiceState != ServiceState.None)
@@ -254,13 +238,12 @@ public abstract class ServiceContextBase : IServiceContext
 
     internal async Task<(object, object)> CreateInstanceAsync(IServiceHost serviceHost, IPeer peer)
     {
-        var adaptorHost = _adaptorHost;
+        var adaptorHost = _adaptorHost!;
         var baseType = GetInstanceType(this, serviceHost);
         var instance = CreateInstance(baseType);
-        // if (instance != null)
         {
             instance.ServiceHost = serviceHost;
-            instance.AdaptorHost = adaptorHost!;
+            instance.AdaptorHost = adaptorHost;
             instance.Peer = peer;
         }
 
@@ -291,9 +274,7 @@ public abstract class ServiceContextBase : IServiceContext
         await Task.Run(() =>
         {
             _token = null;
-            _serializerProvider = null;
             _serializer = null;
-            _adpatorHostProvider = null;
             _adaptorHost = null;
             ServiceState = ServiceState.None;
             Dispatcher?.Dispose();
@@ -314,21 +295,6 @@ public abstract class ServiceContextBase : IServiceContext
     private void AdaptorHost_Disconnected(object? sender, CloseEventArgs e)
     {
         Task.Run(() => CloseAsync(_token!.Guid, e.CloseCode));
-    }
-
-    private void ValidateExceptionDescriptors()
-    {
-        var descriptorByID = new Dictionary<Guid, IExceptionDescriptor>(_componentProvider.ExceptionDescriptors.Length);
-        foreach (var item in _componentProvider.ExceptionDescriptors)
-        {
-            if (descriptorByID.ContainsKey(item.ID) == true)
-            {
-                var value = descriptorByID[item.ID];
-                var message = $"'{item.ID}: {item.GetType()}' is already used in '{value.GetType()}'.";
-                throw new InvalidOperationException(message);
-            }
-            descriptorByID.Add(item.ID, item);
-        }
     }
 
     #region IServiecHost

@@ -25,7 +25,7 @@ using System;
 namespace JSSoft.Communication;
 
 [AttributeUsage(AttributeTargets.Method)]
-public class InstanceMethodAttribute : Attribute
+public sealed class InstanceMethodAttribute : Attribute
 {
     public InstanceMethodAttribute(string methodName)
     {

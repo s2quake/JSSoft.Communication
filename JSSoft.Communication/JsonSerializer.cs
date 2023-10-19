@@ -22,44 +22,20 @@
 
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace JSSoft.Communication;
 
-class JsonSerializer : ISerializer
+sealed class JsonSerializer : ISerializer
 {
     private static readonly JsonSerializerSettings settings = new();
-    private readonly Dictionary<Type, IDataSerializer> _dataSerializerByType;
-
-    public JsonSerializer(IDataSerializer[] dataSerializers)
-    {
-        _dataSerializerByType = dataSerializers.ToDictionary(item => item.Type);
-    }
 
     public string Serialize(Type type, object? data)
     {
-        var currentType = type;
-        while (currentType != null)
-        {
-            if (_dataSerializerByType.ContainsKey(currentType) == true)
-            {
-                var dataSerializer = _dataSerializerByType[currentType];
-                return dataSerializer.Serialize(this, data);
-            }
-            currentType = currentType.BaseType;
-        }
-
         return JsonConvert.SerializeObject(data, type, settings);
     }
 
     public object? Deserialize(Type type, string text)
     {
-        if (_dataSerializerByType.ContainsKey(type) == true)
-        {
-            var dataSerializer = _dataSerializerByType[type];
-            return dataSerializer.Deserialize(this, text);
-        }
         return JsonConvert.DeserializeObject(text, type, settings);
     }
 }

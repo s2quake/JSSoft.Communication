@@ -167,16 +167,18 @@ class AdaptorClientHost : IAdaptorHost
         }
     }
 
-    private void ThrowException(Guid id, string data)
+    private void ThrowException(Type exceptionType, string data)
     {
         if (_serializer == null)
             throw new InvalidOperationException();
-        if (_serviceContext.GetService(typeof(IComponentProvider)) is not IComponentProvider componentProvider)
-            throw new InvalidOperationException("can not get interface of IComponentProvider at serviceProvider");
+        // if (_serviceContext.GetService(typeof(IComponentProvider)) is not IComponentProvider componentProvider)
+        //     throw new InvalidOperationException("can not get interface of IComponentProvider at serviceProvider");
 
-        var exceptionDescriptor = componentProvider.GetExceptionDescriptor(id);
-        if (_serializer.Deserialize(exceptionDescriptor.ExceptionType, data) is Exception exception)
+        if (Newtonsoft.Json.JsonConvert.DeserializeObject(data, exceptionType) is Exception exception)
             throw exception;
+        // var exceptionDescriptor = componentProvider.GetExceptionDescriptor(id);
+        // if (_serializer.Deserialize(exceptionDescriptor.ExceptionType, data) is Exception exception)
+        //     throw exception;
         throw new UnreachableException();
     }
 
@@ -197,10 +199,9 @@ class AdaptorClientHost : IAdaptorHost
         };
         request.Datas.AddRange(datas);
         var reply = _adaptorImpl.Invoke(request);
-        var id = Guid.Parse(reply.ID);
-        if (id != Guid.Empty)
+        if (reply.ID != string.Empty && Type.GetType(reply.ID) is {} exceptionType)
         {
-            ThrowException(id, reply.Data);
+            ThrowException(exceptionType, reply.Data);
         }
     }
 
@@ -219,10 +220,9 @@ class AdaptorClientHost : IAdaptorHost
         };
         request.Datas.AddRange(datas);
         var reply = _adaptorImpl.Invoke(request);
-        var id = Guid.Parse(reply.ID);
-        if (id != Guid.Empty)
+        if (reply.ID != string.Empty && Type.GetType(reply.ID) is {} exceptionType)
         {
-            ThrowException(id, reply.Data);
+            ThrowException(exceptionType, reply.Data);
         }
         if (_serializer.Deserialize(typeof(T), reply.Data) is T value)
             return value;
@@ -244,10 +244,9 @@ class AdaptorClientHost : IAdaptorHost
         };
         request.Datas.AddRange(datas);
         var reply = await _adaptorImpl.InvokeAsync(request);
-        var id = Guid.Parse(reply.ID);
-        if (id != Guid.Empty)
+        if (reply.ID != string.Empty && Type.GetType(reply.ID) is {} exceptionType)
         {
-            ThrowException(id, reply.Data);
+            ThrowException(exceptionType, reply.Data);
         }
     }
 
@@ -266,10 +265,9 @@ class AdaptorClientHost : IAdaptorHost
         };
         request.Datas.AddRange(datas);
         var reply = await _adaptorImpl.InvokeAsync(request);
-        var id = Guid.Parse(reply.ID);
-        if (id != Guid.Empty)
+        if (reply.ID != string.Empty && Type.GetType(reply.ID) is {} exceptionType)
         {
-            ThrowException(id, reply.Data);
+            ThrowException(exceptionType, reply.Data);
         }
         if (_serializer.Deserialize(typeof(T), reply.Data) is T value)
             return value;

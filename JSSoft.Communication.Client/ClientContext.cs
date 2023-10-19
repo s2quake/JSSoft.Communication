@@ -32,8 +32,8 @@ namespace JSSoft.Communication.ConsoleApp;
 class ClientContext : ClientContextBase
 {
     [ImportingConstructor]
-    public ClientContext(IComponentProvider componentProvider, [ImportMany] IServiceHost[] serviceHosts)
-        : base(componentProvider, serviceHosts)
+    public ClientContext([ImportMany] IServiceHost[] serviceHosts)
+        : base(serviceHosts)
     {
 
     }

@@ -24,7 +24,7 @@ namespace JSSoft.Communication;
 
 public interface ISerializerProvider
 {
-    ISerializer Create(IServiceContext serviceHost, IDataSerializer[] dataSerializers);
+    ISerializer Create(IServiceContext serviceHost);
 
     string Name { get; }
 }

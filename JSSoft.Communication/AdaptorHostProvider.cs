@@ -24,7 +24,7 @@ using System;
 
 namespace JSSoft.Communication;
 
-class AdaptorHostProvider : IAdaptorHostProvider
+sealed class AdaptorHostProvider : IAdaptorHostProvider
 {
     public const string DefaultName = "grpc";
 

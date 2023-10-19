@@ -31,7 +31,6 @@ public abstract class ServerServiceHostBase<T, U> : ServiceHostBase where T : cl
     protected ServerServiceHostBase()
         : base(typeof(T), typeof(U))
     {
-
     }
 
     protected virtual Task<T> CreateServiceAsync(IPeer peer, U callback)
@@ -61,7 +60,6 @@ public abstract class ServerServiceHostBase<T> : ServiceHostBase where T : class
     protected ServerServiceHostBase()
         : base(typeof(T), typeof(void))
     {
-
     }
 
     protected virtual Task<T> CreateServiceAsync(IPeer peer)

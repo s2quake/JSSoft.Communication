@@ -29,7 +29,6 @@ public class ServiceContractAttribute : Attribute
 {
     public ServiceContractAttribute()
     {
-
     }
 
     public bool PerPeer { get; set; }

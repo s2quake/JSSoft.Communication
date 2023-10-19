@@ -29,7 +29,6 @@ sealed class ServiceHostAttribute : Attribute
 {
     public ServiceHostAttribute()
     {
-
     }
 
     public bool IsServer { get; set; }
