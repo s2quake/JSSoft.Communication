@@ -50,10 +50,6 @@ public sealed class MethodDescriptor
 
     public async Task<(string, Type, object?)> InvokeAsync(IServiceProvider serviceProvider, object instance, object?[] args)
     {
-        if (serviceProvider.GetService(typeof(IComponentProvider)) is not IComponentProvider componentProvider)
-        {
-            throw new InvalidOperationException("can not get interface of IComponentProvider at serviceProvider");
-        }
         try
         {
             var (type, value) = await InvokeAsync(instance, args);

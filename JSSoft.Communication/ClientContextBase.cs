@@ -30,8 +30,7 @@ public abstract class ClientContextBase : ServiceContextBase
     {
     }
 
-    protected ClientContextBase(IComponentProvider componentProvider, params IServiceHost[] serviceHosts)
-        : base(componentProvider, serviceHosts)
-    {
-    }
+    public override IAdaptorHostProvider AdpatorHostProvider => AdaptorHostProvider.Default;
+
+    public override ISerializerProvider SerializerProvider => JsonSerializerProvider.Default;
 }

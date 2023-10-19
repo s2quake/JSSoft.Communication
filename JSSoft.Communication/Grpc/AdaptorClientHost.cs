@@ -171,8 +171,8 @@ class AdaptorClientHost : IAdaptorHost
     {
         if (_serializer == null)
             throw new InvalidOperationException();
-        if (_serviceContext.GetService(typeof(IComponentProvider)) is not IComponentProvider componentProvider)
-            throw new InvalidOperationException("can not get interface of IComponentProvider at serviceProvider");
+        // if (_serviceContext.GetService(typeof(IComponentProvider)) is not IComponentProvider componentProvider)
+        //     throw new InvalidOperationException("can not get interface of IComponentProvider at serviceProvider");
 
         if (Newtonsoft.Json.JsonConvert.DeserializeObject(data, exceptionType) is Exception exception)
             throw exception;

@@ -20,7 +20,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System;
 using System.ComponentModel.Composition;
 
 namespace JSSoft.Communication.ConsoleApp;
@@ -29,9 +28,8 @@ namespace JSSoft.Communication.ConsoleApp;
 class ServerContext : ServerContextBase
 {
     [ImportingConstructor]
-    public ServerContext(IComponentProvider componentProvider, [ImportMany] IServiceHost[] serviceHosts)
-        : base(componentProvider, serviceHosts)
+    public ServerContext([ImportMany] IServiceHost[] serviceHosts)
+        : base(serviceHosts)
     {
-
     }
 }

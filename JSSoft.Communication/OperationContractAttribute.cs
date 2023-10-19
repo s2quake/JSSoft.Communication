@@ -25,7 +25,7 @@ using System;
 namespace JSSoft.Communication;
 
 [AttributeUsage(AttributeTargets.Method)]
-public class OperationContractAttribute : Attribute
+public sealed class OperationContractAttribute : Attribute
 {
     public OperationContractAttribute()
     {
