@@ -32,7 +32,7 @@ using System.ComponentModel.Composition;
 namespace JSSoft.Communication.Commands;
 
 [Export(typeof(ICommand))]
-class LoginCommand : CommandAsyncBase
+sealed class LoginCommand : CommandAsyncBase
 {
     private readonly Application _application;
     private readonly Lazy<IUserService> _userService;
@@ -58,7 +58,7 @@ class LoginCommand : CommandAsyncBase
 
     public override bool IsEnabled => _application.UserToken == Guid.Empty;
 
-    protected override async Task OnExecuteAsync(CancellationToken cancellationToken)
+    protected override async Task OnExecuteAsync(CancellationToken cancellationToken, IProgress<ProgressInfo> progress)
     {
         var token = await UserService.LoginAsync(UserID, Password);
         _application.Login(UserID, token);

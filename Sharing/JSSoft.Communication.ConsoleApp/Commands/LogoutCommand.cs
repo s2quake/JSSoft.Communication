@@ -31,7 +31,7 @@ using System.Threading.Tasks;
 namespace JSSoft.Communication.Commands;
 
 [Export(typeof(ICommand))]
-class LogoutCommand : CommandAsyncBase
+sealed class LogoutCommand : CommandAsyncBase
 {
     private readonly Application _application;
     private readonly Lazy<IUserService> _userService;
@@ -45,7 +45,7 @@ class LogoutCommand : CommandAsyncBase
 
     public override bool IsEnabled => _application.UserToken != Guid.Empty;
 
-    protected override async Task OnExecuteAsync(CancellationToken cancellationToken)
+    protected override async Task OnExecuteAsync(CancellationToken cancellationToken, IProgress<ProgressInfo> progress)
     {
         await UserService.LogoutAsync(_application.UserToken);
         _application.Logout();

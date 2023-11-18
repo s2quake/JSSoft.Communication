@@ -32,6 +32,7 @@ using System.ComponentModel.Composition.Hosting;
 using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
+using JSSoft.Library.Terminals;
 
 namespace JSSoft.Communication.ConsoleApp;
 
@@ -133,7 +134,7 @@ sealed class Application : IApplication, IServiceProvider
 
     private TextWriter Out => Console.Out;
 
-    private Terminal Terminal => _container.GetExportedValue<Terminal>();
+    private SystemTerminal Terminal => _container.GetExportedValue<SystemTerminal>();
 
     private void UpdatePrompt()
     {
@@ -203,12 +204,12 @@ sealed class Application : IApplication, IServiceProvider
     {
         if (e.Sender == UserID)
         {
-            var text = TerminalStrings.Foreground($"'{e.Receiver}'에게 귓속말: {e.Message}", TerminalColor.BrightMagenta);
+            var text = TerminalStringBuilder.GetString($"'{e.Receiver}'에게 귓속말: {e.Message}", TerminalColorType.BrightMagenta);
             Out.WriteLine(text);
         }
         else if (e.Receiver == UserID)
         {
-            var text = TerminalStrings.Foreground($"'{e.Receiver}'의 귓속말: {e.Message}", TerminalColor.BrightMagenta);
+            var text = TerminalStringBuilder.GetString($"'{e.Receiver}'의 귓속말: {e.Message}", TerminalColorType.BrightMagenta);
             Out.WriteLine(text);
         }
     }
@@ -261,7 +262,7 @@ sealed class Application : IApplication, IServiceProvider
         }
         catch (Exception e)
         {
-            var text = TerminalStrings.Foreground(e.Message, TerminalColor.BrightRed);
+            var text = TerminalStringBuilder.GetString(e.Message, TerminalColorType.BrightRed);
             Console.Error.WriteLine(text);
         }
         await Terminal.StartAsync(_cancellationTokenSource.Token);

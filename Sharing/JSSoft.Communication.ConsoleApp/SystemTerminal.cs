@@ -22,49 +22,46 @@
 
 using JSSoft.Communication.Services;
 using JSSoft.Library.Commands;
+using JSSoft.Library.Commands.Extensions;
 using System;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.ComponentModel.Composition;
+using JSSoft.Library.Terminals;
 
 namespace JSSoft.Communication.ConsoleApp;
 
 [Export]
-sealed class Terminal : TerminalBase
+sealed class SystemTerminal : SystemTerminalBase
 {
     private static readonly string postfix = CommandSettings.IsWin32NT == true ? ">" : "$ ";
-    // private readonly Settings settings;
-    // private readonly CommandContext commandContext;
-    // private readonly IServiceContext serviceHost;
-    // private readonly INotifyUserService userServiceNotification;
-    // private bool isDisposed;
-    // private CancellationTokenSource cancellation;
     private readonly Application _application;
-
-    // static Shell()
-    // {
-    //     JSSoft.Communication.Logging.LogUtility.Logger = JSSoft.Communication.Logging.ConsoleLogger.Default;
-    // }
-
-// #if SERVER
-//         private readonly bool isServer = true;
-// #else
-//         private readonly bool isServer = false;
-// #endif
+    private readonly CommandContext _commandContext;
 
     [ImportingConstructor]
-    public Terminal(Application application, CommandContext commandContext)
-       : base(commandContext)
+    public SystemTerminal(Application application, CommandContext commandContext)
     {
         _application = application;
+        _commandContext = commandContext;
     }
 
     // public static IShell Create()
     // {
     //     return Container.GetService<IShell>();
     // }
+
+    protected override Task OnExecuteAsync(string command, CancellationToken cancellationToken)
+    {
+        return _commandContext.ExecuteAsync(command, cancellationToken);
+    }
+
+    protected override void OnInitialize(TextWriter @out, TextWriter error)
+    {
+        _commandContext.Out = @out;
+        _commandContext.Error = error;
+    }
 
     protected override string FormatPrompt(string prompt)
     {
@@ -78,7 +75,7 @@ sealed class Terminal : TerminalBase
             var pattern = $"(.+@)(.+).{{{postfix.Length}}}";
             var match = Regex.Match(prompt, pattern);
             tb.Append(match.Groups[1].Value);
-            tb.Foreground = TerminalColor.BrightGreen;
+            tb.Foreground = TerminalColorType.BrightGreen;
             tb.Append(match.Groups[2].Value);
             tb.Foreground = null;
             tb.Append(postfix);

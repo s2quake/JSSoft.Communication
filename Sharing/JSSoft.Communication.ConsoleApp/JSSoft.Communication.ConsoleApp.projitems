@@ -7,7 +7,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)CommandContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IApplication.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Application.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Terminal.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemTerminal.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Settings.cs" />
 
     <Compile Include="$(MSBuildThisFileDirectory)Commands\CloseCommand.cs" />

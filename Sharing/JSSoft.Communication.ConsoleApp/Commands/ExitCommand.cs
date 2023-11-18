@@ -31,7 +31,7 @@ using System.ComponentModel.Composition;
 namespace JSSoft.Communication.Commands;
 
 [Export(typeof(ICommand))]
-class ExitCommand : CommandAsyncBase
+sealed class ExitCommand : CommandAsyncBase
 {
     private readonly IApplication _application;
 
@@ -47,7 +47,7 @@ class ExitCommand : CommandAsyncBase
         get; set;
     }
 
-    protected override Task OnExecuteAsync(CancellationToken cancellationToken)
+    protected override Task OnExecuteAsync(CancellationToken cancellationToken, IProgress<ProgressInfo> progress)
     {
         return _application.StopAsync(ExitCode);
     }

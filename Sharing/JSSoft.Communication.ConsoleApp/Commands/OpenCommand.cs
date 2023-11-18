@@ -30,7 +30,7 @@ using System.Threading.Tasks;
 namespace JSSoft.Communication.Commands;
 
 [Export(typeof(ICommand))]
-class OpenCommand : CommandAsyncBase
+sealed class OpenCommand : CommandAsyncBase
 {
     private readonly IServiceContext _serviceHost;
     private readonly Application _application ;
@@ -44,7 +44,7 @@ class OpenCommand : CommandAsyncBase
 
     public override bool IsEnabled => _serviceHost.ServiceState == ServiceState.None;
 
-    protected override async Task OnExecuteAsync(CancellationToken cancellationToken)
+    protected override async Task OnExecuteAsync(CancellationToken cancellationToken, IProgress<ProgressInfo> progress)
     {
         _application.Token = await _serviceHost.OpenAsync();
     }

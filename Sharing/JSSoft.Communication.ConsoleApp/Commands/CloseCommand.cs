@@ -30,7 +30,7 @@ using System.ComponentModel.Composition;
 namespace JSSoft.Communication.Commands;
 
 [Export(typeof(ICommand))]
-class CloseCommand : CommandAsyncBase
+sealed class CloseCommand : CommandAsyncBase
 {
     private readonly IServiceContext _serviceHost;
     private readonly Application _application;
@@ -44,7 +44,7 @@ class CloseCommand : CommandAsyncBase
 
     public override bool IsEnabled => _serviceHost.ServiceState == ServiceState.Open;
 
-    protected override Task OnExecuteAsync(CancellationToken cancellationToken)
+    protected override Task OnExecuteAsync(CancellationToken cancellationToken, IProgress<ProgressInfo> progress)
     {
         return _serviceHost.CloseAsync(_application.Token, 0);
     }
