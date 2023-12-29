@@ -30,7 +30,7 @@ public abstract class ServerContextBase : ServiceContextBase
     {
     }
 
-    public override IAdaptorHostProvider AdpatorHostProvider => AdaptorHostProvider.Default;
+    public override IAdaptorHostProvider AdaptorHostProvider => Communication.AdaptorHostProvider.Default;
 
     public override ISerializerProvider SerializerProvider => JsonSerializerProvider.Default;
 }

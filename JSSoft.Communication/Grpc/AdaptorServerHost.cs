@@ -104,10 +104,10 @@ sealed class AdaptorServerHost : IAdaptorHost
     {
         if (_serializer == null)
             throw new InvalidOperationException();
-        if (_serviceHosts.ContainsKey(request.ServiceName) == false)
+        if (_serviceHosts.ContainsKey(request.ServiceName) != true)
             throw new InvalidOperationException();
         var service = _serviceHosts[request.ServiceName];
-        if (service.MethodDescriptors.ContainsKey(request.Name) == false)
+        if (service.MethodDescriptors.ContainsKey(request.Name) != true)
             throw new InvalidOperationException($"method '{request.Name}' does not exists.");
 
         var token = request.Token;
@@ -221,7 +221,7 @@ sealed class AdaptorServerHost : IAdaptorHost
                 break;
             case NotifyCollectionChangedAction.Remove:
                 {
-                    if (Peers.Any() == false)
+                    if (Peers.Any() != true)
                     {
                         _timer?.Dispose();
                         _timer = null;

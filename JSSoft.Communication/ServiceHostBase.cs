@@ -35,8 +35,8 @@ public abstract class ServiceHostBase : IServiceHost
 
     internal ServiceHostBase(Type serviceType, Type callbackType)
     {
-        ServiceType = serviceType ?? throw new ArgumentNullException(nameof(serviceType));
-        CallbackType = callbackType ?? throw new ArgumentNullException(nameof(callbackType));
+        ServiceType = serviceType;
+        CallbackType = callbackType;
         Name = serviceType.Name;
         MethodDescriptors = new MethodDescriptorCollection(this);
         OnValidate();
@@ -97,37 +97,39 @@ public abstract class ServiceHostBase : IServiceHost
 
     protected virtual void OnValidate()
     {
-        if (ServiceType.IsInterface == false)
+        if (ServiceType.IsInterface != true)
             throw new InvalidOperationException("service type must be interface.");
-        if (ServiceType.IsNested == true)
-            throw new InvalidOperationException("service type can not be nested type.");
-        if (IsPublicType(ServiceType) == false && IsInternalType(ServiceType) == false)
+
+        if (IsNestedPublicType(ServiceType) != true && IsPublicType(ServiceType) != true && IsInternalType(ServiceType) != true)
             throw new InvalidOperationException($"'{ServiceType.Name}' must be public or internal.");
 
         if (CallbackType != typeof(void))
         {
-            if (CallbackType.IsInterface == false)
+            if (CallbackType.IsInterface != true)
                 throw new InvalidOperationException("callback type must be interface.");
-            if (CallbackType.IsNested == true)
-                throw new InvalidOperationException("callback type can not be nested type.");
-            if (IsPublicType(CallbackType) == false && IsInternalType(CallbackType) == false)
-                throw new InvalidOperationException($"'{ServiceType.Name}' type must be public or internal.");
+            if (IsNestedPublicType(CallbackType) != true && IsPublicType(CallbackType) != true && IsInternalType(CallbackType) != true)
+                throw new InvalidOperationException($"'{CallbackType.Name}' must be public or internal.");
         }
+    }
+
+    private static bool IsNestedPublicType(Type type)
+    {
+        return type.IsNested == true && type.IsNestedPublic == true;
     }
 
     private static bool IsPublicType(Type type)
     {
-        return type.IsVisible == true && type.IsPublic == true && type.IsNotPublic == false;
+        return type.IsVisible == true && type.IsPublic == true && type.IsNotPublic != true;
     }
 
     private static bool IsInternalType(Type t)
     {
-        return t.IsVisible == false && t.IsPublic == false && t.IsNotPublic == true;
+        return t.IsVisible != true && t.IsPublic != true && t.IsNotPublic == true;
     }
 
-    private protected abstract Task<object> CreateInstanceInternalAsync(IPeer peer, object obj);
+    private protected abstract object CreateInstanceInternal(IPeer peer, object obj);
 
-    private protected abstract Task DestroyInstanceInternalAsync(IPeer peer, object obj);
+    private protected abstract void DestroyInstanceInternal(IPeer peer, object obj);
 
     internal static bool IsServer(ServiceHostBase serviceHost)
     {
@@ -140,14 +142,14 @@ public abstract class ServiceHostBase : IServiceHost
 
     #region IServiceHost
 
-    Task<object> IServiceHost.CreateInstanceAsync(IPeer peer, object obj)
+    object IServiceHost.CreateInstance(IPeer peer, object obj)
     {
-        return CreateInstanceInternalAsync(peer, obj);
+        return CreateInstanceInternal(peer, obj);
     }
 
-    Task IServiceHost.DestroyInstanceAsync(IPeer peer, object obj)
+    void IServiceHost.DestroyInstance(IPeer peer, object obj)
     {
-        return DestroyInstanceInternalAsync(peer, obj);
+        DestroyInstanceInternal(peer, obj);
     }
 
     IContainer<MethodDescriptor> IServiceHost.MethodDescriptors => MethodDescriptors;

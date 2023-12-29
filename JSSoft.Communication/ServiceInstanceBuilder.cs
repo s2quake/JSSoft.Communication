@@ -57,13 +57,13 @@ sealed class ServiceInstanceBuilder
 
     public Type CreateType(string name, Type baseType, Type interfaceType)
     {
-        var fullname = $"{AssemblyName}.{name}";
-        if (_typeByName.ContainsKey(fullname) == false)
+        var fullName = $"{AssemblyName}.{name}";
+        if (_typeByName.ContainsKey(fullName) != true)
         {
             var type = CreateType(_moduleBuilder, name, baseType, interfaceType);
-            _typeByName.Add(fullname, type);
+            _typeByName.Add(fullName, type);
         }
-        return _typeByName[fullname];
+        return _typeByName[fullName];
     }
 
     public AssemblyName AssemblyName { get; }
@@ -139,7 +139,7 @@ sealed class ServiceInstanceBuilder
             il.Emit(OpCodes.Dup);
             il.EmitLdc_I4(i);
             il.EmitLdarg(i + 1);
-            if (item.ParameterType.IsClass == false)
+            if (item.ParameterType.IsClass != true)
             {
                 il.Emit(OpCodes.Box, parameterTypes[i]);
             }
@@ -195,7 +195,7 @@ sealed class ServiceInstanceBuilder
             il.Emit(OpCodes.Dup);
             il.EmitLdc_I4(i);
             il.EmitLdarg(i + 1);
-            if (item.ParameterType.IsClass == false)
+            if (item.ParameterType.IsClass != true)
             {
                 il.Emit(OpCodes.Box, parameterTypes[i]);
             }

@@ -21,7 +21,6 @@
 // SOFTWARE.
 
 using System.ComponentModel.Composition;
-using System.Threading.Tasks;
 
 namespace JSSoft.Communication.Services;
 
@@ -36,18 +35,17 @@ class UserServiceHost : ServerServiceHostBase<IUserService, IUserServiceCallback
         _userService = userService;
     }
 
-    protected override async Task<IUserService> CreateServiceAsync(IPeer peer, IUserServiceCallback callback)
+    protected override IUserService CreateService(IPeer peer)
     {
-        await Task.Delay(1);
-        _userService.SetCallback(callback);
+        _userService.SetCallback(Callback);
         return _userService;
     }
 
-    protected override async Task DestroyServiceAsync(IPeer peer, IUserService service)
+    protected override void DestroyService(IPeer peer, IUserService service)
     {
         if (service is UserService userService)
         {
-            await userService.DisposeAsync();
+            userService.DisposeAsync().Wait();
         }
     }
 }

@@ -41,7 +41,7 @@ namespace JSSoft.Communication.ConsoleApp;
 // [Export(typeof(Application))]
 sealed class Application : IApplication, IServiceProvider
 {
-    private static readonly string postfix = CommandSettings.IsWin32NT == true ? ">" : "$ ";
+    private static readonly string postfix = TerminalEnvironment.IsWindows() == true ? ">" : "$ ";
     private readonly Settings _settings;
     // private readonly CommandContext commandContext;
     private readonly IServiceContext _serviceHost;
@@ -92,7 +92,7 @@ sealed class Application : IApplication, IServiceProvider
 
     public void Dispose()
     {
-        if (_isDisposed == false)
+        if (_isDisposed != true)
         {
             _container.Dispose();
             _isDisposed = true;

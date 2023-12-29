@@ -30,13 +30,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.ComponentModel.Composition;
 using JSSoft.Library.Terminals;
+using JSSoft.Library.Terminals.Host;
 
 namespace JSSoft.Communication.ConsoleApp;
 
 [Export]
 sealed class SystemTerminal : SystemTerminalBase
 {
-    private static readonly string postfix = CommandSettings.IsWin32NT == true ? ">" : "$ ";
+    private static readonly string postfix = TerminalEnvironment.IsWindows() == true ? ">" : "$ ";
     private readonly Application _application;
     private readonly CommandContext _commandContext;
 

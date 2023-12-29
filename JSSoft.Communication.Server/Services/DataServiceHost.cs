@@ -42,13 +42,12 @@ class DataServiceHost : ServerServiceHostBase<IDataService>, IDisposable
         _dataService.Dispose();
     }
 
-    protected override Task<IDataService> CreateServiceAsync(IPeer peer)
+    protected override IDataService CreateService(IPeer peer)
     {
-        return Task.Run<IDataService>(() => _dataService);
+        return _dataService;
     }
 
-    protected override async Task DestroyServiceAsync(IPeer peer, IDataService service)
+    protected override void DestroyService(IPeer peer, IDataService service)
     {
-        await Task.Delay(1);
     }
 }

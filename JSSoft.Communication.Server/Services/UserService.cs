@@ -277,7 +277,7 @@ class UserService : IUserService, INotifyUserService
         Dispatcher.VerifyAccess();
         if (userID == null)
             throw new ArgumentNullException(nameof(userID));
-        if (_userByID.ContainsKey(userID) == false)
+        if (_userByID.ContainsKey(userID) != true)
             throw new ArgumentException("invalid userID", nameof(userID));
     }
 
@@ -293,7 +293,7 @@ class UserService : IUserService, INotifyUserService
     private void ValidateUser(Guid token)
     {
         Dispatcher.VerifyAccess();
-        if (_userByToken.ContainsKey(token) == false)
+        if (_userByToken.ContainsKey(token) != true)
             throw new ArgumentException("invalid token.", nameof(token));
     }
 

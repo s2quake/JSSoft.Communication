@@ -37,7 +37,7 @@ public abstract class ServiceContextBase : IServiceContext
     private readonly ServiceInstanceBuilder? _instanceBuilder;
     private readonly InstanceContext _instanceContext;
     private readonly bool _isServer;
-    public abstract IAdaptorHostProvider AdpatorHostProvider { get; }
+    public abstract IAdaptorHostProvider AdaptorHostProvider { get; }
     public abstract ISerializerProvider SerializerProvider { get; }
     private ISerializer? _serializer;
     private IAdaptorHost? _adaptorHost;
@@ -65,8 +65,8 @@ public abstract class ServiceContextBase : IServiceContext
             _token = ServiceToken.NewToken();
             _serializer = SerializerProvider.Create(this);
             Debug($"{SerializerProvider.Name} Serializer created.");
-            _adaptorHost = AdpatorHostProvider.Create(this, _instanceContext, _token);
-            Debug($"{AdpatorHostProvider.Name} Adaptor created.");
+            _adaptorHost = AdaptorHostProvider.Create(this, _instanceContext, _token);
+            Debug($"{AdaptorHostProvider.Name} Adaptor created.");
             _adaptorHost.Disconnected += AdaptorHost_Disconnected;
             await _instanceContext.InitializeInstanceAsync();
             foreach (var item in ServiceHosts)
@@ -75,7 +75,7 @@ public abstract class ServiceContextBase : IServiceContext
                 Debug($"{item.Name} Service opened.");
             }
             await _adaptorHost.OpenAsync(Host, Port);
-            await DebugAsync($"{AdpatorHostProvider.Name} Adaptor opened.");
+            await DebugAsync($"{AdaptorHostProvider.Name} Adaptor opened.");
             await _dispatcher.InvokeAsync(() =>
             {
                 Debug($"Service Context opened.");
@@ -103,7 +103,7 @@ public abstract class ServiceContextBase : IServiceContext
         try
         {
             await _adaptorHost!.CloseAsync(closeCode);
-            await DebugAsync($"{AdpatorHostProvider!.Name} Adaptor closed.");
+            await DebugAsync($"{AdaptorHostProvider!.Name} Adaptor closed.");
             foreach (var item in ServiceHosts.Reverse())
             {
                 await item.CloseAsync(_token);
@@ -133,14 +133,16 @@ public abstract class ServiceContextBase : IServiceContext
         }
     }
 
-    public object? GetService(Type serviceType)
+    public virtual object? GetService(Type serviceType)
     {
         if (serviceType == typeof(ISerializer))
             return _serializer;
+        if (_instanceContext.GetService(serviceType) is { } instanceService)
+            return instanceService;
         return null;
     }
 
-    public string AdaptorHostType { get; set; } = AdaptorHostProvider.DefaultName;
+    public string AdaptorHostType { get; set; } = Communication.AdaptorHostProvider.DefaultName;
 
     public string SerializerType { get; set; } = JsonSerializerProvider.DefaultName;
 
@@ -226,7 +228,7 @@ public abstract class ServiceContextBase : IServiceContext
 
     internal static bool IsPerPeer(ServiceContextBase serviceContext, IServiceHost serviceHost)
     {
-        if (IsServer(serviceContext) == false)
+        if (IsServer(serviceContext) != true)
             return false;
         var serviceType = serviceHost.ServiceType;
         if (serviceType.GetCustomAttribute(typeof(ServiceContractAttribute)) is ServiceContractAttribute attribute)
@@ -236,7 +238,7 @@ public abstract class ServiceContextBase : IServiceContext
         return false;
     }
 
-    internal async Task<(object, object)> CreateInstanceAsync(IServiceHost serviceHost, IPeer peer)
+    internal (object, object) CreateInstance(IServiceHost serviceHost, IPeer peer)
     {
         var adaptorHost = _adaptorHost!;
         var baseType = GetInstanceType(this, serviceHost);
@@ -247,21 +249,21 @@ public abstract class ServiceContextBase : IServiceContext
             instance.Peer = peer;
         }
 
-        var impl = await serviceHost.CreateInstanceAsync(peer, instance);
+        var impl = serviceHost.CreateInstance(peer, instance);
         var service = _isServer ? impl : instance;
         var callback = _isServer ? instance : impl;
         return (service, callback);
     }
 
-    internal Task DestroyInstanceAsync(IServiceHost serviceHost, IPeer peer, object service, object callback)
+    internal void DestroyInstance(IServiceHost serviceHost, IPeer peer, object service, object callback)
     {
         if (_isServer == true)
         {
-            return serviceHost.DestroyInstanceAsync(peer, service);
+            serviceHost.DestroyInstance(peer, service);
         }
         else
         {
-            return serviceHost.DestroyInstanceAsync(peer, callback);
+            serviceHost.DestroyInstance(peer, callback);
         }
     }
 
@@ -297,7 +299,7 @@ public abstract class ServiceContextBase : IServiceContext
         Task.Run(() => CloseAsync(_token!.Guid, e.CloseCode));
     }
 
-    #region IServiecHost
+    #region IServiceHost
 
     IContainer<IServiceHost> IServiceContext.ServiceHosts => ServiceHosts;
 

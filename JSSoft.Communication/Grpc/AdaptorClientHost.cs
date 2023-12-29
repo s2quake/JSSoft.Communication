@@ -126,7 +126,7 @@ class AdaptorClientHost : IAdaptorHost
                 }
                 InvokeCallback(reply.Items);
                 reply.Items.Clear();
-                await Task.Delay(1, cancellationToken);
+                await TaskUtility.TryDelay(1, cancellationToken);
             }
             await call.RequestStream.CompleteAsync();
             await call.ResponseStream.MoveNext();
@@ -150,7 +150,7 @@ class AdaptorClientHost : IAdaptorHost
         if (_adaptorImpl == null)
             throw new InvalidOperationException();
 
-        if (serviceHost.MethodDescriptors.ContainsKey(name) == false)
+        if (serviceHost.MethodDescriptors.ContainsKey(name) != true)
             throw new InvalidOperationException();
         var methodDescriptor = serviceHost.MethodDescriptors[name];
         var args = _serializer!.DeserializeMany(methodDescriptor.ParameterTypes, datas);
@@ -199,7 +199,7 @@ class AdaptorClientHost : IAdaptorHost
         };
         request.Datas.AddRange(datas);
         var reply = _adaptorImpl.Invoke(request);
-        if (reply.ID != string.Empty && Type.GetType(reply.ID) is {} exceptionType)
+        if (reply.ID != string.Empty && Type.GetType(reply.ID) is { } exceptionType)
         {
             ThrowException(exceptionType, reply.Data);
         }
@@ -220,7 +220,7 @@ class AdaptorClientHost : IAdaptorHost
         };
         request.Datas.AddRange(datas);
         var reply = _adaptorImpl.Invoke(request);
-        if (reply.ID != string.Empty && Type.GetType(reply.ID) is {} exceptionType)
+        if (reply.ID != string.Empty && Type.GetType(reply.ID) is { } exceptionType)
         {
             ThrowException(exceptionType, reply.Data);
         }
@@ -244,7 +244,7 @@ class AdaptorClientHost : IAdaptorHost
         };
         request.Datas.AddRange(datas);
         var reply = await _adaptorImpl.InvokeAsync(request);
-        if (reply.ID != string.Empty && Type.GetType(reply.ID) is {} exceptionType)
+        if (reply.ID != string.Empty && Type.GetType(reply.ID) is { } exceptionType)
         {
             ThrowException(exceptionType, reply.Data);
         }
@@ -265,7 +265,7 @@ class AdaptorClientHost : IAdaptorHost
         };
         request.Datas.AddRange(datas);
         var reply = await _adaptorImpl.InvokeAsync(request);
-        if (reply.ID != string.Empty && Type.GetType(reply.ID) is {} exceptionType)
+        if (reply.ID != string.Empty && Type.GetType(reply.ID) is { } exceptionType)
         {
             ThrowException(exceptionType, reply.Data);
         }

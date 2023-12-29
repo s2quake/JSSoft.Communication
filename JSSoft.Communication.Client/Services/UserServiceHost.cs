@@ -37,16 +37,14 @@ class UserServiceHost : ClientServiceHostBase<IUserService, IUserServiceCallback
         _userService = userService;
     }
 
-    protected override async Task<IUserServiceCallback> CreateCallbackAsync(IPeer peer, IUserService service)
+    protected override IUserServiceCallback CreateCallback(IPeer peer, IUserService service)
     {
-        await Task.Delay(1);
         _userService.SetUserService(service);
         return _userService;
     }
 
-    protected override async Task DestroyCallbackAsync(IPeer peer, IUserServiceCallback callback)
+    protected override void DestroyCallback(IPeer peer, IUserServiceCallback callback)
     {
-        await Task.Delay(1);
         _userService.SetUserService(null);
     }
 }

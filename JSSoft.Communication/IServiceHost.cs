@@ -35,9 +35,9 @@ public interface IServiceHost
 
     IContainer<MethodDescriptor> MethodDescriptors { get; }
 
-    Task<object> CreateInstanceAsync(IPeer peer, object obj);
+    object CreateInstance(IPeer peer, object obj);
 
-    Task DestroyInstanceAsync(IPeer peer, object obj);
+    void DestroyInstance(IPeer peer, object obj);
 
     Type ServiceType { get; }
 
