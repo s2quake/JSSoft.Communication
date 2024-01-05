@@ -27,7 +27,6 @@ using JSSoft.Library.ObjectModel;
 using JSSoft.Library.Threading;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
@@ -154,6 +153,10 @@ sealed class AdaptorServerHost : IAdaptorHost
                         reply.Items.AddRange(items);
                     }
                 }
+                else
+                {
+                    reply.Code = 0;
+                }
                 await responseStream.WriteAsync(reply);
             }
         }
@@ -213,22 +216,18 @@ sealed class AdaptorServerHost : IAdaptorHost
         }
     }
 
-    private async void Timer_TimerCallback(object? state)
+    private void Timer_TimerCallback(object? state)
     {
-        // var items = await Dispatcher.InvokeAsync(() =>
-        // {
-        //     var dateTime = DateTime.UtcNow;
-        //     var query = from item in Peers.Values
-        //                 where dateTime - item.PingTime > PingTimeout
-        //                 select item;
-        //     return query.ToArray();
-        // });
-        // if (items.Length > 0)
-        // {
-        //     int wqer = 0;
-        // }
-        // var tasks = items.Select(item => Peers.RemoveAsync(Dispatcher, $"{item.ID}", "timer", CancellationToken.None));
-        // await Task.WhenAll(tasks);
+        var dateTime = DateTime.UtcNow;
+        var peers = Peers.ToArray();
+        var query = from item in peers
+                    let peer = item.Value
+                    where dateTime - peer.PingTime > PingTimeout
+                    select peer;
+        foreach (var item in query)
+        {
+            Peers.Remove($"{item.ID}", "timeout");
+        }
     }
 
     #region IAdaptorHost

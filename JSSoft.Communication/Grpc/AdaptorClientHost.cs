@@ -108,6 +108,7 @@ class AdaptorClientHost : IAdaptorHost
     {
         Disconnected?.Invoke(this, e);
     }
+
     private async Task PollAsync(CancellationToken cancellationToken)
     {
         if (_adaptorImpl == null)

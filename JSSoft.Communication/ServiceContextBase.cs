@@ -62,7 +62,7 @@ public abstract class ServiceContextBase : IServiceContext
         try
         {
             ServiceState = ServiceState.Opening;
-            _dispatcher = await Dispatcher.CreateAsync(this);
+            _dispatcher = new Dispatcher(this);
             _token = ServiceToken.NewToken();
             _serializer = SerializerProvider.Create(this);
             Debug($"{SerializerProvider.Name} Serializer created.");
@@ -74,7 +74,7 @@ public abstract class ServiceContextBase : IServiceContext
                 await item.OpenAsync(_token, cancellationToken);
                 Debug($"{item.Name} Service opened.");
             }
-            await _instanceContext.InitializeInstanceAsync(cancellationToken);
+            _instanceContext.InitializeInstance();
             await _adaptorHost.OpenAsync(Host, Port, cancellationToken);
             Debug($"{AdaptorHostProvider.Name} Adaptor opened.");
             Debug($"Service Context opened.");
@@ -103,7 +103,7 @@ public abstract class ServiceContextBase : IServiceContext
             ServiceState = ServiceState.Closing;
             await _adaptorHost!.CloseAsync(closeCode, cancellationToken);
             Debug($"{AdaptorHostProvider!.Name} Adaptor closed.");
-            await _instanceContext.ReleaseInstanceAsync(cancellationToken);
+            _instanceContext.ReleaseInstance();
             foreach (var item in ServiceHosts.Reverse())
             {
                 await item.CloseAsync(_token, cancellationToken);
@@ -128,10 +128,12 @@ public abstract class ServiceContextBase : IServiceContext
         }
     }
 
-    public async Task AbortAsync()
+    public async Task AbortAsync(Guid token)
     {
         if (ServiceState != ServiceState.Faulted)
             throw new InvalidOperationException();
+        if (token == Guid.Empty || _token!.Guid != token)
+            throw new ArgumentException($"invalid token: {token}", nameof(token));
 
         foreach (var item in ServiceHosts)
         {
@@ -141,6 +143,8 @@ public abstract class ServiceContextBase : IServiceContext
         _token = null;
         _serializer = null;
         _adaptorHost = null;
+        if (_adaptorHost != null)
+            await _adaptorHost.DisposeAsync();
         _dispatcher?.Dispose();
         _dispatcher = null;
         ServiceState = ServiceState.None;
@@ -305,6 +309,7 @@ public abstract class ServiceContextBase : IServiceContext
     private void AdaptorHost_Disconnected(object? sender, CloseEventArgs e)
     {
         ServiceState = ServiceState.Faulted;
+        _adaptorHost = null;
     }
 
     #region IServiceHost

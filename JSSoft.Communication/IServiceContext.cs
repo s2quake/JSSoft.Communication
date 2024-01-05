@@ -34,7 +34,7 @@ public interface IServiceContext : IServiceProvider
 
     Task CloseAsync(Guid token, int closeCode, CancellationToken cancellationToken);
 
-    Task AbortAsync();
+    Task AbortAsync(Guid token);
 
     IContainer<IServiceHost> ServiceHosts { get; }
 

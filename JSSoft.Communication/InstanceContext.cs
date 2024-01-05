@@ -41,19 +41,19 @@ sealed class InstanceContext : IInstanceContext, IPeer
         ID = Guid.NewGuid();
     }
 
-    public async Task InitializeInstanceAsync(CancellationToken cancellationToken)
+    public void InitializeInstance()
     {
         var query = from item in _serviceContext.ServiceHosts
                     where ServiceContextBase.IsPerPeer(_serviceContext, item) != true
                     select item;
         foreach (var item in query)
         {
-            var (service, callback) = await Task.Run(() => _serviceContext.CreateInstance(item, this), cancellationToken);
+            var (service, callback) = _serviceContext.CreateInstance(item, this);
             _descriptor.AddInstance(item, service, callback);
         }
     }
 
-    public async Task ReleaseInstanceAsync(CancellationToken cancellationToken)
+    public void ReleaseInstance()
     {
         var isServer = ServiceContextBase.IsServer(_serviceContext);
         var query = from item in _serviceContext.ServiceHosts.Reverse()
@@ -61,7 +61,7 @@ sealed class InstanceContext : IInstanceContext, IPeer
                     select item;
         foreach (var item in query)
         {
-            var (service, callback) = await Task.Run(() => _descriptor.RemoveInstance(item), cancellationToken);
+            var (service, callback) = _descriptor.RemoveInstance(item);
             _serviceContext.DestroyInstance(item, this, service, callback);
         }
     }

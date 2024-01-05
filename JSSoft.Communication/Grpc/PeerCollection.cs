@@ -20,11 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using JSSoft.Library.Threading;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace JSSoft.Communication.Grpc;
 
@@ -39,25 +35,19 @@ sealed class PeerCollection : ConcurrentDictionary<string, Peer>
 
     public void Add(Peer item)
     {
-        // await dispatcher.InvokeAsync(() =>
-        // {
         var descriptor = _instanceContext.CreateInstance(item);
         item.Descriptor = descriptor;
         TryAdd($"{item.ID}", item);
-        // });
     }
 
     public void Remove(string id, string reason)
     {
         Logging.LogUtility.Debug($"{id} {reason}");
-        // await dispatcher.InvokeAsync(() =>
-        // {
-            if (TryRemove(id, out var peer) == true)
-            {
-                _instanceContext.DestroyInstance(peer);
-                peer.Descriptor = null;
-                peer.Dispose();
-            }
-        // });
+        if (TryRemove(id, out var peer) == true)
+        {
+            _instanceContext.DestroyInstance(peer);
+            peer.Descriptor = null;
+            peer.Dispose();
+        }
     }
 }
