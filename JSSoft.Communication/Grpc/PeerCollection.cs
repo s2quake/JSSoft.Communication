@@ -20,50 +20,44 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using JSSoft.Library.ObjectModel;
 using JSSoft.Library.Threading;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JSSoft.Communication.Grpc;
 
-class PeerCollection : ContainerBase<Peer>
+sealed class PeerCollection : ConcurrentDictionary<string, Peer>
 {
-    private readonly IServiceContext _serviceContext;
     private readonly IInstanceContext _instanceContext;
 
-    public PeerCollection(IServiceContext serviceContext, IInstanceContext instanceContext)
+    public PeerCollection(IInstanceContext instanceContext)
     {
-        _serviceContext = serviceContext;
         _instanceContext = instanceContext;
     }
 
-    public async Task AddAsync(Peer item)
+    public void Add(Peer item)
     {
-        var descrptor = await _instanceContext.CreateInstanceAsync(item);
-        item.Descriptor = descrptor;
-        await Dispatcher.InvokeAsync(() => base.AddBase($"{item.ID}", item));
+        // await dispatcher.InvokeAsync(() =>
+        // {
+        var descriptor = _instanceContext.CreateInstance(item);
+        item.Descriptor = descriptor;
+        TryAdd($"{item.ID}", item);
+        // });
     }
 
-    public async Task RemoveAsync(string id)
+    public void Remove(string id, string reason)
     {
-        var peer = await Dispatcher.InvokeAsync(() =>
-        {
-            if (base.ContainsKey(id) == true)
+        Logging.LogUtility.Debug($"{id} {reason}");
+        // await dispatcher.InvokeAsync(() =>
+        // {
+            if (TryRemove(id, out var peer) == true)
             {
-                var item = base[id];
-                base.RemoveBase(id);
-
-                return item;
+                _instanceContext.DestroyInstance(peer);
+                peer.Descriptor = null;
+                peer.Dispose();
             }
-            return null;
-        });
-        if (peer != null)
-        {
-            await _instanceContext.DestroyInstanceAsync(peer);
-            peer.Descriptor = null;
-            peer.Dispose();
-        }
+        // });
     }
-
-    public Dispatcher Dispatcher => _serviceContext.Dispatcher;
 }

@@ -36,6 +36,7 @@ class AdaptorClientHost : IAdaptorHost
     private readonly IServiceContext _serviceContext;
     private readonly IInstanceContext _instanceContext;
     private readonly IContainer<IServiceHost> _serviceHosts;
+    private readonly Dictionary<IServiceHost, MethodDescriptorCollection> _methodsByServiceHost;
     private CancellationTokenSource? _cancellationTokenSource;
     private Task? _task;
     private Channel? _channel;
@@ -48,9 +49,10 @@ class AdaptorClientHost : IAdaptorHost
         _serviceContext = serviceContext;
         _instanceContext = instanceContext;
         _serviceHosts = serviceContext.ServiceHosts;
+        _methodsByServiceHost = _serviceHosts.ToDictionary(item => item, item => new MethodDescriptorCollection(item));
     }
 
-    public async Task OpenAsync(string host, int port)
+    public async Task OpenAsync(string host, int port, CancellationToken cancellationToken)
     {
         if (_adaptorImpl != null)
             throw new InvalidOperationException();
@@ -58,8 +60,8 @@ class AdaptorClientHost : IAdaptorHost
         {
             _channel = new Channel($"{host}:{port}", ChannelCredentials.Insecure);
             _adaptorImpl = new AdaptorClientImpl(_channel, Guid.NewGuid(), _serviceHosts.ToArray());
-            await _adaptorImpl.OpenAsync();
-            _descriptor = await _instanceContext.CreateInstanceAsync(_adaptorImpl);
+            await _adaptorImpl.OpenAsync(cancellationToken);
+            _descriptor = _instanceContext.CreateInstance(_adaptorImpl);
             _cancellationTokenSource = new CancellationTokenSource();
             _serializer = (ISerializer)_serviceContext.GetService(typeof(ISerializer))!;
             _task = PollAsync(_cancellationTokenSource.Token);
@@ -75,23 +77,29 @@ class AdaptorClientHost : IAdaptorHost
         }
     }
 
-    public async Task CloseAsync(int closeCode)
+    public async Task CloseAsync(int closeCode, CancellationToken cancellationToken)
     {
         if (_adaptorImpl == null)
             throw new InvalidOperationException();
 
         _cancellationTokenSource?.Cancel();
-        _cancellationTokenSource = null;
-        _task?.Wait();
-        _task = null;
+        if (_task != null)
+            await _task;
         if (_adaptorImpl != null)
-            await _instanceContext.DestroyInstanceAsync(_adaptorImpl);
+            _instanceContext.DestroyInstance(_adaptorImpl);
         if (_adaptorImpl != null)
-            await _adaptorImpl.CloseAsync();
+            await _adaptorImpl.CloseAsync(cancellationToken);
         _adaptorImpl = null;
         if (_channel != null)
             await _channel.ShutdownAsync();
+        _cancellationTokenSource?.Dispose();
+        _cancellationTokenSource = null;
         _channel = null;
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        return ValueTask.CompletedTask;
     }
 
     public event EventHandler<CloseEventArgs>? Disconnected;
@@ -100,7 +108,6 @@ class AdaptorClientHost : IAdaptorHost
     {
         Disconnected?.Invoke(this, e);
     }
-
     private async Task PollAsync(CancellationToken cancellationToken)
     {
         if (_adaptorImpl == null)
@@ -117,7 +124,7 @@ class AdaptorClientHost : IAdaptorHost
                     Token = $"{_adaptorImpl.Token}"
                 };
                 await call.RequestStream.WriteAsync(request);
-                await call.ResponseStream.MoveNext();
+                var s = await call.ResponseStream.MoveNext();
                 var reply = call.ResponseStream.Current;
                 if (reply.Code != int.MinValue)
                 {
@@ -126,7 +133,6 @@ class AdaptorClientHost : IAdaptorHost
                 }
                 InvokeCallback(reply.Items);
                 reply.Items.Clear();
-                await TaskUtility.TryDelay(1, cancellationToken);
             }
             await call.RequestStream.CompleteAsync();
             await call.ResponseStream.MoveNext();
@@ -145,15 +151,16 @@ class AdaptorClientHost : IAdaptorHost
         }
     }
 
-    private void InvokeCallback(IServiceHost serviceHost, string name, string[] datas)
+    private void InvokeCallback(IServiceHost serviceHost, string name, string[] data)
     {
         if (_adaptorImpl == null)
             throw new InvalidOperationException();
-
-        if (serviceHost.MethodDescriptors.ContainsKey(name) != true)
+        var methodDescriptors = _methodsByServiceHost[serviceHost];
+        if (methodDescriptors.ContainsKey(name) != true)
             throw new InvalidOperationException();
-        var methodDescriptor = serviceHost.MethodDescriptors[name];
-        var args = _serializer!.DeserializeMany(methodDescriptor.ParameterTypes, datas);
+
+        var methodDescriptor = methodDescriptors[name];
+        var args = _serializer!.DeserializeMany(methodDescriptor.ParameterTypes, data);
         var instance = _descriptor!.Callbacks[serviceHost];
         Task.Run(() => methodDescriptor.InvokeAsync(_serviceContext, instance, args));
     }
@@ -163,7 +170,7 @@ class AdaptorClientHost : IAdaptorHost
         foreach (var item in pollItems)
         {
             var service = _serviceHosts[item.ServiceName];
-            InvokeCallback(service, item.Name, item.Datas.ToArray());
+            InvokeCallback(service, item.Name, item.Data.ToArray());
         }
     }
 
@@ -190,14 +197,14 @@ class AdaptorClientHost : IAdaptorHost
             throw new InvalidOperationException();
 
         var token = $"{_adaptorImpl.Token}";
-        var datas = _serializer!.SerializeMany(types, args);
+        var data = _serializer!.SerializeMany(types, args);
         var request = new InvokeRequest()
         {
             ServiceName = instance.ServiceName,
             Name = name,
             Token = token
         };
-        request.Datas.AddRange(datas);
+        request.Data.AddRange(data);
         var reply = _adaptorImpl.Invoke(request);
         if (reply.ID != string.Empty && Type.GetType(reply.ID) is { } exceptionType)
         {
@@ -211,14 +218,14 @@ class AdaptorClientHost : IAdaptorHost
             throw new InvalidOperationException();
 
         var token = $"{_adaptorImpl.Token}";
-        var datas = _serializer.SerializeMany(types, args);
+        var data = _serializer.SerializeMany(types, args);
         var request = new InvokeRequest()
         {
             ServiceName = instance.ServiceName,
             Name = name,
             Token = token
         };
-        request.Datas.AddRange(datas);
+        request.Data.AddRange(data);
         var reply = _adaptorImpl.Invoke(request);
         if (reply.ID != string.Empty && Type.GetType(reply.ID) is { } exceptionType)
         {
@@ -235,14 +242,14 @@ class AdaptorClientHost : IAdaptorHost
             throw new InvalidOperationException();
 
         var token = $"{_adaptorImpl.Token}";
-        var datas = _serializer.SerializeMany(types, args);
+        var data = _serializer.SerializeMany(types, args);
         var request = new InvokeRequest()
         {
             ServiceName = instance.ServiceName,
             Name = name,
             Token = token
         };
-        request.Datas.AddRange(datas);
+        request.Data.AddRange(data);
         var reply = await _adaptorImpl.InvokeAsync(request);
         if (reply.ID != string.Empty && Type.GetType(reply.ID) is { } exceptionType)
         {
@@ -256,14 +263,14 @@ class AdaptorClientHost : IAdaptorHost
             throw new InvalidOperationException();
 
         var token = $"{_adaptorImpl.Token}";
-        var datas = _serializer.SerializeMany(types, args);
+        var data = _serializer.SerializeMany(types, args);
         var request = new InvokeRequest()
         {
             ServiceName = instance.ServiceName,
             Name = name,
             Token = token
         };
-        request.Datas.AddRange(datas);
+        request.Data.AddRange(data);
         var reply = await _adaptorImpl.InvokeAsync(request);
         if (reply.ID != string.Empty && Type.GetType(reply.ID) is { } exceptionType)
         {
@@ -271,7 +278,7 @@ class AdaptorClientHost : IAdaptorHost
         }
         if (_serializer.Deserialize(typeof(T), reply.Data) is T value)
             return value;
-        throw new UnreachableException();
+        return default!;
     }
 
     #endregion

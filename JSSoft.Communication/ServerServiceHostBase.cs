@@ -25,68 +25,73 @@ using System;
 namespace JSSoft.Communication;
 
 [ServiceHost(IsServer = true)]
-public abstract class ServerServiceHostBase<T, U> : ServiceHostBase where T : class where U : class
+public abstract class ServerServiceHostBase<TService, TCallback>
+    : ServiceHostBase
+    where TService : class
+    where TCallback : class
 {
-    private U? _callback;
+    private TCallback? _callback;
 
     protected ServerServiceHostBase()
-        : base(typeof(T), typeof(U))
+        : base(typeof(TService), typeof(TCallback))
     {
     }
 
-    public U Callback => _callback ?? throw new InvalidOperationException();
+    public TCallback Callback => _callback ?? throw new InvalidOperationException();
 
-    protected virtual T CreateService(IPeer peer)
+    protected virtual TService CreateService(IPeer peer)
     {
-        if (typeof(T).IsAssignableFrom(this.GetType()) == true)
-            return (this as T)!;
-        return Activator.CreateInstance<T>();
+        if (typeof(TService).IsAssignableFrom(this.GetType()) == true)
+            return (this as TService)!;
+        return Activator.CreateInstance<TService>();
     }
 
-    protected virtual void DestroyService(IPeer peer, T service)
+    protected virtual void DestroyService(IPeer peer, TService service)
     {
     }
 
-    private protected override object CreateInstanceInternal(IPeer peer, object obj)
+    private protected override object CreateInstance(IPeer peer, object obj)
     {
-        _callback = (U)obj;
+        _callback = (TCallback)obj;
         return CreateService(peer);
     }
 
-    private protected override void DestroyInstanceInternal(IPeer peer, object obj)
+    private protected override void DestroyInstance(IPeer peer, object obj)
     {
-        DestroyService(peer, (T)obj);
+        DestroyService(peer, (TService)obj);
         _callback = null;
     }
 }
 
 [ServiceHost(IsServer = true)]
-public abstract class ServerServiceHostBase<T> : ServiceHostBase where T : class
+public abstract class ServerServiceHostBase<TService>
+    : ServiceHostBase
+    where TService : class
 {
     protected ServerServiceHostBase()
-        : base(typeof(T), typeof(void))
+        : base(typeof(TService), typeof(void))
     {
     }
 
-    protected virtual T CreateService(IPeer peer)
+    protected virtual TService CreateService(IPeer peer)
     {
-        if (typeof(T).IsAssignableFrom(this.GetType()) == true)
-            return (this as T)!;
+        if (typeof(TService).IsAssignableFrom(this.GetType()) == true)
+            return (this as TService)!;
         throw new NotImplementedException();
     }
 
-    protected virtual void DestroyService(IPeer peer, T service)
+    protected virtual void DestroyService(IPeer peer, TService service)
     {
     }
 
-    private protected override object CreateInstanceInternal(IPeer peer, object obj)
+    private protected override object CreateInstance(IPeer peer, object obj)
     {
         return CreateService(peer);
     }
 
-    private protected override void DestroyInstanceInternal(IPeer peer, object obj)
+    private protected override void DestroyInstance(IPeer peer, object obj)
     {
-        DestroyService(peer, (T)obj);
+        DestroyService(peer, (TService)obj);
     }
 }
 
@@ -106,12 +111,12 @@ public class ServerServiceHost<TService>(TService service)
     {
     }
 
-    private protected override object CreateInstanceInternal(IPeer peer, object obj)
+    private protected override object CreateInstance(IPeer peer, object obj)
     {
         return CreateService(peer);
     }
 
-    private protected override void DestroyInstanceInternal(IPeer peer, object obj)
+    private protected override void DestroyInstance(IPeer peer, object obj)
     {
         DestroyService(peer, (TService)obj);
     }

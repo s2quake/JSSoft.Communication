@@ -27,9 +27,11 @@ using System.Threading;
 
 namespace JSSoft.Communication.Grpc;
 
-sealed class Peer : IPeer
+sealed class Peer : IPeer, IDisposable
 {
     private readonly CancellationTokenSource _cancellationTokenSource = new();
+    private CancellationToken _cancellationToken;
+    private bool _isDisposed;
 
     public Peer(Guid id, IServiceHost[] serviceHosts)
     {
@@ -44,21 +46,34 @@ sealed class Peer : IPeer
 
     public void Dispose()
     {
+        if (_isDisposed == true)
+            throw new ObjectDisposedException($"{this}");
+
         foreach (var item in ServiceHosts)
         {
             PollReplyItems.Remove(item);
         }
+        _cancellationToken = _cancellationTokenSource.Token;
+        _cancellationTokenSource.Cancel();
+        _cancellationTokenSource.Dispose();
+        _isDisposed = true;
+        GC.SuppressFinalize(this);
     }
 
     public void Abort()
     {
         _cancellationTokenSource.Cancel();
-        LogUtility.Debug($"{ID} Aboreted.");
+        LogUtility.Debug($"{ID} Aborted.");
     }
 
     public void Ping()
     {
         PingTime = DateTime.UtcNow;
+    }
+
+    public void Ping(DateTime dateTime)
+    {
+        PingTime = dateTime;
     }
 
     public Guid ID { get; }
@@ -75,5 +90,5 @@ sealed class Peer : IPeer
 
     public Dictionary<IServiceHost, PollReplyItemCollection> PollReplyItems { get; } = new Dictionary<IServiceHost, PollReplyItemCollection>();
 
-    public CancellationToken Cancellation => _cancellationTokenSource.Token;
+    public CancellationToken Cancellation => _cancellationToken;
 }

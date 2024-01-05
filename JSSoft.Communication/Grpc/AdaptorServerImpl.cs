@@ -36,12 +36,12 @@ class AdaptorServerImpl : Adaptor.AdaptorBase
 
     public override Task<OpenReply> Open(OpenRequest request, ServerCallContext context)
     {
-        return _adaptorHost.Open(request, context);
+        return _adaptorHost.Open(request, context, context.CancellationToken);
     }
 
     public override Task<CloseReply> Close(CloseRequest request, ServerCallContext context)
     {
-        return _adaptorHost.Close(request, context);
+        return _adaptorHost.Close(request, context, context.CancellationToken);
     }
 
     public override Task<PingReply> Ping(PingRequest request, ServerCallContext context)

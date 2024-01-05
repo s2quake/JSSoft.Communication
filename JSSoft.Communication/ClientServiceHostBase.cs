@@ -21,59 +21,62 @@
 // SOFTWARE.
 
 using System;
-using System.Threading.Tasks;
 
 namespace JSSoft.Communication;
 
 [ServiceHost(IsServer = false)]
-public abstract class ClientServiceHostBase<T, U> : ServiceHostBase where T : class where U : class
+public abstract class ClientServiceHostBase<TService, TCallback>
+    : ServiceHostBase
+    where TService : class
+    where TCallback : class
 {
-    private T? _service;
+    private TService? _service;
 
     protected ClientServiceHostBase()
-        : base(typeof(T), typeof(U))
+        : base(typeof(TService), typeof(TCallback))
     {
     }
 
-    protected T Service => _service ?? throw new InvalidOperationException();
+    protected TService Service => _service ?? throw new InvalidOperationException();
 
-    protected virtual U CreateCallback(IPeer peer, T service)
+    protected virtual TCallback CreateCallback(IPeer peer, TService service)
     {
-        if (typeof(U).IsAssignableFrom(this.GetType()) == true)
-            return (this as U)!;
+        if (typeof(TCallback).IsAssignableFrom(this.GetType()) == true)
+            return (this as TCallback)!;
         throw new NotImplementedException();
     }
 
-    protected virtual void DestroyCallback(IPeer peer, U callback)
+    protected virtual void DestroyCallback(IPeer peer, TCallback callback)
     {
     }
 
-    private protected override object CreateInstanceInternal(IPeer peer, object obj)
+    private protected override object CreateInstance(IPeer peer, object obj)
     {
-        _service = (T?)obj;
-        return CreateCallback(peer, (T)obj);
+        _service = (TService?)obj;
+        return CreateCallback(peer, (TService)obj);
     }
 
-    private protected override void DestroyInstanceInternal(IPeer peer, object obj)
+    private protected override void DestroyInstance(IPeer peer, object obj)
     {
-        DestroyCallback(peer, (U)obj);
+        DestroyCallback(peer, (TCallback)obj);
         _service = null;
     }
 }
 
 [ServiceHost(IsServer = false)]
-public abstract class ClientServiceHostBase<T> : ServiceHostBase where T : class
+public abstract class ClientServiceHostBase<TService>
+    : ServiceHostBase where TService : class
 {
-    private T? _service;
+    private TService? _service;
 
     protected ClientServiceHostBase()
-        : base(typeof(T), typeof(void))
+        : base(typeof(TService), typeof(void))
     {
     }
 
-    protected T Service => _service ?? throw new InvalidOperationException();
+    protected TService Service => _service ?? throw new InvalidOperationException();
 
-    protected virtual void OnServiceCreated(IPeer peer, T service)
+    protected virtual void OnServiceCreated(IPeer peer, TService service)
     {
     }
 
@@ -81,14 +84,14 @@ public abstract class ClientServiceHostBase<T> : ServiceHostBase where T : class
     {
     }
 
-    private protected override object CreateInstanceInternal(IPeer peer, object obj)
+    private protected override object CreateInstance(IPeer peer, object obj)
     {
-        _service = (T?)obj;
-        OnServiceCreated(peer, (T)obj);
+        _service = (TService)obj;
+        OnServiceCreated(peer, (TService)obj);
         return new object();
     }
 
-    private protected override void DestroyInstanceInternal(IPeer peer, object obj)
+    private protected override void DestroyInstance(IPeer peer, object obj)
     {
         OnServiceDestroyed(peer);
         _service = null;
@@ -96,19 +99,21 @@ public abstract class ClientServiceHostBase<T> : ServiceHostBase where T : class
 }
 
 [ServiceHost(IsServer = false)]
-public class ClientServiceHost<TService> : ServiceHostBase where TService : class
+public class ClientServiceHost<TService>
+    : ServiceHostBase
+    where TService : class
 {
     public ClientServiceHost()
         : base(serviceType: typeof(TService), callbackType: typeof(void))
     {
     }
 
-    private protected override object CreateInstanceInternal(IPeer peer, object obj)
+    private protected override object CreateInstance(IPeer peer, object obj)
     {
         return new object();
     }
 
-    private protected override void DestroyInstanceInternal(IPeer peer, object obj)
+    private protected override void DestroyInstance(IPeer peer, object obj)
     {
     }
 }

@@ -20,13 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System.Threading.Tasks;
-
 namespace JSSoft.Communication;
 
 public interface IInstanceContext
 {
-    Task<PeerDescriptor> CreateInstanceAsync(IPeer peer);
+    PeerDescriptor CreateInstance(IPeer peer);
 
-    Task DestroyInstanceAsync(IPeer peer);
+    void DestroyInstance(IPeer peer);
 }

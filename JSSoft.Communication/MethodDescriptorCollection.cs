@@ -27,7 +27,7 @@ namespace JSSoft.Communication;
 
 public sealed class MethodDescriptorCollection : ContainerBase<MethodDescriptor>
 {
-    public MethodDescriptorCollection(ServiceHostBase serviceHost)
+    public MethodDescriptorCollection(IServiceHost serviceHost)
     {
         var isServer = ServiceHostBase.IsServer(serviceHost);
         var instanceType = isServer ? serviceHost.ServiceType : serviceHost.CallbackType;

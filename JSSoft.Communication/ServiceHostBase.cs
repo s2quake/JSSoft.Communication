@@ -20,89 +20,43 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using JSSoft.Library.ObjectModel;
-using JSSoft.Library.Threading;
 using System;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JSSoft.Communication;
 
-public abstract class ServiceHostBase : IServiceHost
+public abstract class ServiceHostBase(Type serviceType, Type callbackType) : IServiceHost
 {
-    private ServiceToken? _token;
-    private Dispatcher? _dispatcher;
+    private ServiceToken? _serviceToken;
 
-    internal ServiceHostBase(Type serviceType, Type callbackType)
-    {
-        ServiceType = serviceType;
-        CallbackType = callbackType;
-        Name = serviceType.Name;
-        MethodDescriptors = new MethodDescriptorCollection(this);
-        OnValidate();
-    }
+    public Type ServiceType { get; } = ValidateServiceType(serviceType);
 
-    public Type ServiceType { get; }
+    public Type CallbackType { get; } = ValidateCallbackType(callbackType);
 
-    public Type CallbackType { get; }
+    public string Name { get; } = serviceType.Name;
 
-    public Dispatcher Dispatcher => _dispatcher ?? throw new InvalidOperationException();
+    public ServiceState ServiceState { get; private set; }
 
-    public MethodDescriptorCollection MethodDescriptors { get; }
+    protected virtual Task OnOpenAsync() => Task.CompletedTask;
 
-    public async Task OpenAsync(ServiceToken token)
-    {
-        if (_dispatcher != null)
-            throw new InvalidOperationException();
-        if (token == ServiceToken.Empty)
-            throw new ArgumentException("Empty tokens cannot be used.", nameof(token));
+    protected virtual Task OnCloseAsync() => Task.CompletedTask;
 
-        _token = token;
-        _dispatcher = new Dispatcher(this);
-        await Dispatcher.InvokeAsync(() =>
-        {
-            OnOpened(EventArgs.Empty);
-        });
-    }
+    protected virtual Task OnAbortAsync() => Task.CompletedTask;
 
-    public async Task CloseAsync(ServiceToken token)
-    {
-        if (_dispatcher == null || _token != token)
-            throw new InvalidOperationException();
-
-        await Dispatcher.InvokeAsync(() =>
-        {
-            OnClosed(EventArgs.Empty);
-        });
-        _token = null;
-        _dispatcher.Dispose();
-        _dispatcher = null;
-    }
-
-    public string Name { get; }
-
-    public event EventHandler? Opened;
-
-    public event EventHandler? Closed;
-
-    protected virtual void OnOpened(EventArgs e)
-    {
-        Opened?.Invoke(this, e);
-    }
-
-    protected virtual void OnClosed(EventArgs e)
-    {
-        Closed?.Invoke(this, e);
-    }
-
-    protected virtual void OnValidate()
+    private static Type ValidateServiceType(Type ServiceType)
     {
         if (ServiceType.IsInterface != true)
             throw new InvalidOperationException("service type must be interface.");
 
         if (IsNestedPublicType(ServiceType) != true && IsPublicType(ServiceType) != true && IsInternalType(ServiceType) != true)
             throw new InvalidOperationException($"'{ServiceType.Name}' must be public or internal.");
+        return ServiceType;
+    }
 
+    private static Type ValidateCallbackType(Type CallbackType)
+    {
         if (CallbackType != typeof(void))
         {
             if (CallbackType.IsInterface != true)
@@ -110,6 +64,7 @@ public abstract class ServiceHostBase : IServiceHost
             if (IsNestedPublicType(CallbackType) != true && IsPublicType(CallbackType) != true && IsInternalType(CallbackType) != true)
                 throw new InvalidOperationException($"'{CallbackType.Name}' must be public or internal.");
         }
+        return CallbackType;
     }
 
     private static bool IsNestedPublicType(Type type)
@@ -127,11 +82,11 @@ public abstract class ServiceHostBase : IServiceHost
         return t.IsVisible != true && t.IsPublic != true && t.IsNotPublic == true;
     }
 
-    private protected abstract object CreateInstanceInternal(IPeer peer, object obj);
+    private protected abstract object CreateInstance(IPeer peer, object obj);
 
-    private protected abstract void DestroyInstanceInternal(IPeer peer, object obj);
+    private protected abstract void DestroyInstance(IPeer peer, object obj);
 
-    internal static bool IsServer(ServiceHostBase serviceHost)
+    internal static bool IsServer(IServiceHost serviceHost)
     {
         if (serviceHost.GetType().GetCustomAttribute(typeof(ServiceHostAttribute)) is ServiceHostAttribute attribute)
         {
@@ -142,17 +97,77 @@ public abstract class ServiceHostBase : IServiceHost
 
     #region IServiceHost
 
-    object IServiceHost.CreateInstance(IPeer peer, object obj)
+
+    async Task IServiceHost.OpenAsync(ServiceToken serviceToken, CancellationToken cancellationToken)
     {
-        return CreateInstanceInternal(peer, obj);
+        if (ServiceState != ServiceState.None)
+            throw new InvalidOperationException();
+
+        try
+        {
+            ServiceState = ServiceState.Opening;
+            await OnOpenAsync();
+            _serviceToken = serviceToken;
+            ServiceState = ServiceState.Open;
+        }
+        catch
+        {
+            ServiceState = ServiceState.Faulted;
+        }
     }
 
-    void IServiceHost.DestroyInstance(IPeer peer, object obj)
+    async Task IServiceHost.CloseAsync(ServiceToken serviceToken, CancellationToken cancellationToken)
     {
-        DestroyInstanceInternal(peer, obj);
+        if (ServiceState != ServiceState.Open)
+            throw new InvalidOperationException();
+        if (serviceToken != _serviceToken)
+            throw new ArgumentException("Invalid Token", nameof(serviceToken));
+
+        try
+        {
+            ServiceState = ServiceState.Closing;
+            await OnCloseAsync();
+            _serviceToken = null;
+            ServiceState = ServiceState.Closed;
+        }
+        catch
+        {
+            ServiceState = ServiceState.Faulted;
+        }
     }
 
-    IContainer<MethodDescriptor> IServiceHost.MethodDescriptors => MethodDescriptors;
+    async Task IServiceHost.AbortAsync(ServiceToken serviceToken)
+    {
+        if (ServiceState != ServiceState.Faulted)
+            throw new InvalidOperationException();
+        if (serviceToken != _serviceToken)
+            throw new ArgumentException("Invalid Token", nameof(serviceToken));
+
+        ServiceState = ServiceState.Closing;
+        await OnAbortAsync();
+        _serviceToken = null;
+        ServiceState = ServiceState.None;
+    }
+
+    object IServiceHost.CreateInstance(ServiceToken serviceToken, IPeer peer, object obj)
+    {
+        if (ServiceState != ServiceState.Open)
+            throw new InvalidOperationException();
+        if (serviceToken != _serviceToken)
+            throw new ArgumentException("Invalid Token", nameof(serviceToken));
+
+        return CreateInstance(peer, obj);
+    }
+
+    void IServiceHost.DestroyInstance(ServiceToken serviceToken, IPeer peer, object obj)
+    {
+        if (ServiceState != ServiceState.Open)
+            throw new InvalidOperationException();
+        if (serviceToken != _serviceToken)
+            throw new ArgumentException("Invalid Token", nameof(serviceToken));
+
+        DestroyInstance(peer, obj);
+    }
 
     #endregion
 }

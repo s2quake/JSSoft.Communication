@@ -26,5 +26,4 @@ namespace JSSoft.Communication;
 
 sealed class InstanceCollection : Dictionary<IServiceHost, object>
 {
-
 }

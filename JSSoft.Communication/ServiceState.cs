@@ -32,5 +32,7 @@ public enum ServiceState
 
     Closing,
 
+    Faulted,
+
     Closed = None,
 }

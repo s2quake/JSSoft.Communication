@@ -26,6 +26,7 @@ using JSSoft.Library.Threading;
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JSSoft.Communication;
@@ -54,45 +55,42 @@ public abstract class ServiceContextBase : IServiceContext
         _instanceContext = new InstanceContext(this);
     }
 
-    public async Task<Guid> OpenAsync()
+    public async Task<Guid> OpenAsync(CancellationToken cancellationToken)
     {
         if (ServiceState != ServiceState.None)
             throw new InvalidOperationException();
-        ServiceState = ServiceState.Opening;
-        _dispatcher = await Dispatcher.CreateAsync(this);
         try
         {
+            ServiceState = ServiceState.Opening;
+            _dispatcher = await Dispatcher.CreateAsync(this);
             _token = ServiceToken.NewToken();
             _serializer = SerializerProvider.Create(this);
             Debug($"{SerializerProvider.Name} Serializer created.");
             _adaptorHost = AdaptorHostProvider.Create(this, _instanceContext, _token);
             Debug($"{AdaptorHostProvider.Name} Adaptor created.");
             _adaptorHost.Disconnected += AdaptorHost_Disconnected;
-            await _instanceContext.InitializeInstanceAsync();
             foreach (var item in ServiceHosts)
             {
-                await item.OpenAsync(_token);
+                await item.OpenAsync(_token, cancellationToken);
                 Debug($"{item.Name} Service opened.");
             }
-            await _adaptorHost.OpenAsync(Host, Port);
-            await DebugAsync($"{AdaptorHostProvider.Name} Adaptor opened.");
-            await _dispatcher.InvokeAsync(() =>
-            {
-                Debug($"Service Context opened.");
-                ServiceState = ServiceState.Open;
-                OnOpened(EventArgs.Empty);
-            });
+            await _instanceContext.InitializeInstanceAsync(cancellationToken);
+            await _adaptorHost.OpenAsync(Host, Port, cancellationToken);
+            Debug($"{AdaptorHostProvider.Name} Adaptor opened.");
+            Debug($"Service Context opened.");
+            ServiceState = ServiceState.Open;
+            OnOpened(EventArgs.Empty);
             return _token.Guid;
         }
         catch
         {
-            ServiceState = ServiceState.None;
-            await AbortAsync();
+            ServiceState = ServiceState.Faulted;
+            OnFaulted(EventArgs.Empty);
             throw;
         }
     }
 
-    public async Task CloseAsync(Guid token, int closeCode)
+    public async Task CloseAsync(Guid token, int closeCode, CancellationToken cancellationToken)
     {
         if (ServiceState != ServiceState.Open)
             throw new InvalidOperationException();
@@ -102,35 +100,51 @@ public abstract class ServiceContextBase : IServiceContext
             throw new ArgumentException($"invalid close code: '{closeCode}'", nameof(closeCode));
         try
         {
-            await _adaptorHost!.CloseAsync(closeCode);
-            await DebugAsync($"{AdaptorHostProvider!.Name} Adaptor closed.");
+            ServiceState = ServiceState.Closing;
+            await _adaptorHost!.CloseAsync(closeCode, cancellationToken);
+            Debug($"{AdaptorHostProvider!.Name} Adaptor closed.");
+            await _instanceContext.ReleaseInstanceAsync(cancellationToken);
             foreach (var item in ServiceHosts.Reverse())
             {
-                await item.CloseAsync(_token);
-                await Dispatcher.InvokeAsync(() =>
-                {
-                    Debug($"{item.Name} Service closed.");
-                });
+                await item.CloseAsync(_token, cancellationToken);
+                Debug($"{item.Name} Service closed.");
             }
-            await _instanceContext.ReleaseInstanceAsync();
-            await Dispatcher.InvokeAsync(() =>
-            {
-                _adaptorHost.Disconnected -= AdaptorHost_Disconnected;
-                _adaptorHost = null;
-                _serializer = null;
-                Dispatcher.Dispose();
-                _dispatcher = null;
-                _token = ServiceToken.Empty;
-                ServiceState = ServiceState.None;
-                OnClosed(new CloseEventArgs(closeCode));
-                Debug($"Service Context closed.");
-            });
+            _adaptorHost.Disconnected -= AdaptorHost_Disconnected;
+            await _adaptorHost.DisposeAsync();
+            _adaptorHost = null;
+            _serializer = null;
+            _dispatcher?.Dispose();
+            _dispatcher = null;
+            _token = ServiceToken.Empty;
+            ServiceState = ServiceState.None;
+            OnClosed(new CloseEventArgs(closeCode));
+            Debug($"Service Context closed.");
         }
         catch
         {
-            await AbortAsync();
+            ServiceState = ServiceState.Faulted;
+            OnFaulted(EventArgs.Empty);
             throw;
         }
+    }
+
+    public async Task AbortAsync()
+    {
+        if (ServiceState != ServiceState.Faulted)
+            throw new InvalidOperationException();
+
+        foreach (var item in ServiceHosts)
+        {
+            if (item.ServiceState == ServiceState.Faulted)
+                await item.AbortAsync(_token!);
+        }
+        _token = null;
+        _serializer = null;
+        _adaptorHost = null;
+        _dispatcher?.Dispose();
+        _dispatcher = null;
+        ServiceState = ServiceState.None;
+        OnAborted(EventArgs.Empty);
     }
 
     public virtual object? GetService(Type serviceType)
@@ -186,6 +200,10 @@ public abstract class ServiceContextBase : IServiceContext
 
     public event EventHandler<CloseEventArgs>? Closed;
 
+    public event EventHandler? Faulted;
+
+    public event EventHandler? Aborted;
+
     protected virtual InstanceBase CreateInstance(Type type)
     {
         if (_instanceBuilder == null)
@@ -205,6 +223,16 @@ public abstract class ServiceContextBase : IServiceContext
     protected virtual void OnClosed(CloseEventArgs e)
     {
         Closed?.Invoke(this, e);
+    }
+
+    protected virtual void OnFaulted(EventArgs e)
+    {
+        Faulted?.Invoke(this, e);
+    }
+
+    protected virtual void OnAborted(EventArgs e)
+    {
+        Aborted?.Invoke(this, e);
     }
 
     internal static bool IsServer(ServiceContextBase serviceContext)
@@ -248,8 +276,9 @@ public abstract class ServiceContextBase : IServiceContext
             instance.AdaptorHost = adaptorHost;
             instance.Peer = peer;
         }
+        var token = _token!;
 
-        var impl = serviceHost.CreateInstance(peer, instance);
+        var impl = serviceHost.CreateInstance(token, peer, instance);
         var service = _isServer ? impl : instance;
         var callback = _isServer ? instance : impl;
         return (service, callback);
@@ -257,46 +286,25 @@ public abstract class ServiceContextBase : IServiceContext
 
     internal void DestroyInstance(IServiceHost serviceHost, IPeer peer, object service, object callback)
     {
+        var token = _token!;
         if (_isServer == true)
         {
-            serviceHost.DestroyInstance(peer, service);
+            serviceHost.DestroyInstance(token, peer, service);
         }
         else
         {
-            serviceHost.DestroyInstance(peer, callback);
+            serviceHost.DestroyInstance(token, peer, callback);
         }
     }
 
-    private async Task AbortAsync()
-    {
-        foreach (var item in ServiceHosts)
-        {
-            await item.CloseAsync(_token!);
-        }
-        await Task.Run(() =>
-        {
-            _token = null;
-            _serializer = null;
-            _adaptorHost = null;
-            ServiceState = ServiceState.None;
-            Dispatcher?.Dispose();
-            _dispatcher = null;
-        });
-    }
-
-    private void Debug(string message)
+    private static void Debug(string message)
     {
         LogUtility.Debug(message);
     }
 
-    private Task DebugAsync(string message)
-    {
-        return Dispatcher.InvokeAsync(() => Debug(message));
-    }
-
     private void AdaptorHost_Disconnected(object? sender, CloseEventArgs e)
     {
-        Task.Run(() => CloseAsync(_token!.Guid, e.CloseCode));
+        ServiceState = ServiceState.Faulted;
     }
 
     #region IServiceHost

@@ -66,21 +66,9 @@ class PollReplyItemCollection : IEnumerable<PollReplyItem>, IReadOnlyList<PollRe
 
     #region IEnumerable
 
-    IEnumerator<PollReplyItem> IEnumerable<PollReplyItem>.GetEnumerator()
-    {
-        foreach (var item in _itemList)
-        {
-            yield return item;
-        }
-    }
+    IEnumerator<PollReplyItem> IEnumerable<PollReplyItem>.GetEnumerator() => _itemList.GetEnumerator();
 
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        foreach (var item in _itemList)
-        {
-            yield return item;
-        }
-    }
+    IEnumerator IEnumerable.GetEnumerator() => _itemList.GetEnumerator();
 
     #endregion
 }

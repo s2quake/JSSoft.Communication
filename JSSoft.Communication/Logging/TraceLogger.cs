@@ -20,37 +20,37 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using JSSoft.Library.ObjectModel;
-using JSSoft.Library.Threading;
 using System;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Diagnostics;
 
-namespace JSSoft.Communication;
+namespace JSSoft.Communication.Logging;
 
-public interface IServiceContext : IServiceProvider
+public class TraceLogger : ILogger
 {
-    Task<Guid> OpenAsync(CancellationToken cancellationToken);
+    public void Debug(object message)
+    {
+        Trace.WriteLine(message);
+    }
 
-    Task CloseAsync(Guid token, int closeCode, CancellationToken cancellationToken);
+    public void Info(object message)
+    {
+        Trace.TraceInformation($"{message}");
+    }
 
-    Task AbortAsync();
+    public void Error(object message)
+    {
+        Trace.TraceError($"{message}");
+    }
 
-    IContainer<IServiceHost> ServiceHosts { get; }
+    public void Warn(object message)
+    {
+        Trace.TraceWarning($"{message}");
+    }
 
-    string Host { get; set; }
+    public void Fatal(object message)
+    {
+        Trace.TraceError($"{message}");
+    }
 
-    int Port { get; set; }
-
-    Dispatcher Dispatcher { get; }
-
-    ServiceState ServiceState { get; }
-
-    event EventHandler Opened;
-
-    event EventHandler<CloseEventArgs> Closed;
-
-    event EventHandler? Faulted;
-
-    event EventHandler? Aborted;
+    public static readonly TraceLogger Default = new();
 }

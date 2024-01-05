@@ -24,7 +24,7 @@ using System;
 
 namespace JSSoft.Communication;
 
-public class CloseEventArgs : EventArgs
+public sealed class CloseEventArgs : EventArgs
 {
     public CloseEventArgs(int closeCode)
     {

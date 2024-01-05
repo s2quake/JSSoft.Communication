@@ -21,15 +21,16 @@
 // SOFTWARE.
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JSSoft.Communication;
 
-public interface IAdaptorHost
+public interface IAdaptorHost : IAsyncDisposable
 {
-    Task OpenAsync(string host, int port);
+    Task OpenAsync(string host, int port, CancellationToken cancellationToken);
 
-    Task CloseAsync(int closeCode);
+    Task CloseAsync(int closeCode, CancellationToken cancellationToken);
 
     void Invoke(InstanceBase instance, string name, Type[] types, object?[] args);
 

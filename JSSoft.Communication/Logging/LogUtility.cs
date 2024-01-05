@@ -26,7 +26,7 @@ namespace JSSoft.Communication.Logging;
 
 public static class LogUtility
 {
-    private static ILogger logger = EmptyLogger.Default;
+    private static ILogger logger = TraceLogger.Default;
     private static LogLevel logLevel = LogLevel.Fatal;
 
     public static ILogger Logger

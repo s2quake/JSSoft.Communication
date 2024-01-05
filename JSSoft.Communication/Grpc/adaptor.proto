@@ -45,7 +45,7 @@ message InvokeRequest {
     string token = 1;
     string serviceName = 2;
     string name = 3;
-    repeated string datas = 4;
+    repeated string data = 4;
 }
 
 message InvokeReply {
@@ -60,7 +60,7 @@ message PollRequest {
 message PollReplyItem {
     string serviceName = 2;
     string name = 3;
-    repeated string datas = 4;
+    repeated string data = 4;
 }
 
 message PollReply {

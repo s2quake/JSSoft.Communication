@@ -22,17 +22,15 @@
 
 using Grpc.Core;
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using System.Timers;
-using Timer = System.Timers.Timer;
 
 namespace JSSoft.Communication.Grpc;
 
 class AdaptorClientImpl : Adaptor.AdaptorClient, IPeer
 {
-    private static readonly TimeSpan timeout = new(0, 0, 15);
+    private static readonly TimeSpan Timeout = new(0, 0, 15);
     private Timer? _timer;
 
     public AdaptorClientImpl(Channel channel, Guid id, IServiceHost[] serviceHosts)
@@ -42,7 +40,7 @@ class AdaptorClientImpl : Adaptor.AdaptorClient, IPeer
         ServiceHosts = serviceHosts;
     }
 
-    public async Task OpenAsync()
+    public async Task OpenAsync(CancellationToken cancellationToken)
     {
         var request = await Task.Run(() =>
         {
@@ -50,34 +48,25 @@ class AdaptorClientImpl : Adaptor.AdaptorClient, IPeer
             var req = new OpenRequest() { Time = DateTime.UtcNow.Ticks };
             req.ServiceNames.AddRange(serviceNames);
             return req;
-        });
-        var reply = await base.OpenAsync(request);
-        await Task.Run(() =>
-        {
-            Token = Guid.Parse(reply.Token);
-            _timer = new Timer(timeout.TotalMilliseconds);
-            _timer.Elapsed += Timer_Elapsed;
-            _timer.Start();
-        });
+        }, cancellationToken);
+        var reply = await base.OpenAsync(request, cancellationToken: cancellationToken);
+        Token = Guid.Parse(reply.Token);
+        _timer = new Timer(Timer_TimerCallback, null, TimeSpan.Zero, Timeout);
     }
 
-    public async Task CloseAsync()
+    public async Task CloseAsync(CancellationToken cancellationToken)
     {
-        await Task.Run(() =>
-        {
-            _timer?.Dispose();
-            _timer = null;
-        });
-        await base.CloseAsync(new CloseRequest() { Token = Token.ToString() });
+        if (_timer != null)
+            await _timer.DisposeAsync();
+        _timer = null;
+        await base.CloseAsync(new CloseRequest() { Token = Token.ToString() }, cancellationToken: cancellationToken);
     }
 
     public async Task AbortAsync()
     {
-        await Task.Run(() =>
-        {
-            _timer?.Dispose();
-            _timer = null;
-        });
+        if (_timer != null)
+            await _timer.DisposeAsync();
+        _timer = null;
     }
 
     public Guid ID { get; }
@@ -86,22 +75,18 @@ class AdaptorClientImpl : Adaptor.AdaptorClient, IPeer
 
     public IServiceHost[] ServiceHosts { get; }
 
-    private void Timer_Elapsed(object? sender, ElapsedEventArgs e)
+    private async void Timer_TimerCallback(object? state)
     {
         var request = new PingRequest()
         {
             Token = Token.ToString()
         };
-        Task.Run(async () =>
+        try
         {
-            try
-            {
-                await PingAsync(request);
-            }
-            catch
-            {
-
-            }
-        });
+            await PingAsync(request);
+        }
+        catch
+        {
+        }
     }
 }

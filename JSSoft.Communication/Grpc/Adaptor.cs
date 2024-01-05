@@ -57,10 +57,10 @@ namespace JSSoft.Communication.Grpc {
             new pbr::GeneratedClrTypeInfo(typeof(global::JSSoft.Communication.Grpc.CloseReply), global::JSSoft.Communication.Grpc.CloseReply.Parser, new[]{ "Time" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::JSSoft.Communication.Grpc.PingRequest), global::JSSoft.Communication.Grpc.PingRequest.Parser, new[]{ "Token", "Time" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::JSSoft.Communication.Grpc.PingReply), global::JSSoft.Communication.Grpc.PingReply.Parser, new[]{ "Time", "Token" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::JSSoft.Communication.Grpc.InvokeRequest), global::JSSoft.Communication.Grpc.InvokeRequest.Parser, new[]{ "Token", "ServiceName", "Name", "Datas" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::JSSoft.Communication.Grpc.InvokeRequest), global::JSSoft.Communication.Grpc.InvokeRequest.Parser, new[]{ "Token", "ServiceName", "Name", "Data" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::JSSoft.Communication.Grpc.InvokeReply), global::JSSoft.Communication.Grpc.InvokeReply.Parser, new[]{ "ID", "Data" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::JSSoft.Communication.Grpc.PollRequest), global::JSSoft.Communication.Grpc.PollRequest.Parser, new[]{ "Token" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::JSSoft.Communication.Grpc.PollReplyItem), global::JSSoft.Communication.Grpc.PollReplyItem.Parser, new[]{ "ServiceName", "Name", "Datas" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::JSSoft.Communication.Grpc.PollReplyItem), global::JSSoft.Communication.Grpc.PollReplyItem.Parser, new[]{ "ServiceName", "Name", "Data" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::JSSoft.Communication.Grpc.PollReply), global::JSSoft.Communication.Grpc.PollReply.Parser, new[]{ "Code", "Items" }, null, null, null, null)
           }));
     }
@@ -946,7 +946,7 @@ namespace JSSoft.Communication.Grpc {
       token_ = other.token_;
       serviceName_ = other.serviceName_;
       name_ = other.name_;
-      datas_ = other.datas_.Clone();
+      data_ = other.data_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -988,14 +988,14 @@ namespace JSSoft.Communication.Grpc {
       }
     }
 
-    /// <summary>Field number for the "datas" field.</summary>
-    public const int DatasFieldNumber = 4;
-    private static readonly pb::FieldCodec<string> _repeated_datas_codec
+    /// <summary>Field number for the "data" field.</summary>
+    public const int DataFieldNumber = 4;
+    private static readonly pb::FieldCodec<string> _repeated_data_codec
         = pb::FieldCodec.ForString(34);
-    private readonly pbc::RepeatedField<string> datas_ = new pbc::RepeatedField<string>();
+    private readonly pbc::RepeatedField<string> data_ = new pbc::RepeatedField<string>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public pbc::RepeatedField<string> Datas {
-      get { return datas_; }
+    public pbc::RepeatedField<string> Data {
+      get { return data_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1014,7 +1014,7 @@ namespace JSSoft.Communication.Grpc {
       if (Token != other.Token) return false;
       if (ServiceName != other.ServiceName) return false;
       if (Name != other.Name) return false;
-      if(!datas_.Equals(other.datas_)) return false;
+      if(!data_.Equals(other.data_)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -1024,7 +1024,7 @@ namespace JSSoft.Communication.Grpc {
       if (Token.Length != 0) hash ^= Token.GetHashCode();
       if (ServiceName.Length != 0) hash ^= ServiceName.GetHashCode();
       if (Name.Length != 0) hash ^= Name.GetHashCode();
-      hash ^= datas_.GetHashCode();
+      hash ^= data_.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -1050,7 +1050,7 @@ namespace JSSoft.Communication.Grpc {
         output.WriteRawTag(26);
         output.WriteString(Name);
       }
-      datas_.WriteTo(output, _repeated_datas_codec);
+      data_.WriteTo(output, _repeated_data_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -1068,7 +1068,7 @@ namespace JSSoft.Communication.Grpc {
       if (Name.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Name);
       }
-      size += datas_.CalculateSize(_repeated_datas_codec);
+      size += data_.CalculateSize(_repeated_data_codec);
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -1089,7 +1089,7 @@ namespace JSSoft.Communication.Grpc {
       if (other.Name.Length != 0) {
         Name = other.Name;
       }
-      datas_.Add(other.datas_);
+      data_.Add(other.data_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -1114,7 +1114,7 @@ namespace JSSoft.Communication.Grpc {
             break;
           }
           case 34: {
-            datas_.AddEntriesFrom(input, _repeated_datas_codec);
+            data_.AddEntriesFrom(input, _repeated_data_codec);
             break;
           }
         }
@@ -1436,7 +1436,7 @@ namespace JSSoft.Communication.Grpc {
     public PollReplyItem(PollReplyItem other) : this() {
       serviceName_ = other.serviceName_;
       name_ = other.name_;
-      datas_ = other.datas_.Clone();
+      data_ = other.data_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -1467,14 +1467,14 @@ namespace JSSoft.Communication.Grpc {
       }
     }
 
-    /// <summary>Field number for the "datas" field.</summary>
-    public const int DatasFieldNumber = 4;
-    private static readonly pb::FieldCodec<string> _repeated_datas_codec
+    /// <summary>Field number for the "data" field.</summary>
+    public const int DataFieldNumber = 4;
+    private static readonly pb::FieldCodec<string> _repeated_data_codec
         = pb::FieldCodec.ForString(34);
-    private readonly pbc::RepeatedField<string> datas_ = new pbc::RepeatedField<string>();
+    private readonly pbc::RepeatedField<string> data_ = new pbc::RepeatedField<string>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public pbc::RepeatedField<string> Datas {
-      get { return datas_; }
+    public pbc::RepeatedField<string> Data {
+      get { return data_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1492,7 +1492,7 @@ namespace JSSoft.Communication.Grpc {
       }
       if (ServiceName != other.ServiceName) return false;
       if (Name != other.Name) return false;
-      if(!datas_.Equals(other.datas_)) return false;
+      if(!data_.Equals(other.data_)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -1501,7 +1501,7 @@ namespace JSSoft.Communication.Grpc {
       int hash = 1;
       if (ServiceName.Length != 0) hash ^= ServiceName.GetHashCode();
       if (Name.Length != 0) hash ^= Name.GetHashCode();
-      hash ^= datas_.GetHashCode();
+      hash ^= data_.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -1523,7 +1523,7 @@ namespace JSSoft.Communication.Grpc {
         output.WriteRawTag(26);
         output.WriteString(Name);
       }
-      datas_.WriteTo(output, _repeated_datas_codec);
+      data_.WriteTo(output, _repeated_data_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -1538,7 +1538,7 @@ namespace JSSoft.Communication.Grpc {
       if (Name.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Name);
       }
-      size += datas_.CalculateSize(_repeated_datas_codec);
+      size += data_.CalculateSize(_repeated_data_codec);
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -1556,7 +1556,7 @@ namespace JSSoft.Communication.Grpc {
       if (other.Name.Length != 0) {
         Name = other.Name;
       }
-      datas_.Add(other.datas_);
+      data_.Add(other.data_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -1577,7 +1577,7 @@ namespace JSSoft.Communication.Grpc {
             break;
           }
           case 34: {
-            datas_.AddEntriesFrom(input, _repeated_datas_codec);
+            data_.AddEntriesFrom(input, _repeated_data_codec);
             break;
           }
         }

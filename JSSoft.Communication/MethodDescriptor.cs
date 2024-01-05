@@ -104,7 +104,7 @@ public sealed class MethodDescriptor
         {
             await task;
             var taskType = task.GetType();
-            if (taskType.GetGenericArguments().Any() == true)
+            if (taskType.GetGenericArguments().Length > 0)
             {
                 var propertyInfo = taskType.GetProperty(nameof(Task<object>.Result));
                 value = propertyInfo!.GetValue(task);

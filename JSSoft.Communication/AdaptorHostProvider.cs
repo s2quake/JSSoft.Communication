@@ -30,9 +30,9 @@ sealed class AdaptorHostProvider : IAdaptorHostProvider
 
     public IAdaptorHost Create(IServiceContext serviceContext, IInstanceContext instanceContext, ServiceToken token)
     {
-        // Environment.SetEnvironmentVariable("GRPC_VERBOSITY", "DEBUG");
-        // Environment.SetEnvironmentVariable("GRPC_TRACE", "all");
-        // global::Grpc.Core.GrpcEnvironment.SetLogger(new global::Grpc.Core.Logging.ConsoleLogger());
+        Environment.SetEnvironmentVariable("GRPC_VERBOSITY", "DEBUG");
+        Environment.SetEnvironmentVariable("GRPC_TRACE", "all");
+        global::Grpc.Core.GrpcEnvironment.SetLogger(new global::Grpc.Core.Logging.ConsoleLogger());
 
         if (serviceContext is ServerContextBase serverContextBase)
             return new Grpc.AdaptorServerHost(serverContextBase, instanceContext);

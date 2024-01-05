@@ -20,34 +20,29 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using JSSoft.Library.ObjectModel;
-using JSSoft.Library.Threading;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JSSoft.Communication;
 
 public interface IServiceHost
 {
-    Task OpenAsync(ServiceToken token);
-
-    Task CloseAsync(ServiceToken token);
-
-    IContainer<MethodDescriptor> MethodDescriptors { get; }
-
-    object CreateInstance(IPeer peer, object obj);
-
-    void DestroyInstance(IPeer peer, object obj);
-
     Type ServiceType { get; }
 
     Type CallbackType { get; }
 
     string Name { get; }
 
-    Dispatcher Dispatcher { get; }
+    ServiceState ServiceState {get;}
 
-    event EventHandler? Opened;
+    Task OpenAsync(ServiceToken serviceToken, CancellationToken cancellationToken);
+    
+    Task CloseAsync(ServiceToken serviceToken, CancellationToken cancellationToken);
 
-    event EventHandler? Closed;
+    Task AbortAsync(ServiceToken serviceToken);
+
+    object CreateInstance(ServiceToken serviceToken, IPeer peer, object obj);
+
+    void DestroyInstance(ServiceToken serviceToken, IPeer peer, object obj);
 }
